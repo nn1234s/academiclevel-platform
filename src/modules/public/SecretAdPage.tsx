@@ -96,13 +96,18 @@ const REVIEWS_POOL: ReviewItem[] = [
 ];
 
 const LIVE_ENROLLMENTS = [
-  'Yogeshwar KumarSingh from Bihar has enrolled',
-  'Prabir Sen from Kolkata has enrolled',
-  'Preetish Mohanty from Bhubaneswar has enrolled',
-  'Shaymin Roy from Bangalore has enrolled',
-  'Aarav Deshmukh from Pune has enrolled',
-  'Ananya Sharma from Jaipur has enrolled',
-  'Rohan Agrawal from Mumbai has enrolled'
+  'One kid enrolled from Bihar',
+  'One kid enrolled from Maharashtra',
+  'One kid enrolled from Odisha',
+  'One kid enrolled from Karnataka',
+  'One kid enrolled from West Bengal',
+  'One kid enrolled from Delhi NCR',
+  'One kid enrolled from Uttar Pradesh',
+  'One kid enrolled from Gujarat',
+  'One kid enrolled from Rajasthan',
+  'One kid enrolled from Tamil Nadu',
+  'One kid enrolled from Punjab',
+  'One kid enrolled from Telangana'
 ];
 
 export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered }) => {
