@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SuperAdminGuard } from '../core/auth/SuperAdminGuard';
 import { useAuth } from '../core/auth/AuthContext';
-import { SUPER_ADMIN_EMAIL } from '../core/storage/StorageRLSLayer';
+import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../core/storage/StorageRLSLayer';
 import {
   Users,
   CreditCard,
@@ -58,8 +58,17 @@ export const AdminVaultShell: React.FC<AdminVaultShellProps> = ({ onExitVault })
   const [activeTab, setActiveTab] = useState<AdminTab>('PAYMENTS');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navItems: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
-    { id: 'PAYMENTS', label: 'Payment Queue (UPI)', icon: <CreditCard className="w-4 h-4" /> },
+  const pendingCount = StorageRLSLayer.getAllSubscriptionsAdmin(SUPER_ADMIN_EMAIL).filter(
+    (s: any) => s.status === 'PENDING_VERIFICATION'
+  ).length;
+
+  const navItems: { id: AdminTab; label: string; icon: React.ReactNode; badge?: string }[] = [
+    {
+      id: 'PAYMENTS',
+      label: 'PAID PAYMENT people',
+      icon: <CreditCard className="w-4 h-4" />,
+      badge: pendingCount > 0 ? `${pendingCount} NEW` : undefined
+    },
     { id: 'STUDENTS', label: 'Kid Control & Finder', icon: <Users className="w-4 h-4" /> },
     { id: 'ENTITLEMENTS', label: 'Entitlement & Trials', icon: <Zap className="w-4 h-4" /> },
     { id: 'GIFTS', label: 'Gift & Amazon GC Dispatch', icon: <Truck className="w-4 h-4" /> },
@@ -146,8 +155,15 @@ export const AdminVaultShell: React.FC<AdminVaultShellProps> = ({ onExitVault })
                   }`}
                 >
                   {item.icon}
-                  <span className="flex-1 text-left">{item.label}</span>
-                  {activeTab === item.id && <ChevronRight className="w-3.5 h-3.5" />}
+                  <span className="flex-1 text-left flex items-center justify-between">
+                    <span>{item.label}</span>
+                    {item.badge && (
+                      <span className="ml-1.5 px-2 py-0.5 rounded-full text-[9px] font-mono font-black bg-amber-400 text-slate-950 shadow-sm animate-pulse">
+                        {item.badge}
+                      </span>
+                    )}
+                  </span>
+                  {activeTab === item.id && <ChevronRight className="w-3.5 h-3.5 ml-1" />}
                 </button>
               ))}
             </div>

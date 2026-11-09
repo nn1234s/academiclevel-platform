@@ -9,6 +9,7 @@ import { AuthModal } from './modules/shared/AuthModal';
 // Public Pages
 import { LandingPage } from './modules/public/LandingPage';
 import { AdsLandingPage } from './modules/public/AdsLandingPage';
+import { SecretAdPage } from './modules/public/SecretAdPage';
 import { PublicCourses } from './modules/public/PublicCourses';
 import { PricingPage } from './modules/public/PricingPage';
 import { AboutPage } from './modules/public/AboutPage';
@@ -71,6 +72,7 @@ export const App: React.FC = () => {
       const path = window.location.pathname;
       if (path === '/adminservice' || path === '/ops-vault-al99') return 'ADMIN_VAULT';
       if (path === '/ads' || path === '/ads/') return 'ADS_FUNNEL';
+      if (path === '/advert1' || path === '/advert1/') return 'ADVERT1_FUNNEL';
     }
     return 'HOME';
   });
@@ -108,6 +110,8 @@ export const App: React.FC = () => {
         setCurrentRoute('ADMIN_VAULT');
       } else if (path === '/ads' || path === '/ads/') {
         setCurrentRoute('ADS_FUNNEL');
+      } else if (path === '/advert1' || path === '/advert1/') {
+        setCurrentRoute('ADVERT1_FUNNEL');
       } else {
         if (!isAuthenticated) {
           setCurrentRoute('HOME');
@@ -127,8 +131,10 @@ export const App: React.FC = () => {
       window.history.pushState({}, '', '/adminservice');
     } else if (route === 'ADS_FUNNEL') {
       window.history.pushState({}, '', '/ads');
+    } else if (route === 'ADVERT1_FUNNEL') {
+      window.history.pushState({}, '', '/advert1');
     } else {
-      if (window.location.pathname === '/adminservice' || window.location.pathname === '/ops-vault-al99' || window.location.pathname === '/ads') {
+      if (window.location.pathname === '/adminservice' || window.location.pathname === '/ops-vault-al99' || window.location.pathname === '/ads' || window.location.pathname === '/advert1') {
         window.history.pushState({}, '', '/');
       }
     }
@@ -159,6 +165,17 @@ export const App: React.FC = () => {
   if (currentRoute === 'ADS_FUNNEL') {
     return (
       <AdsLandingPage
+        onSuccessRegistered={() => {
+          navigateTo('DASHBOARD');
+        }}
+      />
+    );
+  }
+
+  // Secret Oda Class style Ad Landing Page (/advert1)
+  if (currentRoute === 'ADVERT1_FUNNEL') {
+    return (
+      <SecretAdPage
         onSuccessRegistered={() => {
           navigateTo('DASHBOARD');
         }}
