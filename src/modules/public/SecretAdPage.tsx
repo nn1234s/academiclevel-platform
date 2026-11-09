@@ -14,7 +14,6 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
-  RefreshCw,
   Zap,
   Phone,
   User,
@@ -135,11 +134,6 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
     return () => clearInterval(timer);
   }, []);
 
-  // Shuffle / generate randomized reviews featuring Prabir, Preetish, Shaymin
-  const handleShuffleReviews = () => {
-    const shuffled = [...REVIEWS_POOL].sort(() => 0.5 - Math.random());
-    setReviewsList(shuffled.slice(0, 3));
-  };
 
   const handleEnrollSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -248,10 +242,11 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
                 </div>
               </div>
 
-              {/* Bottom White Arch: 10,000,000+ PARENTS' CHOICE */}
+              {/* Bottom White Arch: 4.8 Positive Review */}
               <div className="mt-5 -mb-6 mx-auto w-fit">
-                <div className="bg-white text-[#f95a00] font-black text-xs px-6 py-1.5 rounded-full shadow-md border border-orange-100 tracking-wider">
-                  10,000,000+ PARENTS&apos; CHOICE
+                <div className="bg-white text-[#f95a00] font-black text-xs px-5 py-1.5 rounded-full shadow-md border border-orange-100 tracking-wider flex items-center gap-1.5">
+                  <span className="text-amber-500 font-bold">★</span>
+                  <span>4.8 Positive Review</span>
                 </div>
               </div>
             </div>
@@ -259,22 +254,16 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
             {/* Highly Rated by Parents & Students Section */}
             <div className="p-4 sm:p-6 pt-8 space-y-4">
               {/* Golden Curved Header Banner */}
-              <div className="relative flex items-center justify-between bg-gradient-to-r from-[#fbb034] to-[#ffdd00] px-4 py-2 rounded-2xl shadow-sm text-slate-900">
+              <div className="flex items-center justify-between bg-gradient-to-r from-[#fbb034] to-[#ffdd00] px-4 py-2 rounded-2xl shadow-sm text-slate-900">
                 <div className="flex items-center space-x-2">
                   <Star className="w-4 h-4 fill-slate-900 text-slate-900" />
                   <span className="text-xs font-black tracking-wide">
                     Highly Rated by Parents & Students
                   </span>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleShuffleReviews}
-                  className="flex items-center gap-1 text-[10px] font-bold bg-white/80 hover:bg-white text-slate-800 px-2 py-0.5 rounded-lg shadow-sm transition-all"
-                  title="Generate new random reviews"
-                >
-                  <RefreshCw className="w-3 h-3" />
-                  <span>Randomize</span>
-                </button>
+                <span className="text-[10px] font-black bg-white/90 text-slate-900 px-2.5 py-0.5 rounded-full shadow-sm">
+                  4.8 ★ Positive Review
+                </span>
               </div>
 
               {/* Reviews List (Prabir, Preetish, Shaymin) */}
@@ -413,22 +402,22 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
             </div>
           </div>
 
-          {/* Extra Materials Book Stack Card */}
+          {/* 100% Digital Study Kit Card */}
           <div className="bg-gradient-to-r from-[#fff9f2] to-[#fff3e6] border border-orange-200 rounded-2xl p-3 flex items-center justify-between">
             <div>
               <span className="text-[9px] font-black uppercase tracking-wider text-white bg-[#f95a00] px-2 py-0.5 rounded">
-                MATHS & SCIENCE
+                100% DIGITAL ACCESS
               </span>
               <h4 className="text-xs font-extrabold text-slate-900 mt-1">
-                Extra Materials & Physical Workbooks
+                Digital Concept Workbooks & Formula Sheets
               </h4>
               <p className="text-[10px] text-slate-500 font-medium">
-                * Collect at your doorstep after enrolled
+                * Instant digital access unlocked right inside your student dashboard
               </p>
             </div>
             <div className="w-14 h-14 bg-white rounded-xl shadow-sm border border-orange-200 flex flex-col items-center justify-center text-[#f95a00] font-black text-[10px] p-1 text-center">
-              <span>📚</span>
-              <span>Workbooks</span>
+              <span>📱</span>
+              <span>Digital PDF</span>
             </div>
           </div>
 
@@ -467,17 +456,13 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
             </div>
           </div>
 
-          {/* Trust Banner: 10,000,000+ parents and students */}
-          <div className="text-center space-y-0.5 border-t border-slate-100 pt-2">
-            <p className="text-[11px] font-extrabold text-slate-700 flex items-center justify-center gap-1">
-              <span>🌾</span>
-              <span>Trusted by 10,000,000+ parents and students!</span>
-              <span>🌾</span>
+          {/* Trust Banner: 4.8 Positive Review */}
+          <div className="text-center space-y-1 border-t border-slate-100 pt-2.5">
+            <p className="text-xs font-black text-slate-800 flex items-center justify-center gap-1.5">
+              <span className="text-amber-500">★★★★★</span>
+              <span>4.8 Positive Review</span>
             </p>
             <p className="text-[10px] text-slate-500 font-extrabold tracking-widest uppercase">-- ACADEMIC LEVEL --</p>
-            <p className="text-[11px] text-[#f95a00] font-black animate-pulse">
-              Only Today: Be the 1922383th Student
-            </p>
           </div>
 
           {/* Sticky Bottom Checkout Bar (Total Fee: ₹49) */}
