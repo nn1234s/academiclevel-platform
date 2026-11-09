@@ -1,0 +1,847 @@
+import express from 'express';
+import cors from 'cors';
+import crypto from 'node:crypto';
+import { db, initDatabaseSchema } from './db.js';
+
+initDatabaseSchema();
+
+export const apiRouter = express.Router();
+
+apiRouter.use(cors());
+apiRouter.use(express.json());
+
+const SUPER_ADMIN_EMAIL = 'naitiknanda1235@gmail.com';
+
+// ==========================================
+// Health & Telemetry
+// ==========================================
+apiRouter.get('/health', (req, res) => {
+  const learnerCount = db.prepare('SELECT count(*) as count FROM learners').get().count;
+  const subCount = db.prepare('SELECT count(*) as count FROM subscriptions').get().count;
+  res.json({
+    status: 'online',
+    engine: 'AcademicLevel Enterprise SQLite (ACID WAL)',
+    timestampUtc: new Date().toISOString(),
+    metrics: { learners: learnerCount, subscriptions: subCount }
+  });
+});
+
+// ==========================================
+// Auth Routes
+// ==========================================
+apiRouter.post('/auth/register', (req, res) => {
+  try {
+    const { fullName, email, board, grade, parentName, parentPin, referredByCode } = req.body;
+    if (!fullName || !email || !board || !grade) {
+      return res.status(400).json({ success: false, error: 'Missing required registration fields.' });
+    }
+
+    const cleanEmail = String(email).trim().toLowerCase();
+    const existing = db.prepare('SELECT * FROM learners WHERE email = ?').get(cleanEmail);
+    if (existing) {
+      return res.status(400).json({ success: false, error: 'A student account with this email already exists.' });
+    }
+
+    let referredById = null;
+    if (referredByCode && String(referredByCode).trim()) {
+      const ref = db.prepare('SELECT id FROM learners WHERE referralCode = ?').get(String(referredByCode).trim().toUpperCase());
+      if (ref) referredById = ref.id;
+    }
+
+    const learnerId = 'lrn_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+    const referralCode = 'AL-' + String(fullName).substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'X') + Math.floor(1000 + Math.random() * 9000);
+    const now = new Date().toISOString();
+
+    db.prepare(`
+      INSERT INTO learners (
+        id, email, fullName, board, grade, parentName, parentPin,
+        role, isActive, quizzesCompletedCount, levelsCompletedCount,
+        classChangesUsedPremium, classChangesUsedPostExpiry, referralCode,
+        referredBy, referralQualified, currentStreakDays, longestStreakDays,
+        lastStudyDate, streakFreezesAvailable, coinBalance, createdAt, updatedAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      learnerId,
+      cleanEmail,
+      String(fullName).trim(),
+      board,
+      Number(grade),
+      parentName ? String(parentName).trim() : null,
+      parentPin ? String(parentPin).trim() : '1234',
+      'STUDENT',
+      1,
+      0,
+      0,
+      0,
+      0,
+      referralCode,
+      referredById,
+      0,
+      1,
+      1,
+      now.split('T')[0],
+      1,
+      10, // starter coins
+      now,
+      now
+    );
+
+    // Initial Ledger Entry
+    db.prepare(`
+      INSERT INTO coin_ledger (
+        entryId, learnerId, amount, transactionType, reasonCode,
+        balanceAfter, metadataJson, timestampUtc, signatureHash
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      'c_tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      learnerId,
+      10,
+      'CREDIT',
+      'WELCOME_BONUS',
+      10,
+      JSON.stringify({ note: 'Welcome starter coins' }),
+      now,
+      'SIG_' + crypto.randomBytes(6).toString('hex')
+    );
+
+    const token = 'tok_' + crypto.randomBytes(24).toString('hex');
+    db.prepare(`
+      INSERT INTO sessions (token, learnerId, email, role, createdAt, expiresAt)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(
+      token,
+      learnerId,
+      cleanEmail,
+      'STUDENT',
+      now,
+      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    );
+
+    const newLearner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    res.json({ success: true, learner: newLearner, token });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/auth/login', (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ success: false, error: 'Email is required.' });
+
+    const cleanEmail = String(email).trim().toLowerCase();
+    const learner = db.prepare('SELECT * FROM learners WHERE email = ?').get(cleanEmail);
+
+    if (!learner) {
+      return res.status(404).json({ success: false, error: 'No student account found with this email. Please register.' });
+    }
+
+    if (!learner.isActive) {
+      return res.status(403).json({ success: false, error: 'This account is currently suspended. Please contact support.' });
+    }
+
+    const token = 'tok_' + crypto.randomBytes(24).toString('hex');
+    db.prepare(`
+      INSERT INTO sessions (token, learnerId, email, role, createdAt, expiresAt)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(
+      token,
+      learner.id,
+      cleanEmail,
+      learner.role,
+      new Date().toISOString(),
+      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    );
+
+    res.json({ success: true, learner, token });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.get('/auth/me', (req, res) => {
+  try {
+    const learnerId = req.query.learnerId || req.headers['x-learner-id'];
+    const email = req.query.email || req.headers['x-learner-email'];
+
+    let learner = null;
+    if (learnerId) {
+      learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(String(learnerId));
+    } else if (email) {
+      learner = db.prepare('SELECT * FROM learners WHERE email = ?').get(String(email).trim().toLowerCase());
+    }
+
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+    res.json({ success: true, learner });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// Student Profiles & Actions
+// ==========================================
+apiRouter.get('/students/:id', (req, res) => {
+  try {
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    // Active subscription
+    const activeSub = db.prepare(`
+      SELECT * FROM subscriptions
+      WHERE learnerId = ? AND status = 'ACTIVE' AND (expiresAt IS NULL OR datetime(expiresAt) > datetime('now'))
+      ORDER BY createdAt DESC LIMIT 1
+    `).get(learner.id);
+
+    const pendingSub = db.prepare(`
+      SELECT * FROM subscriptions
+      WHERE learnerId = ? AND status = 'PENDING_VERIFICATION'
+      ORDER BY createdAt DESC LIMIT 1
+    `).get(learner.id);
+
+    res.json({ success: true, learner, activeSub: activeSub || null, pendingSub: pendingSub || null });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.patch('/students/:id', (req, res) => {
+  try {
+    const { phone, parentName, parentPin, avatarFrame } = req.body;
+    const updates = [];
+    const params = [];
+
+    if (phone !== undefined) { updates.push('phone = ?'); params.push(phone); }
+    if (parentName !== undefined) { updates.push('parentName = ?'); params.push(parentName); }
+    if (parentPin !== undefined) { updates.push('parentPin = ?'); params.push(parentPin); }
+    if (avatarFrame !== undefined) { updates.push('avatarFrame = ?'); params.push(avatarFrame); }
+
+    if (updates.length > 0) {
+      updates.push("updatedAt = datetime('now')");
+      params.push(req.params.id);
+      db.prepare(`UPDATE learners SET ${updates.join(', ')} WHERE id = ?`).run(...params);
+    }
+
+    const updated = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
+    res.json({ success: true, learner: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.patch('/students/:id/curriculum', (req, res) => {
+  try {
+    const { board, grade } = req.body;
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    // Check active subscription
+    const activeSub = db.prepare(`
+      SELECT * FROM subscriptions
+      WHERE learnerId = ? AND status = 'ACTIVE' AND (expiresAt IS NULL OR datetime(expiresAt) > datetime('now'))
+      LIMIT 1
+    `).get(learner.id);
+
+    if (activeSub) {
+      if (learner.classChangesUsedPremium >= 1) {
+        return res.status(403).json({ success: false, error: 'Class Change Policy: You have already used your 1 permitted class change for this active subscription cycle.' });
+      }
+      db.prepare(`
+        UPDATE learners
+        SET board = ?, grade = ?, classChangesUsedPremium = classChangesUsedPremium + 1, updatedAt = datetime('now')
+        WHERE id = ?
+      `).run(board, Number(grade), learner.id);
+    } else {
+      if (learner.classChangesUsedPostExpiry >= 1) {
+        return res.status(403).json({ success: false, error: 'Class Change Policy: Maximum 1 post-cycle class change permitted. Please upgrade or contact support.' });
+      }
+      db.prepare(`
+        UPDATE learners
+        SET board = ?, grade = ?, classChangesUsedPostExpiry = classChangesUsedPostExpiry + 1, updatedAt = datetime('now')
+        WHERE id = ?
+      `).run(board, Number(grade), learner.id);
+    }
+
+    const refreshed = db.prepare('SELECT * FROM learners WHERE id = ?').get(learner.id);
+    res.json({ success: true, learner: refreshed });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/students/:id/spin', (req, res) => {
+  try {
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    const now = Date.now();
+    if (learner.lastSpinTimestampUtc) {
+      const lastSpinTime = new Date(learner.lastSpinTimestampUtc).getTime();
+      const elapsedHours = (now - lastSpinTime) / (1000 * 60 * 60);
+      if (elapsedHours < 24) {
+        const remainingMinutes = Math.ceil((24 - elapsedHours) * 60);
+        return res.status(429).json({
+          success: false,
+          error: `Daily spin on cooldown. Please wait ${Math.floor(remainingMinutes / 60)}h ${remainingMinutes % 60}m.`
+        });
+      }
+    }
+
+    // Spin slices: 2, 3, 5 coins (or 40 if referral qualified)
+    let coinsWon = 2;
+    const roll = Math.random();
+    if (learner.referralQualified && roll > 0.90) {
+      coinsWon = 40; // Jackpot
+    } else if (roll > 0.60) {
+      coinsWon = 5;
+    } else if (roll > 0.30) {
+      coinsWon = 3;
+    }
+
+    const newBalance = learner.coinBalance + coinsWon;
+    const nowIso = new Date().toISOString();
+
+    db.prepare(`
+      UPDATE learners
+      SET coinBalance = ?, lastSpinTimestampUtc = ?, updatedAt = ?
+      WHERE id = ?
+    `).run(newBalance, nowIso, nowIso, learner.id);
+
+    db.prepare(`
+      INSERT INTO coin_ledger (
+        entryId, learnerId, amount, transactionType, reasonCode,
+        balanceAfter, metadataJson, timestampUtc, signatureHash
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      'c_tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      learner.id,
+      coinsWon,
+      'CREDIT',
+      'DAILY_SPIN_WHEEL',
+      newBalance,
+      JSON.stringify({ isJackpot: coinsWon === 40 }),
+      nowIso,
+      'SIG_' + crypto.randomBytes(6).toString('hex')
+    );
+
+    res.json({ success: true, coinsWon, newBalance, isJackpot: coinsWon === 40 });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// Payments & Subscriptions
+// ==========================================
+apiRouter.post('/payments/submit', (req, res) => {
+  try {
+    const { learnerId, tier, payerUpiId, utrReference } = req.body;
+    if (!learnerId || !tier || !payerUpiId) {
+      return res.status(400).json({ success: false, error: 'Learner ID, tier, and Payer UPI ID are required.' });
+    }
+
+    if (!String(payerUpiId).includes('@')) {
+      return res.status(400).json({ success: false, error: 'Please enter a valid Payer UPI ID (e.g. name@okhdfcbank).' });
+    }
+
+    const cleanUtr = utrReference ? String(utrReference).trim() : null;
+    let finalUtr = cleanUtr;
+
+    if (cleanUtr) {
+      if (!/^[0-9]{12}$/.test(cleanUtr)) {
+        return res.status(400).json({ success: false, error: 'UTR must be exactly 12 numeric digits.' });
+      }
+      const existingUtr = db.prepare('SELECT id FROM subscriptions WHERE utrReference = ?').get(cleanUtr);
+      if (existingUtr) {
+        return res.status(400).json({ success: false, error: 'Duplicate UTR Reference! This transaction reference has already been submitted.' });
+      }
+    } else {
+      finalUtr = `UPI-REF-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    }
+
+    const price = tier === 'PLUS' ? 129 : 49;
+    const durationDays = tier === 'PLUS' ? 180 : 60;
+    const subId = 'sub_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+    const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+    const now = new Date().toISOString();
+
+    db.prepare(`
+      INSERT INTO subscriptions (
+        id, learnerId, planTier, status, paymentMethod,
+        utrReference, payerUpiId, amountInr, durationDays,
+        invoiceNumber, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      subId,
+      learnerId,
+      tier,
+      'PENDING_VERIFICATION',
+      'UPI_QR',
+      finalUtr,
+      String(payerUpiId).trim(),
+      price,
+      durationDays,
+      invoiceNumber,
+      now
+    );
+
+    const subscription = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(subId);
+    res.json({
+      success: true,
+      message: 'Thank you for your purchase. Due to server side checks, we will grant after 1 day.',
+      subscription
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.get('/payments/my-subscriptions', (req, res) => {
+  try {
+    const learnerId = req.query.learnerId;
+    if (!learnerId) return res.status(400).json({ success: false, error: 'learnerId is required.' });
+
+    const subs = db.prepare('SELECT * FROM subscriptions WHERE learnerId = ? ORDER BY createdAt DESC').all(learnerId);
+    res.json({ success: true, subscriptions: subs });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// Coin Economy & Gift Card Arena
+// ==========================================
+apiRouter.get('/coins/:learnerId/ledger', (req, res) => {
+  try {
+    const entries = db.prepare('SELECT * FROM coin_ledger WHERE learnerId = ? ORDER BY timestampUtc DESC').all(req.params.learnerId);
+    res.json({ success: true, entries });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/coins/transact', (req, res) => {
+  try {
+    const { learnerId, amount, transactionType, reasonCode, metadata } = req.body;
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    const numAmount = Number(amount);
+    if (numAmount < 0 && learner.coinBalance < Math.abs(numAmount)) {
+      return res.status(400).json({ success: false, error: 'Insufficient coin balance.' });
+    }
+
+    const newBalance = Math.max(0, learner.coinBalance + numAmount);
+    const now = new Date().toISOString();
+
+    db.prepare('UPDATE learners SET coinBalance = ?, updatedAt = ? WHERE id = ?').run(newBalance, now, learnerId);
+
+    const entryId = 'c_tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+    db.prepare(`
+      INSERT INTO coin_ledger (
+        entryId, learnerId, amount, transactionType, reasonCode,
+        balanceAfter, metadataJson, timestampUtc, signatureHash
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      entryId,
+      learnerId,
+      numAmount,
+      transactionType || (numAmount >= 0 ? 'CREDIT' : 'DEBIT'),
+      reasonCode || 'USER_TRANSACTION',
+      newBalance,
+      metadata ? JSON.stringify(metadata) : null,
+      now,
+      'SIG_' + crypto.randomBytes(6).toString('hex')
+    );
+
+    res.json({ success: true, newBalance, entryId });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/gifts/redeem', (req, res) => {
+  try {
+    const { learnerId, level, brand, rsAmount, coinsCost, deliveryEmail, deliveryPhone, upiId } = req.body;
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    const cost = Number(coinsCost);
+    if (learner.coinBalance < cost) {
+      return res.status(400).json({ success: false, error: `Insufficient Study Coins. Required: ${cost.toLocaleString()}, Available: ${learner.coinBalance.toLocaleString()}` });
+    }
+
+    const newBalance = learner.coinBalance - cost;
+    const now = new Date().toISOString();
+    const reqId = 'gc_req_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+    const targetEmail = 'academiclevels@gmail.com';
+
+    db.prepare('UPDATE learners SET coinBalance = ?, updatedAt = ? WHERE id = ?').run(newBalance, now, learner.id);
+
+    db.prepare(`
+      INSERT INTO coin_ledger (
+        entryId, learnerId, amount, transactionType, reasonCode,
+        balanceAfter, metadataJson, timestampUtc, signatureHash
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      'c_tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      learner.id,
+      -cost,
+      'DEBIT',
+      'GIFT_STORE_REDEMPTION',
+      newBalance,
+      JSON.stringify({ level, rsAmount, brand, deliveryEmail, deliveryPhone, targetEmail }),
+      now,
+      'SIG_' + crypto.randomBytes(6).toString('hex')
+    );
+
+    const title = `Level ${level}: ₹${rsAmount} ${brand}`;
+    const shipping = `Email Request to ${targetEmail} | Delivery: ${deliveryEmail}${upiId ? ` | UPI: ${upiId}` : ''}`;
+
+    db.prepare(`
+      INSERT INTO gift_requests (
+        id, learnerId, learnerName, itemTitle, coinsCost,
+        shippingAddress, contactPhone, status, requestedAt, updatedAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      reqId,
+      learner.id,
+      learner.fullName,
+      title,
+      cost,
+      shipping,
+      String(deliveryPhone || ''),
+      'PENDING_APPROVAL',
+      now,
+      now
+    );
+
+    res.json({
+      success: true,
+      reqId,
+      newBalance,
+      targetEmail,
+      message: `Gift card request for ₹${rsAmount} ${brand} successfully queued and dispatched to ${targetEmail}!`
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.get('/gifts/my-requests', (req, res) => {
+  try {
+    const learnerId = req.query.learnerId;
+    if (!learnerId) return res.status(400).json({ success: false, error: 'learnerId is required' });
+    const requests = db.prepare('SELECT * FROM gift_requests WHERE learnerId = ? ORDER BY requestedAt DESC').all(learnerId);
+    res.json({ success: true, requests });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// Super-Admin Control Plane Routes
+// ==========================================
+const adminAuth = (req, res, next) => {
+  const adminEmail = req.headers['x-admin-email'] || req.query.adminEmail;
+  if (!adminEmail || String(adminEmail).toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    return res.status(403).json({ success: false, error: '403 Forbidden: Only Super-Admin may access this control plane.' });
+  }
+  next();
+};
+
+apiRouter.get('/admin/learners', adminAuth, (req, res) => {
+  try {
+    const learners = db.prepare('SELECT * FROM learners ORDER BY createdAt DESC').all();
+    const subs = db.prepare(`SELECT * FROM subscriptions WHERE status = 'ACTIVE' AND (expiresAt IS NULL OR datetime(expiresAt) > datetime('now'))`).all();
+    const pendingSubs = db.prepare(`SELECT * FROM subscriptions WHERE status = 'PENDING_VERIFICATION'`).all();
+
+    res.json({ success: true, learners, activeSubscriptions: subs, pendingSubscriptions: pendingSubs });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/learners/:id/grant-premium', adminAuth, (req, res) => {
+  try {
+    const { tier, durationDays, note } = req.body;
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    // Revoke any prior active/pending subscriptions
+    db.prepare(`UPDATE subscriptions SET status = 'REVOKED' WHERE learnerId = ? AND (status = 'ACTIVE' OR status = 'PENDING_VERIFICATION')`).run(learner.id);
+
+    const now = new Date();
+    const expiry = new Date(now.getTime() + Number(durationDays || 60) * 24 * 60 * 60 * 1000);
+    const subId = 'admin_grant_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+
+    db.prepare(`
+      INSERT INTO subscriptions (
+        id, learnerId, planTier, status, paymentMethod, amountInr,
+        durationDays, startsAt, expiresAt, verifiedByAdmin, verifiedAt,
+        invoiceNumber, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      subId,
+      learner.id,
+      tier || 'PLUS',
+      'ACTIVE',
+      'ADMIN_TRIAL',
+      0,
+      Number(durationDays || 60),
+      now.toISOString(),
+      expiry.toISOString(),
+      SUPER_ADMIN_EMAIL,
+      now.toISOString(),
+      `ADMIN-${Math.floor(100000 + Math.random() * 900000)}`,
+      now.toISOString()
+    );
+
+    // Audit log
+    db.prepare(`
+      INSERT INTO security_audit_logs (id, timestampUtc, actorEmail, actionType, targetId, severity, details)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      'admin_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      now.toISOString(),
+      SUPER_ADMIN_EMAIL,
+      'GRANT_PREMIUM_DIRECT',
+      learner.id,
+      'INFO',
+      `Super-Admin granted ${tier} (${durationDays} days) to learner ${learner.fullName}. Note: ${note || 'Admin grant'}`
+    );
+
+    res.json({ success: true, message: `Granted ${tier} (${durationDays} days) to ${learner.fullName}.` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/learners/:id/revoke-premium', adminAuth, (req, res) => {
+  try {
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    db.prepare(`UPDATE subscriptions SET status = 'REVOKED', verifiedByAdmin = ?, verifiedAt = datetime('now') WHERE learnerId = ? AND (status = 'ACTIVE' OR status = 'PENDING_VERIFICATION')`).run(SUPER_ADMIN_EMAIL, learner.id);
+
+    db.prepare(`
+      INSERT INTO security_audit_logs (id, timestampUtc, actorEmail, actionType, targetId, severity, details)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      'admin_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      new Date().toISOString(),
+      SUPER_ADMIN_EMAIL,
+      'REVOKE_PREMIUM_DIRECT',
+      learner.id,
+      'INFO',
+      `Super-Admin revoked premium for learner ${learner.fullName}.`
+    );
+
+    res.json({ success: true, message: `Revoked premium for ${learner.fullName}. Account returned to Free Tier.` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/learners/:id/adjust-coins', adminAuth, (req, res) => {
+  try {
+    const { amount, note } = req.body;
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    const delta = Number(amount);
+    const newBalance = Math.max(0, learner.coinBalance + delta);
+    const now = new Date().toISOString();
+
+    db.prepare('UPDATE learners SET coinBalance = ?, updatedAt = ? WHERE id = ?').run(newBalance, now, learner.id);
+
+    db.prepare(`
+      INSERT INTO coin_ledger (
+        entryId, learnerId, amount, transactionType, reasonCode,
+        balanceAfter, metadataJson, timestampUtc, signatureHash
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      'c_tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      learner.id,
+      delta,
+      delta >= 0 ? 'CREDIT' : 'DEBIT',
+      'ADMIN_ADJUSTMENT',
+      newBalance,
+      JSON.stringify({ admin: SUPER_ADMIN_EMAIL, note }),
+      now,
+      'SIG_' + crypto.randomBytes(6).toString('hex')
+    );
+
+    res.json({ success: true, newBalance, message: `Updated balance to ${newBalance.toLocaleString()} coins.` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/learners/:id/override-curriculum', adminAuth, (req, res) => {
+  try {
+    const { board, grade } = req.body;
+    db.prepare('UPDATE learners SET board = ?, grade = ?, updatedAt = datetime("now") WHERE id = ?').run(board, Number(grade), req.params.id);
+    res.json({ success: true, message: `Updated curriculum to ${board} Class ${grade}.` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/learners/:id/reset-locks', adminAuth, (req, res) => {
+  try {
+    db.prepare('UPDATE learners SET classChangesUsedPremium = 0, classChangesUsedPostExpiry = 0, updatedAt = datetime("now") WHERE id = ?').run(req.params.id);
+    res.json({ success: true, message: 'Class-change locks reset to 0.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/learners/:id/reset-quotas', adminAuth, (req, res) => {
+  try {
+    db.prepare('UPDATE learners SET quizzesCompletedCount = 0, levelsCompletedCount = 0, updatedAt = datetime("now") WHERE id = ?').run(req.params.id);
+    res.json({ success: true, message: 'Quiz & Level counters reset to 0.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/learners/:id/toggle-suspend', adminAuth, (req, res) => {
+  try {
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    const newActive = learner.isActive ? 0 : 1;
+    db.prepare('UPDATE learners SET isActive = ?, updatedAt = datetime("now") WHERE id = ?').run(newActive, learner.id);
+    res.json({ success: true, isActive: newActive === 1 });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Admin Payments
+apiRouter.get('/admin/payments/queue', adminAuth, (req, res) => {
+  try {
+    const subs = db.prepare('SELECT * FROM subscriptions ORDER BY createdAt DESC').all();
+    res.json({ success: true, subscriptions: subs });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/payments/:id/approve', adminAuth, (req, res) => {
+  try {
+    const sub = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(req.params.id);
+    if (!sub) return res.status(404).json({ success: false, error: 'Subscription not found' });
+
+    const now = new Date();
+    const expiry = new Date(now.getTime() + sub.durationDays * 24 * 60 * 60 * 1000);
+
+    db.prepare(`
+      UPDATE subscriptions
+      SET status = 'ACTIVE', startsAt = ?, expiresAt = ?, verifiedByAdmin = ?, verifiedAt = ?
+      WHERE id = ?
+    `).run(now.toISOString(), expiry.toISOString(), SUPER_ADMIN_EMAIL, now.toISOString(), sub.id);
+
+    db.prepare(`
+      INSERT INTO security_audit_logs (id, timestampUtc, actorEmail, actionType, targetId, severity, details)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      'admin_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      now.toISOString(),
+      SUPER_ADMIN_EMAIL,
+      'APPROVE_UPI_PAYMENT',
+      sub.id,
+      'INFO',
+      `Approved subscription ${sub.id} (${sub.planTier} ${sub.durationDays}d) for learner ${sub.learnerId}. UTR: ${sub.utrReference || 'None'}`
+    );
+
+    res.json({ success: true, message: `Subscription ${sub.id} activated.` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/payments/:id/reject', adminAuth, (req, res) => {
+  try {
+    const { reason } = req.body;
+    db.prepare(`UPDATE subscriptions SET status = 'REVOKED', verifiedByAdmin = ?, verifiedAt = datetime('now') WHERE id = ?`).run(SUPER_ADMIN_EMAIL, req.params.id);
+    res.json({ success: true, message: `Subscription ${req.params.id} rejected. Reason: ${reason || 'Admin rejection'}` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Admin Gifts
+apiRouter.get('/admin/gifts', adminAuth, (req, res) => {
+  try {
+    const gifts = db.prepare('SELECT * FROM gift_requests ORDER BY requestedAt DESC').all();
+    res.json({ success: true, gifts });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/gifts/:id/dispatch', adminAuth, (req, res) => {
+  try {
+    const { voucherCode } = req.body;
+    const reqItem = db.prepare('SELECT * FROM gift_requests WHERE id = ?').get(req.params.id);
+    if (!reqItem) return res.status(404).json({ success: false, error: 'Request not found' });
+
+    const code = voucherCode ? String(voucherCode).trim() : `GC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    const newAddress = `${reqItem.shippingAddress} | Voucher Code: ${code}`;
+
+    db.prepare(`
+      UPDATE gift_requests
+      SET status = 'APPROVED_DISPATCHED', voucherCode = ?, shippingAddress = ?, updatedAt = datetime('now')
+      WHERE id = ?
+    `).run(code, newAddress, reqItem.id);
+
+    res.json({ success: true, message: `Dispatched voucher code ${code}.` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/gifts/:id/reject', adminAuth, (req, res) => {
+  try {
+    db.prepare(`UPDATE gift_requests SET status = 'REJECTED', updatedAt = datetime('now') WHERE id = ?`).run(req.params.id);
+    res.json({ success: true, message: 'Gift request marked as rejected.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.get('/admin/audit-logs', adminAuth, (req, res) => {
+  try {
+    const logs = db.prepare('SELECT * FROM security_audit_logs ORDER BY timestampUtc DESC LIMIT 200').all();
+    res.json({ success: true, logs });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// Universal Storage Sync (Legacy Compatibility)
+// ==========================================
+apiRouter.get('/storage', (req, res) => {
+  try {
+    const learners = db.prepare('SELECT * FROM learners').all();
+    const subs = db.prepare('SELECT * FROM subscriptions').all();
+    const ledger = db.prepare('SELECT * FROM coin_ledger').all();
+    const gifts = db.prepare('SELECT * FROM gift_requests').all();
+    const acodes = db.prepare('SELECT * FROM acodes').all();
+    const logs = db.prepare('SELECT * FROM security_audit_logs').all();
+
+    res.json({
+      al_prod_learners_v1: learners,
+      al_prod_subscriptions_v1: subs,
+      al_prod_coin_ledger_v1: ledger,
+      al_prod_gift_requests_v1: gifts,
+      al_prod_acodes_v1: acodes,
+      al_prod_security_audit_logs_v1: logs
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});

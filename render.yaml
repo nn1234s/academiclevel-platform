@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: academiclevel-enterprise
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SUPER_ADMIN_EMAIL
+        value: naitiknanda1235@gmail.com
+      - key: DATA_DIR
+        value: /var/data
+    disk:
+      name: academiclevel-data
+      mountPath: /var/data
+      sizeGB: 1

@@ -1,0 +1,448 @@
+{
+  "al_prod_learners_v1": [
+    {
+      "id": "lrn_mw9asujp_rzun",
+      "email": "prabir2gmailc.@gmail.com",
+      "fullName": "Sigmqa Bro",
+      "board": "CBSE",
+      "grade": 1,
+      "parentName": "Naosa",
+      "parentPin": "1234",
+      "role": "STUDENT",
+      "isActive": true,
+      "createdAt": "2026-11-09T13:29:42.565Z",
+      "quizzesCompletedCount": 0,
+      "levelsCompletedCount": 0,
+      "classChangesUsedPremium": 0,
+      "classChangesUsedPostExpiry": 1,
+      "referralCode": "AL-SIG1016",
+      "referralQualified": false,
+      "currentStreakDays": 1,
+      "longestStreakDays": 1,
+      "lastStudyDate": "2026-11-09",
+      "streakFreezesAvailable": 1,
+      "coinBalance": 250010,
+      "lastSpinTimestampUtc": "2026-11-09T13:30:06.834Z"
+    },
+    {
+      "id": "usr_super_admin_001",
+      "email": "naitiknanda1235@gmail.com",
+      "fullName": "Naitik Nanda (Super-Admin)",
+      "board": "CBSE",
+      "grade": 12,
+      "role": "SUPER_ADMIN",
+      "isActive": true,
+      "createdAt": "2026-11-09T13:46:57.966Z",
+      "quizzesCompletedCount": 0,
+      "levelsCompletedCount": 0,
+      "classChangesUsedPremium": 0,
+      "classChangesUsedPostExpiry": 0,
+      "referralCode": "AL-ADMIN-VAULT",
+      "referralQualified": true,
+      "currentStreakDays": 99,
+      "longestStreakDays": 99,
+      "streakFreezesAvailable": 108,
+      "coinBalance": 9969,
+      "avatarFrame": "Emerald",
+      "lastSpinTimestampUtc": "2026-11-09T13:57:04.753Z"
+    },
+    {
+      "id": "lrn_mw9bph4q_xacr",
+      "email": "wewewe@gmail.com",
+      "fullName": "wewewe",
+      "board": "CBSE",
+      "grade": 10,
+      "parentName": "",
+      "parentPin": "1234",
+      "role": "STUDENT",
+      "isActive": true,
+      "createdAt": "2026-11-09T13:55:04.826Z",
+      "quizzesCompletedCount": 0,
+      "levelsCompletedCount": 0,
+      "classChangesUsedPremium": 0,
+      "classChangesUsedPostExpiry": 0,
+      "referralCode": "AL-WEW5123",
+      "referralQualified": false,
+      "currentStreakDays": 1,
+      "longestStreakDays": 1,
+      "lastStudyDate": "2026-11-09",
+      "streakFreezesAvailable": 1,
+      "coinBalance": 10
+    }
+  ],
+  "al_prod_subscriptions_v1": [
+    {
+      "id": "admin_grant_mw9bysnn_ibr6",
+      "learnerId": "lrn_mw9bph4q_xacr",
+      "planTier": "PLUS",
+      "status": "ACTIVE",
+      "paymentMethod": "ADMIN_TRIAL",
+      "amountInr": 0,
+      "durationDays": 365,
+      "startsAt": "2026-11-09T14:02:19.667Z",
+      "expiresAt": "2027-11-09T14:02:19.667Z",
+      "verifiedByAdmin": "naitiknanda1235@gmail.com",
+      "verifiedAt": "2026-11-09T14:02:19.667Z",
+      "createdAt": "2026-11-09T14:02:19.667Z",
+      "invoiceNumber": "ADMIN-333786"
+    }
+  ],
+  "al_prod_coin_ledger_v1": [
+    {
+      "entryId": "c_tx_1794231006834_2fza",
+      "learnerId": "lrn_mw9asujp_rzun",
+      "amount": 3,
+      "transactionType": "CREDIT",
+      "reasonCode": "DAILY_SPIN_WHEEL",
+      "balanceAfter": 13,
+      "metadata": {
+        "isJackpot": false,
+        "qualifiedReferralsCount": 0
+      },
+      "timestampUtc": "2026-11-09T13:30:06.834Z",
+      "signatureHash": "SIG_000015c31b45"
+    },
+    {
+      "entryId": "c_tx_1794232072902_79ap",
+      "learnerId": "usr_super_admin_001",
+      "amount": -20,
+      "transactionType": "DEBIT",
+      "reasonCode": "MALL_PURCHASE",
+      "balanceAfter": 9979,
+      "metadata": {
+        "item": "AVATAR_FRAME_EMERALD"
+      },
+      "timestampUtc": "2026-11-09T13:47:52.902Z",
+      "signatureHash": "SIG_00003eb789d5"
+    },
+    {
+      "entryId": "c_tx_1794232075309_8l48",
+      "learnerId": "usr_super_admin_001",
+      "amount": -15,
+      "transactionType": "DEBIT",
+      "reasonCode": "MALL_PURCHASE",
+      "balanceAfter": 9984,
+      "metadata": {
+        "item": "STREAK_FREEZE_1X"
+      },
+      "timestampUtc": "2026-11-09T13:47:55.309Z",
+      "signatureHash": "SIG_0000036822a4"
+    },
+    {
+      "entryId": "c_tx_1794232075877_pu5j",
+      "learnerId": "usr_super_admin_001",
+      "amount": -15,
+      "transactionType": "DEBIT",
+      "reasonCode": "MALL_PURCHASE",
+      "balanceAfter": 9984,
+      "metadata": {
+        "item": "STREAK_FREEZE_1X"
+      },
+      "timestampUtc": "2026-11-09T13:47:55.877Z",
+      "signatureHash": "SIG_00000878243a"
+    },
+    {
+      "entryId": "c_tx_1794232076061_5kj2",
+      "learnerId": "usr_super_admin_001",
+      "amount": -15,
+      "transactionType": "DEBIT",
+      "reasonCode": "MALL_PURCHASE",
+      "balanceAfter": 9984,
+      "metadata": {
+        "item": "STREAK_FREEZE_1X"
+      },
+      "timestampUtc": "2026-11-09T13:47:56.061Z",
+      "signatureHash": "SIG_00001f08bdfc"
+    },
+    {
+      "entryId": "c_tx_1794232076237_q5b6",
+      "learnerId": "usr_super_admin_001",
+      "amount": -15,
+      "transactionType": "DEBIT",
+      "reasonCode": "MALL_PURCHASE",
+      "balanceAfter": 9984,
+      "metadata": {
+        "item": "STREAK_FREEZE_1X"
+      },
+      "timestampUtc": "2026-11-09T13:47:56.237Z",
+      "signatureHash": "SIG_000014b10fc8"
+    },
+    {
+      "entryId": "c_tx_1794232076429_yctt",
+      "learnerId": "usr_super_admin_001",
+      "amount": -15,
+      "transactionType": "DEBIT",
+      "reasonCode": "MALL_PURCHASE",
+      "balanceAfter": 9984,
+      "metadata": {
+        "item": "STREAK_FREEZE_1X"
+      },
+      "timestampUtc": "2026-11-09T13:47:56.429Z",
+      "signatureHash": "SIG_000078c997f0"
+    },
+    {
+      "entryId": "c_tx_1794232076613_dsla",
+      "learnerId": "usr_super_admin_001",
+      "amount": -15,
+      "transactionType": "DEBIT",
+      "reasonCode": "MALL_PURCHASE",
+      "balanceAfter": 9984,
+      "metadata": {
+        "item": "STREAK_FREEZE_1X"
+      },
+      "timestampUtc": "2026-11-09T13:47:56.613Z",
+      "signatureHash": "SIG_000039206970"
+    },
+    {
+      "entryId": "c_tx_1794232076813_x67d",
+      "learnerId": "usr_super_admin_001",
+      "amount": -15,
+      "transactionType": "DEBIT",
+      "reasonCode": "MALL_PURCHASE",
+      "balanceAfter": 9984,
+      "metadata": {
+        "item": "STREAK_FREEZE_1X"
+      },
+      "timestampUtc": "2026-11-09T13:47:56.813Z",
+      "signatureHash": "SIG_00004b10becd"
+    },
+    {
+      "entryId": "c_tx_1794232077021_adys",
+      "learnerId": "usr_super_admin_001",
+      "amount": -15,
+      "transactionType": "DEBIT",
+      "reasonCode": "MALL_PURCHASE",
+      "balanceAfter": 9984,
+      "metadata": {
+        "item": "STREAK_FREEZE_1X"
+      },
+      "timestampUtc": "2026-11-09T13:47:57.021Z",
+      "signatureHash": "SIG_00006758c31b"
+    },
+    {
+      "entryId": "c_tx_1794232077221_hu8o",
+      "learnerId": "usr_super_admin_001",
+      "amount": -15,
+      "transactionType": "DEBIT",
+      "reasonCode": "MALL_PURCHASE",
+      "balanceAfter": 9984,
+      "metadata": {
+        "item": "STREAK_FREEZE_1X"
+      },
+      "timestampUtc": "2026-11-09T13:47:57.221Z",
+      "signatureHash": "SIG_000022bca7c2"
+    },
+    {
+      "entryId": "c_tx_1794232078749_85ey",
+      "learnerId": "usr_super_admin_001",
+      "amount": -30,
+      "transactionType": "DEBIT",
+      "reasonCode": "MALL_PURCHASE",
+      "balanceAfter": 9969,
+      "metadata": {
+        "item": "FORMULA_GUIDE"
+      },
+      "timestampUtc": "2026-11-09T13:47:58.749Z",
+      "signatureHash": "SIG_0000093f2099"
+    },
+    {
+      "entryId": "c_tx_1794232624752_m31g",
+      "learnerId": "usr_super_admin_001",
+      "amount": 5,
+      "transactionType": "CREDIT",
+      "reasonCode": "DAILY_SPIN_WHEEL",
+      "balanceAfter": 9974,
+      "metadata": {
+        "isJackpot": false,
+        "qualifiedReferralsCount": 0
+      },
+      "timestampUtc": "2026-11-09T13:57:04.752Z",
+      "signatureHash": "SIG_00004aeddf38"
+    },
+    {
+      "entryId": "c_tx_1794232917196_jxwm",
+      "learnerId": "lrn_mw9asujp_rzun",
+      "amount": 50000,
+      "transactionType": "CREDIT",
+      "reasonCode": "ADMIN_ADJUSTMENT",
+      "balanceAfter": 50010,
+      "metadata": {
+        "admin": "naitiknanda1235@gmail.com",
+        "note": "Admin bonus grant"
+      },
+      "timestampUtc": "2026-11-09T14:01:57.196Z",
+      "signatureHash": "SIG_00001e60e7c7"
+    },
+    {
+      "entryId": "c_tx_1794232920149_hryp",
+      "learnerId": "lrn_mw9asujp_rzun",
+      "amount": 200000,
+      "transactionType": "CREDIT",
+      "reasonCode": "ADMIN_ADJUSTMENT",
+      "balanceAfter": 250010,
+      "metadata": {
+        "admin": "naitiknanda1235@gmail.com",
+        "note": "Admin bonus grant"
+      },
+      "timestampUtc": "2026-11-09T14:02:00.149Z",
+      "signatureHash": "SIG_00002e56b95a"
+    },
+    {
+      "entryId": "c_tx_1794233006725_3hnu",
+      "learnerId": "lrn_mw9bph4q_xacr",
+      "amount": 200000,
+      "transactionType": "CREDIT",
+      "reasonCode": "ADMIN_ADJUSTMENT",
+      "balanceAfter": 200010,
+      "metadata": {
+        "admin": "naitiknanda1235@gmail.com",
+        "note": "Scolarship"
+      },
+      "timestampUtc": "2026-11-09T14:03:26.725Z",
+      "signatureHash": "SIG_0000198d0b86"
+    },
+    {
+      "entryId": "c_tx_1794233046004_yohj",
+      "learnerId": "lrn_mw9bph4q_xacr",
+      "amount": -200000,
+      "transactionType": "DEBIT",
+      "reasonCode": "GIFT_STORE_REDEMPTION",
+      "balanceAfter": 10,
+      "metadata": {
+        "level": 1,
+        "rsAmount": 20,
+        "brand": "AMAZON",
+        "email": "wewewe@gmail.com",
+        "phone": "9861439460",
+        "dispatchedTo": "academiclevels@gmail.com"
+      },
+      "timestampUtc": "2026-11-09T14:04:06.004Z",
+      "signatureHash": "SIG_00001cf1a8e6"
+    },
+    {
+      "entryId": "c_tx_1794233153051_4h81",
+      "learnerId": "lrn_mw9bph4q_xacr",
+      "amount": 1000000,
+      "transactionType": "CREDIT",
+      "reasonCode": "ADMIN_ADJUSTMENT",
+      "balanceAfter": 1000010,
+      "metadata": {
+        "admin": "naitiknanda1235@gmail.com",
+        "note": "Admin bonus grant"
+      },
+      "timestampUtc": "2026-11-09T14:05:53.051Z",
+      "signatureHash": "SIG_00007fb520ea"
+    },
+    {
+      "entryId": "c_tx_1794233176885_8whc",
+      "learnerId": "lrn_mw9bph4q_xacr",
+      "amount": -1000000,
+      "transactionType": "DEBIT",
+      "reasonCode": "GIFT_STORE_REDEMPTION",
+      "balanceAfter": 10,
+      "metadata": {
+        "level": 9,
+        "rsAmount": 100,
+        "brand": "AMAZON",
+        "email": "wewewe@gmail.com",
+        "phone": "99999999",
+        "dispatchedTo": "academiclevels@gmail.com"
+      },
+      "timestampUtc": "2026-11-09T14:06:16.885Z",
+      "signatureHash": "SIG_000022978f94"
+    }
+  ],
+  "al_prod_acodes_v1": [
+    {
+      "code": "AL-SCHOLAR-2026",
+      "planTier": "PLUS",
+      "durationDays": 180,
+      "isRedeemed": false,
+      "createdBy": "naitiknanda1235@gmail.com",
+      "expiresAt": "2027-12-31T23:59:59.000Z",
+      "createdAt": "2026-11-09T13:28:20.746Z"
+    },
+    {
+      "code": "AL-CBSE-TOPPER",
+      "planTier": "LITE",
+      "durationDays": 60,
+      "isRedeemed": false,
+      "createdBy": "naitiknanda1235@gmail.com",
+      "expiresAt": "2027-12-31T23:59:59.000Z",
+      "createdAt": "2026-11-09T13:28:20.746Z"
+    }
+  ],
+  "al_prod_security_audit_logs_v1": [
+    {
+      "id": "admin_1794233204880_ubcmw",
+      "timestampUtc": "2026-11-09T14:06:44.880Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "APPROVE_GIFT_DISPATCH",
+      "targetId": "gc_req_mw9c3vp5_oj9w",
+      "severity": "INFO",
+      "details": "Approved and dispatched voucher code ECGN-YCPH47-T4WE for Level 9: ₹100 Amazon Pay Gift Card to wewewe."
+    },
+    {
+      "id": "admin_1794233065571_q17il",
+      "timestampUtc": "2026-11-09T14:04:25.571Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "APPROVE_GIFT_DISPATCH",
+      "targetId": "gc_req_mw9c12pk_tljq",
+      "severity": "INFO",
+      "details": "Approved and dispatched voucher code GC-039XGV for Level 1: ₹20 Amazon Pay Gift Card to wewewe."
+    },
+    {
+      "id": "admin_1794232939667_p90x5",
+      "timestampUtc": "2026-11-09T14:02:19.668Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "GRANT_PREMIUM_DIRECT",
+      "targetId": "lrn_mw9bph4q_xacr",
+      "severity": "INFO",
+      "details": "Super-Admin granted PLUS (365 days) to learner lrn_mw9bph4q_xacr. Note: Quick grant: 365 days"
+    },
+    {
+      "id": "log_boot_1794230900747",
+      "timestampUtc": "2026-11-09T13:28:20.747Z",
+      "actorEmail": "SYSTEM",
+      "actionType": "SECURITY_BOOTSTRAP",
+      "targetId": "KERNEL",
+      "severity": "INFO",
+      "details": "AcademicLevel RLS Kernel initialized with tenant isolation and Super-Admin guard."
+    },
+    {
+      "id": "log_boot_1794230900735",
+      "timestampUtc": "2026-11-09T13:28:20.735Z",
+      "actorEmail": "SYSTEM",
+      "actionType": "SECURITY_BOOTSTRAP",
+      "targetId": "KERNEL",
+      "severity": "INFO",
+      "details": "AcademicLevel RLS Kernel initialized with tenant isolation and Super-Admin guard."
+    }
+  ],
+  "al_prod_gift_requests_v1": [
+    {
+      "id": "gc_req_mw9c12pk_tljq",
+      "learnerId": "lrn_mw9bph4q_xacr",
+      "learnerName": "wewewe",
+      "itemTitle": "Level 1: ₹20 Amazon Pay Gift Card",
+      "coinsCost": 200000,
+      "shippingAddress": "Email Request to academiclevels@gmail.com | Delivery: wewewe@gmail.com | Brand: Amazon Pay Gift Card | Voucher Code: GC-039XGV",
+      "contactPhone": "9861439460",
+      "status": "APPROVED_DISPATCHED",
+      "requestedAt": "2026-11-09T14:04:06.008Z",
+      "updatedAt": "2026-11-09T14:04:25.569Z"
+    },
+    {
+      "id": "gc_req_mw9c3vp5_oj9w",
+      "learnerId": "lrn_mw9bph4q_xacr",
+      "learnerName": "wewewe",
+      "itemTitle": "Level 9: ₹100 Amazon Pay Gift Card",
+      "coinsCost": 1000000,
+      "shippingAddress": "Email Request to academiclevels@gmail.com | Delivery: wewewe@gmail.com | Brand: Amazon Pay Gift Card | Voucher Code: ECGN-YCPH47-T4WE",
+      "contactPhone": "99999999",
+      "status": "APPROVED_DISPATCHED",
+      "requestedAt": "2026-11-09T14:06:16.889Z",
+      "updatedAt": "2026-11-09T14:06:44.879Z"
+    }
+  ]
+}
