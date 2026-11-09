@@ -47,7 +47,7 @@ const REVIEWS_POOL: ReviewItem[] = [
     date: '16 May 2026',
     stars: 5,
     avatarBg: 'bg-amber-600',
-    text: 'It is really good because you have the best teacher and they explain really nicely and energetic!!! Best Choice ever to join ACADEMIC LEVEL!! My son used to struggle with geometry and algebraic equations, but the 50+ solving skills and IIT mentor tricks made him score 98% in his term exams!'
+    text: 'It is really good because the adaptive AI quizzes explain every concept so nicely and energetic!!! Best Choice ever to join ACADEMIC LEVEL!! My son used to struggle with geometry and algebraic equations, but the 50+ solving skills and AI practice tests made him score 98% in his term exams!'
   },
   {
     id: 'preetish-1',
@@ -56,7 +56,7 @@ const REVIEWS_POOL: ReviewItem[] = [
     date: '11 May 2026',
     stars: 5,
     avatarBg: 'bg-emerald-600',
-    text: "It's very good learning app for children.. the teacher inspired our children and topics are also too good .... I think it is best learning app ❤️👏 The live doubt clearance and daily quizzes keep my daughter completely disciplined. Worth 10x more than ₹29!"
+    text: "It's very good learning app for children.. the AI quizzes keep my daughter completely disciplined. She can practice anytime 24/7 at her own pace and topics are also too good .... Worth 10x more than ₹49!"
   },
   {
     id: 'shaymin-1',
@@ -65,7 +65,7 @@ const REVIEWS_POOL: ReviewItem[] = [
     date: '05 May 2026',
     stars: 5,
     avatarBg: 'bg-indigo-600',
-    text: 'It is very interesting I am enjoying so much with lots of shortcut methods! Physics numericals and Chemistry balancing was my biggest fear, but ACADEMIC LEVEL IIT teachers broke down every single concept with animation. Best study booster ever!!'
+    text: 'It is very interesting I am enjoying so much with lots of shortcut methods! Physics numericals and Chemistry balancing was my biggest fear, but ACADEMIC LEVEL AI quizzes broke down every single concept with instant hints. Best study booster ever!!'
   },
   {
     id: 'prabir-2',
@@ -74,7 +74,7 @@ const REVIEWS_POOL: ReviewItem[] = [
     date: '02 May 2026',
     stars: 5,
     avatarBg: 'bg-amber-600',
-    text: 'Extraordinary teaching quality. The extra workbooks and chapter-wise quiz challenges helped my child top his school Olympiad rank. Hats off to the faculty!'
+    text: 'Extraordinary AI quiz quality. The instant step-by-step solutions and chapter-wise quiz challenges helped my child top his school Olympiad rank. Best self-paced platform!'
   },
   {
     id: 'preetish-2',
@@ -83,7 +83,7 @@ const REVIEWS_POOL: ReviewItem[] = [
     date: '27 Apr 2026',
     stars: 5,
     avatarBg: 'bg-emerald-600',
-    text: 'My son was addicted to mobile games. After joining the Thinking Power Camp, he eagerly waits for his 8:00 PM session and solves maths problems by himself without any scolding!'
+    text: 'My son was addicted to mobile games. After joining ACADEMIC LEVEL, he practices AI quizzes anytime he wants and solves maths problems by himself without any scolding!'
   },
   {
     id: 'shaymin-2',
@@ -92,7 +92,7 @@ const REVIEWS_POOL: ReviewItem[] = [
     date: '21 Apr 2026',
     stars: 5,
     avatarBg: 'bg-indigo-600',
-    text: 'The 50+ solving skills are pure magic! Things that took me 10 minutes to solve on paper can now be solved in 30 seconds using the IIT mentor shortcuts.'
+    text: 'The AI quiz solving skills are pure magic! Things that took me 10 minutes to solve on paper can now be solved in 30 seconds using the instant step-by-step AI guidance.'
   }
 ];
 
@@ -216,7 +216,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
                 <span className="truncate font-semibold">{LIVE_ENROLLMENTS[tickerIndex]}</span>
               </div>
 
-              {/* Middle Section: Bullets + Teachers Photo Representation */}
+              {/* Middle Section: Bullets + AI Engine Badge Representation */}
               <div className="mt-4 flex items-center justify-between gap-2">
                 {/* 4 Value Bullets */}
                 <div className="space-y-1.5 text-xs font-black">
@@ -234,17 +234,16 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
                   </div>
                   <div className="flex items-center space-x-1.5">
                     <span className="text-[#ffe066] text-sm leading-none">▶</span>
-                    <span>IIT/NIT Teachers</span>
+                    <span>Adaptive AI Quizzes 24/7</span>
                   </div>
                 </div>
 
-                {/* Teachers Portrait Representation */}
-                <div className="flex items-end justify-center -space-x-4 flex-shrink-0">
-                  <div className="w-14 h-14 rounded-full bg-slate-900 border-2 border-white shadow-md flex items-center justify-center text-white text-xs font-black text-center p-1 leading-tight">
-                    IIT<br />Delhi
-                  </div>
-                  <div className="w-16 h-16 rounded-full bg-slate-800 border-2 border-amber-300 shadow-xl flex items-center justify-center text-amber-300 text-xs font-black text-center p-1 leading-tight z-10">
-                    NIT<br />Topper
+                {/* AI Quiz Engine Badge */}
+                <div className="flex items-center justify-center flex-shrink-0">
+                  <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-md border-2 border-amber-300 shadow-xl flex flex-col items-center justify-center text-amber-200 font-black text-center p-1 leading-none">
+                    <Sparkles className="w-5 h-5 text-amber-300 mb-0.5 fill-amber-300" />
+                    <span className="text-[10px] text-white font-extrabold">AI QUIZ</span>
+                    <span className="text-[8px] text-amber-200 font-mono mt-0.5">24/7 ACCESS</span>
                   </div>
                 </div>
               </div>
@@ -361,7 +360,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
               </h2>
               <div className="flex items-center space-x-1.5 text-xs text-slate-500 mt-1 font-semibold">
                 <Clock className="w-3.5 h-3.5 text-[#f95a00]" />
-                <span>Course Schedule: 16 Nov – 21 Nov (Evening Sessions)</span>
+                <span>Practice Anytime 24/7 • Self-Paced AI Quizzes</span>
               </div>
             </div>
           </div>
@@ -457,7 +456,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
               <div className="bg-[#fffdf7] border border-dashed border-orange-300 rounded-xl p-2.5 flex flex-col justify-between">
                 <span className="font-black text-[#f95a00] text-sm">50+</span>
                 <span className="text-[10px] font-bold text-slate-800">Solving Skills</span>
-                <span className="text-[9px] text-slate-400 mt-0.5">Summarized by top IIT/NIT teachers</span>
+                <span className="text-[9px] text-slate-400 mt-0.5">Step-by-step AI guided solutions & shortcuts</span>
               </div>
 
               <div className="bg-[#fffdf7] border border-dashed border-amber-300 rounded-xl p-2.5 flex flex-col justify-between">
@@ -481,11 +480,11 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
             </p>
           </div>
 
-          {/* Sticky Bottom Checkout Bar (Total Fee: ₹29) */}
+          {/* Sticky Bottom Checkout Bar (Total Fee: ₹49) */}
           <div className="pt-2 border-t border-slate-200 flex items-center justify-between gap-4">
             <div>
               <div className="flex items-baseline space-x-1.5">
-                <span className="text-2xl font-black text-[#f95a00]">₹29</span>
+                <span className="text-2xl font-black text-[#f95a00]">₹49</span>
                 <span className="text-xs text-slate-400 line-through">₹499</span>
               </div>
               <span className="text-[10px] text-slate-400 block font-medium">
@@ -498,7 +497,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
               onClick={() => setIsModalOpen(true)}
               className="flex-1 max-w-[220px] py-3.5 px-6 rounded-2xl bg-gradient-to-r from-[#f95a00] to-[#ff7a00] hover:from-[#e04f00] hover:to-[#f95a00] text-white font-black text-sm shadow-xl shadow-orange-500/30 transition-all transform active:scale-95 flex items-center justify-center space-x-1.5"
             >
-              <span>Enroll Now</span>
+              <span>Enroll Now (₹49)</span>
               <ArrowRight className="w-4 h-4 stroke-[3]" />
             </button>
           </div>
@@ -508,7 +507,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
       </div>
 
       {/* ======================================================== */}
-      {/* QUICK ENROLLMENT MODAL (₹29)                             */}
+      {/* QUICK ENROLLMENT MODAL (₹49)                             */}
       {/* ======================================================== */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
@@ -528,7 +527,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
                 Thinking Power Camp • Class {selectedClass}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Special Offer: Unlock all 50+ concepts for ₹29 (normally ₹499)
+                Special Offer: Unlock all 50+ concepts & unlimited AI quizzes for ₹49 (normally ₹499)
               </p>
             </div>
 
@@ -618,11 +617,11 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
               <div className="p-3 bg-orange-50 border border-orange-200 rounded-xl text-[11px] text-orange-950 space-y-1">
                 <div className="flex justify-between font-bold">
                   <span>Camp Fee:</span>
-                  <span className="text-[#f95a00] font-black">₹29.00</span>
+                  <span className="text-[#f95a00] font-black">₹49.00</span>
                 </div>
                 <div className="flex justify-between text-[10px] text-slate-500">
                   <span>Included:</span>
-                  <span>50+ Concepts + Digital Kit + Certificates</span>
+                  <span>50+ Concepts + Unlimited AI Quizzes + Digital Kit</span>
                 </div>
               </div>
 
@@ -636,7 +635,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
                 ) : (
                   <>
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Proceed to Pay ₹29 & Unlock Camp</span>
+                    <span>Proceed to Pay ₹49 & Unlock Camp</span>
                   </>
                 )}
               </button>
