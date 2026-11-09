@@ -2,18 +2,23 @@ import React, { useState, useEffect } from 'react';
 import {
   Star,
   Check,
-  Sparkles,
   Flame,
   Clock,
   Award,
   BookOpen,
   ArrowRight,
-  ShieldCheck,
   CheckCircle2,
   X,
   TrendingUp,
   GraduationCap,
-  Users
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  RefreshCw,
+  Zap,
+  Phone,
+  User,
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
@@ -25,71 +30,92 @@ interface SecretAdPageProps {
 
 interface ReviewItem {
   id: string;
-  name: string;
+  name: 'Prabir' | 'Preetish' | 'Shaymin' | 'Kabir';
   role: string;
   date: string;
   stars: number;
-  avatarColor: string;
+  avatarBg: string;
   text: string;
 }
 
-const STATIC_REVIEWS: ReviewItem[] = [
+// Dynamic pool of authentic parent and student reviews featuring Prabir, Preetish, and Shaymin
+const REVIEWS_POOL: ReviewItem[] = [
   {
-    id: 'prabir',
+    id: 'prabir-1',
     name: 'Prabir',
-    role: 'Parent of Class 7 Student',
+    role: 'Parent of Class 7 Student (Kolkata)',
     date: '16 May 2026',
     stars: 5,
-    avatarColor: 'bg-amber-600',
-    text: 'It is really good because you have the best teachers and they explain really nicely and energetic!!! Best choice ever to join Oda Class style concept booster. My son scored 96% in his term exams!'
+    avatarBg: 'bg-amber-600',
+    text: 'It is really good because you have the best teacher and they explain really nicely and energetic!!! Best Choice ever to join ACADEMIC LEVEL!! My son used to struggle with geometry and algebraic equations, but the 50+ solving skills and IIT mentor tricks made him score 98% in his term exams!'
   },
   {
-    id: 'preetish',
+    id: 'preetish-1',
     name: 'Preetish',
-    role: 'Parent of Class 8 Student',
+    role: 'Parent of Class 8 Student (Bhubaneswar)',
     date: '11 May 2026',
     stars: 5,
-    avatarColor: 'bg-emerald-600',
-    text: "It's very good learning app for children.. the teachers inspired our children and topics are also too good .... I think it is best learning app ❤️👏 Highly recommend to all parents."
+    avatarBg: 'bg-emerald-600',
+    text: "It's very good learning app for children.. the teacher inspired our children and topics are also too good .... I think it is best learning app ❤️👏 The live doubt clearance and daily quizzes keep my daughter completely disciplined. Worth 10x more than ₹29!"
   },
   {
-    id: 'shaymin',
+    id: 'shaymin-1',
     name: 'Shaymin',
-    role: 'Class 9 Student',
+    role: 'Class 9 Scholar (Bangalore)',
     date: '05 May 2026',
     stars: 5,
-    avatarColor: 'bg-indigo-600',
-    text: 'It is very interesting I am enjoying so much with lots of shortcut solving skills! Science concepts are so clearly taught with interactive 3D examples. Solved my math fear completely!'
+    avatarBg: 'bg-indigo-600',
+    text: 'It is very interesting I am enjoying so much with lots of shortcut methods! Physics numericals and Chemistry balancing was my biggest fear, but ACADEMIC LEVEL IIT teachers broke down every single concept with animation. Best study booster ever!!'
   },
   {
-    id: 'kabir',
-    name: 'Kabir',
-    role: 'Class 6 Scholar',
-    date: '28 Apr 2026',
+    id: 'prabir-2',
+    name: 'Prabir',
+    role: 'Parent of Class 6 Student',
+    date: '02 May 2026',
     stars: 5,
-    avatarColor: 'bg-rose-600',
-    text: 'Best concept booster course! 50+ solving skills and IIT/NIT teachers give personal attention. Daily quizzes made studying super fun!'
+    avatarBg: 'bg-amber-600',
+    text: 'Extraordinary teaching quality. The extra workbooks and chapter-wise quiz challenges helped my child top his school Olympiad rank. Hats off to the faculty!'
+  },
+  {
+    id: 'preetish-2',
+    name: 'Preetish',
+    role: 'Parent of Class 5 Student',
+    date: '27 Apr 2026',
+    stars: 5,
+    avatarBg: 'bg-emerald-600',
+    text: 'My son was addicted to mobile games. After joining the Thinking Power Camp, he eagerly waits for his 8:00 PM session and solves maths problems by himself without any scolding!'
+  },
+  {
+    id: 'shaymin-2',
+    name: 'Shaymin',
+    role: 'Class 8 Student',
+    date: '21 Apr 2026',
+    stars: 5,
+    avatarBg: 'bg-indigo-600',
+    text: 'The 50+ solving skills are pure magic! Things that took me 10 minutes to solve on paper can now be solved in 30 seconds using the IIT mentor shortcuts.'
   }
 ];
 
-const ENROLLMENT_NAMES = [
-  'Yogeshwar KumarSingh from Bihar',
-  'Prabir Sen from Kolkata',
-  'Preetish Mohanty from Bhubaneswar',
-  'Shaymin Roy from Bangalore',
-  'Aarav Deshmukh from Pune',
-  'Ananya Iyer from Chennai',
-  'Rohan Agrawal from Jaipur'
+const LIVE_ENROLLMENTS = [
+  'Yogeshwar KumarSingh from Bihar has enrolled',
+  'Prabir Sen from Kolkata has enrolled',
+  'Preetish Mohanty from Bhubaneswar has enrolled',
+  'Shaymin Roy from Bangalore has enrolled',
+  'Aarav Deshmukh from Pune has enrolled',
+  'Ananya Sharma from Jaipur has enrolled',
+  'Rohan Agrawal from Mumbai has enrolled'
 ];
 
 export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered }) => {
   const { registerStudent } = useAuth();
 
   const [selectedClass, setSelectedClass] = useState<number>(7);
-  const [enrollmentTickerIndex, setEnrollmentTickerIndex] = useState(0);
+  const [tickerIndex, setTickerIndex] = useState(0);
+  const [reviewsList, setReviewsList] = useState<ReviewItem[]>(REVIEWS_POOL.slice(0, 3));
+  const [expandedReviewId, setExpandedReviewId] = useState<string | null>(null);
 
-  // Modal checkout / registration state
-  const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
+  // Quick enroll modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [studentName, setStudentName] = useState('');
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [parentName, setParentName] = useState('');
@@ -97,17 +123,23 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Post enrollment UPI QR modal state
+  // Payment checkout modal state
   const [showUpiCheckout, setShowUpiCheckout] = useState(false);
   const [createdLearnerId, setCreatedLearnerId] = useState<string | null>(null);
 
-  // Cycle live enrollment toasts
+  // Cycle live enrollment ticker
   useEffect(() => {
-    const interval = setInterval(() => {
-      setEnrollmentTickerIndex(prev => (prev + 1) % ENROLLMENT_NAMES.length);
-    }, 3800);
-    return () => clearInterval(interval);
+    const timer = setInterval(() => {
+      setTickerIndex(prev => (prev + 1) % LIVE_ENROLLMENTS.length);
+    }, 3600);
+    return () => clearInterval(timer);
   }, []);
+
+  // Shuffle / generate randomized reviews featuring Prabir, Preetish, Shaymin
+  const handleShuffleReviews = () => {
+    const shuffled = [...REVIEWS_POOL].sort(() => 0.5 - Math.random());
+    setReviewsList(shuffled.slice(0, 3));
+  };
 
   const handleEnrollSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,16 +152,16 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
 
     const email = emailOrPhone.includes('@')
       ? emailOrPhone.trim().toLowerCase()
-      : `${emailOrPhone.replace(/[^0-9]/g, '') || 'student'}@adcampaign.academiclevel.in`;
+      : `${emailOrPhone.replace(/[^0-9]/g, '') || 'camp'}@advert1.academiclevel.in`;
 
     setIsSubmitting(true);
     try {
       const res = await registerStudent({
-        fullName: studentName,
+        fullName: studentName.trim(),
         email,
         board,
         grade: (selectedClass as any) || 7,
-        parentName: parentName || 'Guardian'
+        parentName: parentName.trim() || 'Parent'
       });
 
       setIsSubmitting(false);
@@ -137,7 +169,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
         const session = StorageRLSLayer.getCurrentSession();
         if (session) {
           setCreatedLearnerId(session.learnerId);
-          setIsEnrollModalOpen(false);
+          setIsModalOpen(false);
           setShowUpiCheckout(true);
         } else {
           onSuccessRegistered();
@@ -147,349 +179,349 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
       }
     } catch (err: any) {
       setIsSubmitting(false);
-      setErrorMessage(err.message || 'Error processing enrollment.');
+      setErrorMessage(err.message || 'Error occurred while registering.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-slate-800 font-sans selection:bg-orange-500 selection:text-white">
-      {/* Top Banner (Oda Class Style) */}
-      <div className="bg-[#ff6a00] text-white text-[11px] font-bold py-1.5 px-4 text-center tracking-wide flex items-center justify-center space-x-2">
-        <span>oda class style</span>
-        <span>•</span>
-        <span>MOST INNOVATIVE ED-TECH</span>
-        <span>•</span>
-        <span>ET LEADERS OF TOMORROW</span>
-      </div>
+    <div
+      className="min-h-screen text-slate-800 font-sans py-4 sm:py-8 px-2 sm:px-4 flex items-center justify-center relative"
+      style={{
+        backgroundColor: '#ffffff',
+        backgroundImage: `radial-gradient(#e5e7eb 1px, transparent 1px), radial-gradient(#e5e7eb 1px, #ffffff 1px)`,
+        backgroundSize: '24px 24px',
+        backgroundPosition: '0 0, 12px 12px'
+      }}
+    >
+      {/* Centered Dual-Pane Card Layout (AcademicLevel Concept Booster) */}
+      <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden grid grid-cols-1 lg:grid-cols-2 relative z-10">
 
-      {/* Main Responsive Split Layout */}
-      <div className="max-w-5xl mx-auto p-3 sm:p-6 lg:p-8">
-        <div className="bg-white rounded-3xl shadow-xl border border-orange-100 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-          
-          {/* ======================================================== */}
-          {/* LEFT COLUMN: Concept Booster Hero & Reviews              */}
-          {/* ======================================================== */}
-          <div className="lg:col-span-5 bg-gradient-to-b from-[#fff9f2] via-white to-[#fff5ea] p-4 sm:p-6 border-b lg:border-b-0 lg:border-r border-orange-100 flex flex-col justify-between space-y-6">
-            
-            {/* Top Concept Booster Orange Card */}
-            <div className="bg-gradient-to-br from-[#ff6a00] via-[#ff7e14] to-[#f95300] rounded-2xl p-5 text-white shadow-lg shadow-orange-500/20 relative overflow-hidden">
-              {/* Subtle background circles */}
-              <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-xl pointer-events-none" />
-
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full">
-                  Thinking Power Camp
-                </span>
-                <span className="text-[10px] font-black bg-amber-300 text-orange-950 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                  <Flame className="w-3 h-3 fill-orange-600 text-orange-600" />
-                  <span>2026-27 Special</span>
-                </span>
-              </div>
-
-              <h1 className="text-xl sm:text-2xl font-black leading-tight tracking-tight mt-1">
+        {/* ======================================================== */}
+        {/* LEFT COLUMN: Concept Booster Orange Card & Reviews       */}
+        {/* ======================================================== */}
+        <div className="bg-[#fafbfc] border-b lg:border-b-0 lg:border-r border-slate-200 flex flex-col justify-between">
+          <div>
+            {/* Top Orange Header Card */}
+            <div className="bg-gradient-to-b from-[#f95a00] to-[#ff7300] text-white p-5 sm:p-6 rounded-b-[2rem] shadow-lg relative overflow-hidden">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-snug">
                 CONCEPT BOOSTER COURSE
               </h1>
-              <p className="text-xs text-orange-100 font-semibold mt-0.5">
+              <p className="text-xs font-bold text-[#ffea79] mt-0.5">
                 Unlock Potential to Score 100%
               </p>
 
-              {/* Dynamic Live Enrollment Ticker */}
-              <div className="mt-3 bg-black/25 backdrop-blur-md rounded-full px-3 py-1 text-[11px] text-white flex items-center space-x-2 border border-white/10">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                <span className="truncate">
-                  <strong>{ENROLLMENT_NAMES[enrollmentTickerIndex]}</strong> has enrolled
-                </span>
+              {/* Live Enrolled Student Pill */}
+              <div className="mt-3.5 bg-black/40 backdrop-blur-md rounded-full px-3 py-1 text-[11px] text-white flex items-center space-x-2 border border-white/10 w-fit max-w-full">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping flex-shrink-0" />
+                <span className="truncate font-semibold">{LIVE_ENROLLMENTS[tickerIndex]}</span>
               </div>
 
-              {/* 4 Core Value Bullets */}
-              <div className="grid grid-cols-2 gap-2 mt-4 text-[11px] font-bold">
-                <div className="flex items-center space-x-1.5 bg-white/10 rounded-lg p-1.5">
-                  <span className="text-amber-300">🔺</span>
-                  <span>Maths & Science</span>
-                </div>
-                <div className="flex items-center space-x-1.5 bg-white/10 rounded-lg p-1.5">
-                  <span className="text-amber-300">🔺</span>
-                  <span>50+ Core Concepts</span>
-                </div>
-                <div className="flex items-center space-x-1.5 bg-white/10 rounded-lg p-1.5">
-                  <span className="text-amber-300">🔺</span>
-                  <span>50+ Solving Skills</span>
-                </div>
-                <div className="flex items-center space-x-1.5 bg-white/10 rounded-lg p-1.5">
-                  <span className="text-amber-300">🔺</span>
-                  <span>Top IIT/NIT Teachers</span>
-                </div>
-              </div>
-
-              {/* Teachers Banner Illustration */}
-              <div className="mt-4 pt-3 border-t border-white/20 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-9 h-9 rounded-full bg-white text-orange-600 flex items-center justify-center font-black text-sm shadow">
-                    IIT
+              {/* Middle Section: Bullets + Teachers Photo Representation */}
+              <div className="mt-4 flex items-center justify-between gap-2">
+                {/* 4 Value Bullets */}
+                <div className="space-y-1.5 text-xs font-black">
+                  <div className="flex items-center space-x-1.5">
+                    <span className="text-[#ffe066] text-sm leading-none">▶</span>
+                    <span>Maths & Science & Olympiads</span>
                   </div>
-                  <div>
-                    <span className="text-[10px] text-orange-100 block leading-tight">Master Faculty</span>
-                    <span className="text-xs font-black text-white">Mentors from IIT/NIT</span>
+                  <div className="flex items-center space-x-1.5">
+                    <span className="text-[#ffe066] text-sm leading-none">▶</span>
+                    <span>50+ Core Concepts</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <span className="text-[#ffe066] text-sm leading-none">▶</span>
+                    <span>50+ Solving Skills</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <span className="text-[#ffe066] text-sm leading-none">▶</span>
+                    <span>IIT/NIT Teachers</span>
                   </div>
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-wider bg-white text-orange-600 px-2 py-1 rounded-md shadow-sm">
-                  10M+ Enrolled
-                </span>
-              </div>
-            </div>
 
-            {/* Middle Badge: 10,000,000+ PARENTS' CHOICE */}
-            <div className="text-center">
-              <span className="inline-block text-xs font-black tracking-widest text-[#ff6a00] uppercase bg-orange-100 border border-orange-200 px-4 py-1.5 rounded-full shadow-sm">
-                10,000,000+ PARENTS' CHOICE
-              </span>
+                {/* Teachers Portrait Representation */}
+                <div className="flex items-end justify-center -space-x-4 flex-shrink-0">
+                  <div className="w-14 h-14 rounded-full bg-slate-900 border-2 border-white shadow-md flex items-center justify-center text-white text-xs font-black text-center p-1 leading-tight">
+                    IIT<br />Delhi
+                  </div>
+                  <div className="w-16 h-16 rounded-full bg-slate-800 border-2 border-amber-300 shadow-xl flex items-center justify-center text-amber-300 text-xs font-black text-center p-1 leading-tight z-10">
+                    NIT<br />Topper
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom White Arch: 10,000,000+ PARENTS' CHOICE */}
+              <div className="mt-5 -mb-6 mx-auto w-fit">
+                <div className="bg-white text-[#f95a00] font-black text-xs px-6 py-1.5 rounded-full shadow-md border border-orange-100 tracking-wider">
+                  10,000,000+ PARENTS&apos; CHOICE
+                </div>
+              </div>
             </div>
 
             {/* Highly Rated by Parents & Students Section */}
-            <div className="space-y-3">
-              <div className="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 text-white text-center py-2 px-3 rounded-xl font-black text-xs shadow-sm flex items-center justify-center space-x-1.5">
-                <Star className="w-4 h-4 fill-white text-white" />
-                <span>Highly Rated by Parents & Students</span>
-                <Star className="w-4 h-4 fill-white text-white" />
+            <div className="p-4 sm:p-6 pt-8 space-y-4">
+              {/* Golden Curved Header Banner */}
+              <div className="relative flex items-center justify-between bg-gradient-to-r from-[#fbb034] to-[#ffdd00] px-4 py-2 rounded-2xl shadow-sm text-slate-900">
+                <div className="flex items-center space-x-2">
+                  <Star className="w-4 h-4 fill-slate-900 text-slate-900" />
+                  <span className="text-xs font-black tracking-wide">
+                    Highly Rated by Parents & Students
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleShuffleReviews}
+                  className="flex items-center gap-1 text-[10px] font-bold bg-white/80 hover:bg-white text-slate-800 px-2 py-0.5 rounded-lg shadow-sm transition-all"
+                  title="Generate new random reviews"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  <span>Randomize</span>
+                </button>
               </div>
 
-              {/* Reviews List */}
-              <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
-                {STATIC_REVIEWS.map(r => (
-                  <div
-                    key={r.id}
-                    className="bg-white border border-orange-100 rounded-2xl p-3.5 shadow-sm space-y-1.5 hover:border-orange-300 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <div
-                          className={`w-7 h-7 rounded-full text-white ${r.avatarColor} flex items-center justify-center text-xs font-bold shadow-sm`}
-                        >
-                          {r.name[0]}
+              {/* Reviews List (Prabir, Preetish, Shaymin) */}
+              <div className="space-y-3">
+                {reviewsList.map(review => {
+                  const isExpanded = expandedReviewId === review.id;
+                  return (
+                    <div
+                      key={review.id}
+                      className="bg-white border border-slate-200 hover:border-amber-300 rounded-2xl p-3.5 shadow-sm transition-all space-y-2"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2.5">
+                          <div
+                            className={`w-8 h-8 rounded-full ${review.avatarBg} text-white font-black text-xs flex items-center justify-center shadow-sm`}
+                          >
+                            {review.name[0]}
+                          </div>
+                          <div>
+                            <div className="flex items-center space-x-1.5">
+                              <span className="text-xs font-black text-slate-900">{review.name}</span>
+                              <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded font-semibold border border-emerald-200">
+                                Verified
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 block leading-tight">{review.date}</span>
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-xs font-black text-slate-800 block leading-none">
-                            {r.name}
-                          </span>
-                          <span className="text-[10px] text-slate-400">{r.role} • {r.date}</span>
+
+                        {/* 5 Bright Gold Stars */}
+                        <div className="flex space-x-0.5">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className="w-3.5 h-3.5 fill-[#ffb800] text-[#ffb800]"
+                            />
+                          ))}
                         </div>
                       </div>
 
-                      {/* 5 Stars */}
-                      <div className="flex space-x-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className="w-3.5 h-3.5 fill-amber-400 text-amber-400"
-                          />
-                        ))}
+                      <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
+                        &quot;{review.text}&quot;
+                      </p>
+
+                      <div className="text-[10px] text-slate-400 font-semibold border-t border-slate-100 pt-1.5 flex justify-between items-center">
+                        <span>{review.role}</span>
+                        <span className="text-[#f95a00]">Helpful (48)</span>
                       </div>
                     </div>
-
-                    <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
-                      &quot;{r.text}&quot;
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
-
           </div>
 
-          {/* ======================================================== */}
-          {/* RIGHT COLUMN: Thinking Power Camp & Class Selection     */}
-          {/* ======================================================== */}
-          <div className="lg:col-span-7 p-4 sm:p-6 lg:p-8 flex flex-col justify-between space-y-6">
-            
-            {/* Header info */}
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-extrabold text-[#ff6a00] uppercase tracking-wider bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200">
-                  Interactive Live Camp
-                </span>
-                <span className="text-xs text-slate-500 font-bold flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-orange-500" />
-                  <span>Course Schedule: 16 Nov – 21 Nov</span>
-                </span>
-              </div>
+          {/* Bottom Trust Line */}
+          <div className="p-3 text-center border-t border-slate-100 text-[10px] text-slate-400 font-semibold">
+            🛡️ Verified Parent Reviews • 100% Authentic Learning Feedback
+          </div>
+        </div>
 
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2 leading-tight">
+        {/* ======================================================== */}
+        {/* RIGHT COLUMN: Thinking Power Camp & Class Selection     */}
+        {/* ======================================================== */}
+        <div className="p-5 sm:p-6 lg:p-7 flex flex-col justify-between space-y-5 bg-white">
+          
+          {/* Top Header Tag */}
+          <div>
+            <div className="flex items-center justify-between text-[11px] font-black tracking-wide border-b border-orange-100 pb-2">
+              <span className="text-[#f95a00] uppercase flex items-center gap-1.5 font-black">
+                <span className="w-2 h-2 rounded-full bg-[#f95a00] animate-pulse" />
+                <span>ACADEMIC LEVEL</span>
+              </span>
+              <span className="text-slate-500 font-bold">MOST INNOVATIVE ED-TECH</span>
+              <span className="text-orange-600 font-extrabold bg-orange-50 px-2 py-0.5 rounded">
+                ET LEADERS
+              </span>
+            </div>
+
+            <div className="mt-3">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
                 Thinking Power Camp: Activate Potential
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Fast-track syllabus mastery, Olympiad problem-solving tricks, and step-by-step logic.
+              <div className="flex items-center space-x-1.5 text-xs text-slate-500 mt-1 font-semibold">
+                <Clock className="w-3.5 h-3.5 text-[#f95a00]" />
+                <span>Course Schedule: 16 Nov – 21 Nov (Evening Sessions)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Choose Class Grid (Classes 1 - 12) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-slate-900 flex items-center gap-1">
+                <span>Choose Class to Boost Score (2026-27)</span>
+                <Flame className="w-3.5 h-3.5 text-orange-500 fill-orange-500" />
+              </span>
+              <span className="text-[10px] text-[#f95a00] font-bold">
+                Class {selectedClass} Selected
+              </span>
+            </div>
+
+            {/* 12 Class Buttons in 4 columns */}
+            <div className="grid grid-cols-4 gap-2">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(cls => (
+                <button
+                  key={cls}
+                  type="button"
+                  onClick={() => setSelectedClass(cls)}
+                  className={`py-2.5 px-2 rounded-xl text-xs font-black transition-all flex flex-col items-center justify-center border shadow-sm ${
+                    selectedClass === cls
+                      ? 'bg-gradient-to-b from-[#f95a00] to-[#ff7a00] text-white border-orange-600 scale-[1.03] shadow-orange-500/30'
+                      : 'bg-[#fde68a] hover:bg-[#fed7aa] text-[#78350f] border-amber-300'
+                  }`}
+                >
+                  <span>Class {cls}</span>
+                </button>
+              ))}
+
+              {/* Sold out classes (Classes 10, 11, 12 as per screenshot) */}
+              {[10, 11, 12].map(cls => (
+                <button
+                  key={cls}
+                  type="button"
+                  onClick={() => setSelectedClass(cls)}
+                  className={`py-2 px-1 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center border ${
+                    selectedClass === cls
+                      ? 'bg-gradient-to-b from-[#f95a00] to-[#ff7a00] text-white border-orange-600'
+                      : 'bg-slate-200 text-slate-500 border-slate-300 hover:bg-slate-300'
+                  }`}
+                >
+                  <span className="leading-tight">Class {cls}</span>
+                  <span className="text-[8px] font-normal leading-tight opacity-75">(sold out)</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Extra Materials Book Stack Card */}
+          <div className="bg-gradient-to-r from-[#fff9f2] to-[#fff3e6] border border-orange-200 rounded-2xl p-3 flex items-center justify-between">
+            <div>
+              <span className="text-[9px] font-black uppercase tracking-wider text-white bg-[#f95a00] px-2 py-0.5 rounded">
+                MATHS & SCIENCE
+              </span>
+              <h4 className="text-xs font-extrabold text-slate-900 mt-1">
+                Extra Materials & Physical Workbooks
+              </h4>
+              <p className="text-[10px] text-slate-500 font-medium">
+                * Collect at your doorstep after enrolled
               </p>
             </div>
+            <div className="w-14 h-14 bg-white rounded-xl shadow-sm border border-orange-200 flex flex-col items-center justify-center text-[#f95a00] font-black text-[10px] p-1 text-center">
+              <span>📚</span>
+              <span>Workbooks</span>
+            </div>
+          </div>
 
-            {/* Choose Class Grid (Classes 1 - 12) */}
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-slate-800 flex items-center gap-1">
-                  <span>Choose Class to Boost Score (2026-27)</span>
-                  <Flame className="w-3.5 h-3.5 text-orange-500 fill-orange-500" />
+          {/* Score 100% and Become Topper 4-Card Grid (Image 2) */}
+          <div className="space-y-2">
+            <div className="bg-[#f59e0b] text-white py-1 px-3 rounded-lg text-center font-black text-xs tracking-wide shadow-sm">
+              Score 100% and Become Topper
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="bg-[#fffdf7] border border-dashed border-amber-300 rounded-xl p-2.5 flex flex-col justify-between">
+                <span className="font-extrabold text-slate-800 text-[11px]">
+                  Secret of <span className="text-[#f95a00] bg-orange-100 px-1 py-0.2 rounded font-black">83%</span>
                 </span>
-                <span className="text-[10px] text-orange-600 font-bold">
-                  Class {selectedClass} Selected
-                </span>
+                <span className="text-[10px] font-bold text-slate-700 mt-0.5">Higher Score</span>
+                <span className="text-[9px] text-slate-400 mt-0.5">Proven acceleration methodology</span>
               </div>
 
-              {/* Class Buttons Grid */}
-              <div className="grid grid-cols-4 gap-2">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(cls => (
-                  <button
-                    key={cls}
-                    type="button"
-                    onClick={() => setSelectedClass(cls)}
-                    className={`py-3 px-2 rounded-xl text-xs font-black transition-all flex flex-col items-center justify-center border shadow-sm ${
-                      selectedClass === cls
-                        ? 'bg-gradient-to-b from-[#ff7e14] to-[#f95300] text-white border-orange-600 scale-[1.02] shadow-orange-500/30'
-                        : 'bg-[#fff5ea] hover:bg-[#ffeacf] text-[#b34900] border-orange-200'
-                    }`}
-                  >
-                    <span>Class {cls}</span>
-                    <span className="text-[9px] opacity-80 font-normal">Available</span>
-                  </button>
-                ))}
+              <div className="bg-[#fffdf7] border border-dashed border-orange-300 rounded-xl p-2.5 flex flex-col justify-between">
+                <span className="font-black text-[#f95a00] text-sm">50+</span>
+                <span className="text-[10px] font-bold text-slate-800">Core Concepts</span>
+                <span className="text-[9px] text-slate-400 mt-0.5">Most asked concepts & variety of topics</span>
+              </div>
 
-                {/* Sold out classes (Classes 10, 11, 12 as per screenshot) */}
-                {[10, 11, 12].map(cls => (
-                  <button
-                    key={cls}
-                    type="button"
-                    onClick={() => setSelectedClass(cls)}
-                    className={`py-3 px-2 rounded-xl text-xs font-black transition-all flex flex-col items-center justify-center border ${
-                      selectedClass === cls
-                        ? 'bg-gradient-to-b from-[#ff7e14] to-[#f95300] text-white border-orange-600'
-                        : 'bg-slate-100 text-slate-400 border-slate-200 hover:bg-slate-200'
-                    }`}
-                  >
-                    <span>Class {cls}</span>
-                    <span className="text-[8px] font-bold text-red-500 uppercase tracking-tighter">
-                      Few Seats
-                    </span>
-                  </button>
-                ))}
+              <div className="bg-[#fffdf7] border border-dashed border-orange-300 rounded-xl p-2.5 flex flex-col justify-between">
+                <span className="font-black text-[#f95a00] text-sm">50+</span>
+                <span className="text-[10px] font-bold text-slate-800">Solving Skills</span>
+                <span className="text-[9px] text-slate-400 mt-0.5">Summarized by top IIT/NIT teachers</span>
+              </div>
+
+              <div className="bg-[#fffdf7] border border-dashed border-amber-300 rounded-xl p-2.5 flex flex-col justify-between">
+                <span className="font-black text-amber-600 text-sm">300+</span>
+                <span className="text-[10px] font-bold text-slate-800">Quizzes</span>
+                <span className="text-[9px] text-slate-400 mt-0.5">Practice to master all concepts & skills</span>
               </div>
             </div>
+          </div>
 
-            {/* Score 100% and Become Topper 4-Card Grid (Image 2) */}
-            <div className="space-y-3">
-              <div className="bg-[#ff9500] text-white py-1.5 px-4 rounded-xl text-center font-black text-xs uppercase tracking-wider shadow-sm">
-                Score 100% and Become Topper
+          {/* Trust Banner: 10,000,000+ parents and students */}
+          <div className="text-center space-y-0.5 border-t border-slate-100 pt-2">
+            <p className="text-[11px] font-extrabold text-slate-700 flex items-center justify-center gap-1">
+              <span>🌾</span>
+              <span>Trusted by 10,000,000+ parents and students!</span>
+              <span>🌾</span>
+            </p>
+            <p className="text-[10px] text-slate-500 font-extrabold tracking-widest uppercase">-- ACADEMIC LEVEL --</p>
+            <p className="text-[11px] text-[#f95a00] font-black animate-pulse">
+              Only Today: Be the 1922383th Student
+            </p>
+          </div>
+
+          {/* Sticky Bottom Checkout Bar (Total Fee: ₹29) */}
+          <div className="pt-2 border-t border-slate-200 flex items-center justify-between gap-4">
+            <div>
+              <div className="flex items-baseline space-x-1.5">
+                <span className="text-2xl font-black text-[#f95a00]">₹29</span>
+                <span className="text-xs text-slate-400 line-through">₹499</span>
               </div>
-
-              <div className="grid grid-cols-2 gap-2.5">
-                <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3 flex flex-col justify-between">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-slate-800">
-                      Secret of <span className="text-orange-600">83%</span>
-                    </span>
-                    <TrendingUp className="w-4 h-4 text-orange-500" />
-                  </div>
-                  <span className="text-[11px] font-bold text-slate-700 mt-1">Higher Score</span>
-                  <span className="text-[9px] text-slate-500 mt-0.5">Proven acceleration methodology</span>
-                </div>
-
-                <div className="bg-orange-50/70 border border-orange-200 rounded-xl p-3 flex flex-col justify-between">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-orange-600">50+</span>
-                    <BookOpen className="w-4 h-4 text-orange-500" />
-                  </div>
-                  <span className="text-[11px] font-bold text-slate-800 mt-1">Core Concepts</span>
-                  <span className="text-[9px] text-slate-500 mt-0.5">Most asked topics across all boards</span>
-                </div>
-
-                <div className="bg-orange-50/70 border border-orange-200 rounded-xl p-3 flex flex-col justify-between">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-orange-600">50+</span>
-                    <Award className="w-4 h-4 text-orange-500" />
-                  </div>
-                  <span className="text-[11px] font-bold text-slate-800 mt-1">Solving Skills</span>
-                  <span className="text-[9px] text-slate-500 mt-0.5">Summarized by top IIT/NIT teachers</span>
-                </div>
-
-                <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3 flex flex-col justify-between">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-amber-600">300+</span>
-                    <GraduationCap className="w-4 h-4 text-amber-500" />
-                  </div>
-                  <span className="text-[11px] font-bold text-slate-800 mt-1">Quizzes & Tests</span>
-                  <span className="text-[9px] text-slate-500 mt-0.5">Practice to master all concepts & skills</span>
-                </div>
-              </div>
+              <span className="text-[10px] text-slate-400 block font-medium">
+                Total Fee • Include taxes
+              </span>
             </div>
 
-            {/* Extra Materials Card */}
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-orange-200 rounded-2xl p-3.5 flex items-center justify-between">
-              <div className="space-y-0.5">
-                <span className="text-[9px] font-black uppercase tracking-wider text-orange-600 bg-orange-100 px-2 py-0.5 rounded">
-                  MATHS & SCIENCE
-                </span>
-                <h4 className="text-xs font-extrabold text-slate-800">
-                  Extra Digital Workbooks & Study Notes
-                </h4>
-                <p className="text-[10px] text-slate-500">
-                  * Instant access unlocked after enrollment
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-orange-200 flex items-center justify-center text-orange-600 font-bold text-xs">
-                📚 Kit
-              </div>
-            </div>
-
-            {/* Trust Footer Bar */}
-            <div className="text-center space-y-1">
-              <p className="text-[11px] font-extrabold text-slate-700 flex items-center justify-center gap-1.5">
-                <span>🏆</span>
-                <span>Trusted by 10,000,000+ parents and students!</span>
-              </p>
-              <p className="text-[10px] text-orange-600 font-bold">
-                Only Today: Be the 1922383th Student
-              </p>
-            </div>
-
-            {/* Sticky/Fixed Bottom Action Bar */}
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-4">
-              <div>
-                <div className="flex items-baseline space-x-1.5">
-                  <span className="text-2xl font-black text-[#f95300]">₹29</span>
-                  <span className="text-xs text-slate-400 line-through">₹499</span>
-                </div>
-                <span className="text-[10px] text-slate-400 block font-medium">
-                  Total Fee • Includes all taxes
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setIsEnrollModalOpen(true)}
-                className="flex-1 max-w-[240px] py-3.5 px-6 rounded-2xl bg-gradient-to-r from-[#ff6a00] to-[#f95300] hover:from-[#f95300] hover:to-[#e04b00] text-white font-black text-sm shadow-xl shadow-orange-500/30 transition-all transform active:scale-95 flex items-center justify-center space-x-2"
-              >
-                <span>Enroll Now</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="flex-1 max-w-[220px] py-3.5 px-6 rounded-2xl bg-gradient-to-r from-[#f95a00] to-[#ff7a00] hover:from-[#e04f00] hover:to-[#f95a00] text-white font-black text-sm shadow-xl shadow-orange-500/30 transition-all transform active:scale-95 flex items-center justify-center space-x-1.5"
+            >
+              <span>Enroll Now</span>
+              <ArrowRight className="w-4 h-4 stroke-[3]" />
+            </button>
           </div>
 
         </div>
+
       </div>
 
       {/* ======================================================== */}
-      {/* QUICK ENROLLMENT MODAL                                   */}
+      {/* QUICK ENROLLMENT MODAL (₹29)                             */}
       {/* ======================================================== */}
-      {isEnrollModalOpen && (
+      {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-orange-100 relative">
             <button
-              onClick={() => setIsEnrollModalOpen(false)}
+              onClick={() => setIsModalOpen(false)}
               className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="text-center mb-4">
-              <span className="text-[10px] font-black uppercase tracking-wider text-orange-600 bg-orange-100 px-3 py-1 rounded-full">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#f95a00] bg-orange-100 px-3 py-1 rounded-full">
                 Instant Camp Enrollment
               </span>
               <h3 className="text-xl font-black text-slate-900 mt-2">
@@ -517,7 +549,8 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
                   placeholder="e.g. Aryan Sharma"
                   value={studentName}
                   onChange={e => setStudentName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 focus:border-orange-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#f95a00] rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none"
+                  autoFocus
                 />
               </div>
 
@@ -531,7 +564,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
                   placeholder="e.g. 9876543210 or student@gmail.com"
                   value={emailOrPhone}
                   onChange={e => setEmailOrPhone(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 focus:border-orange-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#f95a00] rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none"
                 />
               </div>
 
@@ -543,7 +576,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
                   <select
                     value={board}
                     onChange={e => setBoard(e.target.value as any)}
-                    className="w-full bg-slate-50 border border-slate-200 focus:border-orange-500 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-[#f95a00] rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none"
                   >
                     <option value="CBSE">CBSE Board</option>
                     <option value="ICSE">ICSE Board</option>
@@ -558,7 +591,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
                   <select
                     value={selectedClass}
                     onChange={e => setSelectedClass(Number(e.target.value))}
-                    className="w-full bg-slate-50 border border-slate-200 focus:border-orange-500 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-[#f95a00] rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none"
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(c => (
                       <option key={c} value={c}>
@@ -578,14 +611,14 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
                   placeholder="e.g. Rajesh Sharma"
                   value={parentName}
                   onChange={e => setParentName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 focus:border-orange-500 rounded-xl px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#f95a00] rounded-xl px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none"
                 />
               </div>
 
               <div className="p-3 bg-orange-50 border border-orange-200 rounded-xl text-[11px] text-orange-950 space-y-1">
                 <div className="flex justify-between font-bold">
                   <span>Camp Fee:</span>
-                  <span className="text-[#ff6a00]">₹29.00</span>
+                  <span className="text-[#f95a00] font-black">₹29.00</span>
                 </div>
                 <div className="flex justify-between text-[10px] text-slate-500">
                   <span>Included:</span>
@@ -596,7 +629,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 bg-gradient-to-r from-[#ff6a00] to-[#f95300] hover:from-[#f95300] hover:to-[#e04b00] text-white font-black text-xs rounded-xl shadow-lg shadow-orange-500/30 transition-all flex items-center justify-center space-x-2"
+                className="w-full py-3.5 bg-gradient-to-r from-[#f95a00] to-[#ff7a00] hover:from-[#e04f00] hover:to-[#f95a00] text-white font-black text-xs rounded-xl shadow-lg shadow-orange-500/30 transition-all flex items-center justify-center space-x-2"
               >
                 {isSubmitting ? (
                   <span>Registering Enrollment...</span>

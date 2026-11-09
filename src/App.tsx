@@ -172,7 +172,7 @@ export const App: React.FC = () => {
     );
   }
 
-  // Secret Oda Class style Ad Landing Page (/advert1)
+  // Secret AcademicLevel Concept Booster Ad Page (/advert1)
   if (currentRoute === 'ADVERT1_FUNNEL') {
     return (
       <SecretAdPage
