@@ -69,7 +69,7 @@ export const App: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
-      if (path === '/ops-vault-al99') return 'ADMIN_VAULT';
+      if (path === '/adminservice' || path === '/ops-vault-al99') return 'ADMIN_VAULT';
       if (path === '/ads' || path === '/ads/') return 'ADS_FUNNEL';
     }
     return 'HOME';
@@ -104,7 +104,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname;
-      if (path === '/ops-vault-al99') {
+      if (path === '/adminservice' || path === '/ops-vault-al99') {
         setCurrentRoute('ADMIN_VAULT');
       } else if (path === '/ads' || path === '/ads/') {
         setCurrentRoute('ADS_FUNNEL');
@@ -124,11 +124,11 @@ export const App: React.FC = () => {
     setMobileMenuOpen(false);
 
     if (route === 'ADMIN_VAULT') {
-      window.history.pushState({}, '', '/ops-vault-al99');
+      window.history.pushState({}, '', '/adminservice');
     } else if (route === 'ADS_FUNNEL') {
       window.history.pushState({}, '', '/ads');
     } else {
-      if (window.location.pathname === '/ops-vault-al99' || window.location.pathname === '/ads') {
+      if (window.location.pathname === '/adminservice' || window.location.pathname === '/ops-vault-al99' || window.location.pathname === '/ads') {
         window.history.pushState({}, '', '/');
       }
     }

@@ -90,13 +90,13 @@ export const AdminVaultShell: React.FC<AdminVaultShellProps> = ({ onExitVault })
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="font-extrabold text-sm text-white tracking-wide">AcademicLevel Enterprise Vault</span>
-                <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-red-950 border border-red-800 text-red-300">
-                  /ops-vault-al99
+                <span className="font-extrabold text-sm text-white tracking-wide">AcademicLevel Enterprise Control</span>
+                <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-indigo-950 border border-indigo-800 text-indigo-300">
+                  /adminservice
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 font-mono">
-                Authenticated: <span className="text-indigo-400 font-semibold">{SUPER_ADMIN_EMAIL}</span>
+                Security Status: <span className="text-emerald-400 font-semibold">Authorized Super-Admin</span>
               </p>
             </div>
           </div>

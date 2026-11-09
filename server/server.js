@@ -35,7 +35,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     console.log(`🚀 ACADEMICLEVEL ENTERPRISE SERVER RUNNING`);
     console.log(`🔗 Local Address: http://localhost:${PORT}/`);
     console.log(`📦 Database: SQLite ACID (server/data/academiclevel_prod.db)`);
-    console.log(`🛡️ Super-Admin Lock: naitiknanda1235@gmail.com`);
+    console.log(`🛡️ Super-Admin Route: /adminservice (Protected)`);
     console.log(`====================================================`);
   });
 }
