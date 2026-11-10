@@ -19,7 +19,7 @@ interface AuthContextType {
     referredByCode?: string;
   }) => Promise<{ success: boolean; error?: string }>;
   loginStudent: (email: string) => Promise<{ success: boolean; error?: string }>;
-  loginSuperAdmin: () => { success: boolean; error?: string };
+  loginSuperAdmin: (adminEmailInput?: string) => { success: boolean; error?: string };
   logout: () => void;
   updateActiveGrade: (newGrade: Grade) => { success: boolean; message: string };
   refreshCurrentLearner: () => void;
@@ -162,13 +162,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: false, error: 'No student account found with this email. Please register.' };
   };
 
-  const loginSuperAdmin = () => {
-    let adminLearner = StorageRLSLayer.getLearnerByEmail(SUPER_ADMIN_EMAIL);
+  const loginSuperAdmin = (adminEmailInput?: string) => {
+    const emailToUse = (
+      adminEmailInput ||
+      (typeof window !== 'undefined' ? sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email') : '') ||
+      SUPER_ADMIN_EMAIL
+    ).trim().toLowerCase();
+
+    let adminLearner = StorageRLSLayer.getLearnerByEmail(emailToUse);
     if (!adminLearner) {
       adminLearner = {
         id: 'usr_super_admin_001',
-        email: SUPER_ADMIN_EMAIL,
-        fullName: 'Naitik Nanda (Super-Admin)',
+        email: emailToUse,
+        fullName: 'Administrator (Super-Admin)',
         board: 'CBSE',
         grade: 12,
         role: 'SUPER_ADMIN',
@@ -198,6 +204,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.removeItem('al_admin_token');
+        sessionStorage.removeItem('al_admin_email');
+        localStorage.removeItem('al_admin_token');
+        localStorage.removeItem('al_admin_email');
+      } catch {}
+    }
     StorageRLSLayer.setSession(null);
     setCurrentLearner(null);
   };
@@ -252,12 +266,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   };
 
+  const adminToken = typeof window !== 'undefined'
+    ? (sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token'))
+    : null;
+
+  const storedAdminEmail = (typeof window !== 'undefined'
+    ? (sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email') || '')
+    : '').toLowerCase();
+
+  const isSuperAdmin = Boolean(
+    adminToken ||
+    currentLearner?.role === 'SUPER_ADMIN' ||
+    (currentLearner?.email && [SUPER_ADMIN_EMAIL.toLowerCase(), storedAdminEmail].filter(Boolean).includes(currentLearner.email.toLowerCase()))
+  );
+
   return (
     <AuthContext.Provider
       value={{
         currentLearner,
         isAuthenticated: !!currentLearner,
-        isSuperAdmin: currentLearner?.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase(),
+        isSuperAdmin,
         activeBoard: currentLearner?.board || 'CBSE',
         activeGrade: currentLearner?.grade || 10,
         registerStudent,

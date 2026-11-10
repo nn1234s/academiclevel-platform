@@ -53,14 +53,18 @@ interface AdminVaultShellProps {
   onExitVault: () => void;
 }
 
-export const AdminVaultShell: React.FC<AdminVaultShellProps> = ({ onExitVault }) => {
+const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault }) => {
   const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState<AdminTab>('PAYMENTS');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const pendingCount = StorageRLSLayer.getAllSubscriptionsAdmin(SUPER_ADMIN_EMAIL).filter(
-    (s: any) => s.status === 'PENDING_VERIFICATION'
-  ).length;
+  let pendingCount = 0;
+  try {
+    const subs = StorageRLSLayer.getAllSubscriptionsAdmin(SUPER_ADMIN_EMAIL);
+    pendingCount = subs.filter((s: any) => s.status === 'PENDING_VERIFICATION').length;
+  } catch {
+    pendingCount = 0;
+  }
 
   const navItems: { id: AdminTab; label: string; icon: React.ReactNode; badge?: string }[] = [
     {
@@ -83,8 +87,7 @@ export const AdminVaultShell: React.FC<AdminVaultShellProps> = ({ onExitVault })
   ];
 
   return (
-    <SuperAdminGuard onUnauthorizedRedirect={onExitVault}>
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
         {/* Top Restricted Bar */}
         <header className="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-40">
           <div className="flex items-center space-x-3">
@@ -199,6 +202,13 @@ export const AdminVaultShell: React.FC<AdminVaultShellProps> = ({ onExitVault })
           </main>
         </div>
       </div>
+  );
+};
+
+export const AdminVaultShell: React.FC<AdminVaultShellProps> = ({ onExitVault }) => {
+  return (
+    <SuperAdminGuard onUnauthorizedRedirect={onExitVault}>
+      <AdminVaultShellContent onExitVault={onExitVault} />
     </SuperAdminGuard>
   );
 };

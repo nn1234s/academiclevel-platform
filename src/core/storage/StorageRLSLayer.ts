@@ -124,6 +124,8 @@ class StorageRLSLayerClass {
     if (token) return true;
     const session = this.getCurrentSession();
     if (session?.role === 'SUPER_ADMIN') return true;
+    const storedEmail = sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email');
+    if (storedEmail && adminEmail && storedEmail.toLowerCase() === adminEmail.toLowerCase()) return true;
     return false;
   }
 

@@ -13,21 +13,10 @@ export const SuperAdminGuard: React.FC<SuperAdminGuardProps> = ({
   onUnauthorizedRedirect,
 }) => {
   const { currentLearner, isSuperAdmin, loginSuperAdmin } = useAuth();
-  const [accessDenied, setAccessDenied] = useState(false);
   const [adminEmailInput, setAdminEmailInput] = useState('');
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
-
-  useEffect(() => {
-    // If a regular student is logged in without admin session token, deny direct portal access
-    if (currentLearner && currentLearner.role !== 'SUPER_ADMIN') {
-      const adminToken = typeof window !== 'undefined' ? sessionStorage.getItem('al_admin_token') : null;
-      if (!adminToken) {
-        setAccessDenied(true);
-      }
-    }
-  }, [currentLearner]);
 
   if (isSuperAdmin) {
     return <>{children}</>;
@@ -58,8 +47,7 @@ export const SuperAdminGuard: React.FC<SuperAdminGuardProps> = ({
         } catch {}
 
         await StorageRLSLayer.syncWithServer();
-        loginSuperAdmin();
-        setAccessDenied(false);
+        loginSuperAdmin(data.email || adminEmailInput.trim());
       } else {
         StorageRLSLayer.recordSecurityViolation(
           adminEmailInput.trim() || 'ANONYMOUS_IP',
@@ -90,90 +78,81 @@ export const SuperAdminGuard: React.FC<SuperAdminGuardProps> = ({
           </span>
           <h1 className="text-2xl font-bold tracking-tight text-white">Administrator Portal</h1>
           <p className="text-xs text-slate-400 mt-2">
-            Authorized personnel only. All connection and access attempts are monitored and recorded.
+            Authorized personnel only. All administrative actions and authentications are cryptographically audited.
           </p>
         </div>
 
-        {accessDenied ? (
-          <div className="bg-red-950/40 border border-red-900/80 rounded-xl p-4 mb-6">
-            <div className="flex items-start space-x-3 text-red-300">
-              <ShieldAlert className="w-5 h-5 flex-shrink-0 mt-0.5" />
-              <div className="text-xs">
-                <p className="font-bold">403 Forbidden: Administrator Clearance Required</p>
-                <p className="text-red-400 mt-1">
-                  Active session does not have administrative privileges. Please log in with authorized administrator credentials.
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={onUnauthorizedRedirect}
-              className="mt-4 w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center justify-center space-x-2 transition-all"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Return to Platform</span>
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleSuperAdminUnlock} className="space-y-4">
+        {currentLearner && currentLearner.role !== 'SUPER_ADMIN' && (
+          <div className="bg-amber-950/40 border border-amber-900/60 rounded-xl p-3 mb-5 flex items-start space-x-2 text-xs text-amber-300">
+            <ShieldAlert className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Administrator Email Address
-              </label>
-              <input
-                type="email"
-                required
-                placeholder="Enter administrator email..."
-                value={adminEmailInput}
-                onChange={e => {
-                  setAdminEmailInput(e.target.value);
-                  setLoginError('');
-                }}
-                className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 text-white text-xs rounded-lg px-3 py-2.5 focus:outline-none transition-colors"
-                autoFocus
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Security Password
-              </label>
-              <input
-                type="password"
-                required
-                placeholder="Enter security password..."
-                value={adminPasswordInput}
-                onChange={e => {
-                  setAdminPasswordInput(e.target.value);
-                  setLoginError('');
-                }}
-                className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 text-white text-xs rounded-lg px-3 py-2.5 focus:outline-none transition-colors"
-              />
-            </div>
-
-            {loginError && (
-              <p className="text-xs text-red-400 bg-red-950/30 border border-red-900/50 p-2.5 rounded-lg">
-                {loginError}
+              <p className="font-semibold">Learner session currently active ({currentLearner.email})</p>
+              <p className="text-[11px] text-amber-400/80 mt-0.5">
+                Enter authorized administrator passkey below to elevate to Super-Admin console.
               </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={isVerifying}
-              className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold text-xs rounded-lg shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-2"
-            >
-              <KeyRound className="w-4 h-4" />
-              <span>{isVerifying ? 'Verifying with Backend...' : 'Sign In to Admin Service'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={onUnauthorizedRedirect}
-              className="w-full py-2 text-slate-400 hover:text-slate-200 text-xs font-medium transition-colors text-center"
-            >
-              Cancel & Exit
-            </button>
-          </form>
+            </div>
+          </div>
         )}
+
+        <form onSubmit={handleSuperAdminUnlock} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              Administrator Email Address
+            </label>
+            <input
+              type="email"
+              required
+              placeholder="Enter administrator email..."
+              value={adminEmailInput}
+              onChange={e => {
+                setAdminEmailInput(e.target.value);
+                setLoginError('');
+              }}
+              className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 text-white text-xs rounded-lg px-3 py-2.5 focus:outline-none transition-colors"
+              autoFocus
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              Security Password
+            </label>
+            <input
+              type="password"
+              required
+              placeholder="Enter security password..."
+              value={adminPasswordInput}
+              onChange={e => {
+                setAdminPasswordInput(e.target.value);
+                setLoginError('');
+              }}
+              className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 text-white text-xs rounded-lg px-3 py-2.5 focus:outline-none transition-colors"
+            />
+          </div>
+
+          {loginError && (
+            <p className="text-xs text-red-400 bg-red-950/30 border border-red-900/50 p-2.5 rounded-lg">
+              {loginError}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={isVerifying}
+            className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold text-xs rounded-lg shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-2"
+          >
+            <KeyRound className="w-4 h-4" />
+            <span>{isVerifying ? 'Verifying with Backend...' : 'Sign In to Admin Service'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onUnauthorizedRedirect}
+            className="w-full py-2 text-slate-400 hover:text-slate-200 text-xs font-medium transition-colors text-center"
+          >
+            Cancel & Exit
+          </button>
+        </form>
       </div>
     </div>
   );
