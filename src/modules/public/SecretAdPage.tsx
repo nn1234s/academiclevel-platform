@@ -43,56 +43,56 @@ const REVIEWS_POOL: ReviewItem[] = [
   {
     id: 'prabir-1',
     name: 'Prabir',
-    role: 'Parent of Class 7 Student (Kolkata)',
-    date: '16 May 2026',
+    role: 'Parent of Class 5 Student (Bhubaneswar)',
+    date: '08 Nov 2026',
     stars: 5,
     avatarBg: 'bg-amber-600',
-    text: 'It is really good because the adaptive AI quizzes explain every concept so nicely and energetic!!! Best Choice ever to join ACADEMIC LEVEL!! My son used to struggle with geometry and algebraic equations, but the 50+ solving skills and AI practice tests made him score 98% in his term exams!'
+    text: 'It is really good because the adaptive AI quizzes explain every Class 5 maths and science concept so nicely and energetic!!! Best Choice ever to join ACADEMIC LEVEL!! My son used to struggle with fractions and problem sums, but the 50+ solving skills and AI practice tests made him score 98% in his school exams!'
   },
   {
     id: 'preetish-1',
     name: 'Preetish',
-    role: 'Parent of Class 8 Student (Bhubaneswar)',
-    date: '11 May 2026',
+    role: 'Parent of Class 5 Student (Bhubaneswar)',
+    date: '05 Nov 2026',
     stars: 5,
     avatarBg: 'bg-emerald-600',
-    text: "It's very good learning app for children.. the AI quizzes keep my daughter completely disciplined. She can practice anytime 24/7 at her own pace and topics are also too good .... Worth 10x more than ₹49!"
+    text: "It's very good learning app for Class 5 children.. the AI quizzes keep my daughter completely disciplined. She can practice anytime 24/7 at her own pace and topics are also too good .... Worth 10x more than ₹49!"
   },
   {
     id: 'shaymin-1',
     name: 'Shaymin',
-    role: 'Class 9 Scholar (Bangalore)',
-    date: '05 May 2026',
+    role: 'Class 5 Scholar',
+    date: '02 Nov 2026',
     stars: 5,
     avatarBg: 'bg-indigo-600',
-    text: 'It is very interesting I am enjoying so much with lots of shortcut methods! Physics numericals and Chemistry balancing was my biggest fear, but ACADEMIC LEVEL AI quizzes broke down every single concept with instant hints. Best study booster ever!!'
+    text: 'It is very interesting I am enjoying so much with lots of shortcut methods! Class 5 Science and Maths was confusing for me, but ACADEMIC LEVEL AI quizzes broke down every single concept with instant hints. Best study booster ever!!'
   },
   {
     id: 'prabir-2',
     name: 'Prabir',
-    role: 'Parent of Class 6 Student',
-    date: '02 May 2026',
+    role: 'Parent of Class 5 Student (Bhubaneswar)',
+    date: '07 Nov 2026',
     stars: 5,
     avatarBg: 'bg-amber-600',
-    text: 'Extraordinary AI quiz quality. The instant step-by-step solutions and chapter-wise quiz challenges helped my child top his school Olympiad rank. Best self-paced platform!'
+    text: 'Extraordinary AI quiz quality for Class 5. The instant step-by-step solutions and chapter-wise quiz challenges helped my child top his school Olympiad rank. Best self-paced platform!'
   },
   {
     id: 'preetish-2',
     name: 'Preetish',
-    role: 'Parent of Class 5 Student',
-    date: '27 Apr 2026',
+    role: 'Parent of Class 5 Student (Bhubaneswar)',
+    date: '04 Nov 2026',
     stars: 5,
     avatarBg: 'bg-emerald-600',
-    text: 'My son was addicted to mobile games. After joining ACADEMIC LEVEL, he practices AI quizzes anytime he wants and solves maths problems by himself without any scolding!'
+    text: 'My child was addicted to mobile games. After joining ACADEMIC LEVEL, he practices Class 5 AI quizzes anytime he wants and solves maths problems by himself without any scolding!'
   },
   {
     id: 'shaymin-2',
     name: 'Shaymin',
-    role: 'Class 8 Student',
-    date: '21 Apr 2026',
+    role: 'Class 5 Student',
+    date: '01 Nov 2026',
     stars: 5,
     avatarBg: 'bg-indigo-600',
-    text: 'The AI quiz solving skills are pure magic! Things that took me 10 minutes to solve on paper can now be solved in 30 seconds using the instant step-by-step AI guidance.'
+    text: 'The AI quiz solving skills are pure magic! Class 5 sums that took me 10 minutes to solve on paper can now be solved in 30 seconds using the instant step-by-step AI guidance.'
   }
 ];
 
@@ -114,7 +114,7 @@ const LIVE_ENROLLMENTS = [
 export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered }) => {
   const { registerStudent } = useAuth();
 
-  const [selectedClass, setSelectedClass] = useState<number>(7);
+  const [selectedClass, setSelectedClass] = useState<number>(5);
   const [tickerIndex, setTickerIndex] = useState(0);
   const [reviewsList, setReviewsList] = useState<ReviewItem[]>(REVIEWS_POOL.slice(0, 3));
   const [expandedReviewId, setExpandedReviewId] = useState<string | null>(null);
@@ -160,7 +160,7 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
         fullName: studentName.trim(),
         email,
         board,
-        grade: (selectedClass as any) || 7,
+        grade: (selectedClass as any) || 5,
         parentName: parentName.trim() || 'Parent'
       });
 
