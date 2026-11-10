@@ -1,4 +1,4 @@
-import { Learner, Board, Grade, Subscription, GiftRequest, CoinLedgerEntry } from '../types';
+import { Learner, Board, Grade, Subscription, GiftRequest, CoinLedgerEntry, QuizAttempt, LevelProgress, Certificate } from '../types';
 
 const BASE_URL = '/api';
 
@@ -97,6 +97,95 @@ export class ApiClient {
   }> {
     return this.request(`/students/${id}/spin`, {
       method: 'POST'
+    });
+  }
+
+  // ==========================================
+  // Quiz Attempts & Progress Tracking
+  // ==========================================
+  public static async recordQuizAttempt(attempt: QuizAttempt): Promise<{
+    success: boolean;
+    attemptId: string;
+    quizzesCompletedCount: number;
+    referralBonusAwarded?: boolean;
+  }> {
+    return this.request('/quizzes/attempt', {
+      method: 'POST',
+      body: JSON.stringify({
+        learnerId: attempt.learnerId,
+        board: attempt.board,
+        grade: attempt.grade,
+        subjectId: attempt.subjectId,
+        levelNode: attempt.levelNode,
+        score: attempt.correctCount,
+        maxScore: attempt.totalQuestions,
+        passed: attempt.accuracyPercent >= 70,
+        totalDurationSeconds: attempt.totalDurationSeconds,
+        antiCheatPassed: attempt.antiCheatPassed
+      })
+    });
+  }
+
+  public static async recordLevelProgress(progress: LevelProgress): Promise<{
+    success: boolean;
+    progressId: string;
+    newlyCompleted: boolean;
+  }> {
+    return this.request('/progress/level', {
+      method: 'POST',
+      body: JSON.stringify({
+        learnerId: progress.learnerId,
+        board: progress.board,
+        grade: progress.grade,
+        subjectId: progress.subjectId,
+        levelNode: progress.levelNode,
+        accuracy: progress.bestScorePercent,
+        passed: progress.isCompleted,
+        bestScorePercent: progress.bestScorePercent,
+        calendarYear: progress.calendarYear
+      })
+    });
+  }
+
+  public static async getLearnerProgress(learnerId: string): Promise<{
+    success: boolean;
+    progress: LevelProgress[];
+    attempts: QuizAttempt[];
+  }> {
+    return this.request(`/progress/${learnerId}`);
+  }
+
+  // ==========================================
+  // Certificates
+  // ==========================================
+  public static async issueCertificate(cert: Certificate): Promise<{
+    success: boolean;
+    certificateId: string;
+  }> {
+    return this.request('/certificates/issue', {
+      method: 'POST',
+      body: JSON.stringify(cert)
+    });
+  }
+
+  public static async getCertificates(learnerId: string): Promise<{
+    success: boolean;
+    certificates: Certificate[];
+  }> {
+    return this.request(`/certificates/${learnerId}`);
+  }
+
+  // ==========================================
+  // ACode Scholarships
+  // ==========================================
+  public static async redeemACode(learnerId: string, code: string): Promise<{
+    success: boolean;
+    message: string;
+    subscription: Subscription;
+  }> {
+    return this.request('/acodes/redeem', {
+      method: 'POST',
+      body: JSON.stringify({ learnerId, code })
     });
   }
 

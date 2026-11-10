@@ -64,16 +64,82 @@ const AdminVaultShell = lazy(() =>
   import('./admin-vault/AdminVaultShell').then(m => ({ default: m.AdminVaultShell }))
 );
 
+function resolveRouteFromPath(path: string, isAuth: boolean): string {
+  const p = path.toLowerCase().replace(/\/$/, '');
+  if (p === '/adminservice' || p === '/ops-vault-al99') return 'ADMIN_VAULT';
+  if (p === '/ads') return 'ADS_FUNNEL';
+  if (p === '/advert1') return 'ADVERT1_FUNNEL';
+  if (p === '/pricing') return 'PRICING';
+  if (p === '/about') return 'ABOUT';
+  if (p === '/faq') return 'FAQ';
+  if (p === '/privacy') return 'PRIVACY';
+  if (p === '/terms') return 'TERMS';
+  if (p === '/safety') return 'SAFETY';
+
+  if (p === '/curriculum' || p === '/courses') return isAuth ? 'COURSES' : 'PUBLIC_COURSES';
+
+  if (isAuth) {
+    if (p === '' || p === '/dashboard') return 'DASHBOARD';
+    if (p === '/nova' || p === '/nova-ai') return 'NOVA_AI';
+    if (p === '/community') return 'COMMUNITY';
+    if (p === '/spin' || p === '/spin-wheel') return 'SPIN_WHEEL';
+    if (p === '/referral' || p === '/referrals') return 'REFERRAL';
+    if (p === '/coins' || p === '/coin-mall') return 'COIN_MALL';
+    if (p === '/gifts' || p === '/gift-store') return 'GIFT_STORE';
+    if (p === '/certificates') return 'CERTIFICATES';
+    if (p === '/master-certificate') return 'MASTER_CERT';
+    if (p === '/profile') return 'PROFILE';
+    if (p === '/streaks') return 'STREAKS';
+    if (p === '/offline-bank') return 'OFFLINE_BANK';
+    if (p === '/premium') return 'PREMIUM';
+    if (p === '/qotd') return 'QOTD';
+    if (p === '/challenges') return 'CHALLENGES';
+  } else {
+    if (p === '') return 'HOME';
+  }
+
+  return p === '' ? (isAuth ? 'DASHBOARD' : 'HOME') : 'NOT_FOUND';
+}
+
+function getPathForRoute(route: string): string {
+  switch (route) {
+    case 'ADMIN_VAULT': return '/adminservice';
+    case 'ADS_FUNNEL': return '/ads';
+    case 'ADVERT1_FUNNEL': return '/advert1';
+    case 'PRICING': return '/pricing';
+    case 'ABOUT': return '/about';
+    case 'FAQ': return '/faq';
+    case 'PUBLIC_COURSES': return '/curriculum';
+    case 'PRIVACY': return '/privacy';
+    case 'TERMS': return '/terms';
+    case 'SAFETY': return '/safety';
+    case 'DASHBOARD': return '/';
+    case 'COURSES': return '/courses';
+    case 'NOVA_AI': return '/nova-ai';
+    case 'COMMUNITY': return '/community';
+    case 'SPIN_WHEEL': return '/spin-wheel';
+    case 'REFERRAL': return '/referral';
+    case 'COIN_MALL': return '/coin-mall';
+    case 'GIFT_STORE': return '/gift-store';
+    case 'CERTIFICATES': return '/certificates';
+    case 'MASTER_CERT': return '/master-certificate';
+    case 'PROFILE': return '/profile';
+    case 'STREAKS': return '/streaks';
+    case 'OFFLINE_BANK': return '/offline-bank';
+    case 'PREMIUM': return '/premium';
+    case 'QOTD': return '/qotd';
+    case 'CHALLENGES': return '/challenges';
+    default: return '/';
+  }
+}
+
 export const App: React.FC = () => {
   const { currentLearner, isAuthenticated, isSuperAdmin, logout, refreshCurrentLearner } = useAuth();
 
   // Route state
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
     if (typeof window !== 'undefined') {
-      const path = window.location.pathname;
-      if (path === '/adminservice' || path === '/ops-vault-al99') return 'ADMIN_VAULT';
-      if (path === '/ads' || path === '/ads/') return 'ADS_FUNNEL';
-      if (path === '/advert1' || path === '/advert1/') return 'ADVERT1_FUNNEL';
+      return resolveRouteFromPath(window.location.pathname, false);
     }
     return 'HOME';
   });
@@ -106,37 +172,22 @@ export const App: React.FC = () => {
   // Synchronize URL popstate
   useEffect(() => {
     const handlePopState = () => {
-      const path = window.location.pathname;
-      if (path === '/adminservice' || path === '/ops-vault-al99') {
-        setCurrentRoute('ADMIN_VAULT');
-      } else if (path === '/ads' || path === '/ads/') {
-        setCurrentRoute('ADS_FUNNEL');
-      } else if (path === '/advert1' || path === '/advert1/') {
-        setCurrentRoute('ADVERT1_FUNNEL');
-      } else {
-        if (!isAuthenticated) {
-          setCurrentRoute('HOME');
-        }
-      }
+      const resolved = resolveRouteFromPath(window.location.pathname, isAuthenticated);
+      setCurrentRoute(resolved);
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [isAuthenticated]);
 
-  // Push URL without reload for unlinked admin vault or ads
+  // Push URL with popstate support
   const navigateTo = (route: string, extra?: any) => {
     setCurrentRoute(route);
     setMobileMenuOpen(false);
 
-    if (route === 'ADMIN_VAULT') {
-      window.history.pushState({}, '', '/adminservice');
-    } else if (route === 'ADS_FUNNEL') {
-      window.history.pushState({}, '', '/ads');
-    } else if (route === 'ADVERT1_FUNNEL') {
-      window.history.pushState({}, '', '/advert1');
-    } else {
-      if (window.location.pathname === '/adminservice' || window.location.pathname === '/ops-vault-al99' || window.location.pathname === '/ads' || window.location.pathname === '/advert1') {
-        window.history.pushState({}, '', '/');
+    if (typeof window !== 'undefined') {
+      const targetPath = getPathForRoute(route);
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({}, '', targetPath);
       }
     }
 
@@ -657,6 +708,30 @@ export const App: React.FC = () => {
                 />
               )}
             </>
+          )}
+
+          {/* 404 Fallback View */}
+          {currentRoute === 'NOT_FOUND' && (
+            <div className="max-w-xl mx-auto my-12 p-8 sm:p-12 text-center bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                <Compass className="w-8 h-8" />
+              </div>
+              <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-400 uppercase bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">
+                404 — Node Not Found
+              </span>
+              <h2 className="text-2xl font-extrabold text-white mt-3">Page or Curriculum Node Not Found</h2>
+              <p className="text-xs text-slate-400 mt-2 max-w-sm mx-auto">
+                The requested URL path was not found or requires student authentication.
+              </p>
+              <div className="mt-6 flex items-center justify-center gap-3">
+                <button
+                  onClick={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
+                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all"
+                >
+                  {isAuthenticated ? 'Return to Dashboard' : 'Back to Home'}
+                </button>
+              </div>
+            </div>
           )}
 
           {/* Direct Checkout View */}

@@ -396,7 +396,22 @@ export class PaymentService {
   /**
    * Redeem ACode promotional/scholarship voucher
    */
-  public static redeemACode(learnerId: string, codeInput: string): { success: boolean; message: string } {
+  public static async redeemACode(learnerId: string, codeInput: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const res = await ApiClient.redeemACode(learnerId, codeInput.trim().toUpperCase());
+      if (res.success) {
+        if (res.subscription) {
+          StorageRLSLayer.saveSubscription(res.subscription);
+        }
+        return { success: true, message: res.message };
+      }
+    } catch (apiErr: any) {
+      if (apiErr.message && !apiErr.message.includes('Failed to fetch') && !apiErr.message.includes('NetworkError')) {
+        return { success: false, message: apiErr.message };
+      }
+    }
+
+    // Offline / Local fallback
     const acode = StorageRLSLayer.getACode(codeInput);
     if (!acode) {
       return { success: false, message: 'Invalid ACode. Please verify your promotional voucher key.' };

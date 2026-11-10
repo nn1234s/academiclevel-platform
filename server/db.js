@@ -177,7 +177,32 @@ export function initDatabaseSchema() {
     CREATE INDEX IF NOT EXISTS idx_subs_status ON subscriptions(status);
     CREATE INDEX IF NOT EXISTS idx_ledger_learner ON coin_ledger(learnerId);
     CREATE INDEX IF NOT EXISTS idx_gifts_learner ON gift_requests(learnerId);
+    CREATE INDEX IF NOT EXISTS idx_progress_learner ON course_progress(learnerId);
+    CREATE INDEX IF NOT EXISTS idx_attempts_learner ON quiz_attempts(learnerId);
+    CREATE INDEX IF NOT EXISTS idx_certs_learner ON certificates(learnerId);
   `);
+
+  // Safe additive schema migrations for full synchronization
+  const addColumnSafe = (table, colDef) => {
+    try {
+      db.exec(`ALTER TABLE ${table} ADD COLUMN ${colDef}`);
+    } catch {}
+  };
+  addColumnSafe('course_progress', 'bestScorePercent REAL');
+  addColumnSafe('course_progress', 'isCompleted INTEGER DEFAULT 0');
+  addColumnSafe('course_progress', 'coinRewardClaimed INTEGER DEFAULT 0');
+  addColumnSafe('course_progress', 'calendarYear INTEGER');
+
+  addColumnSafe('quiz_attempts', 'totalQuestions INTEGER');
+  addColumnSafe('quiz_attempts', 'correctCount INTEGER');
+  addColumnSafe('quiz_attempts', 'accuracyPercent REAL');
+  addColumnSafe('quiz_attempts', 'totalDurationSeconds INTEGER');
+  addColumnSafe('quiz_attempts', 'antiCheatPassed INTEGER DEFAULT 1');
+
+  addColumnSafe('certificates', 'certificateId TEXT');
+  addColumnSafe('certificates', 'subjectName TEXT');
+  addColumnSafe('certificates', 'levelName TEXT');
+  addColumnSafe('certificates', 'issuedAt TEXT');
 
   // Seed default ACodes if empty
   const defaultAdminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();

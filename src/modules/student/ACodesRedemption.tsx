@@ -18,14 +18,14 @@ export const ACodesRedemption: React.FC<ACodesRedemptionProps> = ({
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleRedeem = (e: React.FormEvent) => {
+  const handleRedeem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!acodeInput.trim()) return;
 
     setIsSubmitting(true);
     setStatusMessage(null);
 
-    const result = PaymentService.redeemACode(learner.id, acodeInput.trim());
+    const result = await PaymentService.redeemACode(learner.id, acodeInput.trim());
     setIsSubmitting(false);
 
     if (result.success) {

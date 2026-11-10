@@ -587,6 +587,408 @@ apiRouter.get('/gifts/my-requests', (req, res) => {
 });
 
 // ==========================================
+// Quizzes & Attempts API
+// ==========================================
+apiRouter.post('/quizzes/attempt', (req, res) => {
+  try {
+    const {
+      learnerId,
+      board,
+      grade,
+      subjectId,
+      levelNode,
+      score,
+      maxScore,
+      passed,
+      totalDurationSeconds,
+      antiCheatPassed
+    } = req.body;
+
+    if (!learnerId || !board || !grade || !subjectId || !levelNode) {
+      return res.status(400).json({ success: false, error: 'Missing required quiz attempt fields.' });
+    }
+
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    if (!learner) {
+      return res.status(404).json({ success: false, error: 'Learner not found' });
+    }
+
+    const attemptId = 'qa_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+    const now = new Date().toISOString();
+    const finalScore = Number(score) || 0;
+    const finalMax = Number(maxScore) || 5;
+    const isPassed = passed ? 1 : 0;
+    const accuracy = Math.round((finalScore / finalMax) * 100);
+
+    db.prepare(`
+      INSERT INTO quiz_attempts (
+        id, learnerId, board, grade, subjectId, levelNode,
+        score, maxScore, passed, totalQuestions, correctCount,
+        accuracyPercent, totalDurationSeconds, antiCheatPassed, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      attemptId,
+      learnerId,
+      board,
+      Number(grade),
+      subjectId,
+      levelNode,
+      finalScore,
+      finalMax,
+      isPassed,
+      finalMax,
+      finalScore,
+      accuracy,
+      Number(totalDurationSeconds) || 0,
+      antiCheatPassed !== false ? 1 : 0,
+      now
+    );
+
+    // Increment quizzes completed count
+    const newQuizCount = (learner.quizzesCompletedCount || 0) + 1;
+    db.prepare(`
+      UPDATE learners
+      SET quizzesCompletedCount = ?, updatedAt = ?
+      WHERE id = ?
+    `).run(newQuizCount, now, learnerId);
+
+    // Referral qualification check on referee's first quiz
+    let referralBonusAwarded = false;
+    if (learner.referredBy && !learner.referralQualified) {
+      db.prepare('UPDATE learners SET referralQualified = 1, updatedAt = ? WHERE id = ?').run(now, learnerId);
+      const referrer = db.prepare('SELECT * FROM learners WHERE id = ?').get(learner.referredBy);
+      if (referrer) {
+        const updatedRefBal = (referrer.coinBalance || 0) + 40;
+        db.prepare('UPDATE learners SET coinBalance = ?, updatedAt = ? WHERE id = ?').run(updatedRefBal, now, referrer.id);
+        db.prepare(`
+          INSERT INTO coin_ledger (
+            entryId, learnerId, amount, transactionType, reasonCode,
+            balanceAfter, metadataJson, timestampUtc, signatureHash
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          'c_tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+          referrer.id,
+          40,
+          'CREDIT',
+          'REFERRAL_SIGNUP_QUALIFIED',
+          updatedRefBal,
+          JSON.stringify({ refereeId: learner.id, refereeName: learner.fullName }),
+          now,
+          'SIG_' + crypto.randomBytes(6).toString('hex')
+        );
+        referralBonusAwarded = true;
+      }
+    }
+
+    res.json({
+      success: true,
+      attemptId,
+      quizzesCompletedCount: newQuizCount,
+      referralBonusAwarded
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// Course Progress API
+// ==========================================
+apiRouter.post('/progress/level', (req, res) => {
+  try {
+    const {
+      learnerId,
+      board,
+      grade,
+      subjectId,
+      levelNode,
+      accuracy,
+      passed,
+      bestScorePercent,
+      calendarYear
+    } = req.body;
+
+    if (!learnerId || !board || !grade || !subjectId || !levelNode) {
+      return res.status(400).json({ success: false, error: 'Missing required progress parameters.' });
+    }
+
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    const now = new Date().toISOString();
+    const currYear = Number(calendarYear) || new Date().getFullYear();
+    const finalAccuracy = Number(bestScorePercent !== undefined ? bestScorePercent : accuracy) || 0;
+    const isPassed = passed ? 1 : 0;
+
+    const existing = db.prepare(`
+      SELECT * FROM course_progress
+      WHERE learnerId = ? AND board = ? AND grade = ? AND subjectId = ? AND levelNode = ?
+    `).get(learnerId, board, Number(grade), subjectId, levelNode);
+
+    let progressId;
+    let newlyCompleted = false;
+
+    if (existing) {
+      progressId = existing.id;
+      const updatedBest = Math.max(Number(existing.bestScorePercent || existing.accuracy || 0), finalAccuracy);
+      const updatedPassed = (existing.passed || isPassed) ? 1 : 0;
+
+      if (!existing.passed && isPassed) {
+        newlyCompleted = true;
+      }
+
+      db.prepare(`
+        UPDATE course_progress
+        SET accuracy = ?, bestScorePercent = ?, passed = ?, isCompleted = ?,
+            coinRewardClaimed = CASE WHEN coinRewardClaimed = 1 THEN 1 ELSE ? END,
+            completedAt = CASE WHEN ? = 1 THEN ? ELSE completedAt END,
+            calendarYear = ?
+        WHERE id = ?
+      `).run(
+        updatedBest,
+        updatedBest,
+        updatedPassed,
+        updatedPassed,
+        isPassed,
+        isPassed,
+        now,
+        currYear,
+        progressId
+      );
+    } else {
+      progressId = 'cp_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+      if (isPassed) newlyCompleted = true;
+
+      db.prepare(`
+        INSERT INTO course_progress (
+          id, learnerId, board, grade, subjectId, levelNode,
+          accuracy, bestScorePercent, passed, isCompleted,
+          coinRewardClaimed, completedAt, calendarYear
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        progressId,
+        learnerId,
+        board,
+        Number(grade),
+        subjectId,
+        levelNode,
+        finalAccuracy,
+        finalAccuracy,
+        isPassed,
+        isPassed,
+        isPassed,
+        isPassed ? now : now,
+        currYear
+      );
+    }
+
+    if (newlyCompleted) {
+      db.prepare(`
+        UPDATE learners
+        SET levelsCompletedCount = levelsCompletedCount + 1, updatedAt = ?
+        WHERE id = ?
+      `).run(now, learnerId);
+    }
+
+    res.json({ success: true, progressId, newlyCompleted });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.get('/progress/:learnerId', (req, res) => {
+  try {
+    const { learnerId } = req.params;
+    const progress = db.prepare(`
+      SELECT * FROM course_progress WHERE learnerId = ? ORDER BY completedAt DESC
+    `).all(learnerId);
+
+    const attempts = db.prepare(`
+      SELECT * FROM quiz_attempts WHERE learnerId = ? ORDER BY createdAt DESC LIMIT 100
+    `).all(learnerId);
+
+    res.json({ success: true, progress, attempts });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// Certificates API
+// ==========================================
+apiRouter.post('/certificates/issue', (req, res) => {
+  try {
+    const {
+      certificateId,
+      learnerId,
+      learnerName,
+      certificateType,
+      subjectId,
+      grade,
+      board,
+      academicYear,
+      issueDate,
+      issuedAt,
+      verificationToken,
+      subjectName,
+      levelName
+    } = req.body;
+
+    if (!learnerId || !certificateType) {
+      return res.status(400).json({ success: false, error: 'Missing certificate parameters.' });
+    }
+
+    const certId = certificateId || 'cert_' + Date.now().toString(36);
+    const dateStr = issuedAt || issueDate || new Date().toISOString();
+    const token = verificationToken || 'VTOKEN_' + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+    // Deduplication check for ANNUAL_MASTER in same academicYear
+    if (certificateType === 'ANNUAL_MASTER') {
+      const existing = db.prepare(`
+        SELECT * FROM certificates
+        WHERE learnerId = ? AND certificateType = 'ANNUAL_MASTER' AND academicYear = ?
+      `).get(learnerId, academicYear);
+      if (existing) {
+        return res.json({ success: true, certificateId: existing.id || existing.certificateId, deduplicated: true });
+      }
+    }
+
+    db.prepare(`
+      INSERT INTO certificates (
+        id, certificateId, learnerId, learnerName, certificateType,
+        subjectId, subjectName, grade, board, levelName,
+        academicYear, issueDate, issuedAt, verificationToken
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      certId,
+      certId,
+      learnerId,
+      learnerName || '',
+      certificateType,
+      subjectId || 'GENERAL',
+      subjectName || subjectId || 'General Mastery',
+      Number(grade) || 0,
+      board || 'CBSE',
+      levelName || 'Level Mastery',
+      academicYear || `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`,
+      dateStr,
+      dateStr,
+      token
+    );
+
+    res.json({ success: true, certificateId: certId });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.get('/certificates/:learnerId', (req, res) => {
+  try {
+    const { learnerId } = req.params;
+    const certs = db.prepare(`
+      SELECT * FROM certificates WHERE learnerId = ? ORDER BY issueDate DESC
+    `).all(learnerId);
+
+    const formatted = certs.map(c => ({
+      certificateId: c.certificateId || c.id,
+      learnerId: c.learnerId,
+      learnerName: c.learnerName,
+      certificateType: c.certificateType,
+      board: c.board,
+      grade: c.grade,
+      subjectName: c.subjectName || c.subjectId,
+      levelName: c.levelName || 'Level Mastery',
+      academicYear: c.academicYear,
+      issuedAt: c.issuedAt || c.issueDate,
+      verificationToken: c.verificationToken
+    }));
+
+    res.json({ success: true, certificates: formatted });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// ACode Institutional Scholarship Redemption API
+// ==========================================
+apiRouter.post('/acodes/redeem', (req, res) => {
+  try {
+    const { learnerId, code } = req.body;
+    if (!learnerId || !code) {
+      return res.status(400).json({ success: false, error: 'learnerId and code are required.' });
+    }
+
+    const cleanCode = String(code).trim().toUpperCase();
+    const acode = db.prepare('SELECT * FROM acodes WHERE UPPER(code) = ?').get(cleanCode);
+
+    if (!acode) {
+      return res.status(404).json({ success: false, error: 'Invalid ACode. Please verify your promotional voucher key.' });
+    }
+
+    if (acode.isRedeemed) {
+      return res.status(400).json({ success: false, error: 'This ACode has already been redeemed.' });
+    }
+
+    if (new Date(acode.expiresAt).getTime() < Date.now()) {
+      return res.status(400).json({ success: false, error: 'This ACode has expired.' });
+    }
+
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    if (!learner) {
+      return res.status(404).json({ success: false, error: 'Learner not found.' });
+    }
+
+    const now = new Date();
+    const expiry = new Date(now.getTime() + acode.durationDays * 24 * 60 * 60 * 1000);
+    const subId = 'acode_sub_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+
+    // Create active subscription
+    db.prepare(`
+      INSERT INTO subscriptions (
+        id, learnerId, planTier, status, paymentMethod,
+        utrReference, payerUpiId, amountInr, durationDays,
+        startsAt, expiresAt, verifiedByAdmin, verifiedAt,
+        invoiceNumber, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      subId,
+      learnerId,
+      acode.planTier,
+      'ACTIVE',
+      'ACODE_SCHOLARSHIP',
+      `ACODE-${cleanCode}`,
+      'ACODE_VOUCHER',
+      0,
+      acode.durationDays,
+      now.toISOString(),
+      expiry.toISOString(),
+      acode.createdBy || 'ADMIN',
+      now.toISOString(),
+      `SCHOLAR-${cleanCode}`,
+      now.toISOString()
+    );
+
+    // Mark ACode as redeemed
+    db.prepare(`
+      UPDATE acodes
+      SET isRedeemed = 1, redeemedBy = ?
+      WHERE code = ?
+    `).run(learnerId, acode.code);
+
+    const subscription = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(subId);
+
+    res.json({
+      success: true,
+      message: `Success! Redeemed ${acode.code}. You now have ${acode.durationDays} days of ${acode.planTier} Premium access!`,
+      subscription
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
 // Super-Admin Backend Authentication & Control Plane
 // ==========================================
 apiRouter.post('/auth/admin-verify', (req, res) => {
@@ -1301,6 +1703,36 @@ apiRouter.get('/storage', (req, res) => {
       (adminToken && isValidAdminSession(String(adminToken).trim())) ||
       (adminPasskey && ADMIN_VALID_PASSKEYS.has(String(adminPasskey).trim()));
 
+    const rawProgress = db.prepare('SELECT * FROM course_progress').all();
+    const formattedProgress = rawProgress.map(p => ({
+      id: p.id,
+      learnerId: p.learnerId,
+      board: p.board,
+      grade: p.grade,
+      subjectId: p.subjectId,
+      levelNode: p.levelNode,
+      isCompleted: Boolean(p.isCompleted || p.passed),
+      bestScorePercent: p.bestScorePercent ?? p.accuracy ?? 0,
+      coinRewardClaimed: Boolean(p.coinRewardClaimed || p.passed),
+      completedAt: p.completedAt,
+      calendarYear: p.calendarYear || new Date(p.completedAt || Date.now()).getFullYear()
+    }));
+
+    const rawCerts = db.prepare('SELECT * FROM certificates').all();
+    const formattedCerts = rawCerts.map(c => ({
+      certificateId: c.certificateId || c.id,
+      learnerId: c.learnerId,
+      learnerName: c.learnerName,
+      certificateType: c.certificateType,
+      board: c.board,
+      grade: c.grade,
+      subjectName: c.subjectName || c.subjectId,
+      levelName: c.levelName || 'Level Mastery',
+      academicYear: c.academicYear,
+      issuedAt: c.issuedAt || c.issueDate,
+      verificationToken: c.verificationToken
+    }));
+
     if (isAdmin) {
       // Full, unredacted database dump strictly for verified Super Admin
       const learners = db.prepare('SELECT * FROM learners').all();
@@ -1310,10 +1742,29 @@ apiRouter.get('/storage', (req, res) => {
       const acodes = db.prepare('SELECT * FROM acodes').all();
       const logs = db.prepare('SELECT * FROM security_audit_logs').all();
 
+      const rawAttempts = db.prepare('SELECT * FROM quiz_attempts').all();
+      const formattedAttempts = rawAttempts.map(q => ({
+        id: q.id,
+        learnerId: q.learnerId,
+        board: q.board,
+        grade: q.grade,
+        subjectId: q.subjectId,
+        levelNode: q.levelNode,
+        totalQuestions: q.totalQuestions || q.maxScore || 5,
+        correctCount: q.correctCount || q.score || 0,
+        accuracyPercent: q.accuracyPercent || (q.maxScore ? Math.round((q.score / q.maxScore) * 100) : 0),
+        totalDurationSeconds: q.totalDurationSeconds || 0,
+        antiCheatPassed: Boolean(q.antiCheatPassed ?? 1),
+        completedAt: q.createdAt
+      }));
+
       return res.json({
         al_prod_learners_v1: learners,
         al_prod_subscriptions_v1: subs,
         al_prod_coin_ledger_v1: ledger,
+        al_prod_course_progress_v1: formattedProgress,
+        al_prod_quiz_attempts_v1: formattedAttempts,
+        al_prod_certificates_v1: formattedCerts,
         al_prod_gift_requests_v1: gifts,
         al_prod_acodes_v1: acodes,
         al_prod_security_audit_logs_v1: logs
@@ -1349,6 +1800,8 @@ apiRouter.get('/storage', (req, res) => {
       al_prod_learners_v1: rawLearners,
       al_prod_subscriptions_v1: subs,
       al_prod_coin_ledger_v1: ledger,
+      al_prod_course_progress_v1: formattedProgress,
+      al_prod_certificates_v1: formattedCerts,
       al_prod_gift_requests_v1: [],
       al_prod_acodes_v1: [],
       al_prod_security_audit_logs_v1: []
@@ -1439,4 +1892,9 @@ apiRouter.post('/storage', adminAuth, (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
+});
+
+// 404 JSON Fallback for any unmatched API endpoints
+apiRouter.use((req, res) => {
+  res.status(404).json({ success: false, error: `API route not found: ${req.method} ${req.originalUrl}` });
 });

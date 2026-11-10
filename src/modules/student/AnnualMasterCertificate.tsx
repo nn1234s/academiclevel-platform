@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Learner } from '../../core/types';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { CertificateService } from '../../services/certificateService';
+import { ApiClient } from '../../core/api/apiClient';
 import confetti from 'canvas-confetti';
 import { Award, Sparkles, CheckCircle2, Lock, ArrowRight, AlertCircle } from 'lucide-react';
 
@@ -43,6 +44,9 @@ export const AnnualMasterCertificate: React.FC<AnnualMasterCertificateProps> = (
     );
 
     if (result.awarded) {
+      if (result.certificate) {
+        ApiClient.issueCertificate(result.certificate).catch(() => {});
+      }
       try {
         confetti({
           particleCount: 150,

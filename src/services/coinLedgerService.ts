@@ -1,5 +1,6 @@
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../core/storage/StorageRLSLayer';
 import { CoinLedgerEntry, CoinReasonCode, Learner } from '../core/types';
+import { ApiClient } from '../core/api/apiClient';
 
 /**
  * Append-Only Study Coin Ledger Service
@@ -73,6 +74,9 @@ export class CoinLedgerService {
     learner.coinBalance = newBalance;
     StorageRLSLayer.saveLearner(learner, learnerId);
 
+    // 3. Dispatch to server database
+    ApiClient.transactCoins(learnerId, amount, amount >= 0 ? 'CREDIT' : 'DEBIT', reasonCode, metadata).catch(() => {});
+
     return { success: true, newBalance };
   }
 
@@ -134,7 +138,7 @@ export class CoinLedgerService {
 
     if (result.success) {
       // Mark claimed in progress
-      StorageRLSLayer.saveProgress({
+      const progressRecord = {
         learnerId,
         board: board as any,
         grade: grade as any,
@@ -145,7 +149,9 @@ export class CoinLedgerService {
         coinRewardClaimed: true,
         completedAt: new Date().toISOString(),
         calendarYear: new Date().getFullYear()
-      });
+      };
+      StorageRLSLayer.saveProgress(progressRecord);
+      ApiClient.recordLevelProgress(progressRecord).catch(() => {});
 
       return {
         awarded: true,

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Learner, GiftRequest } from '../../core/types';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { CoinLedgerService } from '../../services/coinLedgerService';
+import { ApiClient } from '../../core/api/apiClient';
 import {
   Gift,
   Sparkles,
@@ -214,6 +215,18 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner 
     };
 
     StorageRLSLayer.saveGiftRequest(newRequest);
+
+    // Sync redemption to server database queue
+    ApiClient.redeemGift({
+      learnerId: learner.id,
+      level: selectedLevel.level,
+      brand: selectedBrand,
+      rsAmount: selectedLevel.rsAmount,
+      coinsCost: selectedLevel.coinsCost,
+      deliveryEmail: deliveryEmail.trim(),
+      deliveryPhone: deliveryPhone.trim(),
+      upiId: selectedBrand === 'UPI_CASH' && upiIdInput ? upiIdInput.trim() : undefined
+    }).catch(() => {});
 
     // 3. Prepare formal email request directed to academiclevels@gmail.com
     const mailSubject = `[Gift Card Claim] Level ${selectedLevel.level} (₹${selectedLevel.rsAmount} ${brandName}) - ${learner.fullName}`;

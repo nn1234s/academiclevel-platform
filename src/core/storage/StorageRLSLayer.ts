@@ -124,9 +124,6 @@ class StorageRLSLayerClass {
     if (token) return true;
     const session = this.getCurrentSession();
     if (session?.role === 'SUPER_ADMIN') return true;
-    const storedEmail = sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email');
-    if (storedEmail && adminEmail && adminEmail.toLowerCase() === storedEmail.toLowerCase()) return true;
-    if (adminEmail && adminEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) return true;
     return false;
   }
 
@@ -306,6 +303,11 @@ class StorageRLSLayerClass {
     }
     this.writeRaw(STORAGE_KEYS.LEARNERS, learners);
     return true;
+  }
+
+  public getQualifiedReferralsCount(learnerId: string): number {
+    const learners = this.readRaw<Learner[]>(STORAGE_KEYS.LEARNERS, []);
+    return learners.filter(l => l.referredBy === learnerId && Boolean(l.referralQualified)).length;
   }
 
   // Super-admin only method

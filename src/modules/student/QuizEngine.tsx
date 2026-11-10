@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Question, Board, Grade, LevelNode, Learner } from '../../core/types';
+import { Question, Board, Grade, LevelNode, Learner, QuizAttempt, LevelProgress } from '../../core/types';
 import { OfflineBankService } from '../../services/offlineBankService';
 import { HybridQuizService } from '../../services/hybridQuizService';
 import { CoinLedgerService } from '../../services/coinLedgerService';
 import { QuotaService } from '../../services/quotaService';
 import { CertificateService } from '../../services/certificateService';
+import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
+import { ApiClient } from '../../core/api/apiClient';
 import confetti from 'canvas-confetti';
 import {
   Clock,
@@ -139,10 +141,53 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       // Anti-cheat verification
       const antiCheatPassed = antiCheatViolations === 0;
 
-      // 1. Record Quota & Attempt
+      // 1. Record Quota & Attempt Counter
       QuotaService.recordQuizCompletion(learner.id);
 
-      // 2. Award Level Completion Reward if passed
+      // Qualify referral if referee's first quiz
+      CoinLedgerService.qualifyReferralOnFirstQuiz(learner.id);
+
+      // 2. Build & Persist Quiz Attempt
+      const attempt: QuizAttempt = {
+        id: 'qa_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6),
+        learnerId: learner.id,
+        board,
+        grade,
+        subjectId,
+        levelNode,
+        totalQuestions,
+        correctCount: finalScore,
+        accuracyPercent,
+        totalDurationSeconds: Math.max(10, questionDwellSeconds),
+        antiCheatPassed,
+        completedAt: new Date().toISOString()
+      };
+      StorageRLSLayer.recordQuizAttempt(attempt);
+      ApiClient.recordQuizAttempt(attempt).catch(() => {});
+
+      // 3. Save Level Mastery Progress
+      const existingList = StorageRLSLayer.getProgressForLearner(learner.id, learner.id);
+      const existingProgress = existingList.find(
+        p => p.board === board && p.grade === grade && p.subjectId === subjectId && p.levelNode === levelNode
+      );
+      const isNewBest = !existingProgress || accuracyPercent > (existingProgress.bestScorePercent || 0);
+
+      const progressRecord: LevelProgress = {
+        learnerId: learner.id,
+        board,
+        grade,
+        subjectId,
+        levelNode,
+        isCompleted: passed || Boolean(existingProgress?.isCompleted),
+        bestScorePercent: isNewBest ? accuracyPercent : (existingProgress?.bestScorePercent ?? accuracyPercent),
+        coinRewardClaimed: Boolean(existingProgress?.coinRewardClaimed || (passed && antiCheatPassed)),
+        completedAt: passed ? (existingProgress?.completedAt || new Date().toISOString()) : existingProgress?.completedAt,
+        calendarYear: new Date().getFullYear()
+      };
+      StorageRLSLayer.saveProgress(progressRecord);
+      ApiClient.recordLevelProgress(progressRecord).catch(() => {});
+
+      // 4. Award Level Completion Reward if passed
       if (passed) {
         QuotaService.recordLevelCompletion(learner.id);
 
@@ -157,8 +202,8 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         );
         setRewardResult(reward);
 
-        // 3. Issue verifiable certificate
-        CertificateService.issueLevelCertificate(
+        // 5. Issue verifiable certificate
+        const cert = CertificateService.issueLevelCertificate(
           learner.id,
           learner.fullName,
           board,
@@ -166,6 +211,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
           subjectId.toUpperCase(),
           levelNode
         );
+        ApiClient.issueCertificate(cert).catch(() => {});
 
         // Trigger Confetti
         try {

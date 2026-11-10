@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Learner } from '../../core/types';
 import { CoinLedgerService } from '../../services/coinLedgerService';
-import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
+import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
+import { ApiClient } from '../../core/api/apiClient';
 import confetti from 'canvas-confetti';
 import { Sparkles, Clock, Lock, Unlock, Trophy, AlertCircle } from 'lucide-react';
 
@@ -21,11 +22,8 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
     error?: string;
   } | null>(null);
 
-  // Check qualified referral count
-  const allLearners = StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL);
-  const qualifiedReferralsCount = allLearners.filter(
-    l => l.referredBy === learner.id && l.referralQualified
-  ).length;
+  // Safely check qualified referral count without admin privilege requirement
+  const qualifiedReferralsCount = StorageRLSLayer.getQualifiedReferralsCount(learner.id);
   const isJackpotUnlocked = qualifiedReferralsCount >= 1;
 
   useEffect(() => {
@@ -51,14 +49,27 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
     return `${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
   };
 
-  const handleSpinClick = () => {
+  const handleSpinClick = async () => {
     if (!canSpin || isSpinning) return;
 
     setIsSpinning(true);
     setSpinResult(null);
 
-    // Call service to compute reward
-    const result = CoinLedgerService.executeSpin(learner.id);
+    let result = { coinsAwarded: 2, isJackpot: false, error: undefined as string | undefined };
+    try {
+      const serverRes = await ApiClient.spinWheel(learner.id);
+      result = { coinsAwarded: serverRes.coinsWon, isJackpot: serverRes.isJackpot, error: undefined };
+      const localLearner = StorageRLSLayer.getLearnerById(learner.id, learner.id);
+      if (localLearner) {
+        localLearner.coinBalance = serverRes.newBalance;
+        localLearner.lastSpinTimestampUtc = new Date().toISOString();
+        StorageRLSLayer.saveLearner(localLearner, learner.id);
+      }
+    } catch {
+      // Offline fallback
+      const fallback = CoinLedgerService.executeSpin(learner.id);
+      result = { coinsAwarded: fallback.coinsAwarded, isJackpot: fallback.isJackpot, error: fallback.error };
+    }
 
     // Determine target rotation
     // 4 slices: 0: 2 coins (90 deg), 1: 3 coins (180 deg), 2: 5 coins (270 deg), 3: 40 coins jackpot (360 deg)
