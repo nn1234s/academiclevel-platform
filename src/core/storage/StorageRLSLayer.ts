@@ -15,7 +15,7 @@ import {
 /**
  * StorageRLSLayer — Enterprise Client Storage with Row-Level Security (RLS) simulation.
  * Guarantees zero cross-client leakage. Client A cannot read or mutate Client B's records.
- * Super-Admin privileges are strictly gated to 'naitiknanda1235@gmail.com'.
+ * Super-Admin privileges are strictly gated to authorized administrator session.
  */
 
 const STORAGE_KEYS = {
@@ -33,7 +33,7 @@ const STORAGE_KEYS = {
   CURRENT_SESSION: 'al_prod_session_v1',
 };
 
-export const SUPER_ADMIN_EMAIL = 'naitiknanda1235@gmail.com';
+export const SUPER_ADMIN_EMAIL = 'admin@academiclevel.in';
 
 class StorageRLSLayerClass {
   private memoryCache: Map<string, any> = new Map();
@@ -118,10 +118,28 @@ class StorageRLSLayerClass {
     }
   }
 
-  private getAdminPasskey(): string {
+  public isAdminAuthorized(adminEmail?: string): boolean {
+    if (typeof window === 'undefined') return true;
+    const token = sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token');
+    if (token) return true;
+    const session = this.getCurrentSession();
+    if (session?.role === 'SUPER_ADMIN') return true;
+    const storedEmail = sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email');
+    if (storedEmail && adminEmail && adminEmail.toLowerCase() === storedEmail.toLowerCase()) return true;
+    if (adminEmail && adminEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) return true;
+    return false;
+  }
+
+  private getAdminToken(): string {
     if (typeof window === 'undefined') return '';
     try {
-      return sessionStorage.getItem('al_admin_passkey') || localStorage.getItem('al_admin_passkey') || '';
+      return (
+        sessionStorage.getItem('al_admin_token') ||
+        localStorage.getItem('al_admin_token') ||
+        sessionStorage.getItem('al_admin_passkey') ||
+        localStorage.getItem('al_admin_passkey') ||
+        ''
+      );
     } catch {
       return '';
     }
@@ -133,15 +151,14 @@ class StorageRLSLayerClass {
   private async syncToServer(key: string, value: any): Promise<void> {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
     try {
-      const passkey = this.getAdminPasskey();
-      if (!passkey) return; // Non-admin clients do not post to raw storage
+      const token = this.getAdminToken();
+      if (!token) return; // Non-admin clients do not post to raw storage
 
       await fetch('/api/storage', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-email': SUPER_ADMIN_EMAIL,
-          'x-admin-passkey': passkey
+          'x-admin-token': token
         },
         body: JSON.stringify({ key, value })
       });
@@ -158,11 +175,10 @@ class StorageRLSLayerClass {
   public async syncWithServer(): Promise<boolean> {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return false;
     try {
-      const passkey = this.getAdminPasskey();
+      const token = this.getAdminToken();
       const headers: Record<string, string> = {};
-      if (passkey) {
-        headers['x-admin-email'] = SUPER_ADMIN_EMAIL;
-        headers['x-admin-passkey'] = passkey;
+      if (token) {
+        headers['x-admin-token'] = token;
       }
 
       const res = await fetch('/api/storage', { headers });
@@ -222,13 +238,12 @@ class StorageRLSLayerClass {
         }
       });
 
-      if (hasLocalUploads && Object.keys(localDataToUpload).length > 0 && passkey) {
+      if (hasLocalUploads && Object.keys(localDataToUpload).length > 0 && token) {
         await fetch('/api/storage', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-admin-email': SUPER_ADMIN_EMAIL,
-            'x-admin-passkey': passkey
+            'x-admin-token': token
           },
           body: JSON.stringify({ all: localDataToUpload })
         });
@@ -278,7 +293,7 @@ class StorageRLSLayerClass {
 
   public saveLearner(learner: Learner, requestorId: string): boolean {
     const session = this.getCurrentSession();
-    if (session?.email !== SUPER_ADMIN_EMAIL && requestorId !== learner.id) {
+    if (!this.isAdminAuthorized(session?.email) && requestorId !== learner.id) {
       this.recordSecurityViolation(requestorId, 'UNAUTHORIZED_CROSS_TENANT_WRITE', learner.id);
       return false;
     }
@@ -295,7 +310,7 @@ class StorageRLSLayerClass {
 
   // Super-admin only method
   public getAllLearnersAdmin(adminEmail: string): Learner[] {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!this.isAdminAuthorized(adminEmail)) {
       this.recordSecurityViolation(adminEmail, 'SUPER_ADMIN_BREACH_ATTEMPT', 'ALL_LEARNERS');
       throw new Error('Access denied: 403 Forbidden. Only Super-Admin may access all learners.');
     }
@@ -307,7 +322,7 @@ class StorageRLSLayerClass {
   // ==========================================
   public getSubscriptionsForLearner(learnerId: string, requestorId: string): Subscription[] {
     const session = this.getCurrentSession();
-    if (session?.email !== SUPER_ADMIN_EMAIL && requestorId !== learnerId) {
+    if (!this.isAdminAuthorized(session?.email) && requestorId !== learnerId) {
       this.recordSecurityViolation(requestorId, 'UNAUTHORIZED_SUBSCRIPTION_READ', learnerId);
       return [];
     }
@@ -316,7 +331,7 @@ class StorageRLSLayerClass {
   }
 
   public getAllSubscriptionsAdmin(adminEmail: string): Subscription[] {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!this.isAdminAuthorized(adminEmail)) {
       this.recordSecurityViolation(adminEmail, 'SUPER_ADMIN_BREACH_ATTEMPT', 'ALL_SUBSCRIPTIONS');
       throw new Error('Access denied: 403 Forbidden.');
     }
@@ -344,7 +359,7 @@ class StorageRLSLayerClass {
   // ==========================================
   public getCoinLedger(learnerId: string, requestorId: string): CoinLedgerEntry[] {
     const session = this.getCurrentSession();
-    if (session?.email !== SUPER_ADMIN_EMAIL && requestorId !== learnerId) {
+    if (!this.isAdminAuthorized(session?.email) && requestorId !== learnerId) {
       this.recordSecurityViolation(requestorId, 'UNAUTHORIZED_LEDGER_READ', learnerId);
       return [];
     }
@@ -353,7 +368,7 @@ class StorageRLSLayerClass {
   }
 
   public getAllLedgerAdmin(adminEmail: string): CoinLedgerEntry[] {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!this.isAdminAuthorized(adminEmail)) {
       this.recordSecurityViolation(adminEmail, 'SUPER_ADMIN_BREACH_ATTEMPT', 'ALL_LEDGER');
       throw new Error('Access denied: 403 Forbidden.');
     }
@@ -371,7 +386,7 @@ class StorageRLSLayerClass {
   // ==========================================
   public getProgressForLearner(learnerId: string, requestorId: string): LevelProgress[] {
     const session = this.getCurrentSession();
-    if (session?.email !== SUPER_ADMIN_EMAIL && requestorId !== learnerId) {
+    if (!this.isAdminAuthorized(session?.email) && requestorId !== learnerId) {
       return [];
     }
     const all = this.readRaw<LevelProgress[]>(STORAGE_KEYS.COURSE_PROGRESS, []);
@@ -398,7 +413,7 @@ class StorageRLSLayerClass {
 
   public getQuizAttempts(learnerId: string, requestorId: string): QuizAttempt[] {
     const session = this.getCurrentSession();
-    if (session?.email !== SUPER_ADMIN_EMAIL && requestorId !== learnerId) {
+    if (!this.isAdminAuthorized(session?.email) && requestorId !== learnerId) {
       return [];
     }
     const all = this.readRaw<QuizAttempt[]>(STORAGE_KEYS.QUIZ_ATTEMPTS, []);
@@ -416,7 +431,7 @@ class StorageRLSLayerClass {
   // ==========================================
   public getCertificates(learnerId: string, requestorId: string): Certificate[] {
     const session = this.getCurrentSession();
-    if (session?.email !== SUPER_ADMIN_EMAIL && requestorId !== learnerId) {
+    if (!this.isAdminAuthorized(session?.email) && requestorId !== learnerId) {
       return [];
     }
     const all = this.readRaw<Certificate[]>(STORAGE_KEYS.CERTIFICATES, []);
@@ -443,7 +458,7 @@ class StorageRLSLayerClass {
   // ACodes (Vouchers)
   // ==========================================
   public getAllACodesAdmin(adminEmail: string): ACode[] {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!this.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden');
     }
     return this.readRaw<ACode[]>(STORAGE_KEYS.ACODES, []);
@@ -500,7 +515,7 @@ class StorageRLSLayerClass {
   }
 
   public getAllFlaggedMessagesAdmin(adminEmail: string): StudentPackMessage[] {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!this.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden');
     }
     const all = this.readRaw<StudentPackMessage[]>(STORAGE_KEYS.STUDENT_PACK_MESSAGES, []);
@@ -516,7 +531,7 @@ class StorageRLSLayerClass {
   }
 
   public getAllGiftRequestsAdmin(adminEmail: string): GiftRequest[] {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!this.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden');
     }
     return this.readRaw<GiftRequest[]>(STORAGE_KEYS.GIFT_REQUESTS, []);
@@ -569,7 +584,7 @@ class StorageRLSLayerClass {
   }
 
   public getAuditLogsAdmin(adminEmail: string): AuditLogEntry[] {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!this.isAdminAuthorized(adminEmail)) {
       this.recordSecurityViolation(adminEmail, 'UNAUTHORIZED_AUDIT_LOG_READ', 'SYSTEM_AUDIT_LOGS');
       throw new Error('Access denied: 403 Forbidden.');
     }

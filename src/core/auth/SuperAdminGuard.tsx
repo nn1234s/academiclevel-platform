@@ -17,16 +17,15 @@ export const SuperAdminGuard: React.FC<SuperAdminGuardProps> = ({
   const [adminEmailInput, setAdminEmailInput] = useState('');
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
 
   useEffect(() => {
-    // If a non-admin student is currently logged in, deny admin access
-    if (currentLearner && currentLearner.email.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
-      StorageRLSLayer.recordSecurityViolation(
-        currentLearner.email,
-        'UNAUTHORIZED_ADMIN_VAULT_PROBE',
-        '/adminservice'
-      );
-      setAccessDenied(true);
+    // If a regular student is logged in without admin session token, deny direct portal access
+    if (currentLearner && currentLearner.role !== 'SUPER_ADMIN') {
+      const adminToken = typeof window !== 'undefined' ? sessionStorage.getItem('al_admin_token') : null;
+      if (!adminToken) {
+        setAccessDenied(true);
+      }
     }
   }, [currentLearner]);
 
@@ -34,27 +33,45 @@ export const SuperAdminGuard: React.FC<SuperAdminGuardProps> = ({
     return <>{children}</>;
   }
 
-  const handleSuperAdminUnlock = (e: React.FormEvent) => {
+  const handleSuperAdminUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
-    const isEmailValid = adminEmailInput.trim().toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
-    const isPasswordValid =
-      adminPasswordInput.trim() === 'vault99' || adminPasswordInput.trim() === 'naitik2026';
+    setIsVerifying(true);
+    setLoginError('');
 
-    if (isEmailValid && isPasswordValid) {
-      try {
-        sessionStorage.setItem('al_admin_passkey', adminPasswordInput.trim());
-        localStorage.setItem('al_admin_passkey', adminPasswordInput.trim());
-      } catch {}
-      StorageRLSLayer.syncWithServer().catch(() => {});
-      loginSuperAdmin();
-      setAccessDenied(false);
-    } else {
-      StorageRLSLayer.recordSecurityViolation(
-        adminEmailInput.trim() || 'ANONYMOUS_IP',
-        'FAILED_SUPERADMIN_VAULT_CHALLENGE',
-        '/adminservice'
-      );
-      setLoginError('Invalid administrator credentials. Access denied.');
+    try {
+      const res = await fetch('/api/auth/admin-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: adminEmailInput.trim(),
+          passkey: adminPasswordInput.trim()
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.token) {
+        try {
+          sessionStorage.setItem('al_admin_token', data.token);
+          sessionStorage.setItem('al_admin_email', data.email || adminEmailInput.trim());
+          localStorage.setItem('al_admin_token', data.token);
+          localStorage.setItem('al_admin_email', data.email || adminEmailInput.trim());
+        } catch {}
+
+        await StorageRLSLayer.syncWithServer();
+        loginSuperAdmin();
+        setAccessDenied(false);
+      } else {
+        StorageRLSLayer.recordSecurityViolation(
+          adminEmailInput.trim() || 'ANONYMOUS_IP',
+          'FAILED_SUPERADMIN_VAULT_CHALLENGE',
+          '/adminservice'
+        );
+        setLoginError(data.error || 'Invalid administrator credentials. Access denied.');
+      }
+    } catch (err: any) {
+      setLoginError(err.message || 'Connection error. Please try again.');
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -141,10 +158,11 @@ export const SuperAdminGuard: React.FC<SuperAdminGuardProps> = ({
 
             <button
               type="submit"
-              className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-lg shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-2"
+              disabled={isVerifying}
+              className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold text-xs rounded-lg shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-2"
             >
               <KeyRound className="w-4 h-4" />
-              <span>Sign In to Admin Service</span>
+              <span>{isVerifying ? 'Verifying with Backend...' : 'Sign In to Admin Service'}</span>
             </button>
 
             <button

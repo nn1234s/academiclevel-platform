@@ -1,7 +1,32 @@
 import express from 'express';
 import cors from 'cors';
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
 import { db, initDatabaseSchema } from './db.js';
+
+// Auto-load .env configuration if present
+try {
+  const envPath = path.resolve(process.cwd(), '.env');
+  if (fs.existsSync(envPath)) {
+    const envLines = fs.readFileSync(envPath, 'utf8').split('\n');
+    for (const rawLine of envLines) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#')) continue;
+      const idx = line.indexOf('=');
+      if (idx !== -1) {
+        const k = line.substring(0, idx).trim();
+        let v = line.substring(idx + 1).trim();
+        if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+          v = v.slice(1, -1);
+        }
+        if (!process.env[k]) {
+          process.env[k] = v;
+        }
+      }
+    }
+  }
+} catch {}
 
 initDatabaseSchema();
 
@@ -10,8 +35,26 @@ export const apiRouter = express.Router();
 apiRouter.use(cors());
 apiRouter.use(express.json());
 
-const SUPER_ADMIN_EMAIL = 'naitiknanda1235@gmail.com';
-const ADMIN_VALID_PASSKEYS = new Set(['naitik2026', 'vault99']);
+const SUPER_ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+const ADMIN_VALID_PASSKEYS = new Set(
+  [process.env.ADMIN_PASSKEY, process.env.ADMIN_PASSKEY_FALLBACK]
+    .filter(Boolean)
+    .map(s => String(s).trim())
+);
+
+// Active Admin In-Memory Session Storage: token -> { email, expiresAt }
+const adminSessions = new Map();
+
+function isValidAdminSession(token) {
+  if (!token) return false;
+  const sess = adminSessions.get(String(token).trim());
+  if (!sess) return false;
+  if (Date.now() > sess.expiresAt) {
+    adminSessions.delete(String(token).trim());
+    return false;
+  }
+  return true;
+}
 
 // ==========================================
 // Health & Telemetry
@@ -544,9 +587,69 @@ apiRouter.get('/gifts/my-requests', (req, res) => {
 });
 
 // ==========================================
-// Super-Admin Control Plane Routes
+// Super-Admin Backend Authentication & Control Plane
 // ==========================================
+apiRouter.post('/auth/admin-verify', (req, res) => {
+  try {
+    const { email, passkey } = req.body;
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    const cleanPass = String(passkey || '').trim();
+
+    const isEmailValid = cleanEmail === SUPER_ADMIN_EMAIL.toLowerCase();
+    const isPassValid = ADMIN_VALID_PASSKEYS.has(cleanPass);
+
+    if (!isEmailValid || !isPassValid) {
+      try {
+        db.prepare(`
+          INSERT INTO security_audit_logs (id, learnerId, action, targetResource, ipAddress, userAgent, timestampUtc)
+          VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+        `).run(
+          'sec_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6),
+          cleanEmail || 'ANONYMOUS',
+          'FAILED_ADMIN_LOGIN_CHALLENGE',
+          '/api/auth/admin-verify',
+          req.ip || req.headers['x-forwarded-for'] || 'UNKNOWN',
+          req.headers['user-agent'] || 'UNKNOWN'
+        );
+      } catch {}
+
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid administrator credentials. Access denied.'
+      });
+    }
+
+    const token = 'adm_sess_' + crypto.randomBytes(32).toString('hex');
+    const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+    adminSessions.set(token, { email: cleanEmail, expiresAt });
+
+    try {
+      db.prepare(`
+        INSERT INTO security_audit_logs (id, learnerId, action, targetResource, ipAddress, userAgent, timestampUtc)
+        VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+      `).run(
+        'sec_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6),
+        cleanEmail,
+        'SUCCESSFUL_ADMIN_LOGIN',
+        '/api/auth/admin-verify',
+        req.ip || req.headers['x-forwarded-for'] || 'UNKNOWN',
+        req.headers['user-agent'] || 'UNKNOWN'
+      );
+    } catch {}
+
+    res.json({
+      success: true,
+      token,
+      email: cleanEmail,
+      message: 'Admin authorization granted.'
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 const adminAuth = (req, res, next) => {
+  const adminToken = req.headers['x-admin-token'] || req.query.adminToken;
   const adminEmail = req.headers['x-admin-email'] || req.query.adminEmail;
   const adminPasskey =
     req.headers['x-admin-passkey'] ||
@@ -555,10 +658,14 @@ const adminAuth = (req, res, next) => {
     req.query.adminPasskey ||
     req.body?.adminPasskey;
 
-  const isEmailValid = adminEmail && String(adminEmail).toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
-  const isPasskeyValid = adminPasskey && ADMIN_VALID_PASSKEYS.has(String(adminPasskey).trim());
+  const hasValidToken = adminToken && isValidAdminSession(String(adminToken).trim());
+  const hasValidDirectPasskey =
+    adminEmail &&
+    String(adminEmail).toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase() &&
+    adminPasskey &&
+    ADMIN_VALID_PASSKEYS.has(String(adminPasskey).trim());
 
-  if (!isEmailValid || !isPasskeyValid) {
+  if (!hasValidToken && !hasValidDirectPasskey) {
     try {
       db.prepare(`
         INSERT INTO security_audit_logs (id, learnerId, action, targetResource, ipAddress, userAgent, timestampUtc)
@@ -575,7 +682,7 @@ const adminAuth = (req, res, next) => {
 
     return res.status(401).json({
       success: false,
-      error: '401 Unauthorized: Valid administrator passkey (naitik2026) required.'
+      error: '401 Unauthorized: Valid administrator session required.'
     });
   }
   next();
@@ -1183,12 +1290,16 @@ Rules:
 // ==========================================
 apiRouter.get('/storage', (req, res) => {
   try {
+    const adminToken = req.headers['x-admin-token'] || req.query.adminToken;
     const adminPasskey =
       req.headers['x-admin-passkey'] ||
       req.headers['x-admin-key'] ||
       req.query.passkey ||
       req.query.adminPasskey;
-    const isAdmin = adminPasskey && ADMIN_VALID_PASSKEYS.has(String(adminPasskey).trim());
+
+    const isAdmin =
+      (adminToken && isValidAdminSession(String(adminToken).trim())) ||
+      (adminPasskey && ADMIN_VALID_PASSKEYS.has(String(adminPasskey).trim()));
 
     if (isAdmin) {
       // Full, unredacted database dump strictly for verified Super Admin

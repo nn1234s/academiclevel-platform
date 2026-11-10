@@ -25,8 +25,15 @@ dist-ssr
 
 # Environment files
 .env
+.env.*
 .env.production
+!.env.example
 
-# SQLite WAL and shm temporary locks
+# SQLite Databases & Locks
+server/data/*.db
 server/data/*.db-wal
 server/data/*.db-shm
+*.db
+*.db-wal
+*.db-shm
+*.db-journal

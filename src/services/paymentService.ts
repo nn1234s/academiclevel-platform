@@ -155,13 +155,13 @@ export class PaymentService {
 
   /**
    * Super-Admin One-Tick Approval of Pending Payment
-   * ONLY executable by naitiknanda1235@gmail.com
+   * ONLY executable by authenticated administrator
    */
   public static approvePaymentAdmin(
     adminEmail: string,
     subscriptionId: string
   ): { success: boolean; error?: string } {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       StorageRLSLayer.recordSecurityViolation(adminEmail, 'UNAUTHORIZED_PAYMENT_APPROVAL_ATTEMPT', subscriptionId);
       throw new Error('403 Forbidden: Only Super-Admin may approve subscriptions.');
     }
@@ -205,7 +205,7 @@ export class PaymentService {
     subscriptionId: string,
     reason: string
   ): { success: boolean; error?: string } {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden');
     }
 
@@ -239,7 +239,7 @@ export class PaymentService {
     days: number,
     tier: 'LITE' | 'PLUS' = 'PLUS'
   ): { success: boolean; error?: string } {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden');
     }
 
@@ -283,7 +283,7 @@ export class PaymentService {
     subscriptionId: string,
     reason: string
   ): { success: boolean; error?: string } {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden');
     }
 
@@ -314,7 +314,7 @@ export class PaymentService {
     durationDays: number,
     note?: string
   ): { success: boolean; subscription?: Subscription; error?: string } {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden: Only Super-Admin may grant premium.');
     }
 

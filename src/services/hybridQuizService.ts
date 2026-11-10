@@ -239,18 +239,21 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
    */
   public static async saveConfig(
     geminiApiKey: string,
-    preferLiveAi: boolean,
-    adminEmail = 'naitiknanda1235@gmail.com'
+    preferLiveAi: boolean
   ): Promise<{ success: boolean; message: string }> {
     this.setClientStoredKey(geminiApiKey);
     this.setPreferLiveAi(preferLiveAi);
+
+    const token = typeof window !== 'undefined'
+      ? (sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token') || '')
+      : '';
 
     try {
       const res = await fetch('/api/admin/ai/config', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-email': adminEmail
+          ...(token ? { 'x-admin-token': token } : {})
         },
         body: JSON.stringify({ geminiApiKey, preferLiveAi })
       });
@@ -269,17 +272,19 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
    * Ping Gemini API to test connection
    */
   public static async testConnection(
-    customApiKey?: string,
-    adminEmail = 'naitiknanda1235@gmail.com'
+    customApiKey?: string
   ): Promise<{ success: boolean; latencyMs?: number; message?: string; error?: string }> {
     const key = customApiKey || this.getClientStoredKey();
+    const token = typeof window !== 'undefined'
+      ? (sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token') || '')
+      : '';
 
     try {
       const res = await fetch('/api/admin/ai/test-connection', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-email': adminEmail
+          ...(token ? { 'x-admin-token': token } : {})
         },
         body: JSON.stringify({ customApiKey: key })
       });

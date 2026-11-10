@@ -3,28 +3,28 @@ import { Learner, Board, Grade, Subscription, GiftRequest, CoinLedgerEntry } fro
 const BASE_URL = '/api';
 
 export class ApiClient {
-  private static getAdminPasskey(): string {
+  private static getAdminToken(): string {
     if (typeof window === 'undefined') return '';
     try {
-      return sessionStorage.getItem('al_admin_passkey') || localStorage.getItem('al_admin_passkey') || '';
+      return sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token') || '';
     } catch {
       return '';
     }
   }
 
-  private static adminHeaders(adminEmail: string): Record<string, string> {
-    const passkey = this.getAdminPasskey() || 'naitik2026';
+  private static adminHeaders(adminEmail?: string): Record<string, string> {
+    const token = this.getAdminToken();
     return {
-      'x-admin-email': adminEmail,
-      'x-admin-passkey': passkey
+      ...(adminEmail ? { 'x-admin-email': adminEmail } : {}),
+      ...(token ? { 'x-admin-token': token } : {})
     };
   }
 
   private static async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const adminPasskey = this.getAdminPasskey();
+    const adminToken = this.getAdminToken();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...(adminPasskey ? { 'x-admin-passkey': adminPasskey } : {}),
+      ...(adminToken ? { 'x-admin-token': adminToken } : {}),
       ...((options.headers as Record<string, string>) || {})
     };
 

@@ -180,18 +180,19 @@ export function initDatabaseSchema() {
   `);
 
   // Seed default ACodes if empty
+  const defaultAdminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
   const countACodes = db.prepare('SELECT count(*) as cnt FROM acodes').get().cnt;
   if (countACodes === 0) {
     const insertAcode = db.prepare(`
       INSERT INTO acodes (code, planTier, durationDays, isRedeemed, createdBy, expiresAt, createdAt)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
-    insertAcode.run('AL-SCHOLAR-2026', 'PLUS', 180, 0, 'naitiknanda1235@gmail.com', '2027-12-31T23:59:59.000Z', new Date().toISOString());
-    insertAcode.run('AL-CBSE-TOPPER', 'LITE', 60, 0, 'naitiknanda1235@gmail.com', '2027-12-31T23:59:59.000Z', new Date().toISOString());
+    insertAcode.run('AL-SCHOLAR-2026', 'PLUS', 180, 0, defaultAdminEmail, '2027-12-31T23:59:59.000Z', new Date().toISOString());
+    insertAcode.run('AL-CBSE-TOPPER', 'LITE', 60, 0, defaultAdminEmail, '2027-12-31T23:59:59.000Z', new Date().toISOString());
   }
 
   // Seed super-admin learner record if missing
-  const superAdmin = db.prepare('SELECT * FROM learners WHERE email = ?').get('naitiknanda1235@gmail.com');
+  const superAdmin = db.prepare('SELECT * FROM learners WHERE email = ?').get(defaultAdminEmail);
   if (!superAdmin) {
     db.prepare(`
       INSERT INTO learners (
@@ -201,8 +202,8 @@ export function initDatabaseSchema() {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       'usr_super_admin_001',
-      'naitiknanda1235@gmail.com',
-      'Naitik Nanda (Super-Admin)',
+      defaultAdminEmail,
+      'Administrator (Super-Admin)',
       'CBSE',
       12,
       'SUPER_ADMIN',
