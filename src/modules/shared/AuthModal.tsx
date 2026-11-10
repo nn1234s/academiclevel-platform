@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Board, Grade } from '../../core/types';
 import { useAuth } from '../../core/auth/AuthContext';
-import { SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
+import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
 import { X, Sparkles, Lock, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface AuthModalProps {
@@ -55,8 +55,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     } else {
       // Login
       const cleanEmail = email.trim().toLowerCase();
-      if (cleanEmail === SUPER_ADMIN_EMAIL.toLowerCase()) {
-        loginSuperAdmin();
+      if (cleanEmail === SUPER_ADMIN_EMAIL.toLowerCase() || StorageRLSLayer.isAdminAuthorized(cleanEmail)) {
+        loginSuperAdmin(cleanEmail);
         setIsSubmitting(false);
         onClose();
         return;

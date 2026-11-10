@@ -40,7 +40,7 @@ export class QuotaService {
    */
   public static evaluateQuota(learner: Learner): QuotaStatus {
     // Super-Admin is never paywall locked
-    if (learner.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (learner.role === 'SUPER_ADMIN' || learner.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase() || StorageRLSLayer.isAdminAuthorized(learner.email)) {
       return {
         isLocked: false,
         quizzesCompleted: learner.quizzesCompletedCount,

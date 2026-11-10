@@ -367,7 +367,7 @@ export class PaymentService {
     learnerId: string,
     reason: string = 'Super-Admin manual ungrant'
   ): { success: boolean; revokedCount: number; error?: string } {
-    if (adminEmail.toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden: Only Super-Admin may ungrant premium.');
     }
 
