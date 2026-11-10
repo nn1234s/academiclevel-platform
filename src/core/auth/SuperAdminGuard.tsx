@@ -41,6 +41,11 @@ export const SuperAdminGuard: React.FC<SuperAdminGuardProps> = ({
       adminPasswordInput.trim() === 'vault99' || adminPasswordInput.trim() === 'naitik2026';
 
     if (isEmailValid && isPasswordValid) {
+      try {
+        sessionStorage.setItem('al_admin_passkey', adminPasswordInput.trim());
+        localStorage.setItem('al_admin_passkey', adminPasswordInput.trim());
+      } catch {}
+      StorageRLSLayer.syncWithServer().catch(() => {});
       loginSuperAdmin();
       setAccessDenied(false);
     } else {

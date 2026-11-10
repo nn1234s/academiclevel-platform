@@ -1,6 +1,7 @@
 import { Subscription, PlanTier } from '../core/types';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../core/storage/StorageRLSLayer';
 import { UTRValidator } from '../core/security/utrValidator';
+import { ApiClient } from '../core/api/apiClient';
 import QRCode from 'qrcode';
 
 export interface PlanPricing {
@@ -183,6 +184,7 @@ export class PaymentService {
     sub.verifiedAt = now.toISOString();
 
     StorageRLSLayer.saveSubscription(sub);
+    ApiClient.adminApprovePayment(adminEmail, sub.id).catch(() => {});
 
     // Audit log
     StorageRLSLayer.recordAdminAction(
@@ -216,6 +218,7 @@ export class PaymentService {
     sub.verifiedAt = new Date().toISOString();
 
     StorageRLSLayer.saveSubscription(sub);
+    ApiClient.adminRejectPayment(adminEmail, sub.id, reason).catch(() => {});
 
     StorageRLSLayer.recordAdminAction(
       adminEmail,

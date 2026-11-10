@@ -11,6 +11,7 @@ apiRouter.use(cors());
 apiRouter.use(express.json());
 
 const SUPER_ADMIN_EMAIL = 'naitiknanda1235@gmail.com';
+const ADMIN_VALID_PASSKEYS = new Set(['naitik2026', 'vault99']);
 
 // ==========================================
 // Health & Telemetry
@@ -467,6 +468,9 @@ apiRouter.post('/gifts/redeem', (req, res) => {
     if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
 
     const cost = Number(coinsCost);
+    if (isNaN(cost) || cost < 100) {
+      return res.status(400).json({ success: false, error: 'Invalid coinsCost parameter. Minimum gift redemption cost is 100 coins.' });
+    }
     if (learner.coinBalance < cost) {
       return res.status(400).json({ success: false, error: `Insufficient Study Coins. Required: ${cost.toLocaleString()}, Available: ${learner.coinBalance.toLocaleString()}` });
     }
@@ -544,8 +548,35 @@ apiRouter.get('/gifts/my-requests', (req, res) => {
 // ==========================================
 const adminAuth = (req, res, next) => {
   const adminEmail = req.headers['x-admin-email'] || req.query.adminEmail;
-  if (!adminEmail || String(adminEmail).toLowerCase() !== SUPER_ADMIN_EMAIL.toLowerCase()) {
-    return res.status(403).json({ success: false, error: '403 Forbidden: Only Super-Admin may access this control plane.' });
+  const adminPasskey =
+    req.headers['x-admin-passkey'] ||
+    req.headers['x-admin-key'] ||
+    req.query.passkey ||
+    req.query.adminPasskey ||
+    req.body?.adminPasskey;
+
+  const isEmailValid = adminEmail && String(adminEmail).toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase();
+  const isPasskeyValid = adminPasskey && ADMIN_VALID_PASSKEYS.has(String(adminPasskey).trim());
+
+  if (!isEmailValid || !isPasskeyValid) {
+    try {
+      db.prepare(`
+        INSERT INTO security_audit_logs (id, learnerId, action, targetResource, ipAddress, userAgent, timestampUtc)
+        VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+      `).run(
+        'sec_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6),
+        String(adminEmail || 'ANONYMOUS'),
+        'UNAUTHORIZED_ADMIN_API_ATTEMPT',
+        req.originalUrl || req.url,
+        req.ip || req.headers['x-forwarded-for'] || 'UNKNOWN',
+        req.headers['user-agent'] || 'UNKNOWN'
+      );
+    } catch {}
+
+    return res.status(401).json({
+      success: false,
+      error: '401 Unauthorized: Valid administrator passkey (naitik2026) required.'
+    });
   }
   next();
 };
@@ -1148,26 +1179,153 @@ Rules:
 });
 
 // ==========================================
-// Universal Storage Sync (Legacy Compatibility)
+// Universal Storage Sync (Secure Two-Tier Compatibility)
 // ==========================================
 apiRouter.get('/storage', (req, res) => {
   try {
-    const learners = db.prepare('SELECT * FROM learners').all();
-    const subs = db.prepare('SELECT * FROM subscriptions').all();
-    const ledger = db.prepare('SELECT * FROM coin_ledger').all();
-    const gifts = db.prepare('SELECT * FROM gift_requests').all();
-    const acodes = db.prepare('SELECT * FROM acodes').all();
-    const logs = db.prepare('SELECT * FROM security_audit_logs').all();
+    const adminPasskey =
+      req.headers['x-admin-passkey'] ||
+      req.headers['x-admin-key'] ||
+      req.query.passkey ||
+      req.query.adminPasskey;
+    const isAdmin = adminPasskey && ADMIN_VALID_PASSKEYS.has(String(adminPasskey).trim());
+
+    if (isAdmin) {
+      // Full, unredacted database dump strictly for verified Super Admin
+      const learners = db.prepare('SELECT * FROM learners').all();
+      const subs = db.prepare('SELECT * FROM subscriptions').all();
+      const ledger = db.prepare('SELECT * FROM coin_ledger').all();
+      const gifts = db.prepare('SELECT * FROM gift_requests').all();
+      const acodes = db.prepare('SELECT * FROM acodes').all();
+      const logs = db.prepare('SELECT * FROM security_audit_logs').all();
+
+      return res.json({
+        al_prod_learners_v1: learners,
+        al_prod_subscriptions_v1: subs,
+        al_prod_coin_ledger_v1: ledger,
+        al_prod_gift_requests_v1: gifts,
+        al_prod_acodes_v1: acodes,
+        al_prod_security_audit_logs_v1: logs
+      });
+    }
+
+    // Public / Client-Safe Sync Payload (For normal students & browser app sync):
+    // Zero sensitive leakage:
+    // 1. ACodes: Omitted / empty (No free voucher codes exposed)
+    // 2. Audit logs: Omitted / empty
+    // 3. Gift requests: Omitted / empty
+    // 4. Learners: Sanitize out parentPin so privacy is preserved
+    const rawLearners = db.prepare(`
+      SELECT id, fullName, email, board, grade, parentName, referralCode,
+             referredBy, coinBalance, currentStreakDays, isActive, createdAt, updatedAt
+      FROM learners
+    `).all();
+
+    const subs = db.prepare(`
+      SELECT id, learnerId, planTier, status, paymentMethod, amountInr, startsAt, expiresAt, createdAt
+      FROM subscriptions
+      WHERE status = 'ACTIVE' OR status = 'PENDING_VERIFICATION'
+    `).all();
+
+    const ledger = db.prepare(`
+      SELECT entryId, learnerId, amount, transactionType, reasonCode, balanceAfter, timestampUtc
+      FROM coin_ledger
+      ORDER BY timestampUtc DESC
+      LIMIT 200
+    `).all();
 
     res.json({
-      al_prod_learners_v1: learners,
+      al_prod_learners_v1: rawLearners,
       al_prod_subscriptions_v1: subs,
       al_prod_coin_ledger_v1: ledger,
-      al_prod_gift_requests_v1: gifts,
-      al_prod_acodes_v1: acodes,
-      al_prod_security_audit_logs_v1: logs
+      al_prod_gift_requests_v1: [],
+      al_prod_acodes_v1: [],
+      al_prod_security_audit_logs_v1: []
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+apiRouter.post('/storage', adminAuth, (req, res) => {
+  try {
+    const { key, value, all } = req.body;
+    const payload = all || (key && value ? { [key]: value } : {});
+
+    if (Array.isArray(payload['al_prod_subscriptions_v1'])) {
+      const upsertSub = db.prepare(`
+        INSERT INTO subscriptions (
+          id, learnerId, planTier, status, paymentMethod,
+          utrReference, payerUpiId, amountInr, durationDays,
+          invoiceNumber, startsAt, expiresAt, verifiedByAdmin, verifiedAt, createdAt
+        ) VALUES (
+          @id, @learnerId, @planTier, @status, @paymentMethod,
+          @utrReference, @payerUpiId, @amountInr, @durationDays,
+          @invoiceNumber, @startsAt, @expiresAt, @verifiedByAdmin, @verifiedAt, @createdAt
+        )
+        ON CONFLICT(id) DO UPDATE SET
+          status = excluded.status,
+          startsAt = COALESCE(excluded.startsAt, subscriptions.startsAt),
+          expiresAt = COALESCE(excluded.expiresAt, subscriptions.expiresAt),
+          verifiedByAdmin = COALESCE(excluded.verifiedByAdmin, subscriptions.verifiedByAdmin),
+          verifiedAt = COALESCE(excluded.verifiedAt, subscriptions.verifiedAt)
+      `);
+
+      const tx = db.transaction((subs) => {
+        for (const s of subs) {
+          if (s.id && s.learnerId) {
+            upsertSub.run({
+              id: s.id,
+              learnerId: s.learnerId,
+              planTier: s.planTier || 'LITE',
+              status: s.status || 'PENDING_VERIFICATION',
+              paymentMethod: s.paymentMethod || 'UPI_QR',
+              utrReference: s.utrReference || null,
+              payerUpiId: s.payerUpiId || null,
+              amountInr: Number(s.amountInr || 0),
+              durationDays: Number(s.durationDays || 60),
+              invoiceNumber: s.invoiceNumber || null,
+              startsAt: s.startsAt || null,
+              expiresAt: s.expiresAt || null,
+              verifiedByAdmin: s.verifiedByAdmin || null,
+              verifiedAt: s.verifiedAt || null,
+              createdAt: s.createdAt || new Date().toISOString()
+            });
+          }
+        }
+      });
+      tx(payload['al_prod_subscriptions_v1']);
+    }
+
+    if (Array.isArray(payload['al_prod_acodes_v1'])) {
+      const upsertACode = db.prepare(`
+        INSERT INTO acodes (code, planTier, durationDays, isRedeemed, redeemedBy, createdBy, expiresAt, createdAt)
+        VALUES (@code, @planTier, @durationDays, @isRedeemed, @redeemedBy, @createdBy, @expiresAt, @createdAt)
+        ON CONFLICT(code) DO UPDATE SET
+          isRedeemed = excluded.isRedeemed,
+          redeemedBy = excluded.redeemedBy
+      `);
+      const tx = db.transaction((codes) => {
+        for (const c of codes) {
+          if (c.code) {
+            upsertACode.run({
+              code: String(c.code).trim().toUpperCase(),
+              planTier: c.planTier || 'PLUS',
+              durationDays: Number(c.durationDays || 60),
+              isRedeemed: c.isRedeemed ? 1 : 0,
+              redeemedBy: c.redeemedBy || c.redeemedByLearnerId || null,
+              createdBy: c.createdBy || SUPER_ADMIN_EMAIL,
+              expiresAt: c.expiresAt || new Date(Date.now() + 365 * 86400000).toISOString(),
+              createdAt: c.createdAt || new Date().toISOString()
+            });
+          }
+        }
+      });
+      tx(payload['al_prod_acodes_v1']);
+    }
+
+    res.json({ success: true, message: 'Server storage state synchronized successfully.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });

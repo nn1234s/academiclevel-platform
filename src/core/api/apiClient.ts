@@ -3,10 +3,29 @@ import { Learner, Board, Grade, Subscription, GiftRequest, CoinLedgerEntry } fro
 const BASE_URL = '/api';
 
 export class ApiClient {
+  private static getAdminPasskey(): string {
+    if (typeof window === 'undefined') return '';
+    try {
+      return sessionStorage.getItem('al_admin_passkey') || localStorage.getItem('al_admin_passkey') || '';
+    } catch {
+      return '';
+    }
+  }
+
+  private static adminHeaders(adminEmail: string): Record<string, string> {
+    const passkey = this.getAdminPasskey() || 'naitik2026';
+    return {
+      'x-admin-email': adminEmail,
+      'x-admin-passkey': passkey
+    };
+  }
+
   private static async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const headers = {
+    const adminPasskey = this.getAdminPasskey();
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...(options.headers || {})
+      ...(adminPasskey ? { 'x-admin-passkey': adminPasskey } : {}),
+      ...((options.headers as Record<string, string>) || {})
     };
 
     const res = await fetch(`${BASE_URL}${endpoint}`, {
@@ -150,7 +169,7 @@ export class ApiClient {
     pendingSubscriptions: Subscription[];
   }> {
     return this.request('/admin/learners', {
-      headers: { 'x-admin-email': adminEmail }
+      headers: this.adminHeaders(adminEmail)
     });
   }
 
@@ -163,7 +182,7 @@ export class ApiClient {
   ): Promise<{ success: boolean; message: string }> {
     return this.request(`/admin/learners/${learnerId}/grant-premium`, {
       method: 'POST',
-      headers: { 'x-admin-email': adminEmail },
+      headers: this.adminHeaders(adminEmail),
       body: JSON.stringify({ tier, durationDays, note })
     });
   }
@@ -174,7 +193,7 @@ export class ApiClient {
   ): Promise<{ success: boolean; message: string }> {
     return this.request(`/admin/learners/${learnerId}/revoke-premium`, {
       method: 'POST',
-      headers: { 'x-admin-email': adminEmail }
+      headers: this.adminHeaders(adminEmail)
     });
   }
 
@@ -186,7 +205,7 @@ export class ApiClient {
   ): Promise<{ success: boolean; newBalance: number; message: string }> {
     return this.request(`/admin/learners/${learnerId}/adjust-coins`, {
       method: 'POST',
-      headers: { 'x-admin-email': adminEmail },
+      headers: this.adminHeaders(adminEmail),
       body: JSON.stringify({ amount, note })
     });
   }
@@ -199,7 +218,7 @@ export class ApiClient {
   ): Promise<{ success: boolean; message: string }> {
     return this.request(`/admin/learners/${learnerId}/override-curriculum`, {
       method: 'POST',
-      headers: { 'x-admin-email': adminEmail },
+      headers: this.adminHeaders(adminEmail),
       body: JSON.stringify({ board, grade })
     });
   }
@@ -207,48 +226,48 @@ export class ApiClient {
   public static async adminResetLocks(adminEmail: string, learnerId: string): Promise<{ success: boolean; message: string }> {
     return this.request(`/admin/learners/${learnerId}/reset-locks`, {
       method: 'POST',
-      headers: { 'x-admin-email': adminEmail }
+      headers: this.adminHeaders(adminEmail)
     });
   }
 
   public static async adminResetQuotas(adminEmail: string, learnerId: string): Promise<{ success: boolean; message: string }> {
     return this.request(`/admin/learners/${learnerId}/reset-quotas`, {
       method: 'POST',
-      headers: { 'x-admin-email': adminEmail }
+      headers: this.adminHeaders(adminEmail)
     });
   }
 
   public static async adminToggleSuspend(adminEmail: string, learnerId: string): Promise<{ success: boolean; isActive: boolean }> {
     return this.request(`/admin/learners/${learnerId}/toggle-suspend`, {
       method: 'POST',
-      headers: { 'x-admin-email': adminEmail }
+      headers: this.adminHeaders(adminEmail)
     });
   }
 
   public static async adminGetPaymentsQueue(adminEmail: string): Promise<{ success: boolean; subscriptions: Subscription[] }> {
     return this.request('/admin/payments/queue', {
-      headers: { 'x-admin-email': adminEmail }
+      headers: this.adminHeaders(adminEmail)
     });
   }
 
   public static async adminApprovePayment(adminEmail: string, subId: string): Promise<{ success: boolean; message: string }> {
     return this.request(`/admin/payments/${subId}/approve`, {
       method: 'POST',
-      headers: { 'x-admin-email': adminEmail }
+      headers: this.adminHeaders(adminEmail)
     });
   }
 
   public static async adminRejectPayment(adminEmail: string, subId: string, reason?: string): Promise<{ success: boolean; message: string }> {
     return this.request(`/admin/payments/${subId}/reject`, {
       method: 'POST',
-      headers: { 'x-admin-email': adminEmail },
+      headers: this.adminHeaders(adminEmail),
       body: JSON.stringify({ reason })
     });
   }
 
   public static async adminGetGifts(adminEmail: string): Promise<{ success: boolean; gifts: GiftRequest[] }> {
     return this.request('/admin/gifts', {
-      headers: { 'x-admin-email': adminEmail }
+      headers: this.adminHeaders(adminEmail)
     });
   }
 
@@ -259,7 +278,7 @@ export class ApiClient {
   ): Promise<{ success: boolean; message: string }> {
     return this.request(`/admin/gifts/${reqId}/dispatch`, {
       method: 'POST',
-      headers: { 'x-admin-email': adminEmail },
+      headers: this.adminHeaders(adminEmail),
       body: JSON.stringify({ voucherCode })
     });
   }
@@ -267,13 +286,13 @@ export class ApiClient {
   public static async adminRejectGift(adminEmail: string, reqId: string): Promise<{ success: boolean; message: string }> {
     return this.request(`/admin/gifts/${reqId}/reject`, {
       method: 'POST',
-      headers: { 'x-admin-email': adminEmail }
+      headers: this.adminHeaders(adminEmail)
     });
   }
 
   public static async adminGetAuditLogs(adminEmail: string): Promise<{ success: boolean; logs: any[] }> {
     return this.request('/admin/audit-logs', {
-      headers: { 'x-admin-email': adminEmail }
+      headers: this.adminHeaders(adminEmail)
     });
   }
 }

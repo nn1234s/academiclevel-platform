@@ -118,6 +118,10 @@ export const AdminVaultShell: React.FC<AdminVaultShellProps> = ({ onExitVault })
 
             <button
               onClick={() => {
+                try {
+                  sessionStorage.removeItem('al_admin_passkey');
+                  localStorage.removeItem('al_admin_passkey');
+                } catch {}
                 logout();
                 onExitVault();
               }}

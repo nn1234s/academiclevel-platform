@@ -118,15 +118,31 @@ class StorageRLSLayerClass {
     }
   }
 
+  private getAdminPasskey(): string {
+    if (typeof window === 'undefined') return '';
+    try {
+      return sessionStorage.getItem('al_admin_passkey') || localStorage.getItem('al_admin_passkey') || '';
+    } catch {
+      return '';
+    }
+  }
+
   /**
    * Syncs a single key to the backend database
    */
   private async syncToServer(key: string, value: any): Promise<void> {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
     try {
+      const passkey = this.getAdminPasskey();
+      if (!passkey) return; // Non-admin clients do not post to raw storage
+
       await fetch('/api/storage', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-email': SUPER_ADMIN_EMAIL,
+          'x-admin-passkey': passkey
+        },
         body: JSON.stringify({ key, value })
       });
     } catch {
@@ -142,7 +158,14 @@ class StorageRLSLayerClass {
   public async syncWithServer(): Promise<boolean> {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return false;
     try {
-      const res = await fetch('/api/storage');
+      const passkey = this.getAdminPasskey();
+      const headers: Record<string, string> = {};
+      if (passkey) {
+        headers['x-admin-email'] = SUPER_ADMIN_EMAIL;
+        headers['x-admin-passkey'] = passkey;
+      }
+
+      const res = await fetch('/api/storage', { headers });
       if (!res.ok) return false;
       const serverDb = await res.json();
 
@@ -199,10 +222,14 @@ class StorageRLSLayerClass {
         }
       });
 
-      if (hasLocalUploads && Object.keys(localDataToUpload).length > 0) {
+      if (hasLocalUploads && Object.keys(localDataToUpload).length > 0 && passkey) {
         await fetch('/api/storage', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-email': SUPER_ADMIN_EMAIL,
+            'x-admin-passkey': passkey
+          },
           body: JSON.stringify({ all: localDataToUpload })
         });
       }
