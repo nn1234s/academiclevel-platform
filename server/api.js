@@ -822,6 +822,332 @@ apiRouter.get('/admin/audit-logs', adminAuth, (req, res) => {
 });
 
 // ==========================================
+// Hybrid AI Engine (Google Gemini 1.5 Flash + Fallback)
+// ==========================================
+
+function getGeminiApiKey() {
+  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim()) {
+    return process.env.GEMINI_API_KEY.trim();
+  }
+  try {
+    const row = db.prepare("SELECT value FROM system_settings WHERE key = 'gemini_api_key'").get();
+    return row?.value?.trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+function getAiSettings() {
+  let preferLiveAi = true;
+  try {
+    const row = db.prepare("SELECT value FROM system_settings WHERE key = 'prefer_live_ai'").get();
+    if (row && row.value === 'false') preferLiveAi = false;
+  } catch {}
+  const apiKey = getGeminiApiKey();
+  return {
+    hasApiKey: !!apiKey,
+    maskedApiKey: apiKey ? `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}` : null,
+    preferLiveAi,
+    model: 'gemini-1.5-flash'
+  };
+}
+
+apiRouter.get('/ai/config', (req, res) => {
+  res.json({ success: true, ...getAiSettings() });
+});
+
+apiRouter.post('/admin/ai/config', adminAuth, (req, res) => {
+  try {
+    const { geminiApiKey, preferLiveAi } = req.body;
+    const now = new Date().toISOString();
+
+    if (geminiApiKey !== undefined) {
+      const cleanKey = String(geminiApiKey).trim();
+      db.prepare(`
+        INSERT INTO system_settings (key, value, updatedAt)
+        VALUES ('gemini_api_key', ?, ?)
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
+      `).run(cleanKey, now);
+    }
+
+    if (preferLiveAi !== undefined) {
+      db.prepare(`
+        INSERT INTO system_settings (key, value, updatedAt)
+        VALUES ('prefer_live_ai', ?, ?)
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
+      `).run(preferLiveAi ? 'true' : 'false', now);
+    }
+
+    res.json({ success: true, message: 'AI configuration updated successfully', ...getAiSettings() });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/ai/test-connection', adminAuth, async (req, res) => {
+  try {
+    const keyToTest = req.body.customApiKey ? String(req.body.customApiKey).trim() : getGeminiApiKey();
+    if (!keyToTest) {
+      return res.status(400).json({ success: false, error: 'No Gemini API key provided to test.' });
+    }
+
+    const startTime = Date.now();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6000);
+
+    const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keyToTest}`;
+    const response = await fetch(testUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: 'Respond with a simple JSON object: {"status": "ok", "service": "AcademicLevel Hybrid AI"}' }] }],
+        generationConfig: { responseMimeType: 'application/json', maxOutputTokens: 60 }
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    const latencyMs = Date.now() - startTime;
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(response.status).json({ success: false, latencyMs, error: `Gemini API returned HTTP ${response.status}: ${errorText}` });
+    }
+
+    const data = await response.json();
+    const outputText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    res.json({
+      success: true,
+      latencyMs,
+      message: 'Gemini 1.5 Flash responded successfully.',
+      rawSample: outputText
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.name === 'AbortError' ? 'Gemini API ping timed out (>6s)' : err.message });
+  }
+});
+
+apiRouter.post('/ai/generate-quiz', async (req, res) => {
+  try {
+    const { board = 'CBSE', grade = 10, subjectId = 'math', levelNode = 'FOUNDATION', count = 5 } = req.body;
+    const settings = getAiSettings();
+
+    if (!settings.preferLiveAi || !settings.hasApiKey) {
+      return res.json({
+        success: false,
+        fallback: true,
+        reason: !settings.hasApiKey ? 'NO_API_KEY' : 'OFFLINE_PREFERENCE'
+      });
+    }
+
+    const apiKey = getGeminiApiKey();
+    const safeCount = Math.min(Math.max(Number(count) || 5, 1), 10);
+
+    const prompt = `You are an expert curriculum assessment creator for Indian education boards (CBSE, ICSE, Cambridge IGCSE) at AcademicLevel.
+Create exactly ${safeCount} challenging, high-quality Multiple Choice Questions (MCQs) for:
+- Board: ${board}
+- Class/Grade: ${grade}
+- Subject: ${subjectId}
+- Difficulty Level / Progression Node: ${levelNode} (FOUNDATION: core textbook concepts, CONCEPT: application & word problems, EXAM_READY: typical board exam patterns, OLYMPIAD: competitive Olympiad level).
+
+CRITICAL REQUIREMENTS:
+1. Every question must strictly adhere to the authentic Class ${grade} ${board} syllabus.
+2. Provide exactly 4 distinct options per question.
+3. correctIndex MUST be the zero-based index (0, 1, 2, or 3) of the correct answer in the options array.
+4. Provide a clear Socratic step-by-step explanation.
+5. Provide a sharp, helpful hint.
+6. Return a valid JSON array of objects conforming to this schema:
+[
+  {
+    "text": "Question statement here",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correctIndex": 0,
+    "explanation": "Detailed step-by-step mathematical or scientific proof",
+    "hint": "Pedagogical clue",
+    "difficulty": "EASY" | "MEDIUM" | "HARD",
+    "topicTag": "Specific syllabus topic name"
+  }
+]`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6500);
+
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const response = await fetch(geminiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 2500,
+          responseMimeType: 'application/json'
+        }
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.warn(`[Hybrid AI] Gemini error HTTP ${response.status}: ${errText}`);
+      return res.json({ success: false, fallback: true, error: `Gemini HTTP ${response.status}` });
+    }
+
+    const payload = await response.json();
+    const rawText = payload?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawText) {
+      return res.json({ success: false, fallback: true, error: 'Empty response from Gemini' });
+    }
+
+    const cleanedText = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+    const parsed = JSON.parse(cleanedText);
+
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      return res.json({ success: false, fallback: true, error: 'Invalid JSON array received from Gemini' });
+    }
+
+    const validatedQuestions = parsed.map((item, idx) => ({
+      id: `ai_${board.toLowerCase()}_${grade}_${Date.now()}_${idx}`,
+      board,
+      grade: Number(grade),
+      subjectId,
+      levelNode,
+      text: String(item.text || `Question ${idx + 1}`),
+      options: Array.isArray(item.options) && item.options.length === 4
+        ? item.options.map(String)
+        : ['Option A', 'Option B', 'Option C', 'Option D'],
+      correctIndex: typeof item.correctIndex === 'number' && item.correctIndex >= 0 && item.correctIndex <= 3
+        ? item.correctIndex
+        : 0,
+      explanation: String(item.explanation || 'Verified curriculum solution.'),
+      hint: String(item.hint || 'Review standard definitions.'),
+      difficulty: item.difficulty === 'HARD' || item.difficulty === 'EASY' ? item.difficulty : 'MEDIUM',
+      topicTag: String(item.topicTag || `${subjectId.toUpperCase()} Unit ${idx + 1}`),
+      source: 'GEMINI_LIVE'
+    }));
+
+    return res.json({
+      success: true,
+      source: 'GEMINI_LIVE',
+      model: 'gemini-1.5-flash',
+      questions: validatedQuestions
+    });
+  } catch (err) {
+    console.warn(`[Hybrid AI] Fallback triggered: ${err.message}`);
+    return res.json({
+      success: false,
+      fallback: true,
+      error: err.name === 'AbortError' ? 'AI generation timed out' : err.message
+    });
+  }
+});
+
+apiRouter.post('/ai/explain', async (req, res) => {
+  try {
+    const { question, chosenIndex, board = 'CBSE', grade = 10 } = req.body;
+    const apiKey = getGeminiApiKey();
+
+    if (!apiKey || !question) {
+      return res.json({ success: false, fallback: true });
+    }
+
+    const wrongAnswer = question.options?.[chosenIndex] || 'selected choice';
+    const correctAnswer = question.options?.[question.correctIndex] || 'correct choice';
+
+    const prompt = `You are Nova AI, a warm, encouraging, and pedagogically brilliant Socratic tutor for Indian students on AcademicLevel.
+A Class ${grade} student following the ${board} curriculum just answered a question.
+
+Question: "${question.text}"
+Student's Chosen Option: "${wrongAnswer}"
+Correct Option: "${correctAnswer}"
+Syllabus Context & Hint: "${question.hint || ''}"
+Official Base Explanation: "${question.explanation || ''}"
+
+Please provide a personalized, age-appropriate Socratic breakdown:
+- For Grade 1-4: Cheerful, friendly explorer tone with emojis and intuitive everyday metaphors.
+- For Grade 5-8: Guided step-by-step mentor, pointing out the subtle pivot where logic diverted.
+- For Grade 9-12: Rigorous board exam analysis (${board}), referencing marking criteria, key formulas, and how to avoid this common pitfall on the final exam.
+
+Keep the response direct, engaging, and under 150 words.`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4500);
+
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const response = await fetch(geminiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.4, maxOutputTokens: 500 }
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    if (!response.ok) return res.json({ success: false, fallback: true });
+
+    const payload = await response.json();
+    const explanationText = payload?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!explanationText) return res.json({ success: false, fallback: true });
+
+    res.json({ success: true, explanation: explanationText.trim(), source: 'GEMINI_LIVE' });
+  } catch (err) {
+    res.json({ success: false, fallback: true, error: err.message });
+  }
+});
+
+apiRouter.post('/ai/chat', async (req, res) => {
+  try {
+    const { query, board = 'CBSE', grade = 10, subject = 'Mathematics' } = req.body;
+    const apiKey = getGeminiApiKey();
+
+    if (!apiKey || !query) {
+      return res.json({ success: false, fallback: true });
+    }
+
+    const prompt = `You are Nova AI, the Socratic tutor on AcademicLevel for Indian students.
+The user is a Class ${grade} student studying ${subject} under the ${board} curriculum.
+Student Question: "${String(query).trim()}"
+
+Rules:
+1. Don't simply give the final numerical answer immediately if it's a math/science puzzle; guide them with a Socratic question or step-by-step intuition first.
+2. Tone must match Grade ${grade}:
+   - Grade 1-4: warm, simple, playful.
+   - Grade 5-8: encouraging mentor with conceptual clues.
+   - Grade 9-12: clear academic rigor and board exam formula application.
+3. Keep response concise (under 120 words).`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4500);
+
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const response = await fetch(geminiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.5, maxOutputTokens: 400 }
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    if (!response.ok) return res.json({ success: false, fallback: true });
+
+    const payload = await response.json();
+    const replyText = payload?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!replyText) return res.json({ success: false, fallback: true });
+
+    res.json({ success: true, text: replyText.trim(), source: 'GEMINI_LIVE' });
+  } catch (err) {
+    res.json({ success: false, fallback: true, error: err.message });
+  }
+});
+
+// ==========================================
 // Universal Storage Sync (Legacy Compatibility)
 // ==========================================
 apiRouter.get('/storage', (req, res) => {

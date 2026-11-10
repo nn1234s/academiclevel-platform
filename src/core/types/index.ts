@@ -123,6 +123,7 @@ export interface Question {
   hint: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   topicTag: string;
+  source?: 'GEMINI_LIVE' | 'CURATED_OFFLINE';
 }
 
 export interface QuizAttempt {

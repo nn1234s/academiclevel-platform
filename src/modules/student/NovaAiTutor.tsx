@@ -114,7 +114,10 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 {board} • Class {grade}
               </span>
             </div>
-            <p className="text-[11px] text-slate-400">Zero client API keys • Socratic Pedagogy</p>
+            <p className="text-[11px] text-slate-400 flex items-center space-x-1.5 mt-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+              <span>Hybrid Engine (Live Gemini 1.5 + Syllabus Fallback)</span>
+            </p>
           </div>
         </div>
 

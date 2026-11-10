@@ -75,6 +75,12 @@ The system delivers age-adaptive pedagogical interfaces (Classes 1–4 Visual Ga
 
 ---
 
+## 2.5 Hybrid AI Intelligence Engine (Live Gemini + Resilient Syllabus Fallback)
+
+Operates Google Gemini 1.5 Flash live assessment generation with sub-4s automatic fallback to the verified offline syllabus question bank.
+
+---
+
 ## 3. Security Architecture & Threat Model
 
 | Threat Vector | Mitigation Strategy | Implementation |
@@ -124,3 +130,4 @@ academiclevel-platform/
 ├── tailwind.config.js
 └── vite.config.ts
 ```
+

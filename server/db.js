@@ -166,6 +166,12 @@ export function initDatabaseSchema() {
       expiresAt TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS system_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updatedAt TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_learners_email ON learners(email);
     CREATE INDEX IF NOT EXISTS idx_subs_learner ON subscriptions(learnerId);
     CREATE INDEX IF NOT EXISTS idx_subs_status ON subscriptions(status);
