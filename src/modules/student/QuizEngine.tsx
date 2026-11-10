@@ -7,6 +7,7 @@ import { QuotaService } from '../../services/quotaService';
 import { CertificateService } from '../../services/certificateService';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { ApiClient } from '../../core/api/apiClient';
+import { useAuth } from '../../core/auth/AuthContext';
 import confetti from 'canvas-confetti';
 import {
   Clock,
@@ -40,6 +41,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   onFinish,
   onOpenNovaAi,
 }) => {
+  const { refreshCurrentLearner } = useAuth();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoadingQuiz, setIsLoadingQuiz] = useState<boolean>(true);
   const [quizSource, setQuizSource] = useState<'GEMINI_LIVE' | 'CURATED_OFFLINE'>('CURATED_OFFLINE');
@@ -224,6 +226,9 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
           // Confetti fallback
         }
       }
+
+      // Synchronize updated quiz counts, streak, and coin balance with React session state
+      refreshCurrentLearner();
     }
   };
 

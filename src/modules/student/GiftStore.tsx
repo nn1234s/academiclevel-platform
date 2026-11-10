@@ -55,73 +55,73 @@ export const GIFT_CARD_LEVELS: GiftCardLevel[] = [
   {
     level: 1,
     rsAmount: 20,
-    coinsCost: 200000,
-    coinsCostFormatted: '2 Lakh (200K)',
+    coinsCost: 500,
+    coinsCostFormatted: '500 Coins',
     badge: 'Starter Milestone',
     gradient: 'from-amber-500 to-orange-500'
   },
   {
     level: 2,
     rsAmount: 30,
-    coinsCost: 300000,
-    coinsCostFormatted: '3 Lakh (300K)',
+    coinsCost: 800,
+    coinsCostFormatted: '800 Coins',
     badge: 'Bronze Scholar',
     gradient: 'from-orange-500 to-rose-500'
   },
   {
     level: 3,
-    rsAmount: 40,
-    coinsCost: 400000,
-    coinsCostFormatted: '4 Lakh (400K)',
+    rsAmount: 50,
+    coinsCost: 1200,
+    coinsCostFormatted: '1,200 Coins',
     badge: 'Silver Scholar',
     gradient: 'from-rose-500 to-pink-500'
   },
   {
     level: 4,
-    rsAmount: 50,
-    coinsCost: 500000,
-    coinsCostFormatted: '5 Lakh (500K)',
+    rsAmount: 100,
+    coinsCost: 2500,
+    coinsCostFormatted: '2,500 Coins',
     badge: 'Gold Scholar',
     gradient: 'from-indigo-600 to-violet-600',
     popular: true
   },
   {
     level: 5,
-    rsAmount: 60,
-    coinsCost: 600000,
-    coinsCostFormatted: '6 Lakh (600K)',
+    rsAmount: 150,
+    coinsCost: 4000,
+    coinsCostFormatted: '4,000 Coins',
     badge: 'Platinum Scholar',
     gradient: 'from-violet-600 to-purple-600'
   },
   {
     level: 6,
-    rsAmount: 70,
-    coinsCost: 700000,
-    coinsCostFormatted: '7 Lakh (700K)',
+    rsAmount: 200,
+    coinsCost: 5500,
+    coinsCostFormatted: '5,500 Coins',
     badge: 'Diamond Scholar',
     gradient: 'from-cyan-500 to-blue-600'
   },
   {
     level: 7,
-    rsAmount: 80,
-    coinsCost: 800000,
-    coinsCostFormatted: '8 Lakh (800K)',
+    rsAmount: 250,
+    coinsCost: 7000,
+    coinsCostFormatted: '7,000 Coins',
     badge: 'Master Scholar',
     gradient: 'from-blue-600 to-indigo-700'
   },
   {
     level: 8,
-    rsAmount: 90,
-    coinsCost: 900000,
-    coinsCostFormatted: '9 Lakh (900K)',
+    rsAmount: 350,
+    coinsCost: 10000,
+    coinsCostFormatted: '10,000 Coins',
     badge: 'Grandmaster',
     gradient: 'from-emerald-500 to-teal-600'
   },
   {
     level: 9,
-    rsAmount: 100,
-    coinsCost: 1000000,
-    coinsCostFormatted: '10 Lakh (1M)',
+    rsAmount: 500,
+    coinsCost: 15000,
+    coinsCostFormatted: '15,000 Coins',
     badge: 'Olympiad Champion',
     gradient: 'from-amber-400 via-yellow-500 to-amber-600',
     popular: true

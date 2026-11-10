@@ -1,23 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
 import { StudentPackMessage } from '../../core/types';
-import { ShieldAlert, Check, AlertTriangle, Eye } from 'lucide-react';
+import { ShieldAlert, Check, AlertTriangle, Eye, RefreshCw } from 'lucide-react';
 
 export const ModerationReports: React.FC = () => {
-  const [flagged] = useState<StudentPackMessage[]>(() =>
+  const [flagged, setFlagged] = useState<StudentPackMessage[]>(() =>
     StorageRLSLayer.getAllFlaggedMessagesAdmin(SUPER_ADMIN_EMAIL)
   );
+  const [loading, setLoading] = useState(false);
+
+  const loadFlagged = async () => {
+    setLoading(true);
+    try {
+      const token = sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token') || '';
+      const res = await fetch('/api/admin/moderation/flagged-messages', {
+        headers: { ...(token ? { 'x-admin-token': token } : {}) }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.flagged) {
+          setFlagged(data.flagged.map((m: any) => ({
+            id: m.id,
+            senderId: m.senderId,
+            senderName: m.senderName,
+            receiverId: m.receiverId,
+            content: m.content,
+            flaggedForReview: Boolean(m.flaggedForReview),
+            flagReason: m.flagReason,
+            isDelivered: true,
+            sentAt: m.createdAt
+          })));
+        }
+      }
+    } catch {
+      // Local fallback
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadFlagged();
+  }, []);
 
   return (
     <div className="space-y-6 text-slate-100">
-      <div>
-        <h2 className="text-xl font-bold text-white flex items-center space-x-2">
-          <ShieldAlert className="w-5 h-5 text-red-400" />
-          <span>StudentPacks Moderation & Child Safety Queue</span>
-        </h2>
-        <p className="text-xs text-slate-400 mt-0.5">
-          Review automated regex PII violations (phone, email, URLs) and student-reported safety logs under DPDP Act 2023.
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-bold text-white flex items-center space-x-2">
+            <ShieldAlert className="w-5 h-5 text-red-400" />
+            <span>StudentPacks Moderation & Child Safety Queue</span>
+          </h2>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Review automated regex PII violations (phone, email, URLs) and student-reported safety logs under DPDP Act 2023.
+          </p>
+        </div>
+        <button
+          onClick={loadFlagged}
+          disabled={loading}
+          className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-xl text-slate-300 flex items-center space-x-1.5 transition-all"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+          <span>Refresh</span>
+        </button>
       </div>
 
       <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">

@@ -31,15 +31,19 @@ export const StudentPacks: React.FC<StudentPacksProps> = ({ learner }) => {
   const [actionNotice, setActionNotice] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const loadData = () => {
-    const myFriends = StorageRLSLayer.getFriends(learner.id);
-    setFriends(myFriends);
-    const peers = StudentPacksService.getDiscoverablePeers(learner);
-    setDiscoverPeers(peers);
+  const loadData = async () => {
+    try {
+      const myFriends = await StudentPacksService.getFriendships(learner.id);
+      setFriends(myFriends);
+      const peers = await StudentPacksService.getDiscoverablePeers(learner);
+      setDiscoverPeers(peers);
 
-    if (activeChatPeer) {
-      const msgs = StorageRLSLayer.getMessages(learner.id, activeChatPeer.id);
-      setMessages(msgs);
+      if (activeChatPeer) {
+        const msgs = await StudentPacksService.getMessages(learner.id, activeChatPeer.id);
+        setMessages(msgs);
+      }
+    } catch (err) {
+      console.error('[StudentPacks] Error loading live data:', err);
     }
   };
 
@@ -47,33 +51,35 @@ export const StudentPacks: React.FC<StudentPacksProps> = ({ learner }) => {
     loadData();
   }, [learner.id, activeChatPeer]);
 
-  const handleSendFriendRequest = (peerId: string) => {
-    const res = StudentPacksService.sendFriendRequest(learner, peerId);
+  const handleSendFriendRequest = async (peerId: string) => {
+    const res = await StudentPacksService.sendFriendRequest(learner, peerId);
     setActionNotice(res.message);
-    loadData();
+    await loadData();
     setTimeout(() => setActionNotice(''), 3000);
   };
 
-  const handleRespondRequest = (friendshipId: string, action: 'ACCEPT' | 'DECLINE' | 'BLOCK') => {
-    const res = StudentPacksService.respondToRequest(learner.id, friendshipId, action);
+  const handleRespondRequest = async (friendshipId: string, action: 'ACCEPT' | 'DECLINE' | 'BLOCK') => {
+    const res = await StudentPacksService.respondToRequest(learner.id, friendshipId, action);
     setActionNotice(res.message);
-    loadData();
+    await loadData();
     setTimeout(() => setActionNotice(''), 3000);
   };
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageInput.trim() || !activeChatPeer) return;
 
     setWarningNotice('');
-    const res = StudentPacksService.sendMessage(learner, activeChatPeer.id, messageInput.trim());
+    const text = messageInput.trim();
+    setMessageInput('');
+
+    const res = await StudentPacksService.sendMessage(learner, activeChatPeer.id, text);
 
     if (res.warning) {
       setWarningNotice(res.warning);
     }
 
-    setMessageInput('');
-    loadData();
+    await loadData();
   };
 
   const handleReportActivePeer = () => {

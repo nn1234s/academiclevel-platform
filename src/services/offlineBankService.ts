@@ -342,22 +342,26 @@ export class OfflineBankService {
   ): Question[] {
     const list: Question[] = [];
     for (let i = 1; i <= count; i++) {
+      const correctIdx = Math.floor(Math.random() * 4);
+      const options = [
+        `Principle Alpha: Universal conservation and equilibrium under ${board} guidelines.`,
+        `Principle Beta: Inverse proportional relationship across dimensional metrics.`,
+        `Principle Gamma: Direct empirical correlation with standard SI baseline units.`,
+        `Principle Delta: Constant derivative rate of change in closed systems.`
+      ];
+      const correctChoice = options[correctIdx];
+
       list.push({
-        id: `synth_${board.toLowerCase()}_${grade}_${subjectId}_${i}_${Date.now()}`,
+        id: `synth_${board.toLowerCase()}_${grade}_${subjectId}_${i}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
         board,
         grade,
         subjectId,
         levelNode,
-        text: `[${board} Class ${grade} ${levelNode}] Practice Challenge #${i}: Which of the following statements represents the core scientific/mathematical principle for ${subjectId.toUpperCase()}?`,
-        options: [
-          `Principle Alpha: Universal conservation and equilibrium under ${board} guidelines.`,
-          `Principle Beta: Inverse proportional relationship across dimensional metrics.`,
-          `Principle Gamma: Direct empirical correlation with standard SI baseline units.`,
-          `Principle Delta: Constant derivative rate of change in closed systems.`
-        ],
-        correctIndex: 0,
-        explanation: `Under the ${board} Class ${grade} curriculum for ${subjectId}, Principle Alpha provides the primary foundational baseline.`,
-        hint: `Focus on the conservation and equilibrium principle introduced in ${board} syllabus.`,
+        text: `[${board} Class ${grade} • ${levelNode}] Practice Challenge #${i}: Which of the following statements represents the core scientific/mathematical principle for ${subjectId.toUpperCase()}?`,
+        options,
+        correctIndex: correctIdx,
+        explanation: `Under the ${board} Class ${grade} curriculum for ${subjectId}, "${correctChoice.split(':')[0]}" provides the primary foundational baseline.`,
+        hint: `Focus on the conservation and equilibrium principle introduced in the ${board} Class ${grade} syllabus.`,
         difficulty: levelNode === 'OLYMPIAD' ? 'HARD' : levelNode === 'EXAM_READY' ? 'MEDIUM' : 'EASY',
         topicTag: `${subjectId.toUpperCase()} Core Unit ${i}`
       });

@@ -486,6 +486,23 @@ apiRouter.post('/coins/transact', (req, res) => {
     if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
 
     const numAmount = Number(amount);
+    if (isNaN(numAmount)) {
+      return res.status(400).json({ success: false, error: 'Invalid transaction amount.' });
+    }
+
+    // Security Guard: Arbitrary credit (minting) of coins requires Admin Authentication
+    const adminToken = req.headers['x-admin-token'] || req.query.adminToken;
+    const adminPasskey = req.headers['x-admin-passkey'] || req.headers['x-admin-key'] || req.query.passkey;
+    const isAdmin = (adminToken && isValidAdminSession(String(adminToken).trim())) ||
+                    (adminPasskey && ADMIN_VALID_PASSKEYS.has(String(adminPasskey).trim()));
+
+    if (numAmount > 0 && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: 'Unauthorized coin credit: Direct coin minting requires admin authorization. Coins can only be earned through verified quiz completions, daily spins, or official bonuses.'
+      });
+    }
+
     if (numAmount < 0 && learner.coinBalance < Math.abs(numAmount)) {
       return res.status(400).json({ success: false, error: 'Insufficient coin balance.' });
     }
@@ -506,7 +523,7 @@ apiRouter.post('/coins/transact', (req, res) => {
       learnerId,
       numAmount,
       transactionType || (numAmount >= 0 ? 'CREDIT' : 'DEBIT'),
-      reasonCode || 'USER_TRANSACTION',
+      reasonCode || (numAmount >= 0 ? 'ADMIN_CREDIT' : 'MALL_PURCHASE'),
       newBalance,
       metadata ? JSON.stringify(metadata) : null,
       now,
@@ -1004,6 +1021,213 @@ apiRouter.post('/acodes/redeem', (req, res) => {
 });
 
 // ==========================================
+// StudentPacks — Real-Time Peer & Messaging Engine
+// ==========================================
+apiRouter.get('/student-packs/peers', (req, res) => {
+  try {
+    const learnerId = req.query.learnerId;
+    if (!learnerId) return res.status(400).json({ success: false, error: 'learnerId is required' });
+
+    const current = db.prepare('SELECT id, board, grade FROM learners WHERE id = ?').get(learnerId);
+    if (!current) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    // Retrieve active student peers in same board or grade
+    const peers = db.prepare(`
+      SELECT id, fullName, board, grade, avatarFrame, coinBalance, currentStreakDays, createdAt
+      FROM learners
+      WHERE id != ? AND role = 'STUDENT' AND isActive = 1 AND (grade = ? OR board = ?)
+      ORDER BY currentStreakDays DESC, coinBalance DESC
+      LIMIT 60
+    `).all(current.id, current.grade, current.board);
+
+    res.json({ success: true, peers });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.get('/student-packs/friends', (req, res) => {
+  try {
+    const learnerId = req.query.learnerId;
+    if (!learnerId) return res.status(400).json({ success: false, error: 'learnerId is required' });
+
+    const friends = db.prepare(`
+      SELECT * FROM friendships
+      WHERE requesterId = ? OR receiverId = ?
+      ORDER BY updatedAt DESC
+    `).all(learnerId, learnerId);
+
+    res.json({ success: true, friends });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/student-packs/request', (req, res) => {
+  try {
+    const { requesterId, receiverId } = req.body;
+    if (!requesterId || !receiverId) {
+      return res.status(400).json({ success: false, error: 'requesterId and receiverId are required' });
+    }
+    if (requesterId === receiverId) {
+      return res.status(400).json({ success: false, error: 'Cannot connect with yourself.' });
+    }
+
+    const requester = db.prepare('SELECT id, fullName FROM learners WHERE id = ?').get(requesterId);
+    const receiver = db.prepare('SELECT id, fullName FROM learners WHERE id = ?').get(receiverId);
+
+    if (!requester || !receiver) {
+      return res.status(404).json({ success: false, error: 'One or both students not found.' });
+    }
+
+    const existing = db.prepare(`
+      SELECT * FROM friendships
+      WHERE (requesterId = ? AND receiverId = ?) OR (requesterId = ? AND receiverId = ?)
+    `).get(requesterId, receiverId, receiverId, requesterId);
+
+    if (existing) {
+      if (existing.status === 'BLOCKED') {
+        return res.status(403).json({ success: false, error: 'Unable to connect with this user.' });
+      }
+      return res.status(400).json({ success: false, error: `Friendship is already ${existing.status.toLowerCase()}.` });
+    }
+
+    const frId = 'fr_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+    const now = new Date().toISOString();
+
+    db.prepare(`
+      INSERT INTO friendships (id, requesterId, receiverId, requesterName, receiverName, status, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?)
+    `).run(frId, requester.id, receiver.id, requester.fullName, receiver.fullName, now, now);
+
+    const created = db.prepare('SELECT * FROM friendships WHERE id = ?').get(frId);
+    res.json({ success: true, friendship: created, message: `Friend request sent to ${receiver.fullName}!` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/student-packs/respond', (req, res) => {
+  try {
+    const { learnerId, friendshipId, action } = req.body;
+    if (!friendshipId || !action) {
+      return res.status(400).json({ success: false, error: 'friendshipId and action are required' });
+    }
+
+    const validActions = ['ACCEPT', 'DECLINE', 'BLOCK'];
+    const cleanAction = String(action).toUpperCase();
+    if (!validActions.includes(cleanAction)) {
+      return res.status(400).json({ success: false, error: 'Invalid action. Must be ACCEPT, DECLINE, or BLOCK.' });
+    }
+
+    const friendship = db.prepare('SELECT * FROM friendships WHERE id = ?').get(friendshipId);
+    if (!friendship) return res.status(404).json({ success: false, error: 'Friendship record not found.' });
+
+    let newStatus = 'PENDING';
+    if (cleanAction === 'ACCEPT') newStatus = 'ACCEPTED';
+    if (cleanAction === 'DECLINE') newStatus = 'DECLINED';
+    if (cleanAction === 'BLOCK') newStatus = 'BLOCKED';
+
+    const now = new Date().toISOString();
+    db.prepare('UPDATE friendships SET status = ?, updatedAt = ? WHERE id = ?').run(newStatus, now, friendship.id);
+
+    const updated = db.prepare('SELECT * FROM friendships WHERE id = ?').get(friendship.id);
+    res.json({ success: true, friendship: updated, message: `Friendship updated to ${newStatus}.` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.get('/student-packs/messages', (req, res) => {
+  try {
+    const { learnerId, peerId } = req.query;
+    if (!learnerId || !peerId) {
+      return res.status(400).json({ success: false, error: 'learnerId and peerId are required' });
+    }
+
+    const messages = db.prepare(`
+      SELECT * FROM student_messages
+      WHERE (senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?)
+      ORDER BY createdAt ASC
+      LIMIT 100
+    `).all(learnerId, peerId, peerId, learnerId);
+
+    res.json({ success: true, messages });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/student-packs/message', (req, res) => {
+  try {
+    const { senderId, receiverId, content } = req.body;
+    if (!senderId || !receiverId || !content || !String(content).trim()) {
+      return res.status(400).json({ success: false, error: 'senderId, receiverId, and non-empty content are required' });
+    }
+
+    const sender = db.prepare('SELECT id, fullName FROM learners WHERE id = ?').get(senderId);
+    if (!sender) return res.status(404).json({ success: false, error: 'Sender not found' });
+
+    let raw = String(content).trim();
+    let flagged = 0;
+    let reason = null;
+
+    // PII and Child-Safety Regex Firewall
+    const phonePattern = /\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b|\b\d{10}\b/;
+    const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+    const urlPattern = /https?:\/\/[^\s]+/;
+    const vulgarPattern = /\b(?:fuck|shit|bitch|bastard|asshole|porn|sex)\b/i;
+
+    if (phonePattern.test(raw)) {
+      raw = raw.replace(phonePattern, '[PHONE_REDACTED]');
+      flagged = 1;
+      reason = 'PHONE_NUMBER_PII';
+    }
+    if (emailPattern.test(raw)) {
+      raw = raw.replace(emailPattern, '[EMAIL_REDACTED]');
+      flagged = 1;
+      reason = reason ? `${reason}, EMAIL_PII` : 'EMAIL_PII';
+    }
+    if (urlPattern.test(raw)) {
+      raw = raw.replace(urlPattern, '[LINK_REDACTED]');
+      flagged = 1;
+      reason = reason ? `${reason}, EXTERNAL_LINK` : 'EXTERNAL_LINK';
+    }
+    if (vulgarPattern.test(raw)) {
+      raw = raw.replace(vulgarPattern, '***');
+      flagged = 1;
+      reason = reason ? `${reason}, PROFANITY` : 'PROFANITY';
+    }
+
+    const msgId = 'msg_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+    const now = new Date().toISOString();
+
+    db.prepare(`
+      INSERT INTO student_messages (id, senderId, receiverId, senderName, content, flaggedForReview, flagReason, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(msgId, sender.id, receiverId, sender.fullName, raw, flagged, reason, now);
+
+    const inserted = db.prepare('SELECT * FROM student_messages WHERE id = ?').get(msgId);
+    res.json({
+      success: true,
+      message: inserted,
+      warning: flagged ? 'Notice: Your message contained personal contact details or sensitive content that was automatically redacted for child safety.' : undefined
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.get('/admin/moderation/flagged-messages', adminAuth, (req, res) => {
+  try {
+    const flagged = db.prepare('SELECT * FROM student_messages WHERE flaggedForReview = 1 ORDER BY createdAt DESC').all();
+    res.json({ success: true, flagged });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
 // Super-Admin Backend Authentication & Control Plane
 // ==========================================
 apiRouter.post('/auth/admin-verify', (req, res) => {
@@ -1074,7 +1298,7 @@ apiRouter.post('/auth/admin-verify', (req, res) => {
   }
 });
 
-const adminAuth = (req, res, next) => {
+function adminAuth(req, res, next) {
   const adminToken = req.headers['x-admin-token'] || req.query.adminToken;
   const adminEmail = req.headers['x-admin-email'] || req.query.adminEmail;
   const adminPasskey =
@@ -1795,40 +2019,10 @@ apiRouter.get('/storage', (req, res) => {
       });
     }
 
-    // Public / Client-Safe Sync Payload (For normal students & browser app sync):
-    // Zero sensitive leakage:
-    // 1. ACodes: Omitted / empty (No free voucher codes exposed)
-    // 2. Audit logs: Omitted / empty
-    // 3. Gift requests: Omitted / empty
-    // 4. Learners: Sanitize out parentPin so privacy is preserved
-    const rawLearners = db.prepare(`
-      SELECT id, fullName, email, board, grade, parentName, referralCode,
-             referredBy, coinBalance, currentStreakDays, isActive, createdAt, updatedAt
-      FROM learners
-    `).all();
-
-    const subs = db.prepare(`
-      SELECT id, learnerId, planTier, status, paymentMethod, amountInr, startsAt, expiresAt, createdAt
-      FROM subscriptions
-      WHERE status = 'ACTIVE' OR status = 'PENDING_VERIFICATION'
-    `).all();
-
-    const ledger = db.prepare(`
-      SELECT entryId, learnerId, amount, transactionType, reasonCode, balanceAfter, timestampUtc
-      FROM coin_ledger
-      ORDER BY timestampUtc DESC
-      LIMIT 200
-    `).all();
-
-    res.json({
-      al_prod_learners_v1: rawLearners,
-      al_prod_subscriptions_v1: subs,
-      al_prod_coin_ledger_v1: ledger,
-      al_prod_course_progress_v1: formattedProgress,
-      al_prod_certificates_v1: formattedCerts,
-      al_prod_gift_requests_v1: [],
-      al_prod_acodes_v1: [],
-      al_prod_security_audit_logs_v1: []
+    // Unauthenticated access blocked: Admin passkey or session token is strictly required
+    return res.status(401).json({
+      success: false,
+      error: 'Unauthorized: Admin passkey or session token is required to access system storage.'
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

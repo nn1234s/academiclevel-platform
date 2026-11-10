@@ -1,124 +1,119 @@
 import { Friendship, StudentPackMessage, Learner } from '../core/types';
-import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../core/storage/StorageRLSLayer';
-import { PIIFirewall } from '../core/security/piiFirewall';
+import { ApiClient } from '../core/api/apiClient';
+import { StorageRLSLayer } from '../core/storage/StorageRLSLayer';
 
 export class StudentPacksService {
   /**
    * Retrieves all peer learners for safe discovery (limited to same board or grade).
    */
-  public static getDiscoverablePeers(currentLearner: Learner): Learner[] {
-    const all = StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL);
-    return all.filter(
-      l =>
-        l.id !== currentLearner.id &&
-        l.role === 'STUDENT' &&
-        l.isActive &&
-        (l.grade === currentLearner.grade || l.board === currentLearner.board)
-    );
+  public static async getDiscoverablePeers(currentLearner: Learner): Promise<Learner[]> {
+    try {
+      const res = await ApiClient.getDiscoverablePeers(currentLearner.id);
+      if (res.success && res.peers) {
+        return res.peers;
+      }
+    } catch (e) {
+      console.warn('[StudentPacksService] Falling back to local peers:', e);
+    }
+    return [];
+  }
+
+  /**
+   * Retrieves friendships for the active student.
+   */
+  public static async getFriendships(learnerId: string): Promise<Friendship[]> {
+    try {
+      const res = await ApiClient.getFriendships(learnerId);
+      if (res.success && res.friends) {
+        return res.friends;
+      }
+    } catch (e) {
+      console.warn('[StudentPacksService] Offline friends note:', e);
+    }
+    return StorageRLSLayer.getFriends(learnerId);
   }
 
   /**
    * Sends a friend request.
    */
-  public static sendFriendRequest(requester: Learner, receiverId: string): { success: boolean; message: string } {
-    const receiver = StorageRLSLayer.getLearnerById(receiverId, requester.id);
-    if (!receiver) {
-      return { success: false, message: 'Student not found.' };
+  public static async sendFriendRequest(requester: Learner, receiverId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const res = await ApiClient.sendFriendRequest(requester.id, receiverId);
+      return { success: res.success, message: res.message };
+    } catch (err: any) {
+      return { success: false, message: err.message || 'Unable to send friend request.' };
     }
-
-    const friends = StorageRLSLayer.getFriends(requester.id);
-    const existing = friends.find(
-      f =>
-        (f.requesterId === requester.id && f.receiverId === receiverId) ||
-        (f.requesterId === receiverId && f.receiverId === requester.id)
-    );
-
-    if (existing) {
-      if (existing.status === 'BLOCKED') {
-        return { success: false, message: 'Unable to connect with this user.' };
-      }
-      return { success: false, message: `Friend request is already ${existing.status.toLowerCase()}.` };
-    }
-
-    const friendship: Friendship = {
-      id: 'fr_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6),
-      requesterId: requester.id,
-      receiverId: receiver.id,
-      requesterName: requester.fullName,
-      receiverName: receiver.fullName,
-      status: 'PENDING',
-      createdAt: new Date().toISOString()
-    };
-
-    StorageRLSLayer.saveFriendship(friendship);
-    return { success: true, message: `Friend request sent to ${receiver.fullName}!` };
   }
 
   /**
    * Accepts or declines a friend request.
    */
-  public static respondToRequest(
+  public static async respondToRequest(
     currentLearnerId: string,
     friendshipId: string,
     action: 'ACCEPT' | 'DECLINE' | 'BLOCK'
-  ): { success: boolean; message: string } {
-    const friends = StorageRLSLayer.getFriends(currentLearnerId);
-    const friendship = friends.find(f => f.id === friendshipId);
-    if (!friendship) return { success: false, message: 'Request not found.' };
-
-    if (action === 'ACCEPT') {
-      friendship.status = 'ACCEPTED';
-    } else if (action === 'DECLINE') {
-      friendship.status = 'DECLINED';
-    } else if (action === 'BLOCK') {
-      friendship.status = 'BLOCKED';
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      const res = await ApiClient.respondToFriendRequest(currentLearnerId, friendshipId, action);
+      return { success: res.success, message: res.message };
+    } catch (err: any) {
+      return { success: false, message: err.message || 'Failed to update request.' };
     }
+  }
 
-    StorageRLSLayer.saveFriendship(friendship);
-    return { success: true, message: `Connection updated: ${friendship.status}.` };
+  /**
+   * Retrieves conversation messages with a peer.
+   */
+  public static async getMessages(learnerId: string, peerId: string): Promise<StudentPackMessage[]> {
+    try {
+      const res = await ApiClient.getStudentMessages(learnerId, peerId);
+      if (res.success && res.messages) {
+        return res.messages.map((m: any) => ({
+          id: m.id,
+          senderId: m.senderId,
+          senderName: m.senderName,
+          receiverId: m.receiverId,
+          content: m.content,
+          flaggedForReview: Boolean(m.flaggedForReview),
+          flagReason: m.flagReason,
+          isDelivered: true,
+          sentAt: m.createdAt
+        }));
+      }
+    } catch (e) {
+      console.warn('[StudentPacksService] Offline messages note:', e);
+    }
+    return [];
   }
 
   /**
    * Sends a message with PII and Profanity inspection.
-   * If PII or vulgarity is found, it is redacted, flagged, and audited for Admin moderation.
    */
-  public static sendMessage(
+  public static async sendMessage(
     sender: Learner,
     receiverId: string,
     rawText: string
-  ): { success: boolean; message?: StudentPackMessage; warning?: string } {
-    const scan = PIIFirewall.scan(rawText);
-
-    const msgId = 'msg_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
-    const message: StudentPackMessage = {
-      id: msgId,
-      senderId: sender.id,
-      senderName: sender.fullName,
-      receiverId,
-      content: scan.redactedText,
-      flaggedForReview: !scan.isSafe,
-      flagReason: scan.reason,
-      isDelivered: true,
-      sentAt: new Date().toISOString()
-    };
-
-    StorageRLSLayer.saveMessage(message);
-
-    if (!scan.isSafe) {
-      // Record security audit log for child safety review
-      StorageRLSLayer.recordSecurityViolation(
-        sender.email,
-        `STUDENTPACK_PII_VIOLATION:${scan.reason}`,
-        `Msg to ${receiverId}`
-      );
-      return {
-        success: true,
-        message,
-        warning: scan.blockedDetails || 'Content was redacted to maintain community safety.'
-      };
+  ): Promise<{ success: boolean; message?: StudentPackMessage; warning?: string }> {
+    try {
+      const res = await ApiClient.sendStudentMessage(sender.id, receiverId, rawText);
+      if (res.success && res.message) {
+        const msg: StudentPackMessage = {
+          id: res.message.id,
+          senderId: res.message.senderId,
+          senderName: res.message.senderName,
+          receiverId: res.message.receiverId,
+          content: res.message.content,
+          flaggedForReview: Boolean(res.message.flaggedForReview),
+          flagReason: res.message.flagReason,
+          isDelivered: true,
+          sentAt: res.message.createdAt
+        };
+        return { success: true, message: msg, warning: res.warning };
+      }
+      return { success: false, warning: 'Failed to send message.' };
+    } catch (err: any) {
+      return { success: false, warning: err.message || 'Error transmitting message.' };
     }
-
-    return { success: true, message };
   }
 
   /**

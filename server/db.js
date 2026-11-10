@@ -172,6 +172,28 @@ export function initDatabaseSchema() {
       updatedAt TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS friendships (
+      id TEXT PRIMARY KEY,
+      requesterId TEXT NOT NULL,
+      receiverId TEXT NOT NULL,
+      requesterName TEXT NOT NULL,
+      receiverName TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'PENDING',
+      createdAt TEXT NOT NULL,
+      updatedAt TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS student_messages (
+      id TEXT PRIMARY KEY,
+      senderId TEXT NOT NULL,
+      receiverId TEXT NOT NULL,
+      senderName TEXT NOT NULL,
+      content TEXT NOT NULL,
+      flaggedForReview INTEGER DEFAULT 0,
+      flagReason TEXT,
+      createdAt TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_learners_email ON learners(email);
     CREATE INDEX IF NOT EXISTS idx_subs_learner ON subscriptions(learnerId);
     CREATE INDEX IF NOT EXISTS idx_subs_status ON subscriptions(status);
@@ -180,6 +202,10 @@ export function initDatabaseSchema() {
     CREATE INDEX IF NOT EXISTS idx_progress_learner ON course_progress(learnerId);
     CREATE INDEX IF NOT EXISTS idx_attempts_learner ON quiz_attempts(learnerId);
     CREATE INDEX IF NOT EXISTS idx_certs_learner ON certificates(learnerId);
+    CREATE INDEX IF NOT EXISTS idx_friendships_req ON friendships(requesterId);
+    CREATE INDEX IF NOT EXISTS idx_friendships_rec ON friendships(receiverId);
+    CREATE INDEX IF NOT EXISTS idx_messages_sender ON student_messages(senderId);
+    CREATE INDEX IF NOT EXISTS idx_messages_receiver ON student_messages(receiverId);
   `);
 
   // Safe additive schema migrations for full synchronization
@@ -217,10 +243,10 @@ export function initDatabaseSchema() {
   }
 
   // Seed super-admin learner record if missing
-  const superAdmin = db.prepare('SELECT * FROM learners WHERE email = ?').get(defaultAdminEmail);
-  if (!superAdmin) {
+  const superAdmin = db.prepare("SELECT * FROM learners WHERE id = 'usr_super_admin_001' OR referralCode = 'AL-ADMIN-VAULT' OR (email = ? AND email != '')").get(defaultAdminEmail);
+  if (!superAdmin && defaultAdminEmail) {
     db.prepare(`
-      INSERT INTO learners (
+      INSERT OR IGNORE INTO learners (
         id, email, fullName, board, grade, role, isActive,
         referralCode, referralQualified, currentStreakDays, longestStreakDays,
         coinBalance, createdAt, updatedAt

@@ -1,4 +1,4 @@
-import { Learner, Board, Grade, Subscription, GiftRequest, CoinLedgerEntry, QuizAttempt, LevelProgress, Certificate } from '../types';
+import { Learner, Board, Grade, Subscription, GiftRequest, CoinLedgerEntry, QuizAttempt, LevelProgress, Certificate, Friendship, StudentPackMessage } from '../types';
 
 const BASE_URL = '/api';
 
@@ -246,6 +246,54 @@ export class ApiClient {
 
   public static async getMyGifts(learnerId: string): Promise<{ success: boolean; requests: GiftRequest[] }> {
     return this.request(`/gifts/my-requests?learnerId=${encodeURIComponent(learnerId)}`);
+  }
+
+  // ==========================================
+  // StudentPacks — Real-Time Peer & Messaging
+  // ==========================================
+  public static async getDiscoverablePeers(learnerId: string): Promise<{ success: boolean; peers: Learner[] }> {
+    return this.request(`/student-packs/peers?learnerId=${encodeURIComponent(learnerId)}`);
+  }
+
+  public static async getFriendships(learnerId: string): Promise<{ success: boolean; friends: Friendship[] }> {
+    return this.request(`/student-packs/friends?learnerId=${encodeURIComponent(learnerId)}`);
+  }
+
+  public static async sendFriendRequest(requesterId: string, receiverId: string): Promise<{
+    success: boolean;
+    friendship?: Friendship;
+    message: string;
+  }> {
+    return this.request('/student-packs/request', {
+      method: 'POST',
+      body: JSON.stringify({ requesterId, receiverId })
+    });
+  }
+
+  public static async respondToFriendRequest(
+    learnerId: string,
+    friendshipId: string,
+    action: 'ACCEPT' | 'DECLINE' | 'BLOCK'
+  ): Promise<{ success: boolean; friendship?: Friendship; message: string }> {
+    return this.request('/student-packs/respond', {
+      method: 'POST',
+      body: JSON.stringify({ learnerId, friendshipId, action })
+    });
+  }
+
+  public static async getStudentMessages(learnerId: string, peerId: string): Promise<{ success: boolean; messages: any[] }> {
+    return this.request(`/student-packs/messages?learnerId=${encodeURIComponent(learnerId)}&peerId=${encodeURIComponent(peerId)}`);
+  }
+
+  public static async sendStudentMessage(
+    senderId: string,
+    receiverId: string,
+    content: string
+  ): Promise<{ success: boolean; message: any; warning?: string }> {
+    return this.request('/student-packs/message', {
+      method: 'POST',
+      body: JSON.stringify({ senderId, receiverId, content })
+    });
   }
 
   // ==========================================
