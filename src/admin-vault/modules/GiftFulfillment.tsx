@@ -54,7 +54,7 @@ export const GiftFulfillment: React.FC = () => {
           <span>Gift Card & Reward Fulfillment Queue</span>
         </h2>
         <p className="text-xs text-slate-400 mt-0.5">
-          Fulfill ₹20 to ₹100 digital Gift Cards (Levels 1 to 9) and enter voucher redemption codes for dispatch.
+          Fulfill ₹20 to ₹500 digital Gift Cards (Levels 1 to 9) and enter voucher redemption codes for dispatch.
         </p>
       </div>
 

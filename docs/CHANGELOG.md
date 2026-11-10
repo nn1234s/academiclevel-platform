@@ -64,16 +64,16 @@ All notable changes, architectural decisions, and security hardening updates are
   - Provides a one-click button to open pre-filled email in the learner's mail client (`mailto:academiclevels@gmail.com`) plus a one-click copy button for manual submission.
   - In the Super-Admin Vault, `GiftFulfillment.tsx` flags the redemption as targeted to `academiclevels@gmail.com` and provides voucher code dispatch controls.
 - **High-Appeal Gift Card Reward Economy (Level 1 to 9)**:
-  - Re-architected `GiftStore.tsx` to provide appealing real-world rewards starting at **2 Lakh Coins for ₹20 Gift Card**, scaling up by **+1 Lakh Coins per Level**:
-    - Level 1: 2,00,000 Coins (2L) $\to$ ₹20 Gift Card (Starter Milestone)
-    - Level 2: 3,00,000 Coins (3L) $\to$ ₹30 Gift Card (Bronze Scholar)
-    - Level 3: 4,00,000 Coins (4L) $\to$ ₹40 Gift Card (Silver Scholar)
-    - Level 4: 5,00,000 Coins (5L) $\to$ ₹50 Gift Card (Gold Scholar)
-    - Level 5: 6,00,000 Coins (6L) $\to$ ₹60 Gift Card (Platinum Scholar)
-    - Level 6: 7,00,000 Coins (7L) $\to$ ₹70 Gift Card (Diamond Scholar)
-    - Level 7: 8,00,000 Coins (8L) $\to$ ₹80 Gift Card (Master Scholar)
-    - Level 8: 9,00,000 Coins (9L) $\to$ ₹90 Gift Card (Grandmaster)
-    - Level 9: 10,00,000 Coins (10L) $\to$ ₹100 Gift Card (Olympiad Champion)
+  - Re-architected `GiftStore.tsx` to provide motivating real-world rewards starting at **500 Coins for ₹20 Gift Card**, scaling up by milestones to **15,000 Coins for ₹500 Gift Card**:
+    - Level 1: 500 Coins $\to$ ₹20 Gift Card / Direct UPI (Starter Milestone)
+    - Level 2: 800 Coins $\to$ ₹30 Gift Card (Bronze Scholar)
+    - Level 3: 1,200 Coins $\to$ ₹50 Gift Card (Silver Scholar)
+    - Level 4: 2,500 Coins $\to$ ₹100 Gift Card (Gold Scholar)
+    - Level 5: 4,000 Coins $\to$ ₹150 Gift Card (Platinum Scholar)
+    - Level 6: 5,500 Coins $\to$ ₹200 Gift Card (Diamond Scholar)
+    - Level 7: 7,000 Coins $\to$ ₹250 Gift Card (Master Scholar)
+    - Level 8: 10,000 Coins $\to$ ₹350 Gift Card (Grandmaster)
+    - Level 9: 15,000 Coins $\to$ ₹500 Gift Card (Olympiad Champion)
   - Supported delivery formats: Amazon Pay Gift Card, Google Play Redeem Code, Flipkart Voucher, Swiggy Food, and Direct UPI Cash.
   - Added real-time coin progress bar tracking distance to next redeemable milestone.
   - Updated `CoinMall.tsx` with a prominent VIP banner linking learners directly to the Gift Card Arena.

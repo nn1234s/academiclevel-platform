@@ -672,6 +672,7 @@ export const App: React.FC = () => {
                 <GiftStore
                   learner={currentLearner}
                   onRefreshLearner={() => refreshCurrentLearner()}
+                  onNavigateToPremium={() => navigateTo('PREMIUM')}
                 />
               )}
 

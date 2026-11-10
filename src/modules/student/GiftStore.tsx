@@ -3,6 +3,7 @@ import { Learner, GiftRequest } from '../../core/types';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { CoinLedgerService } from '../../services/coinLedgerService';
 import { ApiClient } from '../../core/api/apiClient';
+import { QuotaService } from '../../services/quotaService';
 import {
   Gift,
   Sparkles,
@@ -19,12 +20,15 @@ import {
   Copy,
   Check,
   ExternalLink,
-  Send
+  Send,
+  ShieldCheck,
+  Award
 } from 'lucide-react';
 
 interface GiftStoreProps {
   learner: Learner;
   onRefreshLearner: () => void;
+  onNavigateToPremium?: () => void;
 }
 
 export interface SubmittedClaimInfo {
@@ -136,7 +140,7 @@ export const GIFT_CARD_BRANDS = [
   { id: 'UPI_CASH', name: 'Direct UPI Cash Transfer', emoji: '💸', color: 'text-indigo-400' }
 ];
 
-export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner }) => {
+export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner, onNavigateToPremium }) => {
   const [selectedLevel, setSelectedLevel] = useState<GiftCardLevel | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<string>('AMAZON');
   const [deliveryEmail, setDeliveryEmail] = useState<string>(learner.email || '');
@@ -145,6 +149,13 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner 
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [submittedClaim, setSubmittedClaim] = useState<SubmittedClaimInfo | null>(null);
   const [copiedEmailText, setCopiedEmailText] = useState(false);
+
+  // Unit Economics Guard: Check scholar subscription status and learning milestones
+  const quota = QuotaService.evaluateQuota(learner);
+  const isEnrolledScholar = quota.hasActiveSubscription || learner.role === 'SUPER_ADMIN';
+  const minLevelsRequired = 3;
+  const levelsCount = learner.levelsCompletedCount || 0;
+  const hasAcademicMilestone = levelsCount >= minLevelsRequired || learner.role === 'SUPER_ADMIN';
 
   const existingRequests = StorageRLSLayer.getGiftRequestsForLearner(learner.id);
 
@@ -161,6 +172,25 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner 
     e.preventDefault();
     if (!selectedLevel) return;
 
+    // 1. Check Scholar Plan status (Protects 60%+ platform profit margin)
+    if (!isEnrolledScholar) {
+      setMessage({
+        type: 'error',
+        text: '🌟 Enrolled Scholar Privilege: Real Cash and Gift Card claims are exclusively reserved for active Lite (₹49) or Plus (₹129) subscribers. Upgrade your plan to unlock instant reward claims! You can also spend coins immediately on digital avatars & streak freezes in the Coin Mall.'
+      });
+      return;
+    }
+
+    // 2. Check Academic Effort Requirement
+    if (!hasAcademicMilestone) {
+      setMessage({
+        type: 'error',
+        text: `🎯 Proof of Study Milestone: Complete at least ${minLevelsRequired} curriculum levels with >= 70% score (currently completed: ${levelsCount}/${minLevelsRequired}) to verify genuine learning progress before redeeming.`
+      });
+      return;
+    }
+
+    // 3. Check Coin Balance
     if (learner.coinBalance < selectedLevel.coinsCost) {
       setMessage({
         type: 'error',
@@ -286,9 +316,9 @@ ${learner.fullName}`;
               Study Coin Gift Card Arena
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
-              Convert your academic consistency into appealing gift cards!
+              Convert your academic consistency into real-world rewards!
               <br />
-              <strong className="text-amber-400">Level 1 starts at 2 Lakh Coins (₹20 Gift Card)</strong>, increasing by <strong className="text-white">+1 Lakh Coins for every tier</strong> up to Level 9 (₹100 Gift Card)!
+              <strong className="text-amber-400">Level 1 starts at 500 Coins (₹20 Gift Card)</strong>, scaling up across 9 milestones to <strong className="text-amber-400">15,000 Coins (₹500 Gift Card)</strong>!
             </p>
           </div>
 
@@ -324,6 +354,41 @@ ${learner.fullName}`;
             />
           </div>
         </div>
+      </div>
+
+      {/* Scholar Economics & Trust Badge */}
+      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs shadow-lg">
+        <div className="flex items-start space-x-3.5">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg flex-shrink-0 mt-0.5">
+            🛡️
+          </div>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="font-bold text-white text-sm">Rapid Voucher Dispatch & Fair-Play Economics</span>
+              {isEnrolledScholar ? (
+                <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
+                  ✓ Scholar Enrolled
+                </span>
+              ) : (
+                <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
+                  Free Tier • Upgrade to Cash Out
+                </span>
+              )}
+            </div>
+            <p className="text-slate-400 text-[11px] mt-1 leading-relaxed">
+              Earn <strong className="text-amber-400">+25 coins</strong> per level mastered (70%+ accuracy) plus daily streak bonuses. Real gift cards are reserved for enrolled Lite/Plus Scholars with min. 3 levels mastered. Digital avatars, streak freezes, and PDFs are available to all students in the Coin Mall!
+            </p>
+          </div>
+        </div>
+        {!isEnrolledScholar && onNavigateToPremium && (
+          <button
+            onClick={onNavigateToPremium}
+            className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black rounded-xl text-xs flex-shrink-0 shadow-md transition-all flex items-center justify-center space-x-1"
+          >
+            <span>Upgrade Plan (From ₹49)</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       {/* Feedback Alert */}
