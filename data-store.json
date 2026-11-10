@@ -26,8 +26,8 @@
     },
     {
       "id": "usr_super_admin_001",
-      "email": "naitiknanda1235@gmail.com",
-      "fullName": "Naitik Nanda (Super-Admin)",
+      "email": "admin@academiclevel.in",
+      "fullName": "AcademicLevel Admin (Super-Admin)",
       "board": "CBSE",
       "grade": 12,
       "role": "SUPER_ADMIN",
@@ -81,7 +81,7 @@
       "durationDays": 365,
       "startsAt": "2026-11-09T14:02:19.667Z",
       "expiresAt": "2027-11-09T14:02:19.667Z",
-      "verifiedByAdmin": "naitiknanda1235@gmail.com",
+      "verifiedByAdmin": "admin@academiclevel.in",
       "verifiedAt": "2026-11-09T14:02:19.667Z",
       "createdAt": "2026-11-09T14:02:19.667Z",
       "invoiceNumber": "ADMIN-333786"
@@ -267,7 +267,7 @@
       "reasonCode": "ADMIN_ADJUSTMENT",
       "balanceAfter": 50010,
       "metadata": {
-        "admin": "naitiknanda1235@gmail.com",
+        "admin": "admin@academiclevel.in",
         "note": "Admin bonus grant"
       },
       "timestampUtc": "2026-11-09T14:01:57.196Z",
@@ -281,7 +281,7 @@
       "reasonCode": "ADMIN_ADJUSTMENT",
       "balanceAfter": 250010,
       "metadata": {
-        "admin": "naitiknanda1235@gmail.com",
+        "admin": "admin@academiclevel.in",
         "note": "Admin bonus grant"
       },
       "timestampUtc": "2026-11-09T14:02:00.149Z",
@@ -295,7 +295,7 @@
       "reasonCode": "ADMIN_ADJUSTMENT",
       "balanceAfter": 200010,
       "metadata": {
-        "admin": "naitiknanda1235@gmail.com",
+        "admin": "admin@academiclevel.in",
         "note": "Scolarship"
       },
       "timestampUtc": "2026-11-09T14:03:26.725Z",
@@ -327,7 +327,7 @@
       "reasonCode": "ADMIN_ADJUSTMENT",
       "balanceAfter": 1000010,
       "metadata": {
-        "admin": "naitiknanda1235@gmail.com",
+        "admin": "admin@academiclevel.in",
         "note": "Admin bonus grant"
       },
       "timestampUtc": "2026-11-09T14:05:53.051Z",
@@ -358,7 +358,7 @@
       "planTier": "PLUS",
       "durationDays": 180,
       "isRedeemed": false,
-      "createdBy": "naitiknanda1235@gmail.com",
+      "createdBy": "admin@academiclevel.in",
       "expiresAt": "2027-12-31T23:59:59.000Z",
       "createdAt": "2026-11-09T13:28:20.746Z"
     },
@@ -367,7 +367,7 @@
       "planTier": "LITE",
       "durationDays": 60,
       "isRedeemed": false,
-      "createdBy": "naitiknanda1235@gmail.com",
+      "createdBy": "admin@academiclevel.in",
       "expiresAt": "2027-12-31T23:59:59.000Z",
       "createdAt": "2026-11-09T13:28:20.746Z"
     }
@@ -376,7 +376,7 @@
     {
       "id": "admin_1794233204880_ubcmw",
       "timestampUtc": "2026-11-09T14:06:44.880Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
+      "actorEmail": "admin@academiclevel.in",
       "actionType": "APPROVE_GIFT_DISPATCH",
       "targetId": "gc_req_mw9c3vp5_oj9w",
       "severity": "INFO",
@@ -385,7 +385,7 @@
     {
       "id": "admin_1794233065571_q17il",
       "timestampUtc": "2026-11-09T14:04:25.571Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
+      "actorEmail": "admin@academiclevel.in",
       "actionType": "APPROVE_GIFT_DISPATCH",
       "targetId": "gc_req_mw9c12pk_tljq",
       "severity": "INFO",
@@ -394,7 +394,7 @@
     {
       "id": "admin_1794232939667_p90x5",
       "timestampUtc": "2026-11-09T14:02:19.668Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
+      "actorEmail": "admin@academiclevel.in",
       "actionType": "GRANT_PREMIUM_DIRECT",
       "targetId": "lrn_mw9bph4q_xacr",
       "severity": "INFO",

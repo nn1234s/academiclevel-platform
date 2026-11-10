@@ -44,7 +44,7 @@ git push -u origin main
    - **Instance Type:** `Free`
 5. In **Advanced** $\to$ **Add Environment Variable**:
    - `NODE_ENV` = `production`
-   - `SUPER_ADMIN_EMAIL` = `naitiknanda1235@gmail.com`
+   - `SUPER_ADMIN_EMAIL` = `admin@academiclevel.in` (or your chosen administrator email)
    - `DATA_DIR` = `/var/data`
 6. (Optional Persistent Storage): Under **Disks**, click **Add Disk**, mount path `/var/data`, size `1 GB`.
 7. Click **Create Web Service**.
@@ -94,5 +94,5 @@ Once deployed to a real cloud server:
 - **Shared Central Database:** Every account registered on any device is stored permanently in the cloud SQL database.
 - **Cross-Device Sessions:** A student can register on their desktop, practice quizzes on their phone, and their coin balances, progress levels, and subscriptions remain perfectly synchronized.
 - **Super-Admin Vault Access (`/ops-vault-al99`):**
-  - As the super-admin (`naitiknanda1235@gmail.com`), you can open `https://your-cloud-domain.com/ops-vault-al99` directly on your smartphone anywhere in the world.
+  - As the super-admin, you can open `https://your-cloud-domain.com/adminservice` directly on your smartphone anywhere in the world.
   - You will instantly see all submitted payments in your one-tick verification queue and can grant or revoke subscriptions on the go.

@@ -33,7 +33,17 @@ dist-ssr
 server/data/*.db
 server/data/*.db-wal
 server/data/*.db-shm
+server/data/*.sqlite
+server/data/*.sqlite-wal
+server/data/*.sqlite-shm
 *.db
 *.db-wal
 *.db-shm
 *.db-journal
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+
+# Build and test caches
+dist-test
+dist-test/*

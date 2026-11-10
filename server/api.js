@@ -35,14 +35,14 @@ export const apiRouter = express.Router();
 apiRouter.use(cors());
 apiRouter.use(express.json());
 
-const SUPER_ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+const SUPER_ADMIN_EMAIL = (process.env.ADMIN_EMAIL || process.env.SUPER_ADMIN_EMAIL || 'admin@academiclevel.in').trim().toLowerCase();
 const VALID_ADMIN_EMAILS = new Set(
-  [process.env.ADMIN_EMAIL, 'admin@academiclevel.in', 'naitiknanda1235@gmail.com']
+  [process.env.ADMIN_EMAIL, process.env.SUPER_ADMIN_EMAIL, 'admin@academiclevel.in']
     .filter(Boolean)
     .map(s => String(s).trim().toLowerCase())
 );
 const ADMIN_VALID_PASSKEYS = new Set(
-  [process.env.ADMIN_PASSKEY, process.env.ADMIN_PASSKEY_FALLBACK, 'naitik2026', 'vault99']
+  [process.env.ADMIN_PASSKEY, process.env.ADMIN_PASSKEY_FALLBACK, process.env.ADMIN_PASSWORD]
     .filter(Boolean)
     .map(s => String(s).trim())
 );

@@ -27,7 +27,7 @@ CREATE TABLE learners (
   class_changes_used_post_expiry INT NOT NULL DEFAULT 0 CHECK (class_changes_used_post_expiry <= 1),
   
   -- Gamification & Referral
-  referral_code VARCHAR(32) UNIQUE NOT NULL, -- e.g. "AL-NAITIK99"
+  referral_code VARCHAR(32) UNIQUE NOT NULL, -- e.g. "AL-STUDENT99"
   referred_by VARCHAR(64) REFERENCES learners(id),
   referral_qualified BOOLEAN NOT NULL DEFAULT FALSE, -- turns true after 1st quiz completed
   last_spin_timestamp_utc TIMESTAMP WITH TIME ZONE,
@@ -52,7 +52,7 @@ CREATE TABLE subscriptions (
   amount_inr DECIMAL(10,2) NOT NULL,
   starts_at TIMESTAMP WITH TIME ZONE,
   expires_at TIMESTAMP WITH TIME ZONE,
-  verified_by_admin VARCHAR(255), -- 'naitiknanda1235@gmail.com'
+  verified_by_admin VARCHAR(255), -- 'admin@academiclevel.in'
   verified_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

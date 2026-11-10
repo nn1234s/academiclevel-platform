@@ -41,7 +41,7 @@ The system delivers age-adaptive pedagogical interfaces (Classes 1–4 Visual Ga
 +---------v-------------------------+                    +------------------v--------------------+
 |  Curriculum & Intelligence Engine |                    |   Audited Admin Control Plane         |
 |  - Board x Class 1-12 Syllabi     |                    |   Route: /ops-vault-al99 (Code-Split) |
-|  - 4-Tier Progression Nodes       |                    |   Lock: naitiknanda1235@gmail.com     |
+|  - 4-Tier Progression Nodes       |                    |   Lock: admin@academiclevel.in        |
 |  - Offline IndexedDB/Local Cache  |                    |   - UPI 12-Digit Verification Queue   |
 |  - Nova AI Socratic Engine        |                    |   - Entitlements & ACodes Manager     |
 +-----------------------------------+                    |   - Ledger Inspector & Audit Logs     |
@@ -86,7 +86,7 @@ Operates Google Gemini 1.5 Flash live assessment generation with sub-4s automati
 | Threat Vector | Mitigation Strategy | Implementation |
 |---|---|---|
 | **Admin Route Discovery** | Complete exclusion from public sitemap, navigation, and robots; code-split under `/ops-vault-al99`. | React Lazy route with no public links |
-| **Admin Impersonation** | Hard-locked to verified email `naitiknanda1235@gmail.com`. Any unauthorized access attempt yields 403 Forbidden and writes an immutable audit record. | `SuperAdminGuard.tsx` & `SecurityAuditService` |
+| **Admin Impersonation** | Hard-locked to verified admin email and passkey session authentication. Any unauthorized access attempt yields 403 Forbidden and writes an immutable audit record. | `SuperAdminGuard.tsx` & `SecurityAuditService` |
 | **Cross-Tenant Data Leakage** | Row-Level Security (RLS) simulation enforcing `learner_id` isolation on every read and write operation. | `StorageRLSLayer.ts` |
 | **Payment UTR Replay Fraud** | Global unique constraint on 12-digit UTRs (`^[0-9]{12}$`) backed by SHA-256 fingerprint hashing. | `PaymentService.ts` |
 | **Quiz Speedrun / Cheating** | Enforced minimum dwell time per question ($\ge 3$ seconds) before submit is accepted; prevents automated bot scripts. | `QuizEngine.ts` |

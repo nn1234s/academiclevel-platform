@@ -86,7 +86,7 @@ Lead Architect: Antigravity AI & Lead Enterprise Team
   - Audited UPI Payment Submission with Optional UTR and Primary Payer UPI ID (`/api/payments/submit`)
   - Append-Only Study Coin Ledger with SHA-256 Hashes (`/api/coins/*`)
   - Appealing Gift Card Rewards Claim System with Dispatch to `academiclevels@gmail.com` (`/api/gifts/*`)
-  - Super-Admin Control Plane locked exclusively to `naitiknanda1235@gmail.com` with One-Click Grant/Revoke Premium (`/api/admin/*`)
+  - Super-Admin Control Plane locked exclusively to verified administrator credentials with One-Click Grant/Revoke Premium (`/api/admin/*`)
 - [x] Express 5 Production Static & API Server (`server/server.js`)
 - [x] Unified Vite Integration with `enterpriseApiPlugin` (`vite.config.ts`)
 - [x] Frontend REST API Client (`src/core/api/apiClient.ts`) and Automatic Server RLS Synchronization (`src/core/storage/StorageRLSLayer.ts`)

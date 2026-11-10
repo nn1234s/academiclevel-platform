@@ -34,7 +34,7 @@ All notable changes, architectural decisions, and security hardening updates are
 - **Verified Server-Side 1-Day Verification Flow**:
   - Configured `UPIQRCheckout.tsx` and `PremiumCenter.tsx` so that upon payment submission, students see:
     `"Thank you for your purchase. Due to server side checks, we will grant after 1 day."`
-  - Payments enter the Super-Admin Payment Verification Queue (`/ops-vault-al99`), where the admin (`naitiknanda1235@gmail.com`) can verify the UTR and approve/activate the subscription immediately.
+  - Payments enter the Super-Admin Payment Verification Queue (`/ops-vault-al99`), where the admin can verify the UTR and approve/activate the subscription immediately.
 
 - **Amazon GC & Digital Voucher Email Request Dispatch (`academiclevels@gmail.com`)**:
   - In `GiftStore.tsx`, when a learner redeems coins for an Amazon Pay or digital gift card, the platform debits the append-only ledger and prepares a formal claim dispatched to **`academiclevels@gmail.com`**.
@@ -76,7 +76,7 @@ All notable changes, architectural decisions, and security hardening updates are
   - `src/core/security/utrValidator.ts`: 12-digit numeric constraint `^[0-9]{12}$` & deduplication fingerprinting.
   - `src/core/security/piiFirewall.ts`: Regex firewall blocking phone numbers, emails, social handles, external links, and vulgarity.
   - `src/core/storage/StorageRLSLayer.ts`: Zero demo accounts, strict Row-Level Security simulation scoping every query to `learner_id`.
-  - `src/core/auth/SuperAdminGuard.tsx`: Hard lock exclusively granting `/ops-vault-al99` access to `naitiknanda1235@gmail.com`. Any unauthorized attempt triggers immediate 403 Forbidden and audit record.
+  - `src/core/auth/SuperAdminGuard.tsx`: Hard lock exclusively granting `/ops-vault-al99` access to authorized admin credentials. Any unauthorized attempt triggers immediate 403 Forbidden and audit record.
   - `src/core/auth/AuthContext.tsx`: Full auth provider, session manager, and controlled class-change governance (`classChangesUsedPremium <= 1`, `classChangesUsedPostExpiry <= 1`).
 
 - **Multi-Board Curriculum Engine & Quota Gatekeeper (Phase 2)**:
@@ -107,7 +107,7 @@ All notable changes, architectural decisions, and security hardening updates are
 - **Audited UPI QR Checkout & Admin Control Plane (Phase 4)**:
   - `src/modules/student/UPIQRCheckout.tsx`: Dynamic NPCI UPI QR code generator for ₹49 Lite (60d) and ₹129 Plus (180d). Captures Payer UPI ID and 12-digit UTR with state set to `PENDING_VERIFICATION`.
   - `src/services/paymentService.ts`: Payment verification service, ACode redemption, trial grants, and subscription management.
-  - `src/admin-vault/AdminVaultShell.tsx`: Code-split super-admin portal locked to `naitiknanda1235@gmail.com`.
+  - `src/admin-vault/AdminVaultShell.tsx`: Code-split super-admin portal locked to authorized super-admin credentials.
   - 12 Enterprise Admin Modules:
     1. `StudentManagement.tsx`
     2. `PaymentVerificationQueue.tsx`

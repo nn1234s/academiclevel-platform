@@ -9,7 +9,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: SUPER_ADMIN_EMAIL
-        value: naitiknanda1235@gmail.com
+        value: admin@academiclevel.in
       - key: DATA_DIR
         value: /var/data
     disk:
