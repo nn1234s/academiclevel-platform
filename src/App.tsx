@@ -162,8 +162,19 @@ export const App: React.FC = () => {
     );
   }
 
-  // Unified Ad Funnels (/advert1 and /ads) -> Renders Concept Booster Experience
-  if (currentRoute === 'ADS_FUNNEL' || currentRoute === 'ADVERT1_FUNNEL') {
+  // Ad Campaign Funnel 2 (/ads) -> High School Board Exam Accelerator (Classes 8, 9 & 10)
+  if (currentRoute === 'ADS_FUNNEL') {
+    return (
+      <AdsLandingPage
+        onSuccessRegistered={() => {
+          navigateTo('DASHBOARD');
+        }}
+      />
+    );
+  }
+
+  // Ad Campaign Funnel 1 (/advert1) -> Primary & Middle Concept Booster (Classes 3 to 7, Class 5 Focus)
+  if (currentRoute === 'ADVERT1_FUNNEL') {
     return (
       <SecretAdPage
         onSuccessRegistered={() => {
