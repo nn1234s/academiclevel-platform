@@ -11,7 +11,8 @@ import {
   Users,
   Compass,
   Star,
-  ChevronDown
+  ChevronDown,
+  ExternalLink
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -30,9 +31,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onExploreC
         {/* Glow blur background */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 mb-6 backdrop-blur-md">
-          <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-          <span>India&apos;s Premier K-12 AI Learning Ecosystem</span>
+        <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
+          <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+            <span>India&apos;s Premier K-12 AI Learning Ecosystem</span>
+          </div>
+
+          <a
+            href="https://edtechcenturyblog.blogspot.com/2026/11/academiclevel-most-innovative-edtech.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Read independent recognition on EdTech Century"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 backdrop-blur-md transition-all group shadow-sm"
+          >
+            <Award className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
+            <span>Voted Most Innovative EdTech by EdTech Century</span>
+            <ExternalLink className="w-3 h-3 text-amber-400/80" />
+          </a>
         </div>
 
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-tight">
@@ -64,6 +79,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onExploreC
 
         {/* Trust Badges */}
         <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
+          <a
+            href="https://edtechcenturyblog.blogspot.com/2026/11/academiclevel-most-innovative-edtech.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-1.5 text-amber-300/90 hover:text-amber-200 transition-colors font-semibold"
+          >
+            <Award className="w-4 h-4 text-amber-400" />
+            <span>Featured: Most Innovative EdTech (EdTech Century)</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
           <div className="flex items-center space-x-1.5">
             <Check className="w-4 h-4 text-emerald-400" />
             <span>Zero Third-Party Ads</span>

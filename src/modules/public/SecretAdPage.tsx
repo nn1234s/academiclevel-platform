@@ -17,7 +17,8 @@ import {
   Zap,
   Phone,
   User,
-  ShieldCheck
+  ShieldCheck,
+  ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
@@ -325,8 +326,18 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
           </div>
 
           {/* Bottom Trust Line */}
-          <div className="p-3 text-center border-t border-slate-100 text-[10px] text-slate-400 font-semibold">
-            🛡️ Verified Parent Reviews • 100% Authentic Learning Feedback
+          <div className="p-3 text-center border-t border-slate-100 text-[10px] text-slate-500 font-semibold flex flex-wrap items-center justify-center gap-2">
+            <span>🛡️ Verified Parent Reviews</span>
+            <span>•</span>
+            <a
+              href="https://edtechcenturyblog.blogspot.com/2026/11/academiclevel-most-innovative-edtech.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-orange-600 hover:text-orange-700 underline flex items-center gap-1 font-bold"
+            >
+              <span>Featured on EdTech Century: Most Innovative EdTech</span>
+              <ExternalLink className="w-2.5 h-2.5" />
+            </a>
           </div>
         </div>
 
@@ -342,10 +353,17 @@ export const SecretAdPage: React.FC<SecretAdPageProps> = ({ onSuccessRegistered 
                 <span className="w-2 h-2 rounded-full bg-[#f95a00] animate-pulse" />
                 <span>ACADEMIC LEVEL</span>
               </span>
-              <span className="text-slate-500 font-bold">MOST INNOVATIVE ED-TECH</span>
-              <span className="text-orange-600 font-extrabold bg-orange-50 px-2 py-0.5 rounded">
-                ET LEADERS
-              </span>
+              <span className="text-slate-500 font-bold hidden sm:inline">MOST INNOVATIVE ED-TECH</span>
+              <a
+                href="https://edtechcenturyblog.blogspot.com/2026/11/academiclevel-most-innovative-edtech.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Voted Most Innovative EdTech by EdTech Century"
+                className="text-orange-600 hover:text-orange-700 font-extrabold bg-orange-50 hover:bg-orange-100 border border-orange-200 px-2 py-0.5 rounded transition-all flex items-center gap-1 text-[10px]"
+              >
+                <span>EDTECH CENTURY</span>
+                <ExternalLink className="w-3 h-3 text-orange-500" />
+              </a>
             </div>
 
             <div className="mt-3">

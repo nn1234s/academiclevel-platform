@@ -55,7 +55,8 @@ import {
   Compass,
   Trophy,
   ShieldCheck,
-  ChevronDown
+  ChevronDown,
+  ExternalLink
 } from 'lucide-react';
 
 // Code-split Super-Admin Vault Shell (unlinked from public navigation)
@@ -698,6 +699,15 @@ export const App: React.FC = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-6">
+              <a
+                href="https://edtechcenturyblog.blogspot.com/2026/11/academiclevel-most-innovative-edtech.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-400/90 hover:text-amber-300 flex items-center gap-1 font-semibold transition-colors"
+              >
+                <span>Most Innovative EdTech (EdTech Century)</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
               <button onClick={() => navigateTo('PRIVACY')} className="hover:text-slate-300">
                 Privacy Policy (DPDP 2023)
               </button>
