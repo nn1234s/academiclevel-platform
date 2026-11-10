@@ -1,0 +1,12 @@
+# AcademicLevel Enterprise Robots Directive
+User-agent: *
+Allow: /
+Allow: /advert1
+Allow: /ads
+
+# Strictly protect and shield Super-Admin internal services from indexing
+Disallow: /adminservice
+Disallow: /ops-vault-al99
+Disallow: /api/admin/
+
+Sitemap: https://academiclevel.in/sitemap.xml

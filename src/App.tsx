@@ -162,19 +162,8 @@ export const App: React.FC = () => {
     );
   }
 
-  // Ads Campaign Landing Page (/ads)
-  if (currentRoute === 'ADS_FUNNEL') {
-    return (
-      <AdsLandingPage
-        onSuccessRegistered={() => {
-          navigateTo('DASHBOARD');
-        }}
-      />
-    );
-  }
-
-  // Secret AcademicLevel Concept Booster Ad Page (/advert1)
-  if (currentRoute === 'ADVERT1_FUNNEL') {
+  // Unified Ad Funnels (/advert1 and /ads) -> Renders Concept Booster Experience
+  if (currentRoute === 'ADS_FUNNEL' || currentRoute === 'ADVERT1_FUNNEL') {
     return (
       <SecretAdPage
         onSuccessRegistered={() => {
