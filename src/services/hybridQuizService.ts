@@ -104,9 +104,9 @@ export class HybridQuizService {
         return {
           questions: raceResult.questions,
           source: 'GEMINI_LIVE',
-          model: raceResult.model || 'gemini-1.5-flash',
+          model: raceResult.model || 'gemini-2.5-flash',
           latencyMs: Date.now() - startTime,
-          notice: 'Live AI Generated via Google Gemini 1.5 Flash'
+          notice: 'Live AI Generated via Google Gemini 2.5 Flash'
         };
       }
 
@@ -125,7 +125,7 @@ export class HybridQuizService {
           return {
             questions: directResult,
             source: 'GEMINI_LIVE',
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.5-flash',
             latencyMs: Date.now() - startTime,
             notice: 'Live AI Generated via Client Gemini Key'
           };
@@ -163,7 +163,7 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
       const timeout = setTimeout(() => controller.abort(), 4500);
 
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -218,7 +218,7 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
           hasApiKey: data.hasApiKey || !!clientKey,
           maskedApiKey: data.maskedApiKey || (clientKey ? `${clientKey.substring(0, 4)}...${clientKey.substring(clientKey.length - 4)}` : null),
           preferLiveAi: data.preferLiveAi && this.getPreferLiveAi(),
-          model: data.model || 'gemini-1.5-flash'
+          model: data.model || 'gemini-2.5-flash'
         };
       }
     } catch {
@@ -230,7 +230,7 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
       hasApiKey: !!clientKey,
       maskedApiKey: clientKey ? `${clientKey.substring(0, 4)}...${clientKey.substring(clientKey.length - 4)}` : null,
       preferLiveAi: this.getPreferLiveAi(),
-      model: 'gemini-1.5-flash'
+      model: 'gemini-2.5-flash'
     };
   }
 
@@ -299,7 +299,7 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
         try {
           const start = Date.now();
           const r = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -311,7 +311,7 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
           );
           const latencyMs = Date.now() - start;
           if (r.ok) {
-            return { success: true, latencyMs, message: 'Gemini 1.5 Flash direct ping verified!' };
+            return { success: true, latencyMs, message: 'Gemini 2.5 Flash direct ping verified!' };
           }
           return { success: false, error: `Direct ping HTTP ${r.status}` };
         } catch (e: any) {

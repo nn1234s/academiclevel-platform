@@ -2,6 +2,29 @@
 
 All notable changes, architectural decisions, and security hardening updates are documented in this file.
 
+## [v1.2.0-PROD] - 2026-11-10
+
+### Curriculum & AI Core Upgrade
+- **1,984-Question Comprehensive Curriculum Bank**:
+  - Generated and verified 1,984 authentic class-wise multiple-choice questions across Classes 1 through 12.
+  - Full board coverage: CBSE (664 questions), ICSE (664 questions), and Cambridge IGCSE (656 questions).
+  - Balanced answer distribution: Correct indices evenly distributed (0: 24.8%, 1: 24.3%, 2: 25.8%, 3: 25.1%), eliminating any Option A bias.
+  - Integrated into `OfflineBankService.ts` and `curatedQuestionBank.json` with subject normalization and dynamic fallback hierarchy.
+- **Upgraded to Google Gemini 2.5 Flash**:
+  - Replaced legacy Gemini models with `gemini-2.5-flash` across backend API routes (`/api/ai/generate-quiz`, `/api/ai/explain`, `/api/ai/chat`, `/api/admin/ai/test-connection`).
+  - Updated client-side direct calling services: `HybridQuizService.ts`, `novaAiService.ts`, and `QuestionBankManager.tsx`.
+
+### Security Hardening & StudentPacks Backend
+- **Storage & Coin Minting Hardening**:
+  - Hardened `/api/storage` against anonymous scraping; now strictly requires valid admin passkey or bearer token (401 Unauthorized for anonymous callers).
+  - Secured `/api/coins/transact`: positive credit minting (`amount > 0`) is restricted to super-admin credentials; student callers can only perform legitimate store debits within their own verified balance.
+- **Production SQLite StudentPacks Backend**:
+  - Built persistent SQLite relational tables `friendships` and `student_messages` in `server/db.js`.
+  - Added REST endpoints for peer discovery, friend requests, response handling, and live messaging.
+  - Implemented automated PII/profanity firewall blocking phone numbers, email addresses, and inappropriate content before persistence.
+- **Gift Store Milestone Recalibration**:
+  - Re-anchored reward costs from theoretical multi-year thresholds to motivating, realistic student milestones (500 coins for ₹20 up to 15,000 coins for ₹500).
+
 ## [v1.0.0-PROD] - 2026-11-09
 
 ### Added & Verified

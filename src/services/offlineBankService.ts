@@ -1,7 +1,9 @@
 import { Question, Board, Grade, LevelNode } from '../core/types';
+import curatedBank from '../data/curatedQuestionBank.json';
 
 export class OfflineBankService {
   private static STORAGE_KEY = 'al_prod_offline_question_bank_v1';
+  private static CURATED_BANK: Question[] = (curatedBank as unknown) as Question[];
 
   private static FALLBACK_QUESTIONS: Question[] = [
     // --- CLASS 10 CBSE MATHEMATICS ---
@@ -306,31 +308,71 @@ export class OfflineBankService {
   public static getQuestions(board: Board, grade: Grade, subjectId: string, levelNode: LevelNode): Question[] {
     // 1. Check if user added custom offline questions
     const customBank = this.readCustomQuestions();
-    const all = [...this.FALLBACK_QUESTIONS, ...customBank];
+    const all = [...this.CURATED_BANK, ...this.FALLBACK_QUESTIONS, ...customBank];
 
-    // Filter exact match
+    // Normalize subjectId for robust matching (e.g. 'math' / 'mathematics', 'science' / 'physics')
+    const normSub = (s: string) => {
+      const lower = (s || '').toLowerCase();
+      if (lower.includes('math')) return 'math';
+      if (lower.includes('phys')) return 'physics';
+      if (lower.includes('chem')) return 'chemistry';
+      if (lower.includes('bio')) return 'biology';
+      if (lower.includes('sci')) return 'science';
+      if (lower.includes('eng')) return 'english';
+      if (lower.includes('hist') || lower.includes('civic') || lower.includes('geog') || lower.includes('soc')) return 'social';
+      return lower;
+    };
+
+    const targetSub = normSub(subjectId);
+
+    // Exact curriculum match: Board + Grade + Subject + LevelNode
     let matches = all.filter(
-      q => q.subjectId === subjectId && q.levelNode === levelNode && q.board === board && q.grade === grade
+      q => normSub(q.subjectId) === targetSub &&
+           q.levelNode === levelNode &&
+           q.board === board &&
+           Number(q.grade) === Number(grade)
     );
 
-    // If no exact match, relax board or grade within same educational tier
+    // If exact node has fewer than 5, expand across other nodes for the SAME Board + Grade + Subject
+    if (matches.length < 5) {
+      const gradeMatches = all.filter(
+        q => normSub(q.subjectId) === targetSub &&
+             q.board === board &&
+             Number(q.grade) === Number(grade) &&
+             !matches.some(m => m.id === q.id)
+      );
+      matches = [...matches, ...gradeMatches];
+    }
+
+    // If still empty, relax board for same Grade & Subject
     if (matches.length === 0) {
-      matches = all.filter(q => q.subjectId === subjectId && q.levelNode === levelNode);
+      matches = all.filter(
+        q => normSub(q.subjectId) === targetSub &&
+             Number(q.grade) === Number(grade)
+      );
+    }
+
+    // If still empty, match subject and node across platform
+    if (matches.length === 0) {
+      matches = all.filter(q => normSub(q.subjectId) === targetSub && q.levelNode === levelNode);
     }
     if (matches.length === 0) {
-      matches = all.filter(q => q.subjectId === subjectId);
+      matches = all.filter(q => normSub(q.subjectId) === targetSub);
     }
     if (matches.length === 0) {
       matches = all;
     }
 
-    // Always synthesize at least 5 syllabus-aligned questions if bank has fewer
-    if (matches.length < 5) {
-      const generated = this.synthesizeSyntheticQuestions(board, grade, subjectId, levelNode, 5 - matches.length);
-      return [...matches, ...generated];
+    // Shuffle so student experiences varied test sets across sessions
+    const shuffled = [...matches].sort(() => 0.5 - Math.random());
+
+    // Always guarantee at least 5 syllabus-aligned questions
+    if (shuffled.length < 5) {
+      const generated = this.synthesizeSyntheticQuestions(board, grade, subjectId, levelNode, 5 - shuffled.length);
+      return [...shuffled, ...generated];
     }
 
-    return matches.slice(0, 10);
+    return shuffled.slice(0, 10);
   }
 
   private static synthesizeSyntheticQuestions(

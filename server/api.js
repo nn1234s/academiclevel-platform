@@ -1625,6 +1625,8 @@ function getGeminiApiKey() {
   }
 }
 
+const getActiveGeminiModel = () => process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+
 function getAiSettings() {
   let preferLiveAi = true;
   try {
@@ -1636,7 +1638,7 @@ function getAiSettings() {
     hasApiKey: !!apiKey,
     maskedApiKey: apiKey ? `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}` : null,
     preferLiveAi,
-    model: 'gemini-1.5-flash'
+    model: getActiveGeminiModel()
   };
 }
 
@@ -1683,7 +1685,8 @@ apiRouter.post('/admin/ai/test-connection', adminAuth, async (req, res) => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 6000);
 
-    const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keyToTest}`;
+    const model = getActiveGeminiModel();
+    const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keyToTest}`;
     const response = await fetch(testUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1706,7 +1709,7 @@ apiRouter.post('/admin/ai/test-connection', adminAuth, async (req, res) => {
     res.json({
       success: true,
       latencyMs,
-      message: 'Gemini 1.5 Flash responded successfully.',
+      message: `${model} responded successfully.`,
       rawSample: outputText
     });
   } catch (err) {
@@ -1759,7 +1762,8 @@ CRITICAL REQUIREMENTS:
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 6500);
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const model = getActiveGeminiModel();
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     const response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1817,7 +1821,7 @@ CRITICAL REQUIREMENTS:
     return res.json({
       success: true,
       source: 'GEMINI_LIVE',
-      model: 'gemini-1.5-flash',
+      model,
       questions: validatedQuestions
     });
   } catch (err) {
@@ -1861,7 +1865,8 @@ Keep the response direct, engaging, and under 150 words.`;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 4500);
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const model = getActiveGeminiModel();
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     const response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1910,7 +1915,8 @@ Rules:
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 4500);
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const model = getActiveGeminiModel();
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     const response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
