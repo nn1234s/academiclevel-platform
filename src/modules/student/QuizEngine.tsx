@@ -8,6 +8,7 @@ import { CertificateService } from '../../services/certificateService';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { ApiClient } from '../../core/api/apiClient';
 import { useAuth } from '../../core/auth/AuthContext';
+import { getClassTheme } from '../../core/theme/classThemes';
 import confetti from 'canvas-confetti';
 import {
   Clock,
@@ -19,7 +20,11 @@ import {
   ShieldCheck,
   Award,
   RefreshCw,
-  Cpu
+  Cpu,
+  Target,
+  Flame,
+  Atom,
+  BookOpen
 } from 'lucide-react';
 
 interface QuizEngineProps {
@@ -330,8 +335,51 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   }
 
   // Active Quiz View
+  const theme = getClassTheme(grade);
+
   return (
     <div className="max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-100">
+      {/* Class Persona Header */}
+      <div className={`p-4 rounded-2xl mb-6 bg-gradient-to-r ${theme.gradientHero} text-white flex items-center justify-between`}>
+        <div className="flex items-center space-x-3">
+          <span className="text-2xl p-2 rounded-xl bg-white/20 backdrop-blur-md">{theme.mascot.emoji}</span>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="font-extrabold text-sm">{theme.name} • Class {grade}</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/20 uppercase font-bold tracking-wider">
+                {theme.stageTitle}
+              </span>
+            </div>
+            <p className="text-xs text-white/90 italic font-medium">{theme.motto}</p>
+          </div>
+        </div>
+
+        {/* Specialized class style indicator */}
+        {theme.quizStyle === 'PLAYFUL_BUBBLY' && (
+          <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1 bg-white/25 rounded-full text-xs font-bold">
+            <span>⭐ Explorer Quest</span>
+          </div>
+        )}
+        {theme.quizStyle === 'TACTICAL_QUEST' && (
+          <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1 bg-white/25 rounded-full text-xs font-bold">
+            <Flame className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+            <span>Cadet Mission Radar</span>
+          </div>
+        )}
+        {theme.quizStyle === 'BOARD_SPECIMEN' && (
+          <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1 bg-white/25 rounded-full text-xs font-bold">
+            <Target className="w-3.5 h-3.5 text-red-200" />
+            <span>Board Specimen Exam</span>
+          </div>
+        )}
+        {theme.quizStyle === 'COMPETITIVE_NTA' && (
+          <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1 bg-white/25 rounded-full text-xs font-mono font-bold">
+            <Atom className="w-3.5 h-3.5 text-cyan-200" />
+            <span>NTA Speed Simulator (+4 / -1)</span>
+          </div>
+        )}
+      </div>
+
       {/* Header bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
         <div className="space-y-1">
@@ -343,7 +391,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
             {/* Hybrid Source Badge */}
             {quizSource === 'GEMINI_LIVE' ? (
               <span
-                title="Synthesized dynamically by Google Gemini 1.5 Flash"
+                title="Synthesized dynamically by Google Gemini 2.5 Flash"
                 className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/40 text-purple-300"
               >
                 <Sparkles className="w-3 h-3 text-purple-400 animate-pulse" />
@@ -387,13 +435,38 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="w-full bg-slate-950 rounded-full h-1.5 mb-6 overflow-hidden">
-        <div
-          className="bg-indigo-500 h-1.5 rounded-full transition-all duration-300"
-          style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
-        />
-      </div>
+      {/* Progress Bar & Question Palette for Competitive Classes */}
+      {theme.quizStyle === 'COMPETITIVE_NTA' ? (
+        <div className="mb-6 p-3 bg-slate-950 rounded-2xl border border-slate-800">
+          <div className="text-[11px] font-mono text-slate-400 mb-2 flex items-center justify-between">
+            <span>Question Palette (NTA Grid):</span>
+            <span className="text-emerald-400 font-bold">Answered: {score}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            {questions.map((_, qIdx) => (
+              <span
+                key={qIdx}
+                className={`w-7 h-7 rounded-lg text-xs font-bold font-mono flex items-center justify-center transition-all ${
+                  qIdx === currentIndex
+                    ? 'bg-indigo-600 text-white ring-2 ring-indigo-400'
+                    : qIdx < currentIndex
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-slate-800 text-slate-400'
+                }`}
+              >
+                {qIdx + 1}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="w-full bg-slate-950 rounded-full h-1.5 mb-6 overflow-hidden">
+          <div
+            className="bg-indigo-500 h-1.5 rounded-full transition-all duration-300"
+            style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+          />
+        </div>
+      )}
 
       {/* Question Text */}
       <div className="mb-6">
@@ -416,6 +489,18 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       <div className="space-y-3 mb-6">
         {currentQuestion.options.map((option, idx) => {
           let btnStyle = 'border-slate-800 bg-slate-950/60 hover:border-slate-700 text-slate-200';
+          let letterBadgeStyle = 'bg-slate-800 text-slate-300';
+
+          // Class-specific playful colors for primary grades (1 to 4)
+          if (theme.quizStyle === 'PLAYFUL_BUBBLY') {
+            const letterPalette = [
+              'bg-amber-500/20 text-amber-300 border border-amber-500/40',
+              'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40',
+              'bg-sky-500/20 text-sky-300 border border-sky-500/40',
+              'bg-pink-500/20 text-pink-300 border border-pink-500/40'
+            ];
+            letterBadgeStyle = letterPalette[idx % 4];
+          }
 
           if (selectedOption === idx) {
             btnStyle = 'border-indigo-500 bg-indigo-950/40 text-white';
@@ -439,7 +524,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
               className={`w-full text-left p-4 rounded-2xl border text-xs sm:text-sm font-medium transition-all flex items-center justify-between ${btnStyle}`}
             >
               <div className="flex items-center space-x-3">
-                <span className="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 text-xs font-mono font-bold flex items-center justify-center flex-shrink-0">
+                <span className={`w-7 h-7 rounded-xl text-xs font-mono font-bold flex items-center justify-center flex-shrink-0 ${letterBadgeStyle}`}>
                   {String.fromCharCode(65 + idx)}
                 </span>
                 <span>{option}</span>

@@ -154,6 +154,7 @@ export const App: React.FC = () => {
   // Active quiz context
   const [activeSubjectId, setActiveSubjectId] = useState<string>('math');
   const [activeLevelNode, setActiveLevelNode] = useState<LevelNode>('FOUNDATION');
+  const [activeGradeOverride, setActiveGradeOverride] = useState<Grade | null>(null);
   const [novaQuestionContext, setNovaQuestionContext] = useState<{
     q: Question;
     chosenIdx: number;
@@ -193,7 +194,11 @@ export const App: React.FC = () => {
 
     if (extra?.subjectId) setActiveSubjectId(extra.subjectId);
     if (extra?.node) setActiveLevelNode(extra.node);
+    if (extra?.grade) setActiveGradeOverride(extra.grade);
   };
+
+  const effectiveGrade: Grade = activeGradeOverride || currentLearner?.grade || 10;
+  const effectiveLearner = currentLearner ? { ...currentLearner, grade: effectiveGrade } : null;
 
   // Quota evaluation
   const quota = currentLearner ? QuotaService.evaluateQuota(currentLearner) : null;
@@ -582,11 +587,13 @@ export const App: React.FC = () => {
           {currentRoute === 'SAFETY' && <LegalPages pageType="SAFETY" />}
 
           {/* Student Authenticated Views */}
-          {isAuthenticated && currentLearner && (
+          {isAuthenticated && currentLearner && effectiveLearner && (
             <>
               {currentRoute === 'DASHBOARD' && (
                 <StudentDashboard
                   learner={currentLearner}
+                  activeGradeOverride={activeGradeOverride}
+                  onSelectGradeOverride={setActiveGradeOverride}
                   onNavigate={navigateTo}
                   onOpenUpgradeModal={() => setPaywallModalOpen(true)}
                 />
@@ -594,14 +601,14 @@ export const App: React.FC = () => {
 
               {currentRoute === 'COURSES' && (
                 <CourseCatalogue
-                  learner={currentLearner}
+                  learner={effectiveLearner}
                   onSelectSubject={sId => navigateTo('LEVELS', { subjectId: sId })}
                 />
               )}
 
               {currentRoute === 'LEVELS' && (
                 <CourseLevels
-                  learner={currentLearner}
+                  learner={effectiveLearner}
                   subjectId={activeSubjectId}
                   onBack={() => navigateTo('COURSES')}
                   onStartQuiz={node => navigateTo('QUIZ', { node })}
@@ -612,10 +619,10 @@ export const App: React.FC = () => {
               {currentRoute === 'QUIZ' && (
                 <QuizEngine
                   board={currentLearner.board}
-                  grade={currentLearner.grade}
+                  grade={effectiveGrade}
                   subjectId={activeSubjectId}
                   levelNode={activeLevelNode}
-                  learner={currentLearner}
+                  learner={effectiveLearner}
                   onFinish={() => {
                     refreshCurrentLearner();
                     navigateTo('DASHBOARD');
@@ -630,7 +637,7 @@ export const App: React.FC = () => {
               {currentRoute === 'NOVA_AI' && (
                 <NovaAiTutor
                   board={currentLearner.board}
-                  grade={currentLearner.grade}
+                  grade={effectiveGrade}
                   activeSubject={activeSubjectId.toUpperCase()}
                   initialQuestion={novaQuestionContext?.q || null}
                   initialChosenIndex={novaQuestionContext?.chosenIdx ?? null}
