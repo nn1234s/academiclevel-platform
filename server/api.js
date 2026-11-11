@@ -683,6 +683,140 @@ apiRouter.get('/gifts/my-requests', (req, res) => {
 });
 
 // ==========================================
+// Worldwide Scholarships & Sprints API (Student Facing)
+// ==========================================
+apiRouter.get('/scholarships', (req, res) => {
+  try {
+    const learnerId = req.query.learnerId ? String(req.query.learnerId).trim() : null;
+    let learner = null;
+    if (learnerId) {
+      learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    }
+
+    const scholarships = db.prepare(`
+      SELECT * FROM scholarships 
+      WHERE isActive = 1 
+      ORDER BY createdAt DESC
+    `).all();
+
+    const enriched = scholarships.map(sch => {
+      let isClaimed = false;
+      let completedQuizzesInWindow = 0;
+
+      if (learnerId) {
+        const claim = db.prepare('SELECT * FROM scholarship_claims WHERE scholarshipId = ? AND learnerId = ?').get(sch.id, learnerId);
+        if (claim) isClaimed = true;
+
+        const attemptCount = db.prepare(`
+          SELECT count(*) as count FROM quiz_attempts 
+          WHERE learnerId = ? AND createdAt >= ? AND passed = 1
+        `).get(learnerId, sch.startDate)?.count || 0;
+
+        completedQuizzesInWindow = Math.min(sch.targetQuizCount, Math.max(attemptCount, learner?.quizzesCompletedCount || 0));
+      }
+
+      const isExpired = new Date(sch.endDate).getTime() < Date.now();
+      const isCapacityReached = sch.maxRecipients > 0 && sch.claimedCount >= sch.maxRecipients;
+      const canClaim = !isClaimed && !isExpired && !isCapacityReached && completedQuizzesInWindow >= sch.targetQuizCount;
+
+      return {
+        ...sch,
+        isClaimed,
+        completedQuizzesInWindow,
+        isExpired,
+        isCapacityReached,
+        canClaim,
+        progressPercent: Math.min(100, Math.round((completedQuizzesInWindow / sch.targetQuizCount) * 100))
+      };
+    });
+
+    res.json({ success: true, scholarships: enriched });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/scholarships/:id/claim', (req, res) => {
+  try {
+    const { learnerId } = req.body;
+    if (!learnerId) return res.status(400).json({ success: false, error: 'learnerId is required' });
+
+    const sch = db.prepare('SELECT * FROM scholarships WHERE id = ?').get(req.params.id);
+    if (!sch) return res.status(404).json({ success: false, error: 'Scholarship not found' });
+    if (!sch.isActive) return res.status(400).json({ success: false, error: 'This scholarship challenge is currently inactive.' });
+    if (new Date(sch.endDate).getTime() < Date.now()) {
+      return res.status(400).json({ success: false, error: 'This scholarship challenge has ended.' });
+    }
+    if (sch.maxRecipients > 0 && sch.claimedCount >= sch.maxRecipients) {
+      return res.status(400).json({ success: false, error: 'Scholarship award limit reached. No more slots available.' });
+    }
+
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    // Check duplicate claim
+    const existingClaim = db.prepare('SELECT * FROM scholarship_claims WHERE scholarshipId = ? AND learnerId = ?').get(sch.id, learnerId);
+    if (existingClaim) {
+      return res.status(400).json({ success: false, error: 'You have already claimed this scholarship reward.' });
+    }
+
+    // Check quiz requirement
+    const attemptCount = db.prepare(`
+      SELECT count(*) as count FROM quiz_attempts 
+      WHERE learnerId = ? AND createdAt >= ? AND passed = 1
+    `).get(learnerId, sch.startDate)?.count || 0;
+    const progressCount = Math.max(attemptCount, learner.quizzesCompletedCount || 0);
+
+    if (progressCount < sch.targetQuizCount) {
+      return res.status(400).json({
+        success: false,
+        error: `Academic requirement not met: You have completed ${progressCount} of ${sch.targetQuizCount} required quizzes.`
+      });
+    }
+
+    // Award Coins
+    const now = new Date().toISOString();
+    const newBalance = (learner.coinBalance || 0) + sch.rewardCoins;
+    db.prepare('UPDATE learners SET coinBalance = ?, updatedAt = ? WHERE id = ?').run(newBalance, now, learner.id);
+
+    // Record in coin_ledger
+    const ledgerId = 'cld_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+    db.prepare(`
+      INSERT INTO coin_ledger (id, learnerId, amount, transactionType, source, description, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(ledgerId, learner.id, sch.rewardCoins, 'CREDIT', 'SCHOLARSHIP_REWARD', `Earned ${sch.rewardCoins} Coins from Worldwide Scholarship: ${sch.title}`, now);
+
+    // Record Claim
+    const claimId = 'clm_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+    db.prepare(`
+      INSERT INTO scholarship_claims (id, scholarshipId, learnerId, coinsAwarded, claimedAt)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(claimId, sch.id, learner.id, sch.rewardCoins, now);
+
+    // Increment scholarship claimedCount
+    db.prepare('UPDATE scholarships SET claimedCount = claimedCount + 1, updatedAt = ? WHERE id = ?').run(now, sch.id);
+
+    // Audit log
+    try {
+      db.prepare(`
+        INSERT INTO security_audit_logs (id, learnerId, action, targetResource, ipAddress, userAgent, timestampUtc)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).run('sec_' + Date.now().toString(36), learner.id, 'CLAIM_SCHOLARSHIP', sch.id, req.ip || 'LOCAL', req.headers['user-agent'] || 'STUDENT_APP', now);
+    } catch {}
+
+    res.json({
+      success: true,
+      message: `🎉 Congratulations! You have received ${sch.rewardCoins} coins for completing "${sch.title}"!`,
+      coinsAwarded: sch.rewardCoins,
+      newBalance,
+      badgeTitle: sch.badgeTitle
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
 // Quizzes & Attempts API
 // ==========================================
 apiRouter.post('/quizzes/attempt', (req, res) => {
@@ -1669,6 +1803,124 @@ apiRouter.post('/admin/gifts/:id/reject', adminAuth, (req, res) => {
   try {
     db.prepare(`UPDATE gift_requests SET status = 'REJECTED', updatedAt = datetime('now') WHERE id = ?`).run(req.params.id);
     res.json({ success: true, message: 'Gift request marked as rejected.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// Admin Worldwide Scholarships Control API
+// ==========================================
+apiRouter.get('/admin/scholarships', adminAuth, (req, res) => {
+  try {
+    const scholarships = db.prepare('SELECT * FROM scholarships ORDER BY createdAt DESC').all();
+    const claims = db.prepare(`
+      SELECT sc.*, l.fullName as learnerName, l.email as learnerEmail, l.grade as learnerGrade, s.title as scholarshipTitle
+      FROM scholarship_claims sc
+      LEFT JOIN learners l ON sc.learnerId = l.id
+      LEFT JOIN scholarships s ON sc.scholarshipId = s.id
+      ORDER BY sc.claimedAt DESC
+    `).all();
+
+    const totalCoinsDisbursed = db.prepare('SELECT COALESCE(SUM(coinsAwarded), 0) as total FROM scholarship_claims').get().total;
+
+    res.json({
+      success: true,
+      scholarships,
+      claims,
+      metrics: {
+        totalScholarships: scholarships.length,
+        activeScholarships: scholarships.filter(s => s.isActive === 1).length,
+        totalClaims: claims.length,
+        totalCoinsDisbursed
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/scholarships', adminAuth, (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      targetQuizCount,
+      rewardCoins,
+      durationDays,
+      targetGrade,
+      targetBoard,
+      badgeTitle,
+      maxRecipients
+    } = req.body;
+
+    if (!title || !targetQuizCount || !rewardCoins) {
+      return res.status(400).json({ success: false, error: 'Title, targetQuizCount, and rewardCoins are required.' });
+    }
+
+    const duration = Number(durationDays) || 7;
+    const now = new Date();
+    const endDate = new Date(now.getTime() + duration * 24 * 60 * 60 * 1000);
+    const schId = 'sch_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+    const adminEmail = req.headers['x-admin-email'] || 'admin@academiclevel.in';
+
+    db.prepare(`
+      INSERT INTO scholarships (
+        id, title, description, targetQuizCount, rewardCoins, durationDays,
+        targetGrade, targetBoard, badgeTitle, maxRecipients, claimedCount,
+        isActive, startDate, endDate, createdBy, createdAt, updatedAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      schId,
+      String(title).trim(),
+      description ? String(description).trim() : `Complete ${targetQuizCount} quizzes in ${duration} days to receive ${rewardCoins} coins!`,
+      Number(targetQuizCount),
+      Number(rewardCoins),
+      duration,
+      targetGrade ? Number(targetGrade) : null,
+      targetBoard ? String(targetBoard).trim() : null,
+      badgeTitle ? String(badgeTitle).trim() : '🏆 Worldwide Scholar Sprint Winner',
+      Number(maxRecipients) || 0,
+      0,
+      1,
+      now.toISOString(),
+      endDate.toISOString(),
+      adminEmail,
+      now.toISOString(),
+      now.toISOString()
+    );
+
+    const created = db.prepare('SELECT * FROM scholarships WHERE id = ?').get(schId);
+    res.json({ success: true, scholarship: created, message: 'Worldwide scholarship published successfully!' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.patch('/admin/scholarships/:id/toggle', adminAuth, (req, res) => {
+  try {
+    const sch = db.prepare('SELECT * FROM scholarships WHERE id = ?').get(req.params.id);
+    if (!sch) return res.status(404).json({ success: false, error: 'Scholarship not found' });
+
+    const newStatus = sch.isActive ? 0 : 1;
+    const now = new Date().toISOString();
+    db.prepare('UPDATE scholarships SET isActive = ?, updatedAt = ? WHERE id = ?').run(newStatus, now, sch.id);
+
+    res.json({
+      success: true,
+      isActive: newStatus === 1,
+      message: newStatus === 1 ? 'Scholarship resumed!' : 'Scholarship paused.'
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.delete('/admin/scholarships/:id', adminAuth, (req, res) => {
+  try {
+    db.prepare('DELETE FROM scholarship_claims WHERE scholarshipId = ?').run(req.params.id);
+    db.prepare('DELETE FROM scholarships WHERE id = ?').run(req.params.id);
+    res.json({ success: true, message: 'Scholarship challenge deleted.' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

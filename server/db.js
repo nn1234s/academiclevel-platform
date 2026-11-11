@@ -206,6 +206,38 @@ export function initDatabaseSchema() {
     CREATE INDEX IF NOT EXISTS idx_friendships_rec ON friendships(receiverId);
     CREATE INDEX IF NOT EXISTS idx_messages_sender ON student_messages(senderId);
     CREATE INDEX IF NOT EXISTS idx_messages_receiver ON student_messages(receiverId);
+
+    CREATE TABLE IF NOT EXISTS scholarships (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      targetQuizCount INTEGER NOT NULL,
+      rewardCoins INTEGER NOT NULL,
+      durationDays INTEGER NOT NULL DEFAULT 7,
+      targetGrade INTEGER,
+      targetBoard TEXT,
+      badgeTitle TEXT,
+      maxRecipients INTEGER DEFAULT 0,
+      claimedCount INTEGER NOT NULL DEFAULT 0,
+      isActive INTEGER NOT NULL DEFAULT 1,
+      startDate TEXT NOT NULL,
+      endDate TEXT NOT NULL,
+      createdBy TEXT NOT NULL,
+      createdAt TEXT NOT NULL,
+      updatedAt TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS scholarship_claims (
+      id TEXT PRIMARY KEY,
+      scholarshipId TEXT NOT NULL,
+      learnerId TEXT NOT NULL,
+      coinsAwarded INTEGER NOT NULL,
+      claimedAt TEXT NOT NULL,
+      UNIQUE(scholarshipId, learnerId)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_scholarship_claims_learner ON scholarship_claims(learnerId);
+    CREATE INDEX IF NOT EXISTS idx_scholarship_claims_sch ON scholarship_claims(scholarshipId);
   `);
 
   // Safe additive schema migrations for full synchronization
@@ -230,8 +262,40 @@ export function initDatabaseSchema() {
   addColumnSafe('certificates', 'levelName TEXT');
   addColumnSafe('certificates', 'issuedAt TEXT');
 
-  // Seed default ACodes if empty
+  // Seed inaugural worldwide scholarship if empty
   const defaultAdminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+  const countScholarships = db.prepare('SELECT count(*) as cnt FROM scholarships').get().cnt;
+  if (countScholarships === 0) {
+    const now = new Date();
+    const endDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    db.prepare(`
+      INSERT INTO scholarships (
+        id, title, description, targetQuizCount, rewardCoins, durationDays,
+        targetGrade, targetBoard, badgeTitle, maxRecipients, claimedCount,
+        isActive, startDate, endDate, createdBy, createdAt, updatedAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      'sch_inaugural_sprint_001',
+      '🌟 All-India 7-Day Scholar Sprint (10 Quizzes = 250 Coins)',
+      'Complete 10 curriculum quizzes across any subject this week to earn a 250 Coins Scholarship reward and the official Scholar Sprint Laureate badge!',
+      10,
+      250,
+      7,
+      null,
+      null,
+      '🏆 Scholar Sprint Laureate',
+      0,
+      0,
+      1,
+      now.toISOString(),
+      endDate.toISOString(),
+      defaultAdminEmail || 'admin@academiclevel.in',
+      now.toISOString(),
+      now.toISOString()
+    );
+  }
+
+  // Seed default ACodes if empty
   const countACodes = db.prepare('SELECT count(*) as cnt FROM acodes').get().cnt;
   if (countACodes === 0) {
     const insertAcode = db.prepare(`

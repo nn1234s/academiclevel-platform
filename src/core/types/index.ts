@@ -229,6 +229,37 @@ export interface AuditLogEntry {
   details: string;
 }
 
+export interface Scholarship {
+  id: string;
+  title: string;
+  description: string;
+  targetQuizCount: number;
+  rewardCoins: number;
+  durationDays: number;
+  targetGrade?: number | 'ALL';
+  targetBoard?: Board | 'ALL';
+  badgeTitle?: string;
+  maxRecipients?: number; // 0 for unlimited
+  claimedCount: number;
+  isActive: boolean;
+  startDate: string;
+  endDate: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ScholarshipClaim {
+  id: string;
+  scholarshipId: string;
+  scholarshipTitle?: string;
+  learnerId: string;
+  learnerName?: string;
+  learnerEmail?: string;
+  coinsAwarded: number;
+  claimedAt: string;
+}
+
 export interface SystemMetrics {
   totalLearners: number;
   activeSubscriptions: number;

@@ -1,4 +1,4 @@
-import { Learner, Board, Grade, Subscription, GiftRequest, CoinLedgerEntry, QuizAttempt, LevelProgress, Certificate, Friendship, StudentPackMessage } from '../types';
+import { Learner, Board, Grade, Subscription, GiftRequest, CoinLedgerEntry, QuizAttempt, LevelProgress, Certificate, Friendship, StudentPackMessage, Scholarship, ScholarshipClaim } from '../types';
 
 const BASE_URL = '/api';
 
@@ -429,6 +429,99 @@ export class ApiClient {
 
   public static async adminGetAuditLogs(adminEmail: string): Promise<{ success: boolean; logs: any[] }> {
     return this.request('/admin/audit-logs', {
+      headers: this.adminHeaders(adminEmail)
+    });
+  }
+
+  // ==========================================
+  // Worldwide Scholarships & Sprints
+  // ==========================================
+  public static async getScholarships(learnerId?: string): Promise<{
+    success: boolean;
+    scholarships: (Scholarship & {
+      isClaimed: boolean;
+      completedQuizzesInWindow: number;
+      isExpired: boolean;
+      isCapacityReached: boolean;
+      canClaim: boolean;
+      progressPercent: number;
+    })[];
+  }> {
+    const query = learnerId ? `?learnerId=${encodeURIComponent(learnerId)}` : '';
+    return this.request(`/scholarships${query}`);
+  }
+
+  public static async claimScholarship(scholarshipId: string, learnerId: string): Promise<{
+    success: boolean;
+    message: string;
+    coinsAwarded: number;
+    newBalance: number;
+    badgeTitle?: string;
+  }> {
+    return this.request(`/scholarships/${scholarshipId}/claim`, {
+      method: 'POST',
+      body: JSON.stringify({ learnerId })
+    });
+  }
+
+  public static async adminGetScholarships(adminEmail: string): Promise<{
+    success: boolean;
+    scholarships: Scholarship[];
+    claims: (ScholarshipClaim & {
+      learnerName?: string;
+      learnerEmail?: string;
+      learnerGrade?: number;
+      scholarshipTitle?: string;
+    })[];
+    metrics: {
+      totalScholarships: number;
+      activeScholarships: number;
+      totalClaims: number;
+      totalCoinsDisbursed: number;
+    };
+  }> {
+    return this.request('/admin/scholarships', {
+      headers: this.adminHeaders(adminEmail)
+    });
+  }
+
+  public static async adminCreateScholarship(
+    adminEmail: string,
+    params: {
+      title: string;
+      description?: string;
+      targetQuizCount: number;
+      rewardCoins: number;
+      durationDays?: number;
+      targetGrade?: number | 'ALL';
+      targetBoard?: Board | 'ALL';
+      badgeTitle?: string;
+      maxRecipients?: number;
+    }
+  ): Promise<{ success: boolean; scholarship: Scholarship; message: string }> {
+    return this.request('/admin/scholarships', {
+      method: 'POST',
+      headers: this.adminHeaders(adminEmail),
+      body: JSON.stringify(params)
+    });
+  }
+
+  public static async adminToggleScholarship(
+    adminEmail: string,
+    scholarshipId: string
+  ): Promise<{ success: boolean; isActive: boolean; message: string }> {
+    return this.request(`/admin/scholarships/${scholarshipId}/toggle`, {
+      method: 'PATCH',
+      headers: this.adminHeaders(adminEmail)
+    });
+  }
+
+  public static async adminDeleteScholarship(
+    adminEmail: string,
+    scholarshipId: string
+  ): Promise<{ success: boolean; message: string }> {
+    return this.request(`/admin/scholarships/${scholarshipId}`, {
+      method: 'DELETE',
       headers: this.adminHeaders(adminEmail)
     });
   }

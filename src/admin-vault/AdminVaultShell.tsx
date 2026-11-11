@@ -19,7 +19,8 @@ import {
   Lock,
   ChevronRight,
   Menu,
-  X
+  X,
+  Award
 } from 'lucide-react';
 
 import { StudentManagement } from './modules/StudentManagement';
@@ -31,6 +32,7 @@ import { QuestionBankManager } from './modules/QuestionBankManager';
 import { LedgerInspector } from './modules/LedgerInspector';
 import { ReferralMonitor } from './modules/ReferralMonitor';
 import { GiftFulfillment } from './modules/GiftFulfillment';
+import { ScholarshipManager } from './modules/ScholarshipManager';
 import { ModerationReports } from './modules/ModerationReports';
 import { AuditLogViewer } from './modules/AuditLogViewer';
 import { SystemHealthAnalytics } from './modules/SystemHealthAnalytics';
@@ -39,6 +41,7 @@ type AdminTab =
   | 'STUDENTS'
   | 'PAYMENTS'
   | 'ENTITLEMENTS'
+  | 'SCHOLARSHIPS'
   | 'ACODES'
   | 'CURRICULUM'
   | 'QUESTIONS'
@@ -74,6 +77,7 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
       badge: pendingCount > 0 ? `${pendingCount} NEW` : undefined
     },
     { id: 'STUDENTS', label: 'Kid Control & Finder', icon: <Users className="w-4 h-4" /> },
+    { id: 'SCHOLARSHIPS', label: 'Worldwide Scholarships', icon: <Award className="w-4 h-4" /> },
     { id: 'ENTITLEMENTS', label: 'Entitlement & Trials', icon: <Zap className="w-4 h-4" /> },
     { id: 'GIFTS', label: 'Gift & Amazon GC Dispatch', icon: <Truck className="w-4 h-4" /> },
     { id: 'ACODES', label: 'ACode Vouchers', icon: <KeyRound className="w-4 h-4" /> },
@@ -189,6 +193,7 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-950">
             {activeTab === 'PAYMENTS' && <PaymentVerificationQueue />}
             {activeTab === 'STUDENTS' && <StudentManagement />}
+            {activeTab === 'SCHOLARSHIPS' && <ScholarshipManager />}
             {activeTab === 'ENTITLEMENTS' && <EntitlementManager />}
             {activeTab === 'ACODES' && <ACodeManager />}
             {activeTab === 'CURRICULUM' && <CurriculumManager />}

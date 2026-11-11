@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../core/auth/AuthContext';
 import { Learner, Board, Grade, Subject } from '../../core/types';
 import { QuotaService } from '../../services/quotaService';
 import { CurriculumService } from '../../services/curriculumService';
 import { CLASS_THEMES, getClassTheme } from '../../core/theme/classThemes';
 import { ClassSwitcherBar } from '../shared/ClassSwitcherBar';
+import { WorldwideScholarships } from './WorldwideScholarships';
 import {
   Flame,
   Award,
@@ -44,6 +46,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   onNavigate,
   onOpenUpgradeModal,
 }) => {
+  const { refreshCurrentLearner } = useAuth();
   const isSuperAdmin = learner.role === 'SUPER_ADMIN';
   // Normal students always see the UI according to their sign up class (learner.grade)
   const activeGrade: Grade = (isSuperAdmin && activeGradeOverride) ? activeGradeOverride : (learner.grade || 10);
@@ -301,7 +304,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </div>
       )}
 
-      {/* 4. Quota & Subscription Progress Meter */}
+      {/* 4. Live Worldwide Scholarships & Sprints */}
+      <WorldwideScholarships
+        learner={learner}
+        activeGrade={activeGrade}
+        onRefreshLearner={refreshCurrentLearner}
+        onStartQuiz={() => onNavigate('COURSES')}
+      />
+
+      {/* 5. Quota & Subscription Progress Meter */}
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
           <div>

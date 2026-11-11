@@ -9,7 +9,9 @@ import {
   Friendship,
   StudentPackMessage,
   GiftRequest,
-  AuditLogEntry
+  AuditLogEntry,
+  Scholarship,
+  ScholarshipClaim
 } from '../types';
 
 /**
@@ -29,6 +31,8 @@ const STORAGE_KEYS = {
   FRIENDSHIPS: 'al_prod_friendships_v1',
   STUDENT_PACK_MESSAGES: 'al_prod_student_pack_messages_v1',
   GIFT_REQUESTS: 'al_prod_gift_requests_v1',
+  SCHOLARSHIPS: 'al_prod_scholarships_v1',
+  SCHOLARSHIP_CLAIMS: 'al_prod_scholarship_claims_v1',
   AUDIT_LOGS: 'al_prod_security_audit_logs_v1',
   CURRENT_SESSION: 'al_prod_session_v1',
 };
@@ -551,6 +555,66 @@ class StorageRLSLayerClass {
       all.push(request);
     }
     this.writeRaw(STORAGE_KEYS.GIFT_REQUESTS, all);
+  }
+
+  // ==========================================
+  // Worldwide Scholarships & Sprints
+  // ==========================================
+  public getAllScholarships(): Scholarship[] {
+    const list = this.readRaw<Scholarship[]>(STORAGE_KEYS.SCHOLARSHIPS, []);
+    if (list.length === 0) {
+      const now = new Date();
+      const defaultSch: Scholarship = {
+        id: 'sch_inaugural_sprint_001',
+        title: '🌟 All-India 7-Day Scholar Sprint (10 Quizzes = 250 Coins)',
+        description: 'Complete 10 curriculum quizzes across any subject this week to earn a 250 Coins Scholarship reward and the official Scholar Sprint Laureate badge!',
+        targetQuizCount: 10,
+        rewardCoins: 250,
+        durationDays: 7,
+        badgeTitle: '🏆 Scholar Sprint Laureate',
+        maxRecipients: 0,
+        claimedCount: 0,
+        isActive: true,
+        startDate: now.toISOString(),
+        endDate: new Date(now.getTime() + 7 * 86400000).toISOString(),
+        createdBy: SUPER_ADMIN_EMAIL,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString()
+      };
+      this.writeRaw(STORAGE_KEYS.SCHOLARSHIPS, [defaultSch]);
+      return [defaultSch];
+    }
+    return list;
+  }
+
+  public saveScholarship(sch: Scholarship): void {
+    const all = this.getAllScholarships();
+    const idx = all.findIndex(s => s.id === sch.id);
+    if (idx >= 0) {
+      all[idx] = sch;
+    } else {
+      all.unshift(sch);
+    }
+    this.writeRaw(STORAGE_KEYS.SCHOLARSHIPS, all);
+  }
+
+  public deleteScholarship(id: string): void {
+    const all = this.getAllScholarships().filter(s => s.id !== id);
+    this.writeRaw(STORAGE_KEYS.SCHOLARSHIPS, all);
+    const claims = this.getScholarshipClaims().filter(c => c.scholarshipId !== id);
+    this.writeRaw(STORAGE_KEYS.SCHOLARSHIP_CLAIMS, claims);
+  }
+
+  public getScholarshipClaims(): ScholarshipClaim[] {
+    return this.readRaw<ScholarshipClaim[]>(STORAGE_KEYS.SCHOLARSHIP_CLAIMS, []);
+  }
+
+  public saveScholarshipClaim(claim: ScholarshipClaim): void {
+    const all = this.getScholarshipClaims();
+    if (!all.some(c => c.scholarshipId === claim.scholarshipId && c.learnerId === claim.learnerId)) {
+      all.unshift(claim);
+      this.writeRaw(STORAGE_KEYS.SCHOLARSHIP_CLAIMS, all);
+    }
   }
 
   // ==========================================
