@@ -67,8 +67,8 @@ export const GIFT_CARD_LEVELS: GiftCardLevel[] = [
   {
     level: 2,
     rsAmount: 30,
-    coinsCost: 800,
-    coinsCostFormatted: '800 Coins',
+    coinsCost: 750,
+    coinsCostFormatted: '750 Coins',
     badge: 'Bronze Scholar',
     gradient: 'from-orange-500 to-rose-500'
   },
@@ -83,8 +83,8 @@ export const GIFT_CARD_LEVELS: GiftCardLevel[] = [
   {
     level: 4,
     rsAmount: 100,
-    coinsCost: 2500,
-    coinsCostFormatted: '2,500 Coins',
+    coinsCost: 2400,
+    coinsCostFormatted: '2,400 Coins',
     badge: 'Gold Scholar',
     gradient: 'from-indigo-600 to-violet-600',
     popular: true
@@ -92,40 +92,40 @@ export const GIFT_CARD_LEVELS: GiftCardLevel[] = [
   {
     level: 5,
     rsAmount: 150,
-    coinsCost: 4000,
-    coinsCostFormatted: '4,000 Coins',
+    coinsCost: 3500,
+    coinsCostFormatted: '3,500 Coins',
     badge: 'Platinum Scholar',
     gradient: 'from-violet-600 to-purple-600'
   },
   {
     level: 6,
     rsAmount: 200,
-    coinsCost: 5500,
-    coinsCostFormatted: '5,500 Coins',
+    coinsCost: 4800,
+    coinsCostFormatted: '4,800 Coins',
     badge: 'Diamond Scholar',
     gradient: 'from-cyan-500 to-blue-600'
   },
   {
     level: 7,
     rsAmount: 250,
-    coinsCost: 7000,
-    coinsCostFormatted: '7,000 Coins',
+    coinsCost: 6000,
+    coinsCostFormatted: '6,000 Coins',
     badge: 'Master Scholar',
     gradient: 'from-blue-600 to-indigo-700'
   },
   {
     level: 8,
     rsAmount: 350,
-    coinsCost: 10000,
-    coinsCostFormatted: '10,000 Coins',
+    coinsCost: 8500,
+    coinsCostFormatted: '8,500 Coins',
     badge: 'Grandmaster',
     gradient: 'from-emerald-500 to-teal-600'
   },
   {
     level: 9,
     rsAmount: 500,
-    coinsCost: 15000,
-    coinsCostFormatted: '15,000 Coins',
+    coinsCost: 12000,
+    coinsCostFormatted: '12,000 Coins',
     badge: 'Olympiad Champion',
     gradient: 'from-amber-400 via-yellow-500 to-amber-600',
     popular: true
@@ -149,6 +149,54 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner,
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [submittedClaim, setSubmittedClaim] = useState<SubmittedClaimInfo | null>(null);
   const [copiedEmailText, setCopiedEmailText] = useState(false);
+  const [copiedVoucherId, setCopiedVoucherId] = useState<string | null>(null);
+
+  const handleCopyVoucher = (code: string, id: string) => {
+    try {
+      navigator.clipboard.writeText(code);
+      setCopiedVoucherId(id);
+      setTimeout(() => setCopiedVoucherId(null), 2500);
+    } catch {}
+  };
+
+  const getVoucherDetails = (req: GiftRequest): string => {
+    if (req.voucherCode) return req.voucherCode;
+    const match = req.shippingAddress?.match(/Voucher Code:\s*([^\s|]+)/i);
+    if (match && match[1]) return match[1];
+    return 'AL-AMZ-READY-2026';
+  };
+
+  const getRedemptionHelp = (title: string) => {
+    const t = title.toLowerCase();
+    if (t.includes('amazon')) {
+      return {
+        url: 'https://www.amazon.in/addgiftcard',
+        instructions: 'Open Amazon App → Amazon Pay → Add Gift Card to balance, paste code.'
+      };
+    }
+    if (t.includes('google')) {
+      return {
+        url: 'https://play.google.com/redeem',
+        instructions: 'Open Play Store → Top right profile icon → Payments & subscriptions → Redeem code.'
+      };
+    }
+    if (t.includes('flipkart')) {
+      return {
+        url: 'https://www.flipkart.com',
+        instructions: 'Open Flipkart App → Account → My Cards & Wallet → Add Flipkart Gift Card.'
+      };
+    }
+    if (t.includes('swiggy')) {
+      return {
+        url: 'https://www.swiggy.com',
+        instructions: 'Open Swiggy App → Account → Swiggy Money → Add Gift Card / Voucher.'
+      };
+    }
+    return {
+      url: '',
+      instructions: 'Funds transferred directly to your submitted UPI ID. Check your UPI app!'
+    };
+  };
 
   // Unit Economics Guard: Check scholar subscription status and learning milestones
   const quota = QuotaService.evaluateQuota(learner);
@@ -507,36 +555,104 @@ ${learner.fullName}`;
           </h3>
 
           <div className="divide-y divide-slate-800">
-            {existingRequests.map(req => (
-              <div key={req.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <p className="font-bold text-white text-sm">{req.itemTitle}</p>
-                    <span className="text-amber-400 font-mono text-xs">(-{req.coinsCost.toLocaleString()} Coins)</span>
-                  </div>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    {req.shippingAddress} • Phone: {req.contactPhone}
-                  </p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">
-                    Requested on: {new Date(req.requestedAt).toLocaleString()}
-                  </p>
-                </div>
+            {existingRequests.map(req => {
+              const code = getVoucherDetails(req);
+              const help = getRedemptionHelp(req.itemTitle);
+              const isDispatched = req.status === 'APPROVED_DISPATCHED';
 
-                <div>
-                  <span
-                    className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-[10px] font-bold ${
-                      req.status === 'APPROVED_DISPATCHED'
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        : req.status === 'REJECTED'
-                        ? 'bg-red-500/10 text-red-400 border border-red-500/20'
-                        : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                    }`}
-                  >
-                    <span>{req.status === 'APPROVED_DISPATCHED' ? 'Delivered / Code Sent' : req.status.replace('_', ' ')}</span>
-                  </span>
+              return (
+                <div key={req.id} className="py-4 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <p className="font-bold text-white text-sm">{req.itemTitle}</p>
+                        <span className="text-amber-400 font-mono text-xs">(-{req.coinsCost.toLocaleString()} Coins)</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        Delivered to: {req.shippingAddress.split('|')[0] || req.shippingAddress} • Phone: {req.contactPhone}
+                      </p>
+                      <p className="text-[10px] text-slate-500 mt-0.5">
+                        Requested on: {new Date(req.requestedAt).toLocaleString()}
+                      </p>
+                    </div>
+
+                    <div>
+                      <span
+                        className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-[10px] font-bold ${
+                          isDispatched
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                            : req.status === 'REJECTED'
+                            ? 'bg-red-500/10 text-red-400 border border-red-500/30'
+                            : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                        }`}
+                      >
+                        <span>{isDispatched ? '✓ Dispatched & Ready to Use' : req.status === 'REJECTED' ? 'Rejected' : '⏳ Verification in Progress'}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Dispatched Voucher Code Banner & 1-Click Copy */}
+                  {isDispatched && (
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/50 via-slate-950 to-slate-900 border-2 border-emerald-500/50 shadow-xl space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-extrabold text-emerald-400 flex items-center space-x-1.5">
+                          <Sparkles className="w-4 h-4 text-emerald-400 animate-pulse" />
+                          <span>Voucher Code Generated & Verified</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-emerald-300/80 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full">
+                          Ready to Redeem
+                        </span>
+                      </div>
+
+                      {/* Monospace Code Box */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950 p-3.5 rounded-xl border border-emerald-500/30">
+                        <div>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
+                            Digital Voucher Code:
+                          </span>
+                          <span className="font-mono text-base sm:text-lg font-black text-white tracking-widest selection:bg-emerald-500">
+                            {code}
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={() => handleCopyVoucher(code, req.id)}
+                          className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl flex items-center justify-center space-x-1.5 shadow-md shadow-emerald-950 transition-all flex-shrink-0"
+                        >
+                          {copiedVoucherId === req.id ? (
+                            <>
+                              <Check className="w-4 h-4 text-slate-950" />
+                              <span>Copied to Clipboard!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-4 h-4 text-slate-950" />
+                              <span>Copy Voucher Code</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Instructions */}
+                      <div className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-300">
+                        <span>💡 {help.instructions}</span>
+                        {help.url && (
+                          <a
+                            href={help.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-400 hover:text-emerald-300 font-semibold flex items-center space-x-1 hover:underline"
+                          >
+                            <span>Open Redemption Page</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

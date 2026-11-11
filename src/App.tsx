@@ -197,7 +197,7 @@ export const App: React.FC = () => {
     if (extra?.grade) setActiveGradeOverride(extra.grade);
   };
 
-  const effectiveGrade: Grade = activeGradeOverride || currentLearner?.grade || 10;
+  const effectiveGrade: Grade = (isSuperAdmin && activeGradeOverride) ? activeGradeOverride : (currentLearner?.grade || 10);
   const effectiveLearner = currentLearner ? { ...currentLearner, grade: effectiveGrade } : null;
 
   // Quota evaluation

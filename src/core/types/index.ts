@@ -214,6 +214,7 @@ export interface GiftRequest {
   contactPhone: string;
   status: 'PENDING_APPROVAL' | 'APPROVED_DISPATCHED' | 'REJECTED';
   adminNotes?: string;
+  voucherCode?: string;
   requestedAt: string;
   updatedAt: string;
 }

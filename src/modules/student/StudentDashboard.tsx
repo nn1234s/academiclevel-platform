@@ -44,11 +44,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   onNavigate,
   onOpenUpgradeModal,
 }) => {
-  const [internalGrade, setInternalGrade] = useState<Grade>(activeGradeOverride || learner.grade || 10);
-  const activeGrade = activeGradeOverride || internalGrade;
+  const isSuperAdmin = learner.role === 'SUPER_ADMIN';
+  // Normal students always see the UI according to their sign up class (learner.grade)
+  const activeGrade: Grade = (isSuperAdmin && activeGradeOverride) ? activeGradeOverride : (learner.grade || 10);
 
   const handleSelectGrade = (g: Grade) => {
-    setInternalGrade(g);
     if (onSelectGradeOverride) {
       onSelectGradeOverride(g);
     }
@@ -64,11 +64,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
   return (
     <div className="space-y-6 text-slate-100">
-      {/* 1. Global Class UI Switcher Bar */}
-      <ClassSwitcherBar
-        activeGrade={activeGrade}
-        onSelectGrade={handleSelectGrade}
-      />
+      {/* Super-Admin ONLY: Multi-Class Visual Preview Bar (Hidden for all students) */}
+      {isSuperAdmin && (
+        <ClassSwitcherBar
+          activeGrade={activeGrade}
+          onSelectGrade={handleSelectGrade}
+        />
+      )}
 
       {/* 2. Class-Specific Hero Banner */}
       <div className={`rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden transition-all duration-500 bg-gradient-to-r ${theme.gradientHero}`}>
