@@ -10,6 +10,7 @@ import { AuthModal } from './modules/shared/AuthModal';
 import { LandingPage } from './modules/public/LandingPage';
 import { AdsLandingPage } from './modules/public/AdsLandingPage';
 import { SecretAdPage } from './modules/public/SecretAdPage';
+import { YouTubeAdsLandingPage } from './modules/public/YouTubeAdsLandingPage';
 import { PublicCourses } from './modules/public/PublicCourses';
 import { PricingPage } from './modules/public/PricingPage';
 import { AboutPage } from './modules/public/AboutPage';
@@ -69,6 +70,7 @@ function resolveRouteFromPath(path: string, isAuth: boolean): string {
   if (p === '/adminservice' || p === '/ops-vault-al99') return 'ADMIN_VAULT';
   if (p === '/ads') return 'ADS_FUNNEL';
   if (p === '/advert1') return 'ADVERT1_FUNNEL';
+  if (p === '/yt' || p === '/youtube' || p === '/yt49' || p === '/special49' || p === '/ad-yt' || p === '/advert2') return 'YT_ADS_FUNNEL';
   if (p === '/pricing') return 'PRICING';
   if (p === '/about') return 'ABOUT';
   if (p === '/faq') return 'FAQ';
@@ -106,6 +108,7 @@ function getPathForRoute(route: string): string {
     case 'ADMIN_VAULT': return '/adminservice';
     case 'ADS_FUNNEL': return '/ads';
     case 'ADVERT1_FUNNEL': return '/advert1';
+    case 'YT_ADS_FUNNEL': return '/yt';
     case 'PRICING': return '/pricing';
     case 'ABOUT': return '/about';
     case 'FAQ': return '/faq';
@@ -233,6 +236,17 @@ export const App: React.FC = () => {
   if (currentRoute === 'ADVERT1_FUNNEL') {
     return (
       <SecretAdPage
+        onSuccessRegistered={() => {
+          navigateTo('DASHBOARD');
+        }}
+      />
+    );
+  }
+
+  // Ad Campaign Funnel 3 (/yt, /youtube, /yt49, /special49) -> YouTube Buyer Special 49 Offer (Classes 1 to 12)
+  if (currentRoute === 'YT_ADS_FUNNEL') {
+    return (
+      <YouTubeAdsLandingPage
         onSuccessRegistered={() => {
           navigateTo('DASHBOARD');
         }}
