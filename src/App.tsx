@@ -68,9 +68,20 @@ const AdminVaultShell = lazy(() =>
 function resolveRouteFromPath(path: string, isAuth: boolean): string {
   const p = path.toLowerCase().replace(/\/$/, '');
   if (p === '/adminservice' || p === '/ops-vault-al99') return 'ADMIN_VAULT';
-  if (p === '/ads') return 'ADS_FUNNEL';
-  if (p === '/advert1') return 'ADVERT1_FUNNEL';
-  if (p === '/yt' || p === '/youtube' || p === '/yt49' || p === '/special49' || p === '/ad-yt' || p === '/advert2') return 'YT_ADS_FUNNEL';
+  if (
+    p === '/ads' ||
+    p === '/ad' ||
+    p === '/advert' ||
+    p === '/advert1' ||
+    p === '/advert2' ||
+    p === '/yt' ||
+    p === '/youtube' ||
+    p === '/yt49' ||
+    p === '/special49' ||
+    p === '/offer' ||
+    p === '/special' ||
+    p === '/ad-yt'
+  ) return 'YT_ADS_FUNNEL';
   if (p === '/pricing') return 'PRICING';
   if (p === '/about') return 'ABOUT';
   if (p === '/faq') return 'FAQ';
@@ -221,30 +232,13 @@ export const App: React.FC = () => {
     );
   }
 
-  // Ad Campaign Funnel 2 (/ads) -> High School Board Exam Accelerator (Classes 8, 9 & 10)
-  if (currentRoute === 'ADS_FUNNEL') {
-    return (
-      <AdsLandingPage
-        onSuccessRegistered={() => {
-          navigateTo('DASHBOARD');
-        }}
-      />
-    );
-  }
-
-  // Ad Campaign Funnel 1 (/advert1) -> Primary & Middle Concept Booster (Classes 3 to 7, Class 5 Focus)
-  if (currentRoute === 'ADVERT1_FUNNEL') {
-    return (
-      <SecretAdPage
-        onSuccessRegistered={() => {
-          navigateTo('DASHBOARD');
-        }}
-      />
-    );
-  }
-
-  // Ad Campaign Funnel 3 (/yt, /youtube, /yt49, /special49) -> YouTube Buyer Special 49 Offer (Classes 1 to 12)
-  if (currentRoute === 'YT_ADS_FUNNEL') {
+  // ALL Ad Campaign Funnels (/ads, /advert1, /yt, /youtube, /yt49, /special49, etc.)
+  // Unified under the highly informative YouTube Special UI (Classes 1-12, ₹49 Offer, Oda Class design)
+  if (
+    currentRoute === 'ADS_FUNNEL' ||
+    currentRoute === 'ADVERT1_FUNNEL' ||
+    currentRoute === 'YT_ADS_FUNNEL'
+  ) {
     return (
       <YouTubeAdsLandingPage
         onSuccessRegistered={() => {
