@@ -12,6 +12,15 @@ export class ApiClient {
     }
   }
 
+  private static getStudentToken(): string {
+    if (typeof window === 'undefined') return '';
+    try {
+      return localStorage.getItem('al_student_token') || sessionStorage.getItem('al_student_token') || '';
+    } catch {
+      return '';
+    }
+  }
+
   private static adminHeaders(adminEmail?: string): Record<string, string> {
     const token = this.getAdminToken();
     return {
@@ -22,9 +31,11 @@ export class ApiClient {
 
   private static async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const adminToken = this.getAdminToken();
+    const studentToken = this.getStudentToken();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(adminToken ? { 'x-admin-token': adminToken } : {}),
+      ...(studentToken ? { 'x-session-token': studentToken } : {}),
       ...((options.headers as Record<string, string>) || {})
     };
 

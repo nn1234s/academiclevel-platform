@@ -122,6 +122,24 @@ function isValidAdminSession(token) {
   return false;
 }
 
+export function isValidLearnerSession(token, learnerId) {
+  if (!token || !learnerId) return false;
+  const cleanToken = String(token).replace(/^Bearer\s+/i, '').trim();
+  try {
+    const sess = db.prepare("SELECT * FROM sessions WHERE token = ? AND (learnerId = ? OR role = 'SUPER_ADMIN')").get(cleanToken, String(learnerId));
+    if (!sess) return false;
+    const expTime = new Date(sess.expiresAt).getTime();
+    if (expTime > Date.now()) {
+      return true;
+    } else {
+      db.prepare('DELETE FROM sessions WHERE token = ?').run(cleanToken);
+      return false;
+    }
+  } catch {
+    return false;
+  }
+}
+
 // ==========================================
 // Health & Telemetry
 // ==========================================
@@ -330,6 +348,21 @@ apiRouter.get('/students/:id', (req, res) => {
 
 apiRouter.patch('/students/:id', (req, res) => {
   try {
+    const adminToken = req.headers['x-admin-token'] || req.query.adminToken;
+    const adminPasskey = req.headers['x-admin-passkey'] || req.headers['x-admin-key'] || req.query.passkey;
+    const isAdmin = (adminToken && isValidAdminSession(String(adminToken).trim())) ||
+                    (adminPasskey && isAuthorizedAdminPasskey(String(adminPasskey).trim()));
+
+    const sessionToken = req.headers['x-session-token'] || req.headers['authorization']?.replace(/^Bearer\s+/i, '');
+    const isAuthorizedStudent = isValidLearnerSession(sessionToken, req.params.id);
+
+    if (!isAdmin && !isAuthorizedStudent) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized: Valid student session token or administrator authorization is required.'
+      });
+    }
+
     const { phone, parentName, parentPin, avatarFrame } = req.body;
     const updates = [];
     const params = [];
@@ -354,6 +387,21 @@ apiRouter.patch('/students/:id', (req, res) => {
 
 apiRouter.patch('/students/:id/curriculum', (req, res) => {
   try {
+    const adminToken = req.headers['x-admin-token'] || req.query.adminToken;
+    const adminPasskey = req.headers['x-admin-passkey'] || req.headers['x-admin-key'] || req.query.passkey;
+    const isAdmin = (adminToken && isValidAdminSession(String(adminToken).trim())) ||
+                    (adminPasskey && isAuthorizedAdminPasskey(String(adminPasskey).trim()));
+
+    const sessionToken = req.headers['x-session-token'] || req.headers['authorization']?.replace(/^Bearer\s+/i, '');
+    const isAuthorizedStudent = isValidLearnerSession(sessionToken, req.params.id);
+
+    if (!isAdmin && !isAuthorizedStudent) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized: Valid student session token or administrator authorization is required to change curriculum.'
+      });
+    }
+
     const { board, grade } = req.body;
     const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
     if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
@@ -394,6 +442,21 @@ apiRouter.patch('/students/:id/curriculum', (req, res) => {
 
 apiRouter.post('/students/:id/spin', (req, res) => {
   try {
+    const adminToken = req.headers['x-admin-token'] || req.query.adminToken;
+    const adminPasskey = req.headers['x-admin-passkey'] || req.headers['x-admin-key'] || req.query.passkey;
+    const isAdmin = (adminToken && isValidAdminSession(String(adminToken).trim())) ||
+                    (adminPasskey && isAuthorizedAdminPasskey(String(adminPasskey).trim()));
+
+    const sessionToken = req.headers['x-session-token'] || req.headers['authorization']?.replace(/^Bearer\s+/i, '');
+    const isAuthorizedStudent = isValidLearnerSession(sessionToken, req.params.id);
+
+    if (!isAdmin && !isAuthorizedStudent) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized: Valid student session token is required to spin.'
+      });
+    }
+
     const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
     if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
 
@@ -560,10 +623,20 @@ apiRouter.post('/coins/transact', (req, res) => {
     const isAdmin = (adminToken && isValidAdminSession(String(adminToken).trim())) ||
                     (adminPasskey && isAuthorizedAdminPasskey(String(adminPasskey).trim()));
 
+    const sessionToken = req.headers['x-session-token'] || req.headers['authorization']?.replace(/^Bearer\s+/i, '');
+    const isAuthorizedStudent = isValidLearnerSession(sessionToken, learnerId);
+
     if (numAmount > 0 && !isAdmin) {
       return res.status(403).json({
         success: false,
         error: 'Unauthorized coin credit: Direct coin minting requires admin authorization. Coins can only be earned through verified quiz completions, daily spins, or official bonuses.'
+      });
+    }
+
+    if (numAmount < 0 && !isAdmin && !isAuthorizedStudent) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized coin debit: Valid student session token or admin authorization is required to spend or debit coins.'
       });
     }
 

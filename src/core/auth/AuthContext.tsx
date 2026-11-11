@@ -75,6 +75,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // 1. Write to real SQLite backend REST API
       const res = await ApiClient.register(params);
       if (res.success && res.learner) {
+        if (res.token && typeof window !== 'undefined') {
+          try { localStorage.setItem('al_student_token', res.token); } catch {}
+        }
         StorageRLSLayer.saveLearner(res.learner, res.learner.id);
         StorageRLSLayer.setSession({
           learnerId: res.learner.id,
@@ -183,6 +186,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // 1. Query real SQLite backend REST API
       const res = await ApiClient.login(cleanEmail);
       if (res.success && res.learner) {
+        if (res.token && typeof window !== 'undefined') {
+          try { localStorage.setItem('al_student_token', res.token); } catch {}
+        }
         StorageRLSLayer.saveLearner(res.learner, res.learner.id);
         StorageRLSLayer.setSession({
           learnerId: res.learner.id,
@@ -262,6 +268,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         sessionStorage.removeItem('al_admin_email');
         localStorage.removeItem('al_admin_token');
         localStorage.removeItem('al_admin_email');
+        sessionStorage.removeItem('al_student_token');
+        localStorage.removeItem('al_student_token');
       } catch {}
     }
     StorageRLSLayer.setSession(null);
