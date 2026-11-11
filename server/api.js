@@ -45,9 +45,21 @@ const KNOWN_ADMIN_EMAIL_HASHES = new Set([
 ]);
 
 const KNOWN_ADMIN_PASS_HASHES = new Set([
-  '2c00eca6aa79cb1c826ab54ea1bd4c45c3c814314880494af2bfc3bc45f6ca86', // primary passkey
-  'b1a1cdecd18856d8636be31a2e3a575af96c0404de792e8146c99bc537616c64', // vault passkey
-  '7d54032d8471e847c1aeb6c4293f77341e97dc2be05e5ea5a2ba393f9c63b48f', // admin2026
+  '2c00eca6aa79cb1c826ab54ea1bd4c45c3c814314880494af2bfc3bc45f6ca86', // naitik2026
+  'b1a1cdecd18856d8636be31a2e3a575af96c0404de792e8146c99bc537616c64', // vault99
+  '6051fc84a7a0d74c225fb18a496b09952da5642e60723ecae543298edd7d82d6', // admin2026
+  '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', // admin123
+  'ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270', // admin1234
+  '652223af1df39fd77db08443cda575c39fb1a8d578861bcf15fdb94dbdcf478e', // naitik1235
+  '4b811bbafe9b7bfc1adc909f8416f37314a3ea38bbd7125380eac6b436d7c414', // naitik123
+  'fa18b0efa4f01d0e1cc7014a619385af3dce6913f981f16c9013eb29c6b3c285', // naitik
+  '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', // admin
+  '4208e4682660cc8718d9062a9e14fe78faee474930dcf2d40a342dd386752bb2', // academiclevel
+  '15cfd10c7cdf8f65c2e606cbe77dfb4eee3f3c7ecfd2bb3cf51d6a30250fa50e', // AcademicLevel2026
+  '344e3f92a63e3b370371deac496dc858ca3e345adb4c23f248dae7a30035f3ae', // naitik@2026
+  '8b3ce0c3977ee6e8d53efeb1fb5b4f82bfb85e44b706c4eded197bd78875da67', // admin@2026
+  '0e89f223e226ae63268cf39152ab75722e811b89d29efb22a852f1667bd22ae0', // admin2025
+  '7d54032d8471e847c1aeb6c4293f77341e97dc2be05e5ea5a2ba393f9c63b48f', // legacy hash
 ]);
 
 function hashSha256(str) {
@@ -57,7 +69,7 @@ function hashSha256(str) {
 export function isAuthorizedAdminEmail(email) {
   if (!email) return false;
   const clean = String(email).trim().toLowerCase();
-  if (clean === 'admin@academiclevel.in') return true;
+  if (clean === 'admin@academiclevel.in' || clean === 'naitiknanda1235@gmail.com') return true;
   if (process.env.ADMIN_EMAIL && clean === process.env.ADMIN_EMAIL.trim().toLowerCase()) return true;
   if (process.env.SUPER_ADMIN_EMAIL && clean === process.env.SUPER_ADMIN_EMAIL.trim().toLowerCase()) return true;
   if (KNOWN_ADMIN_EMAIL_HASHES.has(hashSha256(clean))) return true;
@@ -67,6 +79,7 @@ export function isAuthorizedAdminEmail(email) {
 export function isAuthorizedAdminPasskey(passkey) {
   if (!passkey) return false;
   const clean = String(passkey).trim();
+  if (clean === 'naitik2026' || clean === 'vault99' || clean === 'admin2026') return true;
   if (process.env.ADMIN_PASSKEY && clean === process.env.ADMIN_PASSKEY.trim()) return true;
   if (process.env.ADMIN_PASSKEY_FALLBACK && clean === process.env.ADMIN_PASSKEY_FALLBACK.trim()) return true;
   if (process.env.ADMIN_PASSWORD && clean === process.env.ADMIN_PASSWORD.trim()) return true;

@@ -130,15 +130,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check if founder/admin email is logging in via student portal
     try {
-      const enc = new TextEncoder().encode(cleanEmail);
-      const buf = await window.crypto.subtle.digest('SHA-256', enc);
-      const emailHash = Array.from(new Uint8Array(buf))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
+      let emailHash = '';
+      try {
+        const enc = new TextEncoder().encode(cleanEmail);
+        const buf = await window.crypto.subtle.digest('SHA-256', enc);
+        emailHash = Array.from(new Uint8Array(buf))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+      } catch {}
 
       if (
+        cleanEmail === 'naitiknanda1235@gmail.com' ||
+        cleanEmail === 'admin@academiclevel.in' ||
         emailHash === 'f82f3e631ed2142d54fdeb333e6cf87c4d837d398355d24fc6d83f98f955a87e' ||
-        cleanEmail === 'admin@academiclevel.in'
+        emailHash === '4c7e6c4ddbbefea23b9d0347895e7b39670f5e7146cead23e590eb7707e7b68a'
       ) {
         let adminLearner: Learner | null = StorageRLSLayer.getLearnerByEmail(cleanEmail);
         if (!adminLearner) {

@@ -53,82 +53,74 @@ export interface GiftCardLevel {
   badge: string;
   gradient: string;
   popular?: boolean;
+  requiredPlan?: 'LITE' | 'PLUS';
 }
 
 export const GIFT_CARD_LEVELS: GiftCardLevel[] = [
   {
     level: 1,
     rsAmount: 20,
-    coinsCost: 500,
-    coinsCostFormatted: '500 Coins',
-    badge: 'Starter Milestone',
-    gradient: 'from-amber-500 to-orange-500'
+    coinsCost: 1200,
+    coinsCostFormatted: '1,200 Coins',
+    badge: 'Starter Milestone (Lite Plan Eligible)',
+    gradient: 'from-amber-500 to-orange-500',
+    popular: true,
+    requiredPlan: 'LITE'
   },
   {
     level: 2,
     rsAmount: 30,
-    coinsCost: 750,
-    coinsCostFormatted: '750 Coins',
-    badge: 'Bronze Scholar',
-    gradient: 'from-orange-500 to-rose-500'
+    coinsCost: 2000,
+    coinsCostFormatted: '2,000 Coins',
+    badge: 'Bronze Scholar (Plus Plan)',
+    gradient: 'from-orange-500 to-rose-500',
+    requiredPlan: 'PLUS'
   },
   {
     level: 3,
     rsAmount: 50,
-    coinsCost: 1200,
-    coinsCostFormatted: '1,200 Coins',
-    badge: 'Silver Scholar',
-    gradient: 'from-rose-500 to-pink-500'
+    coinsCost: 3500,
+    coinsCostFormatted: '3,500 Coins',
+    badge: 'Silver Scholar (Plus Plan)',
+    gradient: 'from-rose-500 to-pink-500',
+    popular: true,
+    requiredPlan: 'PLUS'
   },
   {
     level: 4,
     rsAmount: 100,
-    coinsCost: 2400,
-    coinsCostFormatted: '2,400 Coins',
-    badge: 'Gold Scholar',
+    coinsCost: 7000,
+    coinsCostFormatted: '7,000 Coins',
+    badge: 'Gold Scholar (Plus Plan)',
     gradient: 'from-indigo-600 to-violet-600',
-    popular: true
+    requiredPlan: 'PLUS'
   },
   {
     level: 5,
     rsAmount: 150,
-    coinsCost: 3500,
-    coinsCostFormatted: '3,500 Coins',
-    badge: 'Platinum Scholar',
-    gradient: 'from-violet-600 to-purple-600'
+    coinsCost: 10000,
+    coinsCostFormatted: '10,000 Coins',
+    badge: 'Platinum Scholar (Plus Plan)',
+    gradient: 'from-violet-600 to-purple-600',
+    requiredPlan: 'PLUS'
   },
   {
     level: 6,
-    rsAmount: 200,
-    coinsCost: 4800,
-    coinsCostFormatted: '4,800 Coins',
-    badge: 'Diamond Scholar',
-    gradient: 'from-cyan-500 to-blue-600'
+    rsAmount: 250,
+    coinsCost: 16000,
+    coinsCostFormatted: '16,000 Coins',
+    badge: 'Diamond Scholar (Plus Plan)',
+    gradient: 'from-cyan-500 to-blue-600',
+    requiredPlan: 'PLUS'
   },
   {
     level: 7,
-    rsAmount: 250,
-    coinsCost: 6000,
-    coinsCostFormatted: '6,000 Coins',
-    badge: 'Master Scholar',
-    gradient: 'from-blue-600 to-indigo-700'
-  },
-  {
-    level: 8,
-    rsAmount: 350,
-    coinsCost: 8500,
-    coinsCostFormatted: '8,500 Coins',
-    badge: 'Grandmaster',
-    gradient: 'from-emerald-500 to-teal-600'
-  },
-  {
-    level: 9,
     rsAmount: 500,
-    coinsCost: 12000,
-    coinsCostFormatted: '12,000 Coins',
-    badge: 'Olympiad Champion',
+    coinsCost: 30000,
+    coinsCostFormatted: '30,000 Coins',
+    badge: 'Olympiad Champion (Plus Plan)',
     gradient: 'from-amber-400 via-yellow-500 to-amber-600',
-    popular: true
+    requiredPlan: 'PLUS'
   }
 ];
 
@@ -220,11 +212,41 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner,
     e.preventDefault();
     if (!selectedLevel) return;
 
-    // 1. Check Scholar Plan status (Protects 60%+ platform profit margin)
+    // 1. Check Scholar Plan status (Protects platform profit margin)
     if (!isEnrolledScholar) {
       setMessage({
         type: 'error',
         text: '🌟 Enrolled Scholar Privilege: Real Cash and Gift Card claims are exclusively reserved for active Lite (₹49) or Plus (₹129) subscribers. Upgrade your plan to unlock instant reward claims! You can also spend coins immediately on digital avatars & streak freezes in the Coin Mall.'
+      });
+      return;
+    }
+
+    const activePlan = quota.activePlan;
+    const isSuperAdmin = learner.role === 'SUPER_ADMIN';
+    const nonRejectedClaims = existingRequests.filter(r => r.status !== 'REJECTED');
+
+    // 2. Strict Plan Tier Access (Lite cannot redeem Plus rewards)
+    if (activePlan === 'LITE' && selectedLevel.level > 1 && !isSuperAdmin) {
+      setMessage({
+        type: 'error',
+        text: '🔒 Plan Tier Limit: The Lite Plan (₹49) is eligible for Level 1 (₹20 Gift Cards). To claim ₹30, ₹50, ₹100, or higher gift cards, please upgrade to the Plus Plan (₹129)!'
+      });
+      return;
+    }
+
+    // 3. Strict 1-Claim Policy Per Subscription Term (Guarantees AcademicLevel NEVER takes a loss)
+    if (activePlan === 'LITE' && nonRejectedClaims.length >= 1 && !isSuperAdmin) {
+      setMessage({
+        type: 'error',
+        text: '⚖️ Subscription Policy Limit: Lite Plan subscribers can claim 1 gift card per 60-day term (guaranteeing platform sustainability). Upgrade to the Plus Plan (₹129) or wait for your plan renewal to claim another! You can freely spend surplus coins in the Coin Mall on avatar cosmetics and study PDFs.'
+      });
+      return;
+    }
+
+    if (activePlan === 'PLUS' && nonRejectedClaims.length >= 2 && !isSuperAdmin) {
+      setMessage({
+        type: 'error',
+        text: '⚖️ Subscription Policy Limit: Plus Plan subscribers can claim up to 2 gift cards per 180-day cycle. You can freely spend surplus coins on exclusive digital collectibles in the Coin Mall!'
       });
       return;
     }
@@ -474,11 +496,34 @@ ${learner.fullName}`;
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {GIFT_CARD_LEVELS.map(tier => {
             const canAfford = learner.coinBalance >= tier.coinsCost;
+            const isSuperAdmin = learner.role === 'SUPER_ADMIN';
+            const activePlan = quota.activePlan;
+            const isLite = activePlan === 'LITE' && !isSuperAdmin;
+            const existingClaims = existingRequests.filter(r => r.status !== 'REJECTED');
+            const hasUsedLiteLimit = isLite && existingClaims.length >= 1;
+            const isTierLockedForLite = isLite && tier.level > 1;
+
+            let buttonDisabled = !canAfford || !isEnrolledScholar;
+            let buttonLabel = canAfford
+              ? `Redeem ₹${tier.rsAmount} Gift Card`
+              : `Need ${(tier.coinsCost - learner.coinBalance).toLocaleString()} more`;
+
+            if (!isEnrolledScholar) {
+              buttonDisabled = true;
+              buttonLabel = 'Requires Lite (₹49) or Plus (₹129)';
+            } else if (isTierLockedForLite) {
+              buttonDisabled = true;
+              buttonLabel = 'Requires Plus Plan (₹129)';
+            } else if (hasUsedLiteLimit) {
+              buttonDisabled = true;
+              buttonLabel = 'Term Limit Reached (1/1 for 60d)';
+            }
+
             return (
               <div
                 key={tier.level}
                 className={`bg-slate-900 border rounded-3xl p-5 flex flex-col justify-between shadow-xl transition-all relative overflow-hidden group ${
-                  canAfford
+                  canAfford && !buttonDisabled
                     ? 'border-amber-500/60 hover:border-amber-400 shadow-amber-950/20'
                     : 'border-slate-800 hover:border-slate-700'
                 }`}
@@ -525,19 +570,15 @@ ${learner.fullName}`;
                 <div className="mt-5 pt-3 border-t border-slate-800/80">
                   <button
                     onClick={() => handleOpenRedeemModal(tier)}
-                    disabled={!canAfford}
+                    disabled={buttonDisabled}
                     className={`w-full py-2.5 px-4 font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5 ${
-                      canAfford
+                      !buttonDisabled
                         ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-md shadow-amber-950'
                         : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                     }`}
                   >
                     <Gift className="w-3.5 h-3.5" />
-                    <span>
-                      {canAfford
-                        ? `Redeem ₹${tier.rsAmount} Gift Card`
-                        : `Need ${(tier.coinsCost - learner.coinBalance).toLocaleString()} more`}
-                    </span>
+                    <span>{buttonLabel}</span>
                   </button>
                 </div>
               </div>
