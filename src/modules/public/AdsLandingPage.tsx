@@ -1,14 +1,14 @@
 import React from 'react';
-import { YouTubeAdsLandingPage } from './YouTubeAdsLandingPage';
+import { Special49AdsLandingPage, Special49AdsLandingPageProps } from './Special49AdsLandingPage';
 
-interface AdsLandingPageProps {
-  onSuccessRegistered: () => void;
-}
+export type AdsLandingPageProps = Special49AdsLandingPageProps;
 
 /**
- * AdsLandingPage - Re-routed to the informative YouTube Special UI
+ * AdsLandingPage - Re-routed to the Special 49 Offer UI
  * Supporting Classes 1 to 12, ₹49 Offer, Oda Class Design & Detailed Syllabus
  */
-export const AdsLandingPage: React.FC<AdsLandingPageProps> = ({ onSuccessRegistered }) => {
-  return <YouTubeAdsLandingPage onSuccessRegistered={onSuccessRegistered} />;
+export const AdsLandingPage: React.FC<AdsLandingPageProps> = (props) => {
+  return <Special49AdsLandingPage {...props} />;
 };
+
+export default AdsLandingPage;

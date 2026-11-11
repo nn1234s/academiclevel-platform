@@ -10,7 +10,7 @@ import { AuthModal } from './modules/shared/AuthModal';
 import { LandingPage } from './modules/public/LandingPage';
 import { AdsLandingPage } from './modules/public/AdsLandingPage';
 import { SecretAdPage } from './modules/public/SecretAdPage';
-import { YouTubeAdsLandingPage } from './modules/public/YouTubeAdsLandingPage';
+import { Special49AdsLandingPage } from './modules/public/Special49AdsLandingPage';
 import { PublicCourses } from './modules/public/PublicCourses';
 import { PricingPage } from './modules/public/PricingPage';
 import { AboutPage } from './modules/public/AboutPage';
@@ -69,6 +69,11 @@ function resolveRouteFromPath(path: string, isAuth: boolean): string {
   const p = path.toLowerCase().replace(/\/$/, '');
   if (p === '/adminservice' || p === '/ops-vault-al99') return 'ADMIN_VAULT';
   if (
+    p === '/special49' ||
+    p === '/special' ||
+    p === '/offer' ||
+    p === '/offer49' ||
+    p === '/special-offer' ||
     p === '/ads' ||
     p === '/ad' ||
     p === '/advert' ||
@@ -77,11 +82,8 @@ function resolveRouteFromPath(path: string, isAuth: boolean): string {
     p === '/yt' ||
     p === '/youtube' ||
     p === '/yt49' ||
-    p === '/special49' ||
-    p === '/offer' ||
-    p === '/special' ||
     p === '/ad-yt'
-  ) return 'YT_ADS_FUNNEL';
+  ) return 'SPECIAL_49_FUNNEL';
   if (p === '/pricing') return 'PRICING';
   if (p === '/about') return 'ABOUT';
   if (p === '/faq') return 'FAQ';
@@ -117,9 +119,10 @@ function resolveRouteFromPath(path: string, isAuth: boolean): string {
 function getPathForRoute(route: string): string {
   switch (route) {
     case 'ADMIN_VAULT': return '/adminservice';
-    case 'ADS_FUNNEL': return '/ads';
-    case 'ADVERT1_FUNNEL': return '/advert1';
-    case 'YT_ADS_FUNNEL': return '/yt';
+    case 'SPECIAL_49_FUNNEL': return '/special49';
+    case 'ADS_FUNNEL': return '/special49';
+    case 'ADVERT1_FUNNEL': return '/special49';
+    case 'YT_ADS_FUNNEL': return '/special49';
     case 'PRICING': return '/pricing';
     case 'ABOUT': return '/about';
     case 'FAQ': return '/faq';
@@ -232,15 +235,16 @@ export const App: React.FC = () => {
     );
   }
 
-  // ALL Ad Campaign Funnels (/ads, /advert1, /yt, /youtube, /yt49, /special49, etc.)
-  // Unified under the highly informative YouTube Special UI (Classes 1-12, ₹49 Offer, Oda Class design)
+  // ALL Ad Campaign Funnels (/special49, /special, /offer, /ads, /advert1, etc.)
+  // Unified under the highly informative Special 49 Offer UI (Classes 1-12, ₹49 Offer, Oda Class design)
   if (
+    currentRoute === 'SPECIAL_49_FUNNEL' ||
     currentRoute === 'ADS_FUNNEL' ||
     currentRoute === 'ADVERT1_FUNNEL' ||
     currentRoute === 'YT_ADS_FUNNEL'
   ) {
     return (
-      <YouTubeAdsLandingPage
+      <Special49AdsLandingPage
         onSuccessRegistered={() => {
           navigateTo('DASHBOARD');
         }}
