@@ -77,7 +77,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       setQuizSource(res.source);
       setAiNotice(res.notice || '');
     } catch {
-      const fallback = OfflineBankService.getQuestions(board, grade, subjectId, levelNode);
+      const fallback = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, 5);
       setQuestions(fallback);
       setQuizSource('CURATED_OFFLINE');
       setAiNotice('Loaded from verified offline syllabus bank');

@@ -238,6 +238,51 @@ export function initDatabaseSchema() {
 
     CREATE INDEX IF NOT EXISTS idx_scholarship_claims_learner ON scholarship_claims(learnerId);
     CREATE INDEX IF NOT EXISTS idx_scholarship_claims_sch ON scholarship_claims(scholarshipId);
+
+    CREATE TABLE IF NOT EXISTS question_bank (
+      id TEXT PRIMARY KEY,
+      board TEXT NOT NULL,
+      grade INTEGER NOT NULL,
+      subjectId TEXT NOT NULL,
+      levelNode TEXT NOT NULL,
+      text TEXT NOT NULL,
+      optionsJson TEXT NOT NULL,
+      correctIndex INTEGER NOT NULL,
+      explanation TEXT,
+      hint TEXT,
+      difficulty TEXT,
+      topicTag TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_qb_lookup ON question_bank(board, grade, subjectId, levelNode);
+
+    CREATE TABLE IF NOT EXISTS weekly_challenges (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      subjectId TEXT NOT NULL,
+      durationMinutes INTEGER NOT NULL,
+      rewardCoins INTEGER NOT NULL,
+      description TEXT NOT NULL,
+      targetBoard TEXT,
+      targetGrade INTEGER,
+      startsAt TEXT NOT NULL,
+      endsAt TEXT NOT NULL,
+      isActive INTEGER NOT NULL DEFAULT 1
+    );
+
+    CREATE TABLE IF NOT EXISTS challenge_completions (
+      id TEXT PRIMARY KEY,
+      challengeId TEXT NOT NULL,
+      learnerId TEXT NOT NULL,
+      learnerName TEXT NOT NULL,
+      scorePercent REAL NOT NULL,
+      timeSpentSeconds INTEGER NOT NULL,
+      coinsAwarded INTEGER NOT NULL,
+      completedAt TEXT NOT NULL,
+      UNIQUE(challengeId, learnerId)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_cc_challenge ON challenge_completions(challengeId);
+    CREATE INDEX IF NOT EXISTS idx_cc_learner ON challenge_completions(learnerId);
   `);
 
   // Safe additive schema migrations for full synchronization
@@ -494,6 +539,103 @@ function migrateFromJsonStore() {
         a.details || ''
       );
     });
+
+    // 6. Seed Question Bank in SQLite if empty (Preserving exactly 12,000 questions)
+    try {
+      const qbCount = db.prepare('SELECT count(*) as c FROM question_bank').get().c;
+      if (qbCount === 0) {
+        const qbPath = path.resolve(__dirname, '../src/data/curatedQuestionBank.json');
+        if (fs.existsSync(qbPath)) {
+          const rawQ = fs.readFileSync(qbPath, 'utf8');
+          const questions = JSON.parse(rawQ);
+          const insertStmt = db.prepare(`
+            INSERT OR REPLACE INTO question_bank (
+              id, board, grade, subjectId, levelNode, text,
+              optionsJson, correctIndex, explanation, hint, difficulty, topicTag
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `);
+
+          db.exec('BEGIN TRANSACTION');
+          for (const q of questions) {
+            insertStmt.run(
+              q.id,
+              q.board,
+              q.grade,
+              q.subjectId,
+              q.levelNode,
+              q.text,
+              JSON.stringify(q.options),
+              q.correctIndex,
+              q.explanation || '',
+              q.hint || '',
+              q.difficulty || 'MEDIUM',
+              q.topicTag || ''
+            );
+          }
+          db.exec('COMMIT');
+          console.log(`[Database] Seeded ${questions.length} curriculum questions into SQLite question_bank.`);
+        }
+      }
+    } catch (qbErr) {
+      console.error('[Database Question Bank Error]:', qbErr);
+    }
+
+    // 7. Seed Weekly Challenges in SQLite if empty
+    try {
+      const wcCount = db.prepare('SELECT count(*) as c FROM weekly_challenges').get().c;
+      if (wcCount === 0) {
+        const now = new Date();
+        const nextWeek = new Date(Date.now() + 7 * 86400000);
+        const insertWc = db.prepare(`
+          INSERT OR REPLACE INTO weekly_challenges (
+            id, title, subjectId, durationMinutes, rewardCoins, description,
+            targetBoard, targetGrade, startsAt, endsAt, isActive
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+
+        insertWc.run(
+          'wc_math_sprint',
+          'All-India Numerical Sprint Challenge',
+          'math',
+          20,
+          35,
+          'Solve 15 non-routine arithmetic and algebraic questions against the live clock.',
+          'ALL',
+          null,
+          now.toISOString(),
+          nextWeek.toISOString(),
+          1
+        );
+        insertWc.run(
+          'wc_science_olympiad',
+          'National Science Diagnostic Cup',
+          'science',
+          25,
+          50,
+          'Experimental design, assertion-reasoning, and scientific inquiry scenarios.',
+          'ALL',
+          null,
+          now.toISOString(),
+          nextWeek.toISOString(),
+          1
+        );
+        insertWc.run(
+          'wc_logic_blitz',
+          'Mental Aptitude & Spatial Logic Championship',
+          'reasoning',
+          15,
+          30,
+          'Pattern completion, syllogisms, and rapid algorithmic problem solving.',
+          'ALL',
+          null,
+          now.toISOString(),
+          nextWeek.toISOString(),
+          1
+        );
+      }
+    } catch (wcErr) {
+      console.error('[Database Weekly Challenges Error]:', wcErr);
+    }
 
     console.log(`[Database] Initialized and migrated data: ${learners.length} learners, ${subscriptions.length} subs, ${giftRequests.length} gifts.`);
   } catch (err) {

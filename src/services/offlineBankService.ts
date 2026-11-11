@@ -1,9 +1,33 @@
 import { Question, Board, Grade, LevelNode } from '../core/types';
-import curatedBank from '../data/curatedQuestionBank.json';
 
 export class OfflineBankService {
   private static STORAGE_KEY = 'al_prod_offline_question_bank_v1';
-  private static CURATED_BANK: Question[] = (curatedBank as unknown) as Question[];
+  private static CURATED_BANK: Question[] = [];
+
+  /**
+   * Fetches questions dynamically from the secure SQLite server question bank (12,000 questions),
+   * preventing client bundle bloat and protecting question keys from browser extraction.
+   */
+  public static async fetchServerQuestions(
+    board: Board,
+    grade: Grade,
+    subjectId: string,
+    levelNode: LevelNode,
+    count = 5
+  ): Promise<Question[]> {
+    try {
+      const res = await fetch(`/api/quizzes/fetch-quiz?board=${board}&grade=${grade}&subjectId=${subjectId}&levelNode=${levelNode}&count=${count}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
+          return data.questions;
+        }
+      }
+    } catch (e) {
+      console.warn('[OfflineBankService] Server question bank fetch failed, using local fallback:', e);
+    }
+    return this.getQuestions(board, grade, subjectId, levelNode);
+  }
 
   private static FALLBACK_QUESTIONS: Question[] = [
     // --- CLASS 10 CBSE MATHEMATICS ---

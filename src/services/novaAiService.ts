@@ -108,7 +108,8 @@ export class NovaAiService {
     query: string,
     board: Board,
     grade: Grade,
-    subject: string
+    subject: string,
+    history?: { role: 'user' | 'model'; text: string }[]
   ): Promise<string> {
     const trimmed = query.trim();
 
@@ -143,7 +144,7 @@ export class NovaAiService {
       const serverCall = fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: trimmed, board, grade, subject })
+        body: JSON.stringify({ query: trimmed, board, grade, subject, history })
       }).then(async (r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();

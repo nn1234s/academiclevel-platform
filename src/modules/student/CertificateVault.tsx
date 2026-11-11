@@ -155,10 +155,16 @@ export const CertificateVault: React.FC<CertificateVaultProps> = ({ learner }) =
                   <p>Issued: {new Date(selectedCert.issuedAt).toLocaleDateString()}</p>
                 </div>
 
-                <div className="flex items-center space-x-1.5 text-amber-900 font-semibold bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
+                <a
+                  href={`/verify/${selectedCert.verificationToken}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center space-x-1.5 text-amber-900 hover:text-indigo-900 font-semibold bg-amber-100 hover:bg-amber-200 px-3 py-1 rounded-full border border-amber-300 transition-colors cursor-pointer"
+                  title="Click to verify credential online"
+                >
                   <ShieldCheck className="w-3.5 h-3.5 text-amber-700" />
                   <span>Token: {selectedCert.verificationToken}</span>
-                </div>
+                </a>
 
                 <div className="text-right">
                   <p className="font-serif font-bold text-slate-900">AcademicLevel Council</p>

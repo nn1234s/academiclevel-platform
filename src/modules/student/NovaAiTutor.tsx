@@ -78,7 +78,11 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
     setIsTyping(true);
 
     try {
-      const response = await NovaAiService.answerStudentQuery(userText, board, grade, activeSubject);
+      const historyPayload = messages.slice(-6).map(m => ({
+        role: (m.sender === 'STUDENT' ? 'user' : 'model') as 'user' | 'model',
+        text: m.text
+      }));
+      const response = await NovaAiService.answerStudentQuery(userText, board, grade, activeSubject, historyPayload);
       const aiMsg: NovaMessage = {
         id: 'msg_nova_' + Date.now(),
         sender: 'NOVA',

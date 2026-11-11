@@ -11,8 +11,28 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DIST_PATH = path.resolve(__dirname, '../dist');
 
+// Disable Express fingerprinting
+app.disable('x-powered-by');
+
+// Enterprise Security Headers
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+
 // Mount API router
 app.use('/api', apiRouter);
+
+// Unmatched API endpoint 404 handler (Structured JSON)
+app.use('/api', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: `API route '${req.method} ${req.originalUrl}' not found on AcademicLevel platform.`
+  });
+});
 
 // Serve production static assets if dist exists
 if (fs.existsSync(DIST_PATH)) {

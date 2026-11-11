@@ -16,6 +16,7 @@ import { PricingPage } from './modules/public/PricingPage';
 import { AboutPage } from './modules/public/AboutPage';
 import { FAQPage } from './modules/public/FAQPage';
 import { LegalPages } from './modules/public/LegalPages';
+import { CertificateVerificationView } from './modules/public/CertificateVerificationView';
 
 // Student Modules
 import { StudentDashboard } from './modules/student/StudentDashboard';
@@ -92,6 +93,7 @@ function resolveRouteFromPath(path: string, isAuth: boolean): string {
   if (p === '/safety') return 'SAFETY';
 
   if (p === '/curriculum' || p === '/courses') return isAuth ? 'COURSES' : 'PUBLIC_COURSES';
+  if (p.startsWith('/verify')) return 'VERIFY_CERTIFICATE';
 
   if (isAuth) {
     if (p === '' || p === '/dashboard') return 'DASHBOARD';
@@ -130,6 +132,7 @@ function getPathForRoute(route: string): string {
     case 'PRIVACY': return '/privacy';
     case 'TERMS': return '/terms';
     case 'SAFETY': return '/safety';
+    case 'VERIFY_CERTIFICATE': return '/verify';
     case 'DASHBOARD': return '/';
     case 'COURSES': return '/courses';
     case 'NOVA_AI': return '/nova-ai';
@@ -597,6 +600,12 @@ export const App: React.FC = () => {
           {currentRoute === 'PRIVACY' && <LegalPages pageType="PRIVACY" />}
           {currentRoute === 'TERMS' && <LegalPages pageType="TERMS" />}
           {currentRoute === 'SAFETY' && <LegalPages pageType="SAFETY" />}
+          {currentRoute === 'VERIFY_CERTIFICATE' && (
+            <CertificateVerificationView
+              token={typeof window !== 'undefined' ? window.location.pathname.replace(/^\/verify\/?/, '') : ''}
+              onNavigateHome={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
+            />
+          )}
 
           {/* Student Authenticated Views */}
           {isAuthenticated && currentLearner && effectiveLearner && (
@@ -675,6 +684,7 @@ export const App: React.FC = () => {
               {currentRoute === 'CHALLENGES' && (
                 <WeeklyChallenges
                   learner={currentLearner}
+                  onRefreshLearner={() => refreshCurrentLearner()}
                   onLaunchChallenge={subj => navigateTo('QUIZ', { node: 'OLYMPIAD' })}
                 />
               )}

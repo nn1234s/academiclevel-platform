@@ -65,8 +65,9 @@ export class HybridQuizService {
 
     // Check preference: If user explicitly opted out of live AI, jump straight to bank
     if (!this.getPreferLiveAi()) {
+      const qList = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, count);
       return {
-        questions: OfflineBankService.getQuestions(board, grade, subjectId, levelNode),
+        questions: qList,
         source: 'CURATED_OFFLINE',
         latencyMs: Date.now() - startTime,
         notice: 'Served from Curated Syllabus Bank (Offline mode requested)'
@@ -92,8 +93,9 @@ export class HybridQuizService {
 
       if ('timeout' in raceResult) {
         console.warn('[HybridQuizService] Server AI call timed out; engaging syllabus bank fallback.');
+        const qList = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, count);
         return {
-          questions: OfflineBankService.getQuestions(board, grade, subjectId, levelNode),
+          questions: qList,
           source: 'CURATED_OFFLINE',
           latencyMs: Date.now() - startTime,
           notice: 'AI generation timed out (Resilient bank loaded)'
@@ -135,9 +137,10 @@ export class HybridQuizService {
       console.warn('[HybridQuizService] Network / AI error:', err.message);
     }
 
-    // Default Fallback: Instant curated offline question bank
+    // Default Fallback: Instant curated offline question bank from server or local
+    const qList = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, count);
     return {
-      questions: OfflineBankService.getQuestions(board, grade, subjectId, levelNode),
+      questions: qList,
       source: 'CURATED_OFFLINE',
       latencyMs: Date.now() - startTime,
       notice: 'Curated Syllabus Bank (Verified Zero-Latency)'

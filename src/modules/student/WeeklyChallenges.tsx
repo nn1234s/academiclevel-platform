@@ -1,14 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Learner } from '../../core/types';
-import { Trophy, Clock, Users, ArrowRight, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react';
+import { Trophy, Clock, Users, ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Loader2 } from 'lucide-react';
 
 interface WeeklyChallengesProps {
   learner: Learner;
   onLaunchChallenge: (subject: string) => void;
+  onRefreshLearner?: () => void;
 }
 
-export const WeeklyChallenges: React.FC<WeeklyChallengesProps> = ({ learner, onLaunchChallenge }) => {
-  const challenges = [
+interface ChallengeItem {
+  id: string;
+  title: string;
+  subject: string;
+  duration: string;
+  cohortSize: string;
+  rewardCoins: number;
+  status: 'OPEN' | 'COMPLETED';
+  description: string;
+  isCompleted?: boolean;
+}
+
+export const WeeklyChallenges: React.FC<WeeklyChallengesProps> = ({
+  learner,
+  onLaunchChallenge,
+  onRefreshLearner
+}) => {
+  const [challenges, setChallenges] = useState<ChallengeItem[]>([
     {
       id: 'wc_math_sprint',
       title: `${learner.board} Numerical Sprint Challenge`,
@@ -39,7 +56,32 @@ export const WeeklyChallenges: React.FC<WeeklyChallengesProps> = ({ learner, onL
       status: 'OPEN',
       description: 'Pattern completion, syllogisms, and rapid algorithmic problem solving.'
     }
-  ];
+  ]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadChallenges = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/challenges?learnerId=${encodeURIComponent(learner.id)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.challenges) && data.challenges.length > 0 && isMounted) {
+            setChallenges(data.challenges);
+          }
+        }
+      } catch (err) {
+        console.warn('[WeeklyChallenges] Failed to fetch server challenges, using cached default:', err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    loadChallenges();
+    return () => {
+      isMounted = false;
+    };
+  }, [learner.id]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 text-slate-100">
@@ -63,47 +105,67 @@ export const WeeklyChallenges: React.FC<WeeklyChallengesProps> = ({ learner, onL
         </div>
       </div>
 
+      {loading && (
+        <div className="flex items-center justify-center p-8 text-slate-400 text-xs space-x-2">
+          <Loader2 className="w-4 h-4 animate-spin text-violet-400" />
+          <span>Synchronizing weekly cohorts...</span>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {challenges.map(c => (
-          <div
-            key={c.id}
-            className="bg-slate-900 border border-slate-800 hover:border-violet-500/50 rounded-3xl p-6 flex flex-col justify-between shadow-xl transition-all"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3 text-xs">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-violet-500/20 text-violet-300">
-                  {c.subject}
-                </span>
-                <span className="text-amber-400 font-bold flex items-center space-x-1">
-                  <Sparkles className="w-3 h-3" />
-                  <span>+{c.rewardCoins} Coins</span>
-                </span>
-              </div>
+        {challenges.map(c => {
+          const isDone = c.isCompleted || c.status === 'COMPLETED';
 
-              <h3 className="font-extrabold text-white text-base leading-snug">{c.title}</h3>
-              <p className="text-xs text-slate-400 mt-2 leading-relaxed">{c.description}</p>
-
-              <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 space-y-1.5">
-                <div className="flex items-center space-x-1.5">
-                  <Clock className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Time Limit: {c.duration}</span>
-                </div>
-                <div className="flex items-center space-x-1.5">
-                  <Users className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Cohort: {c.cohortSize}</span>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => onLaunchChallenge(c.subject)}
-              className="mt-6 w-full py-2.5 px-4 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-violet-950 transition-all flex items-center justify-center space-x-1.5"
+          return (
+            <div
+              key={c.id}
+              className={`bg-slate-900 border rounded-3xl p-6 flex flex-col justify-between shadow-xl transition-all ${
+                isDone ? 'border-emerald-600/40 bg-emerald-950/10' : 'border-slate-800 hover:border-violet-500/50'
+              }`}
             >
-              <span>Enter Mission</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ))}
+              <div>
+                <div className="flex items-center justify-between mb-3 text-xs">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-violet-500/20 text-violet-300">
+                    {c.subject}
+                  </span>
+                  <span className="text-amber-400 font-bold flex items-center space-x-1">
+                    <Sparkles className="w-3 h-3" />
+                    <span>+{c.rewardCoins} Coins</span>
+                  </span>
+                </div>
+
+                <h3 className="font-extrabold text-white text-base leading-snug">{c.title}</h3>
+                <p className="text-xs text-slate-400 mt-2 leading-relaxed">{c.description}</p>
+
+                <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 space-y-1.5">
+                  <div className="flex items-center space-x-1.5">
+                    <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Time Limit: {c.duration}</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <Users className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Cohort: {c.cohortSize}</span>
+                  </div>
+                </div>
+              </div>
+
+              {isDone ? (
+                <div className="mt-6 w-full py-2.5 px-4 bg-emerald-600/20 border border-emerald-500/30 text-emerald-300 font-bold text-xs rounded-xl flex items-center justify-center space-x-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Challenge Completed (+{c.rewardCoins} Coins)</span>
+                </div>
+              ) : (
+                <button
+                  onClick={() => onLaunchChallenge(c.subject)}
+                  className="mt-6 w-full py-2.5 px-4 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-violet-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                >
+                  <span>Enter Mission</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

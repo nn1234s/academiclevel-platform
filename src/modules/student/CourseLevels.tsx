@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Learner, LevelNode } from '../../core/types';
 import { CurriculumService } from '../../services/curriculumService';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
@@ -11,7 +11,11 @@ import {
   Clock,
   ArrowRight,
   ArrowLeft,
-  Lock
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  Lightbulb,
+  FileText
 } from 'lucide-react';
 
 interface CourseLevelsProps {
@@ -32,6 +36,11 @@ export const CourseLevels: React.FC<CourseLevelsProps> = ({
   const levels = CurriculumService.getLevels(learner.board, learner.grade, subjectId);
   const progressList = StorageRLSLayer.getProgressForLearner(learner.id, learner.id);
   const quota = QuotaService.evaluateQuota(learner);
+  const [openNotes, setOpenNotes] = useState<Record<string, boolean>>({});
+
+  const toggleNotes = (levelId: string) => {
+    setOpenNotes(prev => ({ ...prev, [levelId]: !prev[levelId] }));
+  };
 
   const getProgressForNode = (node: LevelNode) => {
     return progressList.find(
@@ -55,7 +64,7 @@ export const CourseLevels: React.FC<CourseLevelsProps> = ({
     <div className="max-w-4xl mx-auto space-y-6 text-slate-100">
       <button
         onClick={onBack}
-        className="flex items-center space-x-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+        className="flex items-center space-x-1.5 text-xs text-slate-400 hover:text-white transition-colors cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back to Course Catalogue</span>
@@ -69,7 +78,7 @@ export const CourseLevels: React.FC<CourseLevelsProps> = ({
           {subjectId.toUpperCase()} Mastery Pathway
         </h2>
         <p className="text-xs text-slate-300 mt-1 max-w-lg">
-          Advance systematically through Foundation, Conceptual Applications, {learner.board} Exam Simulations, and Olympiad Reasoning. Complete any node with $\ge 70\%$ accuracy to earn <strong className="text-amber-400">+25 Study Coins</strong> and an official Mastery Certificate!
+          Advance systematically through Foundation, Conceptual Applications, {learner.board} Exam Simulations, and Olympiad Reasoning. Complete any node with &ge; 70% accuracy to earn <strong className="text-amber-400">+25 Study Coins</strong> and an official Mastery Certificate!
         </p>
       </div>
 
@@ -78,6 +87,7 @@ export const CourseLevels: React.FC<CourseLevelsProps> = ({
           const progress = getProgressForNode(level.node);
           const isDone = progress?.isCompleted;
           const bestScore = progress?.bestScorePercent || 0;
+          const isNotesExpanded = !!openNotes[level.id];
 
           return (
             <div
@@ -118,6 +128,45 @@ export const CourseLevels: React.FC<CourseLevelsProps> = ({
                     </div>
                   ))}
                 </div>
+
+                {/* Structured Revision Notes Accordion */}
+                <div className="mt-5 pt-3 border-t border-slate-800/80">
+                  <button
+                    onClick={() => toggleNotes(level.id)}
+                    className="w-full flex items-center justify-between py-1.5 px-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-xs font-semibold text-slate-200 transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>Chapter Revision Notes</span>
+                    </div>
+                    {isNotesExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  </button>
+
+                  {isNotesExpanded && (
+                    <div className="mt-3 p-3.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs space-y-2.5 animate-fadeIn">
+                      <div className="flex items-start space-x-2">
+                        <Lightbulb className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <span className="font-bold text-amber-300 block text-[11px]">Core Concept Focus:</span>
+                          <p className="text-[11px] text-slate-300 leading-relaxed mt-0.5">
+                            Focus on understanding definitions and step-by-step logic in {level.topics.slice(0, 2).join(' and ')}.
+                            Always label your units and state assumptions clearly in {learner.board} evaluations.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start space-x-2 pt-2 border-t border-slate-800">
+                        <FileText className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <span className="font-bold text-indigo-300 block text-[11px]">Board Marking Key:</span>
+                          <p className="text-[11px] text-slate-400 leading-relaxed mt-0.5">
+                            Step-marking is awarded for accurate formulas before substitution. Review common algebraic signs and boundary conditions before submitting.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between">
@@ -134,7 +183,7 @@ export const CourseLevels: React.FC<CourseLevelsProps> = ({
 
                 <button
                   onClick={() => handleNodeClick(level.node)}
-                  className={`px-4 py-2 font-bold text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 ${
+                  className={`px-4 py-2 font-bold text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer ${
                     isDone
                       ? 'bg-slate-800 hover:bg-slate-700 text-slate-200'
                       : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-950'
