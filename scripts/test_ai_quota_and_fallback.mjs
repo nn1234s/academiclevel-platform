@@ -120,14 +120,20 @@ console.log('[4] Verifying History Trimming & Multi-Model Chain in server/api.js
 import fs from 'fs';
 const apiCode = fs.readFileSync('server/api.js', 'utf8');
 
-const requiredModels = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemma-4-27b-it', 'gemini-1.5-flash'];
+const requiredModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.0-flash-lite'];
 for (const m of requiredModels) {
   if (!apiCode.includes(m)) {
     console.error(`FAIL: server/api.js missing fallback model ${m}!`);
     process.exit(1);
   }
 }
-console.log('  -> [PASS] All 4 fallback models present in server/api.js:', requiredModels);
+console.log('  -> [PASS] Verified standard fallback models present in server/api.js:', requiredModels);
+
+if (!apiCode.includes('discoverAvailableGeminiModels')) {
+  console.error('FAIL: server/api.js missing discoverAvailableGeminiModels function!');
+  process.exit(1);
+}
+console.log('  -> [PASS] Dynamic model discovery function active in server/api.js.');
 
 if (!apiCode.includes('.slice(-4)') || !apiCode.includes('.slice(0, 250)')) {
   console.error('FAIL: server/api.js missing prompt history trimming (last 4 messages, 250 chars)!');

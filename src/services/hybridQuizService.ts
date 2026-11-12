@@ -19,7 +19,16 @@ export interface AiConfig {
 export class HybridQuizService {
   private static LOCAL_KEY_STORAGE = 'al_gemini_api_key';
   private static PREFER_LIVE_KEY = 'al_prefer_live_ai';
-  private static CLIENT_MODEL_CHAIN = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemma-4-27b-it', 'gemini-1.5-flash'];
+  private static CLIENT_CANDIDATES: { version: string; model: string }[] = [
+    { version: 'v1beta', model: 'gemini-2.0-flash' },
+    { version: 'v1', model: 'gemini-1.5-flash' },
+    { version: 'v1beta', model: 'gemini-2.0-flash-lite' },
+    { version: 'v1beta', model: 'gemini-2.5-flash' },
+    { version: 'v1beta', model: 'gemini-1.5-flash-latest' },
+    { version: 'v1beta', model: 'gemini-1.5-flash' },
+    { version: 'v1beta', model: 'gemini-3.5-flash-lite' },
+    { version: 'v1', model: 'gemini-1.5-pro' }
+  ];
 
   public static getClientStoredKey(): string | null {
     if (typeof window === 'undefined') return null;
@@ -162,13 +171,14 @@ export class HybridQuizService {
     const prompt = `Generate exactly ${count} multiple choice questions for ${board} Class ${grade} ${subjectId} at ${levelNode} level.
 Return a valid JSON array of objects with keys: text, options (array of 4 strings), correctIndex (0-3), explanation, hint, difficulty ("EASY"|"MEDIUM"|"HARD"), topicTag.`;
 
-    for (const model of this.CLIENT_MODEL_CHAIN) {
+    for (const candidate of this.CLIENT_CANDIDATES) {
+      const { version, model } = candidate;
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 4500);
 
         const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -305,10 +315,11 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
       if (key) {
         try {
           const start = Date.now();
-          for (const model of this.CLIENT_MODEL_CHAIN) {
+          for (const candidate of this.CLIENT_CANDIDATES) {
+            const { version, model } = candidate;
             try {
               const r = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+                `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${key}`,
                 {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -320,7 +331,7 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
               );
               const latencyMs = Date.now() - start;
               if (r.ok) {
-                return { success: true, latencyMs, message: `Gemini (${model}) direct ping verified!` };
+                return { success: true, latencyMs, message: `Gemini (${version}/${model}) direct ping verified!` };
               }
             } catch {
               // Try next model
