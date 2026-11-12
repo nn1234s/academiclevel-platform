@@ -41,6 +41,7 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
       const res = await ApiClient.getScholarships(learner.id);
       if (res.success && res.scholarships) {
         setScholarships(res.scholarships);
+        setLoading(false);
         return;
       }
     } catch {

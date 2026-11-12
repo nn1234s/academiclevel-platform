@@ -14,8 +14,52 @@ export interface NovaMessage {
   };
 }
 
+export interface StudentAiQuota {
+  dailyUsed: number;
+  dailyLimit: number;
+  bonusMessages: number;
+  remainingToday: number;
+  isExhausted: boolean;
+  coinBalance?: number;
+}
+
 export class NovaAiService {
-  private static AI_TIMEOUT_MS = 3500;
+  private static AI_TIMEOUT_MS = 4500;
+  private static CLIENT_MODEL_CHAIN = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemma-4-27b-it', 'gemini-1.5-flash'];
+
+  /**
+   * Fetches the current student's AI message quota.
+   */
+  public static async getStudentQuota(learnerId: string): Promise<StudentAiQuota | null> {
+    try {
+      const res = await fetch(`/api/ai/quota/${encodeURIComponent(learnerId)}`);
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.quota || null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Unlocks extra Nova AI messages using AL Coins.
+   */
+  public static async buyAiMessages(learnerId: string, packType: 'PACK_5' | 'PACK_12' = 'PACK_5'): Promise<{ success: boolean; message: string; quota?: StudentAiQuota; newCoinBalance?: number }> {
+    try {
+      const res = await fetch('/api/ai/buy-messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ learnerId, packType })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.error || 'Failed to buy messages.' };
+      }
+      return data;
+    } catch (err: any) {
+      return { success: false, message: err.message || 'Network anomaly.' };
+    }
+  }
 
   /**
    * Generates a Socratic, age-adaptive explanation for a question or mistake.
@@ -109,7 +153,8 @@ export class NovaAiService {
     board: Board,
     grade: Grade,
     subject: string,
-    history?: { role: 'user' | 'model'; text: string }[]
+    history?: { role: 'user' | 'model'; text: string }[],
+    learnerId?: string
   ): Promise<string> {
     const trimmed = query.trim();
 
@@ -144,8 +189,15 @@ export class NovaAiService {
       const serverCall = fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: trimmed, board, grade, subject, history })
+        body: JSON.stringify({ query: trimmed, board, grade, subject, history, learnerId })
       }).then(async (r) => {
+        if (r.status === 429) {
+          const errData = await r.json().catch(() => ({}));
+          return {
+            success: true,
+            text: `🪙 **Daily AI Limit Reached (8/8 Free Messages)**\n\nYou've used your 8 daily AI tutor queries! Refill instantly using your AL Coins (10 Coins = 5 Messages) by clicking the Refill button in the header.`
+          };
+        }
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
       });
@@ -166,8 +218,8 @@ export class NovaAiService {
         const directText = await this.directClientChat(clientKey, trimmed, board, grade, subject);
         if (directText) return directText;
       }
-    } catch (err) {
-      console.warn('[NovaAiService] Falling back to deterministic chat response:', err);
+    } catch (err: any) {
+      console.warn('[NovaAiService] Falling back to deterministic chat response:', err?.message || err);
     }
 
     return generateDeterministicFallback();
@@ -180,39 +232,44 @@ export class NovaAiService {
     board: Board,
     grade: Grade
   ): Promise<string | null> {
-    try {
-      const wrong = question.options[chosenIndex] || 'selected choice';
-      const right = question.options[question.correctIndex] || 'correct choice';
-      const prompt = `You are Nova AI, a Socratic tutor on AcademicLevel. A Class ${grade} ${board} student answered:
+    const wrong = question.options[chosenIndex] || 'selected choice';
+    const right = question.options[question.correctIndex] || 'correct choice';
+    const prompt = `You are Nova AI, a Socratic tutor on AcademicLevel. A Class ${grade} ${board} student answered:
 Question: "${question.text}"
 Chosen (Incorrect): "${wrong}"
 Correct: "${right}"
 Explanation context: "${question.explanation}"
 Provide an age-appropriate Socratic breakdown under 120 words.`;
 
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3500);
+    for (const model of this.CLIENT_MODEL_CHAIN) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3500);
 
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 300, temperature: 0.4 }
-          }),
-          signal: controller.signal
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ role: 'user', parts: [{ text: prompt }] }],
+              generationConfig: { maxOutputTokens: 300, temperature: 0.4 }
+            }),
+            signal: controller.signal
+          }
+        );
+        clearTimeout(timeout);
+
+        if (res.ok) {
+          const data = await res.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+          if (text) return text;
         }
-      );
-      clearTimeout(timeout);
-
-      if (!res.ok) return null;
-      const data = await res.json();
-      return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || null;
-    } catch {
-      return null;
+      } catch {
+        // Continue to fallback model in chain
+      }
     }
+    return null;
   }
 
   private static async directClientChat(
@@ -222,33 +279,38 @@ Provide an age-appropriate Socratic breakdown under 120 words.`;
     grade: Grade,
     subject: string
   ): Promise<string | null> {
-    try {
-      const prompt = `You are Nova AI, a supportive Socratic tutor for Class ${grade} ${board} in ${subject}.
+    const prompt = `You are Nova AI, a supportive Socratic tutor for Class ${grade} ${board} in ${subject}.
 Student asks: "${query}"
 Guide them Socratically in under 120 words.`;
 
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3500);
+    for (const model of this.CLIENT_MODEL_CHAIN) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3500);
 
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 300, temperature: 0.5 }
-          }),
-          signal: controller.signal
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ role: 'user', parts: [{ text: prompt }] }],
+              generationConfig: { maxOutputTokens: 300, temperature: 0.5 }
+            }),
+            signal: controller.signal
+          }
+        );
+        clearTimeout(timeout);
+
+        if (res.ok) {
+          const data = await res.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+          if (text) return text;
         }
-      );
-      clearTimeout(timeout);
-
-      if (!res.ok) return null;
-      const data = await res.json();
-      return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || null;
-    } catch {
-      return null;
+      } catch {
+        // Continue to fallback model in chain
+      }
     }
+    return null;
   }
 }

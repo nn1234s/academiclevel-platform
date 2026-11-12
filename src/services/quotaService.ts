@@ -71,9 +71,9 @@ export class QuotaService {
       };
     }
 
-    // Free Tier Evaluation
+    // Free Tier Evaluation: 10 quizzes doesn't mean 10 levels. It means 2 (5 quizzes = 1 level).
     const quizzesCount = learner.quizzesCompletedCount || 0;
-    const levelsCount = learner.levelsCompletedCount || 0;
+    const levelsCount = Math.floor(quizzesCount / 5);
 
     let isLocked = false;
     let reason = '';
@@ -83,7 +83,7 @@ export class QuotaService {
       reason = `Free tier limit reached: You have completed all ${FREE_TIER_MAX_QUIZZES} complimentary quizzes.`;
     } else if (levelsCount >= FREE_TIER_MAX_LEVELS) {
       isLocked = true;
-      reason = `Free tier limit reached: You have completed ${FREE_TIER_MAX_LEVELS} full course levels.`;
+      reason = `Free tier limit reached: You have completed ${FREE_TIER_MAX_LEVELS} full course levels (${FREE_TIER_MAX_LEVELS * 5} quizzes).`;
     }
 
     return {
@@ -98,24 +98,27 @@ export class QuotaService {
   }
 
   /**
-   * Records completion of a quiz and increments learner quota counter.
+   * Records completion of a quiz and updates learner quiz and level quota counters.
+   * 10 quizzes doesn't mean 10 levels. It means 2 (5 quizzes = 1 level).
    */
   public static recordQuizCompletion(learnerId: string): void {
     const learner = StorageRLSLayer.getLearnerById(learnerId, learnerId);
     if (!learner) return;
 
     learner.quizzesCompletedCount = (learner.quizzesCompletedCount || 0) + 1;
+    learner.levelsCompletedCount = Math.floor(learner.quizzesCompletedCount / 5);
     StorageRLSLayer.saveLearner(learner, learnerId);
   }
 
   /**
-   * Records completion of a course level node and increments level counter.
+   * Records completion of a course level node and syncs level counter.
+   * 10 quizzes doesn't mean 10 levels. It means 2 (5 quizzes = 1 level).
    */
   public static recordLevelCompletion(learnerId: string): void {
     const learner = StorageRLSLayer.getLearnerById(learnerId, learnerId);
     if (!learner) return;
 
-    learner.levelsCompletedCount = (learner.levelsCompletedCount || 0) + 1;
+    learner.levelsCompletedCount = Math.floor((learner.quizzesCompletedCount || 0) / 5);
     StorageRLSLayer.saveLearner(learner, learnerId);
   }
 }

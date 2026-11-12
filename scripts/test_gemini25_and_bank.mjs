@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-console.log('=== TEST SUITE: QUESTION BANK & GEMINI 2.5 FLASH VERIFICATION ===');
+console.log('=== TEST SUITE: QUESTION BANK & GEMINI 3.5 FLASH LITE VERIFICATION ===');
 
 // 1. Verify Curated Question Bank
 const bankPath = path.resolve('src/data/curatedQuestionBank.json');
@@ -53,33 +53,33 @@ for (let g = 1; g <= 12; g++) {
 }
 console.log('[PASS] All Grades 1 through 12 present!');
 
-// 3. Inspect Gemini 2.5 Flash configuration in codebase
+// 3. Inspect Gemini 3.5 Flash Lite configuration in codebase
 const apiJs = fs.readFileSync('server/api.js', 'utf8');
-if (!apiJs.includes('gemini-2.5-flash')) {
-  console.error('FAIL: server/api.js does not specify gemini-2.5-flash!');
+if (!apiJs.includes('gemini-3.5-flash-lite')) {
+  console.error('FAIL: server/api.js does not specify gemini-3.5-flash-lite!');
   process.exit(1);
 }
-console.log('[PASS] server/api.js configured with gemini-2.5-flash');
+console.log('[PASS] server/api.js configured with gemini-3.5-flash-lite');
 
 const hybridQuiz = fs.readFileSync('src/services/hybridQuizService.ts', 'utf8');
-if (!hybridQuiz.includes('gemini-2.5-flash')) {
-  console.error('FAIL: src/services/hybridQuizService.ts does not specify gemini-2.5-flash!');
+if (!hybridQuiz.includes('gemini-3.5-flash-lite')) {
+  console.error('FAIL: src/services/hybridQuizService.ts does not specify gemini-3.5-flash-lite!');
   process.exit(1);
 }
-console.log('[PASS] src/services/hybridQuizService.ts configured with gemini-2.5-flash');
+console.log('[PASS] src/services/hybridQuizService.ts configured with gemini-3.5-flash-lite');
 
 const novaAi = fs.readFileSync('src/services/novaAiService.ts', 'utf8');
-if (!novaAi.includes('gemini-2.5-flash')) {
-  console.error('FAIL: src/services/novaAiService.ts does not specify gemini-2.5-flash!');
+if (!novaAi.includes('gemini-3.5-flash-lite')) {
+  console.error('FAIL: src/services/novaAiService.ts does not specify gemini-3.5-flash-lite!');
   process.exit(1);
 }
-console.log('[PASS] src/services/novaAiService.ts configured with gemini-2.5-flash');
+console.log('[PASS] src/services/novaAiService.ts configured with gemini-3.5-flash-lite');
 
 const questionBankMgr = fs.readFileSync('src/admin-vault/modules/QuestionBankManager.tsx', 'utf8');
-if (!questionBankMgr.includes('gemini-2.5-flash')) {
-  console.error('FAIL: src/admin-vault/modules/QuestionBankManager.tsx does not specify gemini-2.5-flash!');
+if (!questionBankMgr.includes('gemini-3.5-flash-lite')) {
+  console.error('FAIL: src/admin-vault/modules/QuestionBankManager.tsx does not specify gemini-3.5-flash-lite!');
   process.exit(1);
 }
-console.log('[PASS] src/admin-vault/modules/QuestionBankManager.tsx configured with gemini-2.5-flash');
+console.log('[PASS] src/admin-vault/modules/QuestionBankManager.tsx configured with gemini-3.5-flash-lite');
 
-console.log('=== ALL QUESTION BANK & GEMINI 2.5 TESTS PASSED SUCCESSFULLY! ===');
+console.log('=== ALL QUESTION BANK & GEMINI 3.5 TESTS PASSED SUCCESSFULLY! ===');

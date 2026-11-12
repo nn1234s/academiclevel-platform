@@ -42,7 +42,7 @@ export const QuestionBankManager: React.FC = () => {
   const [aiConfig, setAiConfig] = useState<AiConfig>({
     hasApiKey: false,
     preferLiveAi: true,
-    model: 'gemini-2.5-flash'
+    model: 'gemini-3.5-flash-lite'
   });
   const [apiKeyInput, setApiKeyInput] = useState('');
   const [showKey, setShowKey] = useState(false);
