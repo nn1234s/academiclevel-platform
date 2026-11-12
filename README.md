@@ -41,7 +41,7 @@ The system delivers age-adaptive pedagogical interfaces (Classes 1–4 Visual Ga
 +---------v-------------------------+                    +------------------v--------------------+
 |  Curriculum & Intelligence Engine |                    |   Audited Admin Control Plane         |
 |  - Board x Class 1-12 Syllabi     |                    |   Route: /ops-vault-al99 (Code-Split) |
-|  - 4-Tier Progression Nodes       |                    |   Lock: admin@academiclevel.in        |
+|  - 4-Tier Progression Nodes       |                    |   Lock: Hidden        |
 |  - Offline IndexedDB/Local Cache  |                    |   - UPI 12-Digit Verification Queue   |
 |  - Nova AI Socratic Engine        |                    |   - Entitlements & ACodes Manager     |
 +-----------------------------------+                    |   - Ledger Inspector & Audit Logs     |
