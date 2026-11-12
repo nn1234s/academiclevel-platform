@@ -448,7 +448,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       </div>
                       <div className="flex items-center space-x-2">
                         <span className="text-[#ffe066] text-sm leading-none">▶</span>
-                        <span>24/7 Nova AI 2.5 Flash Instant Tutor</span>
+                        <span>24/7 Nova AI 3.5 Flash Lite Socratic Tutor</span>
                       </div>
                     </div>
 
@@ -561,19 +561,19 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-6 sm:grid-cols-6 gap-1.5">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-2.5">
                     {([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as Grade[]).map(gradeNum => (
                       <button
                         key={gradeNum}
                         type="button"
                         onClick={() => setSelectedClass(gradeNum)}
-                        className={`py-2 px-1 text-xs font-black rounded-xl transition-all border text-center ${
+                        className={`min-h-[44px] py-2.5 px-2 text-xs sm:text-sm font-black rounded-xl transition-all border text-center flex items-center justify-center ${
                           selectedClass === gradeNum
                             ? 'bg-[#f95a00] text-white border-[#f95a00] shadow-md scale-105'
                             : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                         }`}
                       >
-                        Cls {gradeNum}
+                        Class {gradeNum}
                       </button>
                     ))}
                   </div>
@@ -590,7 +590,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                         key={b}
                         type="button"
                         onClick={() => setSelectedBoard(b)}
-                        className={`py-2 px-2 text-xs font-bold rounded-xl transition-all border text-center ${
+                        className={`min-h-[44px] py-2 px-2 text-xs font-bold rounded-xl transition-all border text-center flex items-center justify-center ${
                           selectedBoard === b
                             ? 'bg-indigo-600 text-white border-indigo-600 font-black shadow-sm'
                             : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
@@ -625,14 +625,14 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               <div className="space-y-2">
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="w-full py-4 bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-orange-500/30 transition-all hover:scale-[1.02] flex items-center justify-center space-x-2"
+                  className="w-full py-4 bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-orange-500/30 transition-all hover:scale-[1.02] flex items-center justify-center space-x-2 cursor-pointer"
                 >
                   <span>CLAIM SPECIAL 49 OFFER (₹49)</span>
                   <ArrowRight className="w-5 h-5" />
                 </button>
 
                 <p className="text-[10px] text-center text-slate-500 font-medium">
-                  🔒 Safe 256-bit UPI Payment • Instant Activation in 3 Seconds
+                  🔒 Safe 256-bit UPI Payment • Verified within 15–30 Mins (Instant with ACode)
                 </p>
               </div>
             </div>
@@ -922,7 +922,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <tr>
                   <td className="p-4 font-bold text-slate-900">Doubt Clearing Availability</td>
                   <td className="p-4 text-slate-600">Fixed 1-hour batch slots only</td>
-                  <td className="p-4 font-black text-emerald-700 bg-orange-50/30">24/7 Nova AI 2.5 Flash Instant Tutor</td>
+                  <td className="p-4 font-black text-emerald-700 bg-orange-50/30">24/7 Nova AI 3.5 Flash Lite Socratic Tutor</td>
                 </tr>
                 <tr>
                   <td className="p-4 font-bold text-slate-900">Gamification &amp; Motivation</td>
@@ -973,8 +973,8 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 a: 'Students earn study coins for completing daily quizzes, maintaining study streaks, and answering Question of the Day. Active Lite scholars can redeem their coins for genuine ₹20 digital gift cards (Amazon Pay, Google Play, etc.) in the Gift Store.'
               },
               {
-                q: 'How do I pay and activate my account?',
-                a: 'Click "Claim Special 49 Offer (₹49)", enter your name and parent number, and pay via any UPI app (GPay, PhonePe, Paytm, BHIM) or QR scan. Your workspace activates instantly.'
+                q: 'How do I pay and how quickly is my account activated?',
+                a: 'Click "Claim Special 49 Offer (₹49)", register with your parent mobile or email, and pay via any UPI app (GPay, PhonePe, Paytm, BHIM) or QR scan. Submit your 12-digit UTR reference for swift human verification (usually within 15–30 minutes). If you have an authorized institutional ACode voucher, activation is instant.'
               }
             ].map((faq, idx) => (
               <div key={idx} className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs">
@@ -1029,7 +1029,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       {/* ======================================================== */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-8 shadow-2xl relative border border-slate-200">
+          <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-8 shadow-2xl relative border border-slate-200 my-auto max-h-[92vh] overflow-y-auto">
             <button
               onClick={() => setIsModalOpen(false)}
               className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100"
@@ -1162,7 +1162,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       {/* ======================================================== */}
       {showUpiCheckout && createdLearnerId && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="max-w-md w-full bg-white rounded-3xl p-6 shadow-2xl relative border border-slate-200">
+          <div className="max-w-md w-full bg-white rounded-3xl p-6 shadow-2xl relative border border-slate-200 my-auto max-h-[92vh] overflow-y-auto">
             <button
               onClick={() => {
                 setShowUpiCheckout(false);

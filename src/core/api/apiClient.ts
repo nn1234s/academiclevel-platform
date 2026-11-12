@@ -23,9 +23,16 @@ export class ApiClient {
 
   private static adminHeaders(adminEmail?: string): Record<string, string> {
     const token = this.getAdminToken();
+    const passkey = typeof window !== 'undefined'
+      ? (sessionStorage.getItem('al_admin_passkey') || localStorage.getItem('al_admin_passkey') || '')
+      : '';
+    const email = adminEmail || (typeof window !== 'undefined'
+      ? (sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email') || '')
+      : '');
     return {
-      ...(adminEmail ? { 'x-admin-email': adminEmail } : {}),
-      ...(token ? { 'x-admin-token': token } : {})
+      ...(email ? { 'x-admin-email': email } : {}),
+      ...(token ? { 'x-admin-token': token } : {}),
+      ...(passkey ? { 'x-admin-passkey': passkey } : {})
     };
   }
 

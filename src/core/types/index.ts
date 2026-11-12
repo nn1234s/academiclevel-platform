@@ -44,6 +44,11 @@ export interface Learner {
   // Real-time coin cache (source of truth is ledger)
   coinBalance: number;
   avatarFrame?: string;
+
+  // AI Quota & Cap
+  dailyAiMessagesUsed?: number;
+  lastAiMessageDateUtc?: string;
+  bonusAiMessages?: number;
 }
 
 export interface Subscription {

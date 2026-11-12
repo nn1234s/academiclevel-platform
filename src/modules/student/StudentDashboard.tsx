@@ -370,7 +370,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           {/* Course Levels Meter */}
           <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-4">
             <div className="flex justify-between items-center text-xs mb-2">
-              <span className="text-slate-400">Course Levels Mastered</span>
+              <div>
+                <span className="text-slate-400 block">Course Levels Mastered</span>
+                <span className="text-[10px] text-slate-500 font-mono">5 quizzes = 1 level</span>
+              </div>
               <span className="font-mono font-bold text-white">
                 {quota.levelsCompleted} / {quota.hasActiveSubscription ? '∞' : quota.maxLevels}
               </span>

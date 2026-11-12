@@ -19,6 +19,7 @@ export interface AiConfig {
 export class HybridQuizService {
   private static LOCAL_KEY_STORAGE = 'al_gemini_api_key';
   private static PREFER_LIVE_KEY = 'al_prefer_live_ai';
+  private static CLIENT_MODEL_CHAIN = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemma-4-27b-it', 'gemini-1.5-flash'];
 
   public static getClientStoredKey(): string | null {
     if (typeof window === 'undefined') return null;
@@ -106,9 +107,9 @@ export class HybridQuizService {
         return {
           questions: raceResult.questions,
           source: 'GEMINI_LIVE',
-          model: raceResult.model || 'gemini-2.5-flash',
+          model: raceResult.model || 'gemini-3.5-flash-lite',
           latencyMs: Date.now() - startTime,
-          notice: 'Live AI Generated via Google Gemini 2.5 Flash'
+          notice: 'Live AI Generated via Google Gemini 3.5 Flash Lite'
         };
       }
 
@@ -127,7 +128,7 @@ export class HybridQuizService {
           return {
             questions: directResult,
             source: 'GEMINI_LIVE',
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3.5-flash-lite',
             latencyMs: Date.now() - startTime,
             notice: 'Live AI Generated via Client Gemini Key'
           };
@@ -158,54 +159,57 @@ export class HybridQuizService {
     levelNode: LevelNode,
     count: number
   ): Promise<Question[] | null> {
-    try {
-      const prompt = `Generate exactly ${count} multiple choice questions for ${board} Class ${grade} ${subjectId} at ${levelNode} level.
+    const prompt = `Generate exactly ${count} multiple choice questions for ${board} Class ${grade} ${subjectId} at ${levelNode} level.
 Return a valid JSON array of objects with keys: text, options (array of 4 strings), correctIndex (0-3), explanation, hint, difficulty ("EASY"|"MEDIUM"|"HARD"), topicTag.`;
 
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 4500);
+    for (const model of this.CLIENT_MODEL_CHAIN) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4500);
 
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { responseMimeType: 'application/json', temperature: 0.3 }
-          }),
-          signal: controller.signal
-        }
-      );
-      clearTimeout(timeout);
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ role: 'user', parts: [{ text: prompt }] }],
+              generationConfig: { responseMimeType: 'application/json', temperature: 0.3 }
+            }),
+            signal: controller.signal
+          }
+        );
+        clearTimeout(timeout);
 
-      if (!res.ok) return null;
-      const data = await res.json();
-      const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!raw) return null;
+        if (!res.ok) continue;
+        const data = await res.json();
+        const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!raw) continue;
 
-      const cleaned = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
-      const list = JSON.parse(cleaned);
-      if (!Array.isArray(list)) return null;
+        const cleaned = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+        const list = JSON.parse(cleaned);
+        if (!Array.isArray(list)) continue;
 
-      return list.map((item, idx) => ({
-        id: `ai_client_${Date.now()}_${idx}`,
-        board,
-        grade,
-        subjectId,
-        levelNode,
-        text: String(item.text),
-        options: Array.isArray(item.options) && item.options.length === 4 ? item.options : ['A', 'B', 'C', 'D'],
-        correctIndex: typeof item.correctIndex === 'number' ? item.correctIndex : 0,
-        explanation: String(item.explanation || ''),
-        hint: String(item.hint || ''),
-        difficulty: item.difficulty || 'MEDIUM',
-        topicTag: String(item.topicTag || 'Practice'),
-        source: 'GEMINI_LIVE'
-      }));
-    } catch {
-      return null;
+        return list.map((item, idx) => ({
+          id: `ai_client_${Date.now()}_${idx}`,
+          board,
+          grade,
+          subjectId,
+          levelNode,
+          text: String(item.text),
+          options: Array.isArray(item.options) && item.options.length === 4 ? item.options : ['A', 'B', 'C', 'D'],
+          correctIndex: typeof item.correctIndex === 'number' ? item.correctIndex : 0,
+          explanation: String(item.explanation || ''),
+          hint: String(item.hint || ''),
+          difficulty: item.difficulty || 'MEDIUM',
+          topicTag: String(item.topicTag || 'Practice'),
+          source: 'GEMINI_LIVE'
+        }));
+      } catch {
+        // Fallback to next model
+      }
     }
+    return null;
   }
 
   /**
@@ -221,7 +225,7 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
           hasApiKey: data.hasApiKey || !!clientKey,
           maskedApiKey: data.maskedApiKey || (clientKey ? `${clientKey.substring(0, 4)}...${clientKey.substring(clientKey.length - 4)}` : null),
           preferLiveAi: data.preferLiveAi && this.getPreferLiveAi(),
-          model: data.model || 'gemini-2.5-flash'
+          model: data.model || 'gemini-3.5-flash-lite'
         };
       }
     } catch {
@@ -233,7 +237,7 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
       hasApiKey: !!clientKey,
       maskedApiKey: clientKey ? `${clientKey.substring(0, 4)}...${clientKey.substring(clientKey.length - 4)}` : null,
       preferLiveAi: this.getPreferLiveAi(),
-      model: 'gemini-2.5-flash'
+      model: 'gemini-3.5-flash-lite'
     };
   }
 
@@ -301,22 +305,28 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
       if (key) {
         try {
           const start = Date.now();
-          const r = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contents: [{ role: 'user', parts: [{ text: 'Respond with: {"ping":"pong"}' }] }],
-                generationConfig: { responseMimeType: 'application/json' }
-              })
+          for (const model of this.CLIENT_MODEL_CHAIN) {
+            try {
+              const r = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    contents: [{ role: 'user', parts: [{ text: 'Respond with: {"ping":"pong"}' }] }],
+                    generationConfig: { responseMimeType: 'application/json' }
+                  })
+                }
+              );
+              const latencyMs = Date.now() - start;
+              if (r.ok) {
+                return { success: true, latencyMs, message: `Gemini (${model}) direct ping verified!` };
+              }
+            } catch {
+              // Try next model
             }
-          );
-          const latencyMs = Date.now() - start;
-          if (r.ok) {
-            return { success: true, latencyMs, message: 'Gemini 2.5 Flash direct ping verified!' };
           }
-          return { success: false, error: `Direct ping HTTP ${r.status}` };
+          return { success: false, error: 'Direct ping failed across fallback models' };
         } catch (e: any) {
           return { success: false, error: e.message };
         }

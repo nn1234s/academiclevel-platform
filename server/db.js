@@ -322,6 +322,11 @@ export function initDatabaseSchema() {
   addColumnSafe('certificates', 'levelName TEXT');
   addColumnSafe('certificates', 'issuedAt TEXT');
 
+  // AI Message Quotas & Coin Recharge Fields
+  addColumnSafe('learners', 'dailyAiMessagesUsed INTEGER DEFAULT 0');
+  addColumnSafe('learners', 'lastAiMessageDateUtc TEXT');
+  addColumnSafe('learners', 'bonusAiMessages INTEGER DEFAULT 0');
+
   // Seed inaugural worldwide scholarship if empty
   const defaultAdminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
   const countScholarships = db.prepare('SELECT count(*) as cnt FROM scholarships').get().cnt;

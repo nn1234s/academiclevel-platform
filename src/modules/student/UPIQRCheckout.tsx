@@ -97,10 +97,10 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             Payment Registered Successfully
           </span>
           <h2 className="text-xl sm:text-2xl font-black text-white leading-snug">
-            Thank you for your purchase. Due to server side checks, we will grant after 1 day.
+            Payment Details Submitted for Verification
           </h2>
           <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-            Your payment details have been recorded in our verification system. You will receive unlimited access across your syllabus as soon as the verification is finalized.
+            Thank you! Our verification desk matches your 12-digit UTR reference with our bank ledger swiftly (typically within 15–30 minutes). You can start practicing free quizzes immediately while your pass is being activated!
           </p>
         </div>
 

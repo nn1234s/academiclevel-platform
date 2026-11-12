@@ -44,8 +44,9 @@ export const ScholarshipManager: React.FC = () => {
       setLoading(true);
       const res = await ApiClient.adminGetScholarships(SUPER_ADMIN_EMAIL);
       if (res.success) {
-        setScholarships(res.scholarships);
-        setClaims(res.claims);
+        setScholarships(res.scholarships || []);
+        setClaims(res.claims || []);
+        setLoading(false);
         return;
       }
     } catch {
@@ -69,29 +70,33 @@ export const ScholarshipManager: React.FC = () => {
       return;
     }
 
-    try {
-      const res = await ApiClient.adminCreateScholarship(SUPER_ADMIN_EMAIL, {
-        title: title.trim(),
-        description: description.trim() || `Complete ${targetQuizCount} curriculum quizzes in ${durationDays} days to claim ${rewardCoins} coins!`,
-        targetQuizCount: Number(targetQuizCount),
-        rewardCoins: Number(rewardCoins),
-        durationDays: Number(durationDays),
-        targetGrade: targetGrade === 'ALL' ? undefined : Number(targetGrade),
-        targetBoard: targetBoard === 'ALL' ? undefined : targetBoard,
-        badgeTitle: badgeTitle.trim() || '🏆 National Scholar Sprint Laureate',
-        maxRecipients: Number(maxRecipients) || 0
-      });
+    const payload = {
+      title: title.trim(),
+      description: description.trim() || `Complete ${targetQuizCount} curriculum quizzes in ${durationDays} days to claim ${rewardCoins} coins!`,
+      targetQuizCount: Number(targetQuizCount),
+      rewardCoins: Number(rewardCoins),
+      durationDays: Number(durationDays),
+      targetGrade: targetGrade === 'ALL' ? undefined : Number(targetGrade),
+      targetBoard: targetBoard === 'ALL' ? undefined : targetBoard,
+      badgeTitle: badgeTitle.trim() || '🏆 National Scholar Sprint Laureate',
+      maxRecipients: Number(maxRecipients) || 0
+    };
 
-      if (res.success) {
+    try {
+      const res = await ApiClient.adminCreateScholarship(SUPER_ADMIN_EMAIL, payload);
+
+      if (res.success && res.scholarship) {
         StorageRLSLayer.saveScholarship(res.scholarship);
         setNotice({ type: 'success', text: `Published scholarship: "${title}" live worldwide!` });
         setIsModalOpen(false);
         resetForm();
-        fetchScholarships();
+        await fetchScholarships();
         setTimeout(() => setNotice(null), 4000);
         return;
+      } else {
+        throw new Error(res.message || 'Server error creating scholarship.');
       }
-    } catch {
+    } catch (err: any) {
       // Offline fallback
       const now = new Date();
       const newSch: Scholarship = {
@@ -117,7 +122,7 @@ export const ScholarshipManager: React.FC = () => {
       setNotice({ type: 'success', text: `Published scholarship: "${title}" live worldwide!` });
       setIsModalOpen(false);
       resetForm();
-      fetchScholarships();
+      await fetchScholarships();
       setTimeout(() => setNotice(null), 4000);
     }
   };

@@ -663,6 +663,8 @@ export const App: React.FC = () => {
                   initialQuestion={novaQuestionContext?.q || null}
                   initialChosenIndex={novaQuestionContext?.chosenIdx ?? null}
                   onClose={() => navigateTo('DASHBOARD')}
+                  learner={currentLearner}
+                  onCoinsUpdated={() => refreshCurrentLearner()}
                 />
               )}
 

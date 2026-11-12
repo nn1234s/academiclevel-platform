@@ -88,8 +88,10 @@ export const SuperAdminGuard: React.FC<SuperAdminGuardProps> = ({
         try {
           sessionStorage.setItem('al_admin_token', data.token);
           sessionStorage.setItem('al_admin_email', data.email || cleanEmail);
+          sessionStorage.setItem('al_admin_passkey', cleanPass);
           localStorage.setItem('al_admin_token', data.token);
           localStorage.setItem('al_admin_email', data.email || cleanEmail);
+          localStorage.setItem('al_admin_passkey', cleanPass);
         } catch {}
 
         await StorageRLSLayer.syncWithServer();
@@ -110,8 +112,10 @@ export const SuperAdminGuard: React.FC<SuperAdminGuardProps> = ({
         try {
           sessionStorage.setItem('al_admin_token', fallbackToken);
           sessionStorage.setItem('al_admin_email', cleanEmail);
+          sessionStorage.setItem('al_admin_passkey', cleanPass);
           localStorage.setItem('al_admin_token', fallbackToken);
           localStorage.setItem('al_admin_email', cleanEmail);
+          localStorage.setItem('al_admin_passkey', cleanPass);
         } catch {}
         loginSuperAdmin(cleanEmail);
         return;
@@ -137,8 +141,10 @@ export const SuperAdminGuard: React.FC<SuperAdminGuardProps> = ({
         try {
           sessionStorage.setItem('al_admin_token', fallbackToken);
           sessionStorage.setItem('al_admin_email', cleanEmail);
+          sessionStorage.setItem('al_admin_passkey', cleanPass);
           localStorage.setItem('al_admin_token', fallbackToken);
           localStorage.setItem('al_admin_email', cleanEmail);
+          localStorage.setItem('al_admin_passkey', cleanPass);
         } catch {}
         loginSuperAdmin(cleanEmail);
         return;

@@ -194,7 +194,8 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner,
   const quota = QuotaService.evaluateQuota(learner);
   const isEnrolledScholar = quota.hasActiveSubscription || learner.role === 'SUPER_ADMIN';
   const minLevelsRequired = 3;
-  const levelsCount = learner.levelsCompletedCount || 0;
+  // 10 quizzes = 2 levels (5 quizzes = 1 level; 3 levels = 15 quizzes)
+  const levelsCount = Math.floor((learner.quizzesCompletedCount || 0) / 5);
   const hasAcademicMilestone = levelsCount >= minLevelsRequired || learner.role === 'SUPER_ADMIN';
 
   const existingRequests = StorageRLSLayer.getGiftRequestsForLearner(learner.id);
