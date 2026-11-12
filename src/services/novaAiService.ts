@@ -25,7 +25,16 @@ export interface StudentAiQuota {
 
 export class NovaAiService {
   private static AI_TIMEOUT_MS = 4500;
-  private static CLIENT_MODEL_CHAIN = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemma-4-27b-it', 'gemini-1.5-flash'];
+  private static CLIENT_CANDIDATES: { version: string; model: string }[] = [
+    { version: 'v1beta', model: 'gemini-2.0-flash' },
+    { version: 'v1', model: 'gemini-1.5-flash' },
+    { version: 'v1beta', model: 'gemini-2.0-flash-lite' },
+    { version: 'v1beta', model: 'gemini-2.5-flash' },
+    { version: 'v1beta', model: 'gemini-1.5-flash-latest' },
+    { version: 'v1beta', model: 'gemini-1.5-flash' },
+    { version: 'v1beta', model: 'gemini-3.5-flash-lite' },
+    { version: 'v1', model: 'gemini-1.5-pro' }
+  ];
 
   /**
    * Fetches the current student's AI message quota.
@@ -241,13 +250,14 @@ Correct: "${right}"
 Explanation context: "${question.explanation}"
 Provide an age-appropriate Socratic breakdown under 120 words.`;
 
-    for (const model of this.CLIENT_MODEL_CHAIN) {
+    for (const candidate of this.CLIENT_CANDIDATES) {
+      const { version, model } = candidate;
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 3500);
 
         const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -283,13 +293,14 @@ Provide an age-appropriate Socratic breakdown under 120 words.`;
 Student asks: "${query}"
 Guide them Socratically in under 120 words.`;
 
-    for (const model of this.CLIENT_MODEL_CHAIN) {
+    for (const candidate of this.CLIENT_CANDIDATES) {
+      const { version, model } = candidate;
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 3500);
 
         const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

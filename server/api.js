@@ -2391,25 +2391,105 @@ function getGeminiApiKey() {
   }
 }
 
-// Multi-Model Fallback Chain for High Quota & Deprecation Resilience:
-// Primary: gemini-3.5-flash-lite -> Fallbacks: gemini-3.1-flash-lite -> gemma-4-27b-it -> gemini-1.5-flash
-const AI_FALLBACK_MODELS = [
-  process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite',
-  'gemini-3.1-flash-lite',
-  'gemma-4-27b-it',
-  'gemini-1.5-flash'
+// Multi-Model Dynamic Discovery & Multi-Version Fallback Engine
+// Automatically queries Google Generative Language API to discover active models for the key,
+// and cascades across both v1 and v1beta endpoints for maximum compatibility and resilience.
+const discoveredModelsCache = new Map();
+
+const DEFAULT_MODEL_CANDIDATES = [
+  { version: 'v1beta', model: process.env.GEMINI_MODEL || 'gemini-2.0-flash' },
+  { version: 'v1', model: 'gemini-1.5-flash' },
+  { version: 'v1beta', model: 'gemini-2.0-flash-lite' },
+  { version: 'v1beta', model: 'gemini-2.5-flash' },
+  { version: 'v1beta', model: 'gemini-1.5-flash-latest' },
+  { version: 'v1beta', model: 'gemini-1.5-flash' },
+  { version: 'v1beta', model: 'gemini-3.5-flash-lite' },
+  { version: 'v1', model: 'gemini-1.5-pro' }
 ];
 
-const getActiveGeminiModel = () => AI_FALLBACK_MODELS[0];
+const AI_FALLBACK_MODELS = DEFAULT_MODEL_CANDIDATES.map(c => c.model);
+const getActiveGeminiModel = () => DEFAULT_MODEL_CANDIDATES[0].model;
 
-// Resilient Multi-Model Caller with Automatic Failover
-async function callGeminiApiWithFallback(apiKey, bodyPayload, timeoutMs = 6000) {
+async function discoverAvailableGeminiModels(apiKey) {
+  const cached = discoveredModelsCache.get(apiKey);
+  if (cached && (Date.now() - cached.timestamp < 3600000) && cached.models?.length > 0) {
+    return cached.models;
+  }
+
+  const discovered = [];
+  const versions = ['v1beta', 'v1'];
+
+  for (const ver of versions) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3500);
+      const res = await fetch(`https://generativelanguage.googleapis.com/${ver}/models?key=${apiKey}`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.models)) {
+          const valid = data.models
+            .filter(m => Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent'))
+            .map(m => {
+              const cleanName = m.name.replace(/^models\//, '');
+              return { version: ver, model: cleanName, isFlash: /flash/i.test(cleanName) };
+            });
+
+          // Sort Flash models to the top
+          valid.sort((a, b) => (b.isFlash ? 1 : 0) - (a.isFlash ? 1 : 0));
+          for (const item of valid) {
+            if (!discovered.some(d => d.version === item.version && d.model === item.model)) {
+              discovered.push({ version: item.version, model: item.model });
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(`[Hybrid AI] Model discovery on ${ver} failed:`, e.message);
+    }
+  }
+
+  // Combine discovered models with default candidates
+  const combined = [...discovered];
+  for (const def of DEFAULT_MODEL_CANDIDATES) {
+    if (!combined.some(c => c.version === def.version && c.model === def.model)) {
+      combined.push(def);
+    }
+  }
+
+  discoveredModelsCache.set(apiKey, {
+    models: combined,
+    timestamp: Date.now(),
+    preferred: discovered[0] || null
+  });
+
+  return combined;
+}
+
+// Resilient Multi-Model Caller with Automatic Dynamic Discovery & Failover
+async function callGeminiApiWithFallback(apiKey, bodyPayload, timeoutMs = 7000) {
+  let candidates = await discoverAvailableGeminiModels(apiKey);
+
+  const cacheEntry = discoveredModelsCache.get(apiKey);
+  if (cacheEntry?.preferred) {
+    candidates = [
+      cacheEntry.preferred,
+      ...candidates.filter(c => !(c.version === cacheEntry.preferred.version && c.model === cacheEntry.preferred.model))
+    ];
+  }
+
   let lastError = null;
-  for (const model of AI_FALLBACK_MODELS) {
+  const attempts = [];
+
+  for (const candidate of candidates) {
+    const { version, model } = candidate;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const geminiUrl = `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`;
       const response = await fetch(geminiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2420,20 +2500,32 @@ async function callGeminiApiWithFallback(apiKey, bodyPayload, timeoutMs = 6000) 
 
       if (response.ok) {
         const data = await response.json();
-        return { ok: true, data, model };
+        if (cacheEntry) {
+          cacheEntry.preferred = candidate;
+        } else {
+          discoveredModelsCache.set(apiKey, { models: candidates, timestamp: Date.now(), preferred: candidate });
+        }
+        return { ok: true, data, model: `${version}/${model}`, rawModel: model, version };
       }
 
       const errText = await response.text();
-      console.warn(`[Hybrid AI] Model ${model} returned HTTP ${response.status}: ${errText.slice(0, 150)}`);
-      lastError = `HTTP ${response.status}: ${errText.slice(0, 150)}`;
-      // If 404 (model deprecated/not found), 429 (quota exhausted), or 503, chain to next model!
+      const summary = `[${version}/${model}] HTTP ${response.status}: ${errText.slice(0, 150)}`;
+      attempts.push(summary);
+      lastError = summary;
+
+      // If invalid API key (400), don't waste time trying remaining models with bad key
+      if (response.status === 400 && errText.includes('API key not valid')) {
+        return { ok: false, error: 'API key not valid. Please verify your Gemini API key in Super Admin Vault.', attempts };
+      }
     } catch (err) {
       clearTimeout(timeout);
-      console.warn(`[Hybrid AI] Model ${model} network error: ${err.message}`);
-      lastError = err.message;
+      const summary = `[${version}/${model}] Error: ${err.message}`;
+      attempts.push(summary);
+      lastError = summary;
     }
   }
-  return { ok: false, error: lastError };
+
+  return { ok: false, error: lastError, attempts };
 }
 
 // Per-Student Daily AI Quota & Coin Recharge Engine
@@ -2647,11 +2739,13 @@ apiRouter.post('/admin/ai/test-connection', adminAuth, async (req, res) => {
     }
 
     const outputText = result.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const cacheEntry = discoveredModelsCache.get(keyToTest);
     res.json({
       success: true,
       latencyMs,
       message: `${result.model} connected and responded successfully.`,
       activeModel: result.model,
+      availableModels: (cacheEntry?.models || []).map(m => `${m.version}/${m.model}`),
       rawSample: outputText
     });
   } catch (err) {
