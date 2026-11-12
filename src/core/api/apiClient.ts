@@ -57,6 +57,7 @@ export class ApiClient {
   public static async register(params: {
     fullName: string;
     email: string;
+    password?: string;
     board: Board;
     grade: Grade;
     parentName?: string;
@@ -69,10 +70,10 @@ export class ApiClient {
     });
   }
 
-  public static async login(email: string): Promise<{ success: boolean; learner: Learner; token: string }> {
+  public static async login(email: string, password?: string): Promise<{ success: boolean; learner: Learner; token: string }> {
     return this.request('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email, password })
     });
   }
 

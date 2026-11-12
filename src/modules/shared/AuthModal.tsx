@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Board, Grade } from '../../core/types';
 import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
-import { X, Sparkles, Lock, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, Sparkles, Lock, ArrowRight, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -21,6 +21,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   // Form fields
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [board, setBoard] = useState<Board>('CBSE');
   const [grade, setGrade] = useState<Grade>(10);
   const [parentName, setParentName] = useState('');
@@ -37,9 +39,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsSubmitting(true);
 
     if (mode === 'REGISTER') {
+      if (!password || password.trim().length < 6) {
+        setErrorMessage('Password is required and must be at least 6 characters.');
+        setIsSubmitting(false);
+        return;
+      }
+
       const res = await registerStudent({
         fullName,
         email,
+        password,
         board,
         grade,
         parentName,
@@ -62,7 +71,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         return;
       }
 
-      const res = await loginStudent(cleanEmail);
+      if (!password) {
+        setErrorMessage('Please enter your password.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      const res = await loginStudent(cleanEmail, password);
       setIsSubmitting(false);
       if (res.success) {
         onClose();
@@ -92,7 +107,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <p className="text-xs text-slate-400 mt-1">
             {mode === 'REGISTER'
               ? 'Starts with 25 free quizzes & full board syllabus coverage.'
-              : 'Enter your registered email to resume learning.'}
+              : 'Enter your email & password to access your scholar workspace.'}
           </p>
         </div>
 
@@ -128,6 +143,33 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               onChange={e => setEmail(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-indigo-500"
             />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-slate-300 font-semibold">Password *</label>
+              {mode === 'REGISTER' && (
+                <span className="text-[10px] text-slate-400">Min. 6 characters</span>
+              )}
+            </div>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                placeholder={mode === 'REGISTER' ? 'Create a secure password (min 6 chars)' : 'Enter your password'}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white pr-10 focus:outline-none focus:border-indigo-500"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           {mode === 'REGISTER' && (

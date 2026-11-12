@@ -12,13 +12,14 @@ interface AuthContextType {
   registerStudent: (params: {
     fullName: string;
     email: string;
+    password?: string;
     board: Board;
     grade: Grade;
     parentName?: string;
     parentPin?: string;
     referredByCode?: string;
   }) => Promise<{ success: boolean; error?: string }>;
-  loginStudent: (email: string) => Promise<{ success: boolean; error?: string }>;
+  loginStudent: (email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
   loginSuperAdmin: (adminEmailInput?: string) => { success: boolean; error?: string };
   logout: () => void;
   updateActiveGrade: (newGrade: Grade) => { success: boolean; message: string };
@@ -65,6 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const registerStudent = async (params: {
     fullName: string;
     email: string;
+    password?: string;
     board: Board;
     grade: Grade;
     parentName?: string;
@@ -128,7 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: true };
   };
 
-  const loginStudent = async (email: string) => {
+  const loginStudent = async (email: string, password?: string) => {
     const cleanEmail = email.trim().toLowerCase();
 
     // Check if founder/admin email is logging in via student portal
@@ -184,7 +186,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       // 1. Query real SQLite backend REST API
-      const res = await ApiClient.login(cleanEmail);
+      const res = await ApiClient.login(cleanEmail, password);
       if (res.success && res.learner) {
         if (res.token && typeof window !== 'undefined') {
           try { localStorage.setItem('al_student_token', res.token); } catch {}

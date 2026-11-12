@@ -50,10 +50,25 @@ export function initDatabaseSchema() {
       coinBalance INTEGER NOT NULL DEFAULT 10,
       avatarFrame TEXT,
       lastSpinTimestampUtc TEXT,
+      passwordHash TEXT,
+      passwordSalt TEXT,
       createdAt TEXT NOT NULL,
       updatedAt TEXT NOT NULL
     );
+  `);
 
+  // Automated schema evolution for password fields
+  try {
+    const learnerCols = db.prepare('PRAGMA table_info(learners)').all().map(c => c.name);
+    if (!learnerCols.includes('passwordHash')) {
+      db.exec('ALTER TABLE learners ADD COLUMN passwordHash TEXT;');
+    }
+    if (!learnerCols.includes('passwordSalt')) {
+      db.exec('ALTER TABLE learners ADD COLUMN passwordSalt TEXT;');
+    }
+  } catch {}
+
+  db.exec(`
     CREATE TABLE IF NOT EXISTS subscriptions (
       id TEXT PRIMARY KEY,
       learnerId TEXT NOT NULL,

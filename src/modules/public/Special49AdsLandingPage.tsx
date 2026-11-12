@@ -26,7 +26,9 @@ import {
   Layers,
   HelpCircle,
   Play,
-  Gift
+  Gift,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
@@ -271,6 +273,8 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [studentName, setStudentName] = useState('');
   const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [parentName, setParentName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -313,6 +317,11 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       return;
     }
 
+    if (!password || password.trim().length < 6) {
+      setErrorMessage('Please create an account password of at least 6 characters.');
+      return;
+    }
+
     const email = emailOrPhone.includes('@')
       ? emailOrPhone.trim().toLowerCase()
       : `${emailOrPhone.replace(/[^0-9]/g, '') || 'special'}@special49.academiclevel.in`;
@@ -322,6 +331,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       const res = await registerStudent({
         fullName: studentName.trim(),
         email,
+        password: password.trim(),
         board: selectedBoard,
         grade: selectedClass,
         parentName: parentName.trim() || 'Parent'
@@ -1068,6 +1078,31 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   onChange={e => setEmailOrPhone(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00]"
                 />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block font-bold text-slate-700">Account Password *</label>
+                  <span className="text-[10px] text-slate-400 font-normal">Min. 6 characters</span>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    placeholder="Create a password for student login"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00] pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
