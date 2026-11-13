@@ -163,11 +163,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <a
             href="/halloffame"
             onClick={handleHallOfFameClick}
-            title="View Recognized Security Researchers"
+            title="View Security & Bug Bounty Policy"
             className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/40 text-blue-300 backdrop-blur-md transition-all group shadow-xs cursor-pointer"
           >
             <ShieldCheck className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
-            <span>🛡️ Security Hall of Fame</span>
+            <span>🛡️ Security &amp; Bug Bounty</span>
           </a>
         </div>
 
