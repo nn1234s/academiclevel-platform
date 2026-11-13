@@ -16,23 +16,25 @@ export interface NovaMessage {
 
 export interface StudentAiQuota {
   dailyUsed: number;
-  dailyLimit: number;
+  dailyLimit: number | typeof Infinity;
   bonusMessages: number;
   remainingToday: number;
   isExhausted: boolean;
+  isSubscriber?: boolean;
+  isSuperAdmin?: boolean;
+  planTier?: string;
   coinBalance?: number;
 }
 
 export class NovaAiService {
   private static AI_TIMEOUT_MS = 4500;
   private static CLIENT_CANDIDATES: { version: string; model: string }[] = [
-    { version: 'v1beta', model: 'gemini-2.0-flash' },
-    { version: 'v1', model: 'gemini-1.5-flash' },
-    { version: 'v1beta', model: 'gemini-2.0-flash-lite' },
-    { version: 'v1beta', model: 'gemini-2.5-flash' },
-    { version: 'v1beta', model: 'gemini-1.5-flash-latest' },
-    { version: 'v1beta', model: 'gemini-1.5-flash' },
     { version: 'v1beta', model: 'gemini-3.5-flash-lite' },
+    { version: 'v1beta', model: 'gemini-3.1-flash-lite' },
+    { version: 'v1beta', model: 'gemini-2.0-flash' },
+    { version: 'v1beta', model: 'gemini-2.0-flash-lite' },
+    { version: 'v1beta', model: 'gemma-2-27b-it' },
+    { version: 'v1', model: 'gemini-1.5-flash' },
     { version: 'v1', model: 'gemini-1.5-pro' }
   ];
 

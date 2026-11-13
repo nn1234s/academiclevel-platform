@@ -3,7 +3,7 @@ import cors from 'cors';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { db, initDatabaseSchema } from './db.js';
+import { db, initDatabaseSchema, exportDbToJsonStore } from './db.js';
 
 // Auto-load .env configuration if present
 try {
@@ -34,6 +34,96 @@ export const apiRouter = express.Router();
 
 apiRouter.use(cors());
 apiRouter.use(express.json());
+
+// ==========================================
+// Rate Limiting Engine (In-Memory Sliding Window)
+// ==========================================
+const rateLimitStores = {
+  global: new Map(),
+  auth: new Map(),
+  payments: new Map(),
+  ai: new Map()
+};
+
+function checkRateLimit(store, key, limit, windowMs) {
+  const now = Date.now();
+  const record = store.get(key) || { count: 0, resetAt: now + windowMs };
+  if (now > record.resetAt) {
+    record.count = 1;
+    record.resetAt = now + windowMs;
+    store.set(key, record);
+    return { allowed: true, remaining: limit - 1 };
+  }
+  if (record.count >= limit) {
+    return { allowed: false, remaining: 0, retryAfterMs: record.resetAt - now };
+  }
+  record.count += 1;
+  store.set(key, record);
+  return { allowed: true, remaining: limit - record.count };
+}
+
+// Global IP limiter: 400 requests / 15 min per IP
+apiRouter.use((req, res, next) => {
+  const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '127.0.0.1';
+  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.global, clientIp, 400, 15 * 60 * 1000);
+  if (!allowed) {
+    return res.status(429).json({
+      success: false,
+      error: 'Too many requests. Please slow down and try again later.',
+      retryAfterSeconds: Math.ceil(retryAfterMs / 1000)
+    });
+  }
+  next();
+});
+
+const authLimiter = (req, res, next) => {
+  const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '127.0.0.1';
+  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.auth, clientIp, 20, 15 * 60 * 1000);
+  if (!allowed) {
+    return res.status(429).json({
+      success: false,
+      error: 'Too many authentication attempts. Please wait 15 minutes before retrying.',
+      retryAfterSeconds: Math.ceil(retryAfterMs / 1000)
+    });
+  }
+  next();
+};
+
+const paymentLimiter = (req, res, next) => {
+  const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '127.0.0.1';
+  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.payments, clientIp, 10, 15 * 60 * 1000);
+  if (!allowed) {
+    return res.status(429).json({
+      success: false,
+      error: 'Payment submission limit reached. Please wait before submitting another transaction.',
+      retryAfterSeconds: Math.ceil(retryAfterMs / 1000)
+    });
+  }
+  next();
+};
+
+const aiChatLimiter = (req, res, next) => {
+  const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '127.0.0.1';
+  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.ai, clientIp, 60, 60 * 60 * 1000);
+  if (!allowed) {
+    return res.status(429).json({
+      success: false,
+      error: 'AI query rate limit reached (60 queries/hour). Please wait a moment before sending another query.',
+      retryAfterSeconds: Math.ceil(retryAfterMs / 1000)
+    });
+  }
+  next();
+};
+
+// Periodic cleanup of expired rate limit entries
+setInterval(() => {
+  const now = Date.now();
+  for (const store of Object.values(rateLimitStores)) {
+    for (const [k, v] of store.entries()) {
+      if (now > v.resetAt) store.delete(k);
+    }
+  }
+}, 5 * 60 * 1000).unref();
 
 const SUPER_ADMIN_EMAIL = (process.env.ADMIN_EMAIL || process.env.SUPER_ADMIN_EMAIL || 'admin@academiclevel.in').trim().toLowerCase();
 
@@ -204,7 +294,7 @@ function clearFailedLogin(email) {
 // ==========================================
 // Auth Routes
 // ==========================================
-apiRouter.post('/auth/register', (req, res) => {
+apiRouter.post('/auth/register', authLimiter, (req, res) => {
   try {
     const { fullName, email, password, board, grade, parentName, parentPin, referredByCode } = req.body;
     if (!fullName || !email || !board || !grade) {
@@ -326,13 +416,20 @@ function getActiveSubscriptionForLearner(learner) {
   const phoneDigits = learnerPhone.replace(/[^0-9]/g, '');
   const phone10 = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : '';
   const learnerEmail = (learner.email || '').trim().toLowerCase();
-  const emailPrefix = learnerEmail.split('@')[0] || '';
+  const normalizedEmail = learnerEmail.replace(/\.+@/, '@');
+  const emailPrefix = normalizedEmail.split('@')[0] || '';
 
   const activeSub = db.prepare(`
     SELECT s.* FROM subscriptions s
     WHERE (
       s.learnerId = ?
-      OR s.learnerId IN (SELECT id FROM learners WHERE email = ? OR (phone IS NOT NULL AND phone != '' AND (phone = ? OR phone = ?)))
+      OR s.learnerId IN (
+        SELECT id FROM learners 
+        WHERE email = ? 
+           OR email = ? 
+           OR replace(email, '.@', '@') = ?
+           OR (phone IS NOT NULL AND phone != '' AND (phone = ? OR phone = ?))
+      )
       OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
       OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
     )
@@ -342,6 +439,8 @@ function getActiveSubscriptionForLearner(learner) {
   `).get(
     learner.id,
     learnerEmail,
+    normalizedEmail,
+    normalizedEmail,
     learnerPhone,
     phone10,
     phone10 || learnerPhone,
@@ -366,13 +465,20 @@ function getPendingSubscriptionForLearner(learner) {
   const phoneDigits = learnerPhone.replace(/[^0-9]/g, '');
   const phone10 = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : '';
   const learnerEmail = (learner.email || '').trim().toLowerCase();
-  const emailPrefix = learnerEmail.split('@')[0] || '';
+  const normalizedEmail = learnerEmail.replace(/\.+@/, '@');
+  const emailPrefix = normalizedEmail.split('@')[0] || '';
 
   const pendingSub = db.prepare(`
     SELECT s.* FROM subscriptions s
     WHERE (
       s.learnerId = ?
-      OR s.learnerId IN (SELECT id FROM learners WHERE email = ? OR (phone IS NOT NULL AND phone != '' AND (phone = ? OR phone = ?)))
+      OR s.learnerId IN (
+        SELECT id FROM learners 
+        WHERE email = ? 
+           OR email = ? 
+           OR replace(email, '.@', '@') = ?
+           OR (phone IS NOT NULL AND phone != '' AND (phone = ? OR phone = ?))
+      )
       OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
       OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
     )
@@ -381,6 +487,8 @@ function getPendingSubscriptionForLearner(learner) {
   `).get(
     learner.id,
     learnerEmail,
+    normalizedEmail,
+    normalizedEmail,
     learnerPhone,
     phone10,
     phone10 || learnerPhone,
@@ -392,13 +500,14 @@ function getPendingSubscriptionForLearner(learner) {
   return pendingSub || null;
 }
 
-apiRouter.post('/auth/login', (req, res) => {
+apiRouter.post('/auth/login', authLimiter, (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email) return res.status(400).json({ success: false, error: 'Email is required.' });
     if (!password) return res.status(400).json({ success: false, error: 'Password is required to sign in.' });
 
     const cleanEmail = String(email).trim().toLowerCase();
+    const normalizedEmail = cleanEmail.replace(/\.+@/, '@');
     const cleanPassword = String(password).trim();
 
     if (isLoginThrottled(cleanEmail)) {
@@ -412,13 +521,16 @@ apiRouter.post('/auth/login', (req, res) => {
     let learner = db.prepare(`
       SELECT * FROM learners 
       WHERE email = ? 
-         OR (phone IS NOT NULL AND phone = ?)
-         OR (phone IS NOT NULL AND phone = ?)
-         OR (phone IS NOT NULL AND phone = ?)
+         OR email = ?
+         OR replace(email, '.@', '@') = ?
+         OR replace(email, '.@', '@') = ?
+         OR (phone IS NOT NULL AND phone != '' AND (phone = ? OR phone = ?))
          OR email = ?
     `).get(
       cleanEmail,
+      normalizedEmail,
       cleanEmail,
+      normalizedEmail,
       phoneDigits,
       phoneDigits.length >= 10 ? phoneDigits.slice(-10) : phoneDigits,
       phoneDigits.length >= 10 ? `${phoneDigits.slice(-10)}@special49.academiclevel.in` : cleanEmail
@@ -791,7 +903,7 @@ apiRouter.post('/students/:id/spin', (req, res) => {
 // ==========================================
 // Payments & Subscriptions
 // ==========================================
-apiRouter.post('/payments/submit', (req, res) => {
+apiRouter.post('/payments/submit', paymentLimiter, (req, res) => {
   try {
     const { learnerId, tier, payerUpiId, utrReference } = req.body;
     if (!learnerId || !tier || !payerUpiId) {
@@ -882,6 +994,8 @@ apiRouter.post('/payments/submit', (req, res) => {
 
       subscription = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(subId);
     }
+
+    exportDbToJsonStore();
 
     res.json({
       success: true,
@@ -1847,6 +1961,7 @@ apiRouter.post('/acodes/redeem', (req, res) => {
     `).run(learnerId, acode.code);
 
     const subscription = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(subId);
+    exportDbToJsonStore();
 
     res.json({
       success: true,
@@ -2274,6 +2389,8 @@ apiRouter.post('/admin/learners/:id/grant-premium', adminAuth, (req, res) => {
       `Super-Admin granted ${tier || 'PLUS'} (${durationDays} days) to learner ${learner.fullName} (and ${targetLearnerIds.length - 1} linked accounts). Note: ${note || 'Admin grant'}`
     );
 
+    exportDbToJsonStore();
+
     res.json({ success: true, message: `Granted ${tier || 'PLUS'} (${durationDays} days) to ${learner.fullName}.` });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -2299,6 +2416,8 @@ apiRouter.post('/admin/learners/:id/revoke-premium', adminAuth, (req, res) => {
       'INFO',
       `Super-Admin revoked premium for learner ${learner.fullName}.`
     );
+
+    exportDbToJsonStore();
 
     res.json({ success: true, message: `Revoked premium for ${learner.fullName}. Account returned to Free Tier.` });
   } catch (err) {
@@ -2419,6 +2538,8 @@ apiRouter.post('/admin/payments/:id/approve', adminAuth, (req, res) => {
       `Approved subscription ${sub.id} (${sub.planTier} ${sub.durationDays}d) for learner ${sub.learnerId}. UTR: ${sub.utrReference || 'None'}`
     );
 
+    exportDbToJsonStore();
+
     res.json({ success: true, message: `Subscription ${sub.id} activated.` });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -2429,6 +2550,7 @@ apiRouter.post('/admin/payments/:id/reject', adminAuth, (req, res) => {
   try {
     const { reason } = req.body;
     db.prepare(`UPDATE subscriptions SET status = 'REVOKED', verifiedByAdmin = ?, verifiedAt = datetime('now') WHERE id = ?`).run(SUPER_ADMIN_EMAIL, req.params.id);
+    exportDbToJsonStore();
     res.json({ success: true, message: `Subscription ${req.params.id} rejected. Reason: ${reason || 'Admin rejection'}` });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -2627,13 +2749,13 @@ function getGeminiApiKey() {
 const discoveredModelsCache = new Map();
 
 const DEFAULT_MODEL_CANDIDATES = [
-  { version: 'v1beta', model: process.env.GEMINI_MODEL || 'gemini-2.0-flash' },
-  { version: 'v1', model: 'gemini-1.5-flash' },
+  { version: 'v1beta', model: process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite' },
+  { version: 'v1beta', model: 'gemini-3.1-flash-lite' },
+  { version: 'v1beta', model: 'gemini-2.0-flash' },
   { version: 'v1beta', model: 'gemini-2.0-flash-lite' },
-  { version: 'v1beta', model: 'gemini-2.5-flash' },
-  { version: 'v1beta', model: 'gemini-1.5-flash-latest' },
-  { version: 'v1beta', model: 'gemini-1.5-flash' },
-  { version: 'v1beta', model: 'gemini-3.5-flash-lite' },
+  { version: 'v1beta', model: 'gemma-2-27b-it' },
+  { version: 'v1beta', model: 'gemma-2-9b-it' },
+  { version: 'v1', model: 'gemini-1.5-flash' },
   { version: 'v1', model: 'gemini-1.5-pro' }
 ];
 
@@ -2763,16 +2885,27 @@ const DAILY_FREE_AI_MESSAGES = 8; // 8 free messages per day per student
 
 function getStudentAiQuota(learnerId) {
   if (!learnerId) {
-    return { dailyUsed: 0, dailyLimit: DAILY_FREE_AI_MESSAGES, bonusMessages: 0, remainingToday: DAILY_FREE_AI_MESSAGES, isExhausted: false };
+    return { dailyUsed: 0, dailyLimit: DAILY_FREE_AI_MESSAGES, bonusMessages: 0, remainingToday: DAILY_FREE_AI_MESSAGES, isExhausted: false, isSubscriber: false };
   }
-  const learner = db.prepare('SELECT id, role, coinBalance, dailyAiMessagesUsed, lastAiMessageDateUtc, bonusAiMessages FROM learners WHERE id = ?').get(learnerId);
+  const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
   if (!learner) {
-    return { dailyUsed: 0, dailyLimit: DAILY_FREE_AI_MESSAGES, bonusMessages: 0, remainingToday: DAILY_FREE_AI_MESSAGES, isExhausted: false };
+    return { dailyUsed: 0, dailyLimit: DAILY_FREE_AI_MESSAGES, bonusMessages: 0, remainingToday: DAILY_FREE_AI_MESSAGES, isExhausted: false, isSubscriber: false };
   }
 
-  // Super admin has unlimited AI
-  if (learner.role === 'SUPER_ADMIN') {
-    return { dailyUsed: 0, dailyLimit: Infinity, bonusMessages: 999, remainingToday: 999, isExhausted: false, isSuperAdmin: true, coinBalance: Number(learner.coinBalance || 0) };
+  // Active subscribers and Super-Admin have unlimited Socratic AI
+  const activeSub = getActiveSubscriptionForLearner(learner);
+  if (learner.role === 'SUPER_ADMIN' || activeSub) {
+    return {
+      dailyUsed: 0,
+      dailyLimit: Infinity,
+      bonusMessages: 9999,
+      remainingToday: 9999,
+      isExhausted: false,
+      isSuperAdmin: learner.role === 'SUPER_ADMIN',
+      isSubscriber: true,
+      planTier: activeSub ? activeSub.planTier : 'PLUS',
+      coinBalance: Number(learner.coinBalance || 0)
+    };
   }
 
   const todayUtc = new Date().toISOString().slice(0, 10);
@@ -2794,14 +2927,19 @@ function getStudentAiQuota(learnerId) {
     bonusMessages,
     remainingToday: totalRemaining,
     isExhausted: totalRemaining <= 0,
+    isSubscriber: false,
     coinBalance: Number(learner.coinBalance || 0)
   };
 }
 
 function consumeStudentAiMessage(learnerId) {
   if (!learnerId) return true;
-  const learner = db.prepare('SELECT id, role, dailyAiMessagesUsed, lastAiMessageDateUtc, bonusAiMessages FROM learners WHERE id = ?').get(learnerId);
+  const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
   if (!learner || learner.role === 'SUPER_ADMIN') return true;
+
+  // Active subscribers have unlimited AI queries
+  const activeSub = getActiveSubscriptionForLearner(learner);
+  if (activeSub) return true;
 
   const todayUtc = new Date().toISOString().slice(0, 10);
   let dailyUsed = Number(learner.dailyAiMessagesUsed || 0);
@@ -2881,12 +3019,27 @@ apiRouter.post('/ai/buy-messages', (req, res) => {
     }
 
     const now = new Date().toISOString();
-    const newBal = (learner.coinBalance || 0) - cost;
-    const newBonus = (learner.bonusAiMessages || 0) + messagesAwarded;
 
     db.exec('BEGIN TRANSACTION;');
-    db.prepare('UPDATE learners SET coinBalance = ?, bonusAiMessages = ?, updatedAt = ? WHERE id = ?')
-      .run(newBal, newBonus, now, learnerId);
+    // Atomic deduction preventing negative balance and concurrent race conditions
+    const updateResult = db.prepare(`
+      UPDATE learners 
+      SET coinBalance = coinBalance - ?, 
+          bonusAiMessages = COALESCE(bonusAiMessages, 0) + ?, 
+          updatedAt = ? 
+      WHERE id = ? AND coinBalance >= ?
+    `).run(cost, messagesAwarded, now, learnerId, cost);
+
+    if (updateResult.changes === 0) {
+      db.exec('ROLLBACK;');
+      return res.status(400).json({
+        success: false,
+        error: `Insufficient AL Coins or concurrent transaction detected. Please refresh.`
+      });
+    }
+
+    const updatedLearner = db.prepare('SELECT coinBalance, bonusAiMessages FROM learners WHERE id = ?').get(learnerId);
+    const newBal = updatedLearner.coinBalance;
 
     const ledgerId = 'c_tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
     db.prepare(`
@@ -2906,6 +3059,7 @@ apiRouter.post('/ai/buy-messages', (req, res) => {
       'SIG_' + crypto.randomBytes(6).toString('hex')
     );
     db.exec('COMMIT;');
+    exportDbToJsonStore();
 
     const quota = getStudentAiQuota(learnerId);
     res.json({
@@ -3155,7 +3309,7 @@ function sanitizeAiQuery(rawText) {
   return { text: cleaned, isSuspect };
 }
 
-apiRouter.post('/ai/chat', async (req, res) => {
+apiRouter.post('/ai/chat', aiChatLimiter, async (req, res) => {
   try {
     const { query, board = 'CBSE', grade = 10, subject = 'Mathematics', history, learnerId } = req.body;
     const resolvedLearnerId = learnerId || req.headers['x-learner-id'] || null;

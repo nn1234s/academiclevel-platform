@@ -662,3 +662,29 @@ function migrateFromJsonStore() {
     console.error('[Database Migration Error]:', err);
   }
 }
+
+export function exportDbToJsonStore() {
+  try {
+    const learners = db.prepare('SELECT * FROM learners').all();
+    const subscriptions = db.prepare('SELECT * FROM subscriptions').all();
+    const coin_ledger = db.prepare('SELECT * FROM coin_ledger').all();
+    const acodes = db.prepare('SELECT * FROM acodes').all();
+    const gift_requests = db.prepare('SELECT * FROM gift_requests').all();
+    const security_audit_logs = db.prepare('SELECT * FROM security_audit_logs').all();
+
+    const data = {
+      al_prod_learners_v1: learners,
+      al_prod_subscriptions_v1: subscriptions,
+      al_prod_coin_ledger_v1: coin_ledger,
+      al_prod_acodes_v1: acodes,
+      al_prod_gift_requests_v1: gift_requests,
+      al_prod_security_audit_logs_v1: security_audit_logs
+    };
+
+    fs.writeFileSync(DATA_STORE_JSON, JSON.stringify(data, null, 2), 'utf8');
+    return true;
+  } catch (err) {
+    console.warn('[Database] exportDbToJsonStore warning:', err.message);
+    return false;
+  }
+}

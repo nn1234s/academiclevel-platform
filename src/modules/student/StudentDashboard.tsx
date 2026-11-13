@@ -322,7 +322,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div>
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
               <Zap className="w-4 h-4 text-amber-400" />
-              <span>Subscription & Free Tier Quota Engine</span>
+              <span>{quota.hasActiveSubscription ? `${quota.activePlan} Scholar Status` : 'Subscription & Free Tier Quota Engine'}</span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
               {quota.hasActiveSubscription
