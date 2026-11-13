@@ -61,7 +61,7 @@ export interface Subscription {
   learnerId: string;
   planTier: 'LITE' | 'PLUS' | 'TRIAL';
   status: SubscriptionStatus;
-  paymentMethod: 'UPI_QR' | 'ACODE_SCHOLARSHIP' | 'ADMIN_TRIAL';
+  paymentMethod: 'UPI_QR' | 'ACODE_SCHOLARSHIP' | 'ADMIN_TRIAL' | 'CONCEPT_BOOSTER_AUTO';
   utrReference?: string;
   payerUpiId?: string;
   amountInr: number;

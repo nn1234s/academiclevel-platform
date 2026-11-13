@@ -136,22 +136,17 @@ async function runVerificationSuite() {
   }
 
   // -------------------------------------------------------------
-  // TEST 5: Free Tier Quota Gate Enforcement
+  // TEST 5: Concept Booster 60-Day Unlimited Quotas
   // -------------------------------------------------------------
-  console.log('\n--- 5. FREE TIER QUOTA GATE (25 QUIZZES / 3 LEVELS) ---');
-  // Student B is on Free Tier
-  studentB.quizzesCompletedCount = 24;
-  let qCheck = QuotaService.evaluateQuota(studentB);
-  assert(qCheck.isLocked === false, 'Quota unlocked at 24/25 quizzes');
-
+  console.log('\n--- 5. 60-DAY CONCEPT BOOSTER PASS & UNLIMITED QUOTAS ---');
+  // Student B receives 60 days unlimited quizzes on registration
+  studentB.createdAt = new Date().toISOString();
   studentB.quizzesCompletedCount = 25;
-  qCheck = QuotaService.evaluateQuota(studentB);
-  assert(qCheck.isLocked === true, 'Quota locked at 25/25 quizzes');
-
-  studentB.quizzesCompletedCount = 10;
-  studentB.levelsCompletedCount = 3;
-  qCheck = QuotaService.evaluateQuota(studentB);
-  assert(qCheck.isLocked === true, 'Quota locked at 3/3 levels');
+  let qCheck = QuotaService.evaluateQuota(studentB);
+  assert(qCheck.isLocked === false, 'Quota unlocked with 60-day Concept Booster pass');
+  assert(qCheck.hasActiveSubscription === true, 'Concept Booster active subscription recognized');
+  assert(qCheck.activePlan === 'LITE', 'Plan tier is LITE');
+  assert(qCheck.daysRemaining !== undefined && qCheck.daysRemaining > 0, 'Positive days remaining');
 
   // Student A has active subscription -> quota unlocked
   const quotaA = QuotaService.evaluateQuota(studentA);

@@ -30,7 +30,10 @@ import {
 
 export const StudentManagement: React.FC = () => {
   const [learners, setLearners] = useState<Learner[]>(() =>
-    StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL)
+    StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL).filter(l => {
+      const em = (l?.email || '').toLowerCase();
+      return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
+    })
   );
   const [search, setSearch] = useState('');
   const [boardFilter, setBoardFilter] = useState<string>('ALL');
@@ -63,8 +66,37 @@ export const StudentManagement: React.FC = () => {
   };
 
   const refreshList = async () => {
+    try {
+      const adminToken = sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token');
+      const passkey = sessionStorage.getItem('al_admin_passkey') || localStorage.getItem('al_admin_passkey') || 'AL-ADMIN-VAULT-2026';
+      const headers: Record<string, string> = {
+        'x-admin-passkey': passkey
+      };
+      if (adminToken) headers['x-admin-token'] = adminToken;
+      const res = await fetch('/api/admin/learners', { headers });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.learners)) {
+          const clean = data.learners.filter((l: Learner) => {
+            const em = (l?.email || '').toLowerCase();
+            return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
+          });
+          setLearners(clean);
+          StorageRLSLayer.setLearnersAdmin(clean, SUPER_ADMIN_EMAIL);
+          if (controllingLearner) {
+            const refreshedTarget = clean.find((l: Learner) => l.id === controllingLearner.id);
+            if (refreshedTarget) setControllingLearner(refreshedTarget);
+          }
+          return;
+        }
+      }
+    } catch {}
+
     await StorageRLSLayer.syncWithServer();
-    const updated = StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL);
+    const updated = StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL).filter(l => {
+      const em = (l?.email || '').toLowerCase();
+      return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
+    });
     setLearners(updated);
     if (controllingLearner) {
       const refreshedTarget = updated.find(l => l.id === controllingLearner.id);
@@ -73,9 +105,7 @@ export const StudentManagement: React.FC = () => {
   };
 
   React.useEffect(() => {
-    StorageRLSLayer.syncWithServer().then(() => {
-      setLearners(StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL));
-    });
+    refreshList();
   }, []);
 
   // Helper to get active subscription info for any learner
@@ -103,7 +133,23 @@ export const StudentManagement: React.FC = () => {
         sub: pending
       };
     }
-    return { isActive: false, isPending: false, tier: 'FREE' };
+
+    // Auto-Grant 60-day Concept Booster pass for registered learners
+    const targetLearner = learners.find(l => l.id === learnerId);
+    const createdAtMs = targetLearner?.createdAt ? new Date(targetLearner.createdAt).getTime() : Date.now();
+    const defaultExpiryMs = createdAtMs + 60 * 24 * 60 * 60 * 1000;
+    const msLeft = defaultExpiryMs - Date.now();
+    const daysLeft = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+    if (daysLeft > 0) {
+      return {
+        isActive: true,
+        tier: 'LITE' as const,
+        daysLeft,
+        expiresAt: new Date(defaultExpiryMs).toISOString()
+      };
+    }
+
+    return { isActive: false, isPending: false, tier: 'EXPIRED' };
   };
 
   // One-Click Quick Grant
@@ -474,12 +520,25 @@ export const StudentManagement: React.FC = () => {
                               UTR: {subInfo.sub?.utrReference || 'Submitted'}
                             </p>
                           </div>
+                        ) : subInfo.isActive ? (
+                          <div>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              subInfo.tier === 'PLUS'
+                                ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
+                                : 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/20'
+                            }`}>
+                              {subInfo.tier === 'PLUS' ? 'PLUS Active' : 'Concept Booster'} ({subInfo.daysLeft}d left)
+                            </span>
+                            <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                              Exp: {subInfo.expiresAt ? new Date(subInfo.expiresAt).toLocaleDateString() : 'Active'}
+                            </p>
+                          </div>
                         ) : (
                           <div>
                             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
-                              Free Tier
+                              Pass Expired
                             </span>
-                            <p className="text-[10px] text-slate-500 mt-0.5">Standard Allowance</p>
+                            <p className="text-[10px] text-slate-500 mt-0.5">Needs Renewal</p>
                           </div>
                         )}
                       </td>
@@ -490,8 +549,8 @@ export const StudentManagement: React.FC = () => {
                           <Coins className="w-3.5 h-3.5 text-amber-400" />
                           <span>{learner.coinBalance.toLocaleString()} Coins</span>
                         </div>
-                        <p className="text-[10px] text-slate-400 font-mono mt-0.5">
-                          {learner.quizzesCompletedCount}/25 Quizzes • {learner.levelsCompletedCount}/3 Levels
+                        <p className="text-[10px] text-emerald-400 font-mono mt-0.5">
+                          Unlimited Quizzes (60d Pass) • {learner.quizzesCompletedCount} Done
                         </p>
                         <p className="text-[10px] text-slate-500 font-mono">Streak: {learner.currentStreakDays}d</p>
                       </td>
@@ -882,9 +941,9 @@ export const StudentManagement: React.FC = () => {
 
                 <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] text-slate-400 block">Free Tier Usage Meter</span>
+                    <span className="text-[11px] text-slate-400 block">Quiz Engine Usage (Unlimited Pass)</span>
                     <span className="text-xs font-mono font-bold text-white">
-                      {controllingLearner.quizzesCompletedCount} Quizzes • {controllingLearner.levelsCompletedCount} Levels
+                      {controllingLearner.quizzesCompletedCount} Quizzes Completed • {controllingLearner.levelsCompletedCount} Levels Mastered
                     </span>
                   </div>
                   <button

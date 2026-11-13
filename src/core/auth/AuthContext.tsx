@@ -184,6 +184,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     StorageRLSLayer.saveLearner(newLearner, learnerId);
+
+    // Auto-grant 60 Days of Unlimited Quizzes (Concept Booster / LITE Plan)
+    const subExpiresAt = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString();
+    StorageRLSLayer.saveSubscription({
+      id: 'sub_reg_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6),
+      learnerId,
+      planTier: 'LITE',
+      status: 'ACTIVE',
+      paymentMethod: 'CONCEPT_BOOSTER_AUTO',
+      amountInr: 49,
+      durationDays: 60,
+      startsAt: new Date().toISOString(),
+      expiresAt: subExpiresAt,
+      verifiedByAdmin: 'SYSTEM_AUTO',
+      verifiedAt: new Date().toISOString(),
+      invoiceNumber: 'INV-WELCOME-' + Math.floor(100000 + Math.random() * 900000),
+      createdAt: new Date().toISOString()
+    });
+
+    (newLearner as any).hasActiveSubscription = true;
+    (newLearner as any).activePlan = 'LITE';
+    (newLearner as any).planTier = 'LITE';
+    (newLearner as any).subscriptionExpiresAt = subExpiresAt;
+
     StorageRLSLayer.setSession({
       learnerId: newLearner.id,
       email: newLearner.email,

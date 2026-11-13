@@ -42,13 +42,13 @@ export const PaywallGateModal: React.FC<PaywallGateModalProps> = ({
             <Zap className="w-7 h-7" />
           </div>
           <span className="block text-xs font-mono font-semibold uppercase tracking-wider text-amber-400 mb-1">
-            Free Tier Quota Limit Reached
+            Plan Upgrade & Renewal
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             Unlock Unlimited K-12 Mastery
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto mt-2">
-            {reason || `You have completed your complimentary allowance (${quizzesCompleted}/25 quizzes or ${levelsCompleted}/3 levels).`}
+            {reason || 'Your 60-Day Concept Booster pass has ended. Upgrade to continue unlimited quizzes and verified certificates.'}
             <br />
             <span className="text-slate-400">
               Your certificates, coin balance, and profile remain 100% safe.

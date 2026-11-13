@@ -96,7 +96,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               {quota.hasActiveSubscription && (
                 <span className="px-2.5 py-1 bg-emerald-500/30 backdrop-blur-md rounded-full text-[10px] font-bold text-white flex items-center space-x-1">
                   <CheckCircle2 className="w-3 h-3" />
-                  <span>{quota.activePlan} Scholar Active</span>
+                  <span>{quota.activePlan === 'LITE' ? 'Concept Booster (60d)' : `${quota.activePlan} Scholar`} Active</span>
                 </span>
               )}
             </div>
@@ -322,12 +322,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div>
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
               <Zap className="w-4 h-4 text-amber-400" />
-              <span>{quota.hasActiveSubscription ? `${quota.activePlan} Scholar Status` : 'Subscription & Free Tier Quota Engine'}</span>
+              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'LITE' ? 'Concept Booster Status' : `${quota.activePlan} Scholar Status`) : 'Subscription & Quota Engine'}</span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
               {quota.hasActiveSubscription
-                ? `${quota.activePlan} Plan Active • Unlimited Access (${quota.daysRemaining} days remaining)`
-                : 'Free Tier strictly capped at 25 quizzes OR 3 course levels.'}
+                ? (quota.activePlan === 'LITE'
+                    ? `Concept Booster Active • 60 Days Unlimited Quizzes (${quota.daysRemaining} days remaining)`
+                    : `${quota.activePlan} Plan Active • Unlimited Access (${quota.daysRemaining} days remaining)`)
+                : '60-Day Concept Booster pass expired. Upgrade to continue unlimited quizzes.'}
             </p>
           </div>
 
@@ -352,7 +354,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <div className="flex justify-between items-center text-xs mb-2">
               <span className="text-slate-400">Quizzes Completed</span>
               <span className="font-mono font-bold text-white">
-                {quota.quizzesCompleted} / {quota.hasActiveSubscription ? '∞' : quota.maxQuizzes}
+                {quota.quizzesCompleted} / {quota.hasActiveSubscription ? '∞ (Unlimited Pass)' : quota.maxQuizzes}
               </span>
             </div>
             <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
@@ -379,7 +381,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <span className="text-[10px] text-slate-500 font-mono">5 quizzes = 1 level</span>
               </div>
               <span className="font-mono font-bold text-white">
-                {quota.levelsCompleted} / {quota.hasActiveSubscription ? '∞' : quota.maxLevels}
+                {quota.levelsCompleted} / {quota.hasActiveSubscription ? '∞ (All Levels Unlocked)' : quota.maxLevels}
               </span>
             </div>
             <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
