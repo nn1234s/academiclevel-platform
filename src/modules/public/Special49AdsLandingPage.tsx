@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
+import { PaymentService } from '../../services/paymentService';
 import { UPIQRCheckout } from '../student/UPIQRCheckout';
 import { CLASS_THEMES } from '../../core/theme/classThemes';
 import { Grade, Board } from '../../core/types';
@@ -342,6 +343,16 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
         const session = StorageRLSLayer.getCurrentSession();
         if (session) {
           setCreatedLearnerId(session.learnerId);
+
+          // Auto-register pending payment intent so the student IMMEDIATELY appears in
+          // the Admin's "PAID PAYMENT people" verification queue under "To Tick"
+          PaymentService.submitUpiPayment(
+            session.learnerId,
+            'LITE',
+            emailOrPhone.trim().includes('@') ? emailOrPhone.trim() : `${emailOrPhone.replace(/[^0-9]/g, '') || '9861439460'}@upi`,
+            undefined
+          ).catch(err => console.warn('Payment intent registration warning:', err));
+
           setIsModalOpen(false);
           setShowUpiCheckout(true);
         } else {

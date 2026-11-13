@@ -21,17 +21,39 @@ export class QuotaService {
   /**
    * Checks whether the learner has an active verified subscription.
    */
-  public static getActiveSubscription(learnerId: string): Subscription | null {
+  public static getActiveSubscription(learnerId: string, email?: string, phone?: string): Subscription | null {
     const subs = StorageRLSLayer.getSubscriptionsForLearner(learnerId, learnerId);
     const now = Date.now();
-    return (
-      subs.find(
-        s =>
-          s.status === 'ACTIVE' &&
-          s.expiresAt &&
-          new Date(s.expiresAt).getTime() > now
-      ) || null
+    const primary = subs.find(
+      s =>
+        s.status === 'ACTIVE' &&
+        s.expiresAt &&
+        new Date(s.expiresAt).getTime() > now
     );
+    if (primary) return primary;
+
+    // Fallback: check all local subscriptions for matching phone, email, or UPI identifier
+    try {
+      const allSubs = StorageRLSLayer.getAllCachedSubscriptions();
+      const cleanPhone = phone ? phone.replace(/[^0-9]/g, '').slice(-10) : '';
+      const cleanEmail = email ? email.trim().toLowerCase() : '';
+      const emailPrefix = cleanEmail.split('@')[0] || '';
+
+      const matched = allSubs.find(s => {
+        if (s.status !== 'ACTIVE' || !s.expiresAt || new Date(s.expiresAt).getTime() <= now) return false;
+        if (s.learnerId === learnerId) return true;
+        if (cleanEmail && s.learnerId.toLowerCase() === cleanEmail) return true;
+        if (cleanPhone && s.learnerId.includes(cleanPhone)) return true;
+        if (cleanPhone && s.payerUpiId && s.payerUpiId.includes(cleanPhone)) return true;
+        if (emailPrefix && s.payerUpiId && s.payerUpiId.toLowerCase().includes(emailPrefix)) return true;
+        if (cleanPhone && s.utrReference && s.utrReference.includes(cleanPhone)) return true;
+        return false;
+      });
+
+      if (matched) return matched;
+    } catch {}
+
+    return null;
   }
 
   /**
@@ -53,7 +75,28 @@ export class QuotaService {
       };
     }
 
-    const activeSub = this.getActiveSubscription(learner.id);
+    // Direct check: Has active subscription already attached to learner object
+    const anyLearner = learner as any;
+    if (anyLearner.hasActiveSubscription || anyLearner.activeSub || (anyLearner.activePlan && anyLearner.activePlan !== 'FREE')) {
+      const sub = anyLearner.activeSub;
+      const plan = anyLearner.activePlan || sub?.planTier || anyLearner.planTier || 'PLUS';
+      const expiresAt = anyLearner.subscriptionExpiresAt || sub?.expiresAt || new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString();
+      const msLeft = new Date(expiresAt).getTime() - Date.now();
+      const daysRemaining = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+      return {
+        isLocked: false,
+        quizzesCompleted: learner.quizzesCompletedCount,
+        maxQuizzes: Infinity,
+        levelsCompleted: learner.levelsCompletedCount,
+        maxLevels: Infinity,
+        hasActiveSubscription: true,
+        activePlan: plan as any,
+        expiresAt,
+        daysRemaining
+      };
+    }
+
+    const activeSub = this.getActiveSubscription(learner.id, learner.email, learner.phone);
 
     if (activeSub && activeSub.expiresAt) {
       const msLeft = new Date(activeSub.expiresAt).getTime() - Date.now();

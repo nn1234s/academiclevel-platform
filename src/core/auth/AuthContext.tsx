@@ -32,31 +32,85 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentLearner, setCurrentLearner] = useState<Learner | null>(null);
 
   useEffect(() => {
-    // Check existing session after syncing with server database
-    StorageRLSLayer.syncWithServer().then(async () => {
+    const hydrateAndSyncSession = async () => {
+      // First attempt to read local session for zero-flicker startup
       const session = StorageRLSLayer.getCurrentSession();
       if (session && session.learnerId) {
+        const localLearner = StorageRLSLayer.getLearnerById(session.learnerId, session.learnerId);
+        if (localLearner) {
+          setCurrentLearner(localLearner);
+        }
+
+        // Live check with backend SQLite database
         try {
           const studentData = await ApiClient.getStudent(session.learnerId);
-          if (studentData.success && studentData.activeSub) {
-            StorageRLSLayer.saveSubscription(studentData.activeSub);
+          if (studentData.success && studentData.learner) {
+            if (studentData.activeSub) {
+              StorageRLSLayer.saveSubscription(studentData.activeSub);
+              studentData.learner.hasActiveSubscription = true;
+              studentData.learner.activePlan = studentData.activeSub.planTier;
+              studentData.learner.subscriptionExpiresAt = studentData.activeSub.expiresAt;
+              (studentData.learner as any).activeSub = studentData.activeSub;
+            }
+            StorageRLSLayer.saveLearner(studentData.learner, studentData.learner.id);
+            setCurrentLearner(studentData.learner);
           }
         } catch {}
-        const learner = StorageRLSLayer.getLearnerById(session.learnerId, session.learnerId);
-        if (learner) {
-          setCurrentLearner(learner);
-        }
       }
+
+      // Background server storage sync (for admins)
+      StorageRLSLayer.syncWithServer().catch(() => {});
+    };
+
+    hydrateAndSyncSession();
+
+    // Re-verify immediately on window/tab focus
+    const onFocusOrVisible = () => {
+      const session = StorageRLSLayer.getCurrentSession();
+      if (session && session.learnerId) {
+        ApiClient.getStudent(session.learnerId).then(studentData => {
+          if (studentData.success && studentData.learner) {
+            if (studentData.activeSub) {
+              StorageRLSLayer.saveSubscription(studentData.activeSub);
+              studentData.learner.hasActiveSubscription = true;
+              studentData.learner.activePlan = studentData.activeSub.planTier;
+              studentData.learner.subscriptionExpiresAt = studentData.activeSub.expiresAt;
+              (studentData.learner as any).activeSub = studentData.activeSub;
+            }
+            StorageRLSLayer.saveLearner(studentData.learner, studentData.learner.id);
+            setCurrentLearner(studentData.learner);
+          }
+        }).catch(() => {});
+      }
+    };
+
+    window.addEventListener('focus', onFocusOrVisible);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') onFocusOrVisible();
     });
+
+    // Auto-poll every 12 seconds so admin manual grants reflect immediately on the student's screen
+    const interval = setInterval(onFocusOrVisible, 12000);
+
+    return () => {
+      window.removeEventListener('focus', onFocusOrVisible);
+      clearInterval(interval);
+    };
   }, []);
 
   const refreshCurrentLearner = async () => {
-    if (currentLearner) {
+    const session = StorageRLSLayer.getCurrentSession();
+    const targetId = currentLearner?.id || session?.learnerId;
+    if (targetId) {
       try {
-        const res = await ApiClient.getStudent(currentLearner.id);
+        const res = await ApiClient.getStudent(targetId);
         if (res.success && res.learner) {
           if (res.activeSub) {
             StorageRLSLayer.saveSubscription(res.activeSub);
+            res.learner.hasActiveSubscription = true;
+            res.learner.activePlan = res.activeSub.planTier;
+            res.learner.subscriptionExpiresAt = res.activeSub.expiresAt;
+            (res.learner as any).activeSub = res.activeSub;
           }
           StorageRLSLayer.saveLearner(res.learner, res.learner.id);
           setCurrentLearner({ ...res.learner });
@@ -65,7 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch {
         // Fallback to local storage
       }
-      const updated = StorageRLSLayer.getLearnerById(currentLearner.id, currentLearner.id);
+      const updated = StorageRLSLayer.getLearnerById(targetId, targetId);
       if (updated) {
         setCurrentLearner({ ...updated });
       }
@@ -200,10 +254,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (res.token && typeof window !== 'undefined') {
           try { localStorage.setItem('al_student_token', res.token); } catch {}
         }
+        if (res.activeSub) {
+          StorageRLSLayer.saveSubscription(res.activeSub);
+          res.learner.hasActiveSubscription = true;
+          res.learner.activePlan = res.activeSub.planTier;
+          res.learner.subscriptionExpiresAt = res.activeSub.expiresAt;
+          (res.learner as any).activeSub = res.activeSub;
+        }
         try {
           const studentData = await ApiClient.getStudent(res.learner.id);
           if (studentData.success && studentData.activeSub) {
             StorageRLSLayer.saveSubscription(studentData.activeSub);
+            res.learner.hasActiveSubscription = true;
+            res.learner.activePlan = studentData.activeSub.planTier;
+            res.learner.subscriptionExpiresAt = studentData.activeSub.expiresAt;
+            (res.learner as any).activeSub = studentData.activeSub;
           }
         } catch {}
         StorageRLSLayer.saveLearner(res.learner, res.learner.id);

@@ -77,14 +77,14 @@ export class ApiClient {
     });
   }
 
-  public static async login(email: string, password?: string): Promise<{ success: boolean; learner: Learner; token: string }> {
+  public static async login(email: string, password?: string): Promise<{ success: boolean; learner: Learner; token: string; activeSub?: Subscription | null }> {
     return this.request('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password })
     });
   }
 
-  public static async getMe(learnerId?: string, email?: string): Promise<{ success: boolean; learner: Learner }> {
+  public static async getMe(learnerId?: string, email?: string): Promise<{ success: boolean; learner: Learner; activeSub?: Subscription | null }> {
     const query = learnerId ? `?learnerId=${encodeURIComponent(learnerId)}` : `?email=${encodeURIComponent(email || '')}`;
     return this.request(`/auth/me${query}`);
   }

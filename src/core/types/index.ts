@@ -24,6 +24,11 @@ export interface Learner {
   // Quota & Gate enforcement
   quizzesCompletedCount: number;
   levelsCompletedCount: number;
+  hasActiveSubscription?: boolean;
+  activePlan?: 'LITE' | 'PLUS' | 'TRIAL' | null;
+  subscriptionExpiresAt?: string | null;
+  subscriptionId?: string | null;
+  activeSub?: any;
 
   // Class Change Governance
   classChangesUsedPremium: number; // Max 1 during active premium
