@@ -3,6 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import { apiRouter } from './api.js';
+import { db } from './db.js';
+import { pullAllFromTurso, pushAllToTurso, startPeriodicSync, TURSO_CONFIG } from './tursoClient.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -82,12 +84,35 @@ if (fs.existsSync(DIST_PATH)) {
 export { app };
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  app.listen(PORT, '0.0.0.0', () => {
+  app.listen(PORT, '0.0.0.0', async () => {
     console.log(`====================================================`);
     console.log(`🚀 ACADEMICLEVEL ENTERPRISE SERVER RUNNING`);
     console.log(`🔗 Local Address: http://localhost:${PORT}/`);
-    console.log(`📦 Database: SQLite ACID (server/data/academiclevel_prod.db)`);
+    console.log(`📦 Database: SQLite Engine + Turso Cloud Persistence`);
+    console.log(`☁️ Turso DB: ${TURSO_CONFIG.url || 'Not configured'}`);
     console.log(`🛡️ Super-Admin Route: /adminservice (Protected)`);
     console.log(`====================================================`);
+
+    // Synchronize latest records from Turso Cloud Database
+    try {
+      await pullAllFromTurso(db);
+      startPeriodicSync(db, 60000);
+    } catch (syncErr) {
+      console.warn('[Turso Boot Sync Warning]:', syncErr.message);
+    }
   });
+
+  // Graceful shutdown: flush records to Turso on SIGTERM/SIGINT before container exits
+  const handleShutdown = async (signal) => {
+    console.log(`[Shutdown] ${signal} received. Flushing records to Turso cloud...`);
+    try {
+      await pushAllToTurso(db);
+      console.log('[Shutdown] Cloud sync complete.');
+    } catch (err) {
+      console.warn('[Shutdown Sync Warning]:', err.message);
+    }
+    process.exit(0);
+  };
+  process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+  process.on('SIGINT', () => handleShutdown('SIGINT'));
 }
