@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Board, Grade } from '../../core/types';
 import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
@@ -18,6 +18,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 }) => {
   const { registerStudent, loginStudent, loginSuperAdmin } = useAuth();
   const [mode, setMode] = useState<'REGISTER' | 'LOGIN'>(initialMode);
+
+  useEffect(() => {
+    setMode(initialMode);
+    setErrorMessage('');
+    setCaptchaVerified(false);
+    setCaptchaError(false);
+  }, [initialMode, isOpen]);
 
   // Form fields
   const [fullName, setFullName] = useState('');
@@ -116,7 +123,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </h2>
           <p className="text-xs text-slate-400 mt-1">
             {mode === 'REGISTER'
-              ? 'Starts with 25 free quizzes & full board syllabus coverage.'
+              ? 'Includes automatic 60-Day Concept Booster Pass with unlimited syllabus practice.'
               : 'Enter your email & password to access your scholar workspace.'}
           </p>
         </div>
@@ -291,7 +298,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 }}
                 className="text-indigo-400 hover:text-indigo-300 font-bold underline"
               >
-                Create Free Account
+                Claim 60-Day Booster Pass
               </button>
             </p>
           )}

@@ -202,16 +202,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             href="/special49"
             className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-2xl shadow-xl shadow-orange-950 transition-all flex items-center justify-center space-x-2 hover:scale-[1.02] cursor-pointer"
           >
-            <span>Claim 10-Day Breakthrough (₹49)</span>
+            <span>Claim 60-Day Breakthrough (₹49)</span>
             <ArrowRight className="w-4 h-4 text-slate-950" />
           </a>
 
-          <a
-            href="/special49"
-            className="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 hover:border-slate-700 font-bold text-sm rounded-2xl transition-all flex items-center justify-center cursor-pointer"
+          <button
+            onClick={() => onOpenAuth('LOGIN')}
+            className="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700 hover:border-slate-500 font-bold text-sm rounded-2xl transition-all flex items-center justify-center cursor-pointer shadow-sm"
           >
-            Sign In / Quick Enroll
-          </a>
+            Sign In (Existing User)
+          </button>
         </div>
 
         {/* Trust Points */}
@@ -244,7 +244,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                Master Core Concepts in <span className="text-amber-400">10 Days</span>
+                Master Core Concepts in <span className="text-amber-400">60 Days</span>
               </h2>
 
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
@@ -254,8 +254,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {/* 3 Pillars */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                 <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
-                  <div className="text-amber-400 font-black text-sm">10 Days</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">Breakthrough Sprint</div>
+                  <div className="text-amber-400 font-black text-sm">60 Days</div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">Concept Booster Pass</div>
                 </div>
                 <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
                   <div className="text-indigo-400 font-black text-sm">Autonomous AI</div>

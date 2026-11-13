@@ -418,10 +418,13 @@ export const App: React.FC = () => {
               {!isAuthenticated ? (
                 <>
                   <button
-                    onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
-                    className="hidden sm:inline-block text-xs font-bold text-slate-300 hover:text-white px-3 py-2 rounded-xl cursor-pointer"
+                    onClick={() => {
+                      setAuthModalMode('LOGIN');
+                      setAuthModalOpen(true);
+                    }}
+                    className="hidden sm:inline-flex items-center text-xs font-bold text-indigo-300 hover:text-white px-3.5 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 transition-all cursor-pointer"
                   >
-                    Log In
+                    Sign In (Existing User)
                   </button>
                   <button
                     onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
@@ -481,6 +484,16 @@ export const App: React.FC = () => {
           <div className="md:hidden bg-slate-900 border-b border-slate-800 p-4 space-y-2 text-xs font-semibold">
             {!isAuthenticated ? (
               <>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setAuthModalMode('LOGIN');
+                    setAuthModalOpen(true);
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-indigo-300 font-bold bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20"
+                >
+                  Sign In (Existing User)
+                </button>
                 <button
                   onClick={() => navigateTo('HOME')}
                   className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"

@@ -44,7 +44,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, onOpenRe
               <span className="text-xs text-slate-400">/ 60 days (Save 90%)</span>
             </div>
             <p className="text-xs text-slate-300 mb-6 leading-relaxed">
-              10-day breakthrough sprint with uninterrupted CBSE, ICSE, and IGCSE syllabus coverage.
+              60-day concept booster pass with uninterrupted CBSE, ICSE, and IGCSE syllabus coverage.
             </p>
             <ul className="space-y-2.5 text-xs text-slate-300">
               {PLAN_PRICING.LITE.features.map((f, i) => (
