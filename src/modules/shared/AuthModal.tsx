@@ -8,12 +8,14 @@ import { ReCaptchaWidget } from './ReCaptchaWidget';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: (mode: 'REGISTER' | 'LOGIN') => void;
   initialMode?: 'REGISTER' | 'LOGIN';
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
+  onSuccess,
   initialMode = 'REGISTER',
 }) => {
   const { registerStudent, loginStudent, loginSuperAdmin } = useAuth();
@@ -74,6 +76,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       });
       setIsSubmitting(false);
       if (res.success) {
+        onSuccess?.('REGISTER');
         onClose();
       } else {
         setErrorMessage(res.error || 'Registration failed.');
@@ -84,6 +87,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       if (cleanEmail === SUPER_ADMIN_EMAIL.toLowerCase() || StorageRLSLayer.isAdminAuthorized(cleanEmail)) {
         loginSuperAdmin(cleanEmail);
         setIsSubmitting(false);
+        onSuccess?.('LOGIN');
         onClose();
         return;
       }
@@ -97,6 +101,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       const res = await loginStudent(cleanEmail, password);
       setIsSubmitting(false);
       if (res.success) {
+        onSuccess?.('LOGIN');
         onClose();
       } else {
         setErrorMessage(res.error || 'Login failed.');
@@ -129,9 +134,37 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {errorMessage && (
-          <div className="mb-4 p-3 bg-red-950/40 border border-red-800 rounded-xl text-xs text-red-300 flex items-center space-x-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
-            <span>{errorMessage}</span>
+          <div className="mb-4 p-3 bg-red-950/40 border border-red-800 rounded-xl text-xs text-red-300 space-y-2">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
+              <span>{errorMessage}</span>
+            </div>
+            {mode === 'REGISTER' && errorMessage.toLowerCase().includes('already exists') && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('LOGIN');
+                  setErrorMessage('');
+                  setPassword('');
+                }}
+                className="w-full py-1.5 px-3 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 rounded-lg text-indigo-300 font-semibold text-center block transition-colors"
+              >
+                Account already registered? Click here to Log In
+              </button>
+            )}
+            {mode === 'LOGIN' && errorMessage.toLowerCase().includes('no student account') && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('REGISTER');
+                  setErrorMessage('');
+                  setPassword('');
+                }}
+                className="w-full py-1.5 px-3 bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 rounded-lg text-indigo-300 font-semibold text-center block transition-colors"
+              >
+                No account yet? Click here to Register
+              </button>
+            )}
           </div>
         )}
 
@@ -265,7 +298,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             disabled={isSubmitting}
             className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-1.5 mt-2"
           >
-            <span>{isSubmitting ? 'Verifying...' : mode === 'REGISTER' ? 'Register & Start (25 Free Quizzes)' : 'Login to Workspace'}</span>
+            <span>{isSubmitting ? 'Verifying...' : mode === 'REGISTER' ? 'Register & Claim 60-Day Pass (Unlimited Quizzes)' : 'Login to Workspace'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>

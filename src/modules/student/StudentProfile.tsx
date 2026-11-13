@@ -13,16 +13,18 @@ import {
   Lock,
   Unlock,
   Eye,
-  EyeOff
+  EyeOff,
+  LogOut
 } from 'lucide-react';
 
 interface StudentProfileProps {
   learner: Learner;
   onRefreshLearner: () => void;
+  onLogout?: () => void;
 }
 
-export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefreshLearner }) => {
-  const { updateActiveGrade } = useAuth();
+export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefreshLearner, onLogout }) => {
+  const { updateActiveGrade, logout } = useAuth();
   const [selectedGrade, setSelectedGrade] = useState<Grade>(learner.grade);
   const [classChangeMessage, setClassChangeMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -77,9 +79,22 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
           </div>
         </div>
 
-        <div className="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-center min-w-[130px]">
-          <span className="text-[10px] text-slate-500 uppercase font-mono block">Enrolled Class</span>
-          <span className="text-2xl font-black text-white">Class {learner.grade}</span>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-center min-w-[130px]">
+            <span className="text-[10px] text-slate-500 uppercase font-mono block">Enrolled Class</span>
+            <span className="text-2xl font-black text-white">Class {learner.grade}</span>
+          </div>
+          <button
+            onClick={() => {
+              if (onLogout) onLogout();
+              else logout();
+            }}
+            className="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-semibold rounded-xl transition-all flex items-center space-x-1.5"
+            title="Sign out of your student account"
+          >
+            <LogOut className="w-3.5 h-3.5 text-rose-400" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </div>
 
