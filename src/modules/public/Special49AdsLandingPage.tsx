@@ -36,6 +36,7 @@ import { PaymentService } from '../../services/paymentService';
 import { UPIQRCheckout } from '../student/UPIQRCheckout';
 import { CLASS_THEMES } from '../../core/theme/classThemes';
 import { Grade, Board } from '../../core/types';
+import { ReCaptchaWidget } from '../shared/ReCaptchaWidget';
 
 export interface Special49AdsLandingPageProps {
   onSuccessRegistered: () => void;
@@ -279,6 +280,8 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const [parentName, setParentName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [captchaError, setCaptchaError] = useState(false);
 
   // Payment checkout modal state
   const [showUpiCheckout, setShowUpiCheckout] = useState(false);
@@ -312,6 +315,12 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const handleEnrollSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+
+    if (!captchaVerified) {
+      setErrorMessage('Please verify that you are not a robot before proceeding.');
+      setCaptchaError(true);
+      return;
+    }
 
     if (!studentName.trim()) {
       setErrorMessage('Please enter student full name.');
@@ -1152,6 +1161,23 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   value={parentName}
                   onChange={e => setParentName(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00]"
+                />
+              </div>
+
+              {/* Authentic reCAPTCHA v2 Widget */}
+              <div className="pt-2">
+                <ReCaptchaWidget
+                  isVerified={captchaVerified}
+                  onVerify={verified => {
+                    setCaptchaVerified(verified);
+                    if (verified) {
+                      setCaptchaError(false);
+                      if (errorMessage.includes('robot')) {
+                        setErrorMessage('');
+                      }
+                    }
+                  }}
+                  hasError={captchaError}
                 />
               </div>
 

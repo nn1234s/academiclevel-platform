@@ -3,6 +3,7 @@ import { Board, Grade } from '../../core/types';
 import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
 import { X, Sparkles, Lock, ArrowRight, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { ReCaptchaWidget } from './ReCaptchaWidget';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -30,12 +31,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [referralCode, setReferralCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [captchaError, setCaptchaError] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+
+    if (!captchaVerified) {
+      setErrorMessage('Please verify that you are not a robot before proceeding.');
+      setCaptchaError(true);
+      return;
+    }
+
     setIsSubmitting(true);
 
     if (mode === 'REGISTER') {
@@ -226,6 +236,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </>
           )}
 
+          {/* Authentic reCAPTCHA v2 Checkbox Widget */}
+          <div className="pt-2 pb-1">
+            <ReCaptchaWidget
+              isVerified={captchaVerified}
+              onVerify={verified => {
+                setCaptchaVerified(verified);
+                if (verified) {
+                  setCaptchaError(false);
+                  if (errorMessage.includes('robot')) {
+                    setErrorMessage('');
+                  }
+                }
+              }}
+              hasError={captchaError}
+            />
+          </div>
+
           <button
             type="submit"
             disabled={isSubmitting}
@@ -244,6 +271,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 onClick={() => {
                   setMode('LOGIN');
                   setErrorMessage('');
+                  setCaptchaVerified(false);
+                  setCaptchaError(false);
                 }}
                 className="text-indigo-400 hover:text-indigo-300 font-bold underline"
               >
@@ -257,6 +286,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 onClick={() => {
                   setMode('REGISTER');
                   setErrorMessage('');
+                  setCaptchaVerified(false);
+                  setCaptchaError(false);
                 }}
                 className="text-indigo-400 hover:text-indigo-300 font-bold underline"
               >
