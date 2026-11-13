@@ -313,12 +313,12 @@ export const App: React.FC = () => {
                     Curriculum
                   </button>
                   <button
-                    onClick={() => navigateTo('PRICING')}
+                    onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
                     className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'PRICING' ? 'text-indigo-400 font-bold' : 'text-slate-300 hover:text-white'
+                      currentRoute === 'SPECIAL_49_FUNNEL' ? 'text-amber-400 font-bold' : 'text-slate-300 hover:text-white'
                     }`}
                   >
-                    Pricing
+                    Special ₹49 Offer
                   </button>
                   <button
                     onClick={() => navigateTo('ABOUT')}
@@ -417,22 +417,16 @@ export const App: React.FC = () => {
               {!isAuthenticated ? (
                 <>
                   <button
-                    onClick={() => {
-                      setAuthModalMode('LOGIN');
-                      setAuthModalOpen(true);
-                    }}
-                    className="hidden sm:inline-block text-xs font-bold text-slate-300 hover:text-white px-3 py-2 rounded-xl"
+                    onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
+                    className="hidden sm:inline-block text-xs font-bold text-slate-300 hover:text-white px-3 py-2 rounded-xl cursor-pointer"
                   >
                     Log In
                   </button>
                   <button
-                    onClick={() => {
-                      setAuthModalMode('REGISTER');
-                      setAuthModalOpen(true);
-                    }}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all"
+                    onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
+                    className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-orange-950 transition-all cursor-pointer"
                   >
-                    Start Free (25 Quizzes)
+                    Special ₹49 Offer
                   </button>
                 </>
               ) : (
@@ -499,10 +493,10 @@ export const App: React.FC = () => {
                   Curriculum & Boards
                 </button>
                 <button
-                  onClick={() => navigateTo('PRICING')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
+                  onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
+                  className="w-full text-left p-2.5 rounded-xl text-amber-400 font-bold hover:bg-slate-800"
                 >
-                  Pricing
+                  Special ₹49 Offer
                 </button>
                 <button
                   onClick={() => navigateTo('ABOUT')}

@@ -198,20 +198,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         {/* Action CTAs */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button
-            onClick={() => onOpenAuth('REGISTER')}
+          <a
+            href="/special49"
             className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-2xl shadow-xl shadow-orange-950 transition-all flex items-center justify-center space-x-2 hover:scale-[1.02] cursor-pointer"
           >
-            <span>Join for Free (25 Free Quizzes)</span>
+            <span>Claim 10-Day Breakthrough (₹49)</span>
             <ArrowRight className="w-4 h-4 text-slate-950" />
-          </button>
+          </a>
 
-          <button
-            onClick={() => onOpenAuth('LOGIN')}
-            className="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 hover:border-slate-700 font-bold text-sm rounded-2xl transition-all cursor-pointer"
+          <a
+            href="/special49"
+            className="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 hover:border-slate-700 font-bold text-sm rounded-2xl transition-all flex items-center justify-center cursor-pointer"
           >
-            Sign In to Workspace
-          </button>
+            Sign In / Quick Enroll
+          </a>
         </div>
 
         {/* Trust Points */}
@@ -299,19 +299,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               <div className="pt-2 space-y-2">
-                <button
-                  onClick={() => onOpenAuth('REGISTER')}
+                <a
+                  href="/special49"
                   className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-orange-950 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>Enroll Now (₹49)</span>
                   <ArrowRight className="w-4 h-4 text-slate-950" />
-                </button>
-                <button
-                  onClick={() => onExploreCourse(selectedBoard, selectedGrade)}
-                  className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-800 transition-colors"
+                </a>
+                <a
+                  href="/special49"
+                  className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-800 transition-colors flex items-center justify-center"
                 >
-                  Learn More
-                </button>
+                  Explore Breakthrough Curriculum
+                </a>
               </div>
             </div>
           </div>

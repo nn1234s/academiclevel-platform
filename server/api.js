@@ -62,10 +62,13 @@ function checkRateLimit(store, key, limit, windowMs) {
   return { allowed: true, remaining: limit - record.count };
 }
 
-// Global IP limiter: 400 requests / 15 min per IP
+// Global IP limiter: Generous 5,000 requests / 15 min per IP (bypasses localhost)
 apiRouter.use((req, res, next) => {
   const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '127.0.0.1';
-  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.global, clientIp, 400, 15 * 60 * 1000);
+  if (clientIp === '127.0.0.1' || clientIp === '::1' || clientIp.includes('127.0.0.1') || clientIp === 'localhost') {
+    return next();
+  }
+  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.global, clientIp, 5000, 15 * 60 * 1000);
   if (!allowed) {
     return res.status(429).json({
       success: false,
@@ -78,7 +81,10 @@ apiRouter.use((req, res, next) => {
 
 const authLimiter = (req, res, next) => {
   const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '127.0.0.1';
-  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.auth, clientIp, 20, 15 * 60 * 1000);
+  if (clientIp === '127.0.0.1' || clientIp === '::1' || clientIp.includes('127.0.0.1') || clientIp === 'localhost') {
+    return next();
+  }
+  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.auth, clientIp, 100, 15 * 60 * 1000);
   if (!allowed) {
     return res.status(429).json({
       success: false,
@@ -411,93 +417,58 @@ apiRouter.post('/auth/register', authLimiter, (req, res) => {
 });
 
 function getActiveSubscriptionForLearner(learner) {
-  if (!learner) return null;
-  const learnerPhone = (learner.phone || '').trim();
-  const phoneDigits = learnerPhone.replace(/[^0-9]/g, '');
-  const phone10 = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : '';
+  if (!learner || !learner.id) return null;
+  const learnerId = learner.id;
   const learnerEmail = (learner.email || '').trim().toLowerCase();
-  const normalizedEmail = learnerEmail.replace(/\.+@/, '@');
-  const emailPrefix = normalizedEmail.split('@')[0] || '';
+  const learnerPhone = (learner.phone || '').trim().replace(/[^0-9]/g, '');
 
-  const activeSub = db.prepare(`
-    SELECT s.* FROM subscriptions s
-    WHERE (
-      s.learnerId = ?
-      OR s.learnerId IN (
-        SELECT id FROM learners 
-        WHERE email = ? 
-           OR email = ? 
-           OR replace(email, '.@', '@') = ?
-           OR (phone IS NOT NULL AND phone != '' AND (phone = ? OR phone = ?))
-      )
-      OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
-      OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
-    )
-    AND s.status = 'ACTIVE' 
-    AND (s.expiresAt IS NULL OR datetime(s.expiresAt) > datetime('now'))
-    ORDER BY s.createdAt DESC LIMIT 1
-  `).get(
-    learner.id,
-    learnerEmail,
-    normalizedEmail,
-    normalizedEmail,
-    learnerPhone,
-    phone10,
-    phone10 || learnerPhone,
-    phone10 || learnerPhone,
-    emailPrefix,
-    emailPrefix
-  );
+  // 1. Direct subscription for this specific learnerId
+  let activeSub = db.prepare(`
+    SELECT * FROM subscriptions 
+    WHERE learnerId = ? 
+      AND status = 'ACTIVE' 
+      AND (expiresAt IS NULL OR datetime(expiresAt) > datetime('now'))
+    ORDER BY createdAt DESC LIMIT 1
+  `).get(learnerId);
 
-  if (activeSub && activeSub.learnerId !== learner.id) {
-    try {
-      db.prepare('UPDATE subscriptions SET learnerId = ? WHERE id = ?').run(learner.id, activeSub.id);
-      activeSub.learnerId = learner.id;
-    } catch {}
+  if (activeSub) return activeSub;
+
+  // 2. Specific verified legacy account aliases (Prabir & Special49 only)
+  if (learnerEmail === 'prabir2gmailc@gmail.com' || learnerEmail === 'prabir@gmail.com' || learnerId === 'lrn_mw9asujp_rzun' || learnerId === 'lrn_prabir_alias_norm') {
+    activeSub = db.prepare(`
+      SELECT * FROM subscriptions 
+      WHERE (learnerId = 'lrn_mw9asujp_rzun' OR learnerId = 'lrn_prabir_alias_norm')
+        AND status = 'ACTIVE' 
+        AND (expiresAt IS NULL OR datetime(expiresAt) > datetime('now'))
+      ORDER BY createdAt DESC LIMIT 1
+    `).get();
+    if (activeSub) return activeSub;
   }
 
-  return activeSub || null;
+  if (learnerPhone.endsWith('9861439460') || learnerEmail.includes('9861439460') || learnerId === 'lrn_special49_9861439460') {
+    activeSub = db.prepare(`
+      SELECT * FROM subscriptions 
+      WHERE learnerId = 'lrn_special49_9861439460'
+        AND status = 'ACTIVE' 
+        AND (expiresAt IS NULL OR datetime(expiresAt) > datetime('now'))
+      ORDER BY createdAt DESC LIMIT 1
+    `).get();
+    if (activeSub) return activeSub;
+  }
+
+  return null;
 }
 
 function getPendingSubscriptionForLearner(learner) {
-  if (!learner) return null;
-  const learnerPhone = (learner.phone || '').trim();
-  const phoneDigits = learnerPhone.replace(/[^0-9]/g, '');
-  const phone10 = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : '';
-  const learnerEmail = (learner.email || '').trim().toLowerCase();
-  const normalizedEmail = learnerEmail.replace(/\.+@/, '@');
-  const emailPrefix = normalizedEmail.split('@')[0] || '';
+  if (!learner || !learner.id) return null;
+  const learnerId = learner.id;
 
-  const pendingSub = db.prepare(`
-    SELECT s.* FROM subscriptions s
-    WHERE (
-      s.learnerId = ?
-      OR s.learnerId IN (
-        SELECT id FROM learners 
-        WHERE email = ? 
-           OR email = ? 
-           OR replace(email, '.@', '@') = ?
-           OR (phone IS NOT NULL AND phone != '' AND (phone = ? OR phone = ?))
-      )
-      OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
-      OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
-    )
-    AND s.status = 'PENDING_VERIFICATION'
-    ORDER BY s.createdAt DESC LIMIT 1
-  `).get(
-    learner.id,
-    learnerEmail,
-    normalizedEmail,
-    normalizedEmail,
-    learnerPhone,
-    phone10,
-    phone10 || learnerPhone,
-    phone10 || learnerPhone,
-    emailPrefix,
-    emailPrefix
-  );
-
-  return pendingSub || null;
+  return db.prepare(`
+    SELECT * FROM subscriptions 
+    WHERE learnerId = ? 
+      AND status = 'PENDING_VERIFICATION'
+    ORDER BY createdAt DESC LIMIT 1
+  `).get(learnerId) || null;
 }
 
 apiRouter.post('/auth/login', authLimiter, (req, res) => {
