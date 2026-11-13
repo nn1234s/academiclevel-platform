@@ -643,7 +643,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 </button>
 
                 <p className="text-[10px] text-center text-slate-500 font-medium">
-                  🔒 Safe 256-bit UPI Payment • Verified within 15–30 Mins (Instant with ACode)
+                  🔒 Safe 256-bit UPI Payment • Verified within 15–60 Mins (Instant with ACode Voucher)
                 </p>
               </div>
             </div>
@@ -985,7 +985,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               },
               {
                 q: 'How do I pay and how quickly is my account activated?',
-                a: 'Click "Claim Special 49 Offer (₹49)", register with your parent mobile or email, and pay via any UPI app (GPay, PhonePe, Paytm, BHIM) or QR scan. Submit your 12-digit UTR reference for swift human verification (usually within 15–30 minutes). If you have an authorized institutional ACode voucher, activation is instant.'
+                a: 'Click "Claim Special 49 Offer (₹49)", register with your parent mobile or email, and pay via any UPI app (GPay, PhonePe, Paytm, BHIM) or QR scan. Submit your 12-digit UTR reference for swift human verification (usually within 15–60 minutes). If you have an authorized institutional ACode voucher, activation is instant.'
               }
             ].map((faq, idx) => (
               <div key={idx} className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs">
@@ -1169,7 +1169,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       )}
 
       {/* ======================================================== */}
-      {/* MODAL 2: 1-CLICK INSTANT UPI QR CHECKOUT                */}
+      {/* MODAL 2: 1-CLICK UPI QR CHECKOUT                         */}
       {/* ======================================================== */}
       {showUpiCheckout && createdLearnerId && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">

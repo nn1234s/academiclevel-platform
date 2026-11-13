@@ -139,6 +139,12 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, onOpenRe
           </button>
         </div>
       </div>
+
+      {/* Trust & Verification Assurance */}
+      <div className="mt-8 p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-center max-w-xl mx-auto flex items-center justify-center space-x-2 text-xs text-slate-400">
+        <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+        <span>Verified UPI Payments • Human-verified within 15–60 minutes • 100% money-back guarantee if syllabus is not covered</span>
+      </div>
     </div>
   );
 };
