@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Policies & Privacy — AcademicLevel</title>
+  <link rel="icon" type="image/svg+xml" href="/vite.svg">
+  <style>
+    :root {
+      --primary-purple: #3b0764;
+      --header-bg: linear-gradient(135deg, #180928 0%, #2e1065 50%, #3b0764 100%);
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --card-bg: #ffffff;
+      --pill-bg: #eef2ff;
+      --pill-text: #4338ca;
+      --pill-hover: #e0e7ff;
+      --warning-bg: #fffbeb;
+      --warning-border: #fde68a;
+      --warning-text: #92400e;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: #f8fafc;
+      color: var(--text-main);
+      line-height: 1.65;
+    }
+    header {
+      background: var(--header-bg);
+      color: #ffffff;
+      padding: 3.5rem 1.5rem 3rem 1.5rem;
+    }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(8px);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.02em;
+    }
+    .badge span.star {
+      color: #fbbf24;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+      color: #ffffff;
+    }
+    .subtitle {
+      font-size: 1.1rem;
+      color: #e2e8f0;
+      max-width: 720px;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+    .main-container {
+      max-width: 900px;
+      margin: -1.5rem auto 3rem auto;
+      padding: 0 1rem;
+    }
+    .warning-banner {
+      background-color: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      color: var(--warning-text);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    }
+    .warning-banner strong {
+      color: #78350f;
+    }
+    .on-this-page {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    }
+    .on-this-page h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 1rem;
+    }
+    .pills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .pill {
+      background: var(--pill-bg);
+      color: var(--pill-text);
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s ease-in-out;
+      border: 1px solid transparent;
+    }
+    .pill:hover {
+      background: var(--pill-hover);
+      border-color: #c7d2fe;
+    }
+    .content-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 2.25rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+    }
+    .effective-date {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #64748b;
+      background: #f1f5f9;
+      padding: 0.35rem 0.85rem;
+      border-radius: 6px;
+      margin-bottom: 2rem;
+    }
+    .policy-section {
+      margin-bottom: 2.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #f1f5f9;
+    }
+    .policy-section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+    .policy-section h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .policy-section h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .policy-section p {
+      color: #334155;
+      font-size: 0.975rem;
+      margin-bottom: 0.85rem;
+    }
+    .policy-section ul {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+      color: #334155;
+      font-size: 0.975rem;
+    }
+    .policy-section li {
+      margin-bottom: 0.5rem;
+    }
+    .notice-box {
+      background: #f8fafc;
+      border-left: 4px solid #4f46e5;
+      padding: 0.85rem 1.15rem;
+      margin: 1.25rem 0;
+      font-size: 0.925rem;
+      color: #334155;
+      border-radius: 0 8px 8px 0;
+    }
+    .contact-box {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-top: 2rem;
+    }
+    .contact-box h3 {
+      font-size: 1.25rem;
+      color: #0f172a;
+      margin-bottom: 0.75rem;
+    }
+    footer {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      font-size: 0.875rem;
+      color: #64748b;
+      border-top: 1px solid var(--border-color);
+    }
+    a {
+      color: #4f46e5;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .back-nav {
+      margin-bottom: 1.5rem;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+    .back-link:hover {
+      color: #ffffff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="back-nav">
+        <a href="/" class="back-link">← Return to AcademicLevel</a>
+      </div>
+      <div class="badge">
+        <span class="star">A✦</span> AcademicLevel
+      </div>
+      <h1>Policies &amp; Privacy</h1>
+      <p class="subtitle">Clear information for learners, parents and teachers about using AcademicLevel, how information is handled, and how to contact us.</p>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="warning-banner">
+      <strong>Important for parents and guardians:</strong> AcademicLevel is designed for school-age learners. A parent or guardian should review these policies, supervise account use and any purchase, and contact us with questions about a child's information. This page describes our current product practices; it is not a certification of legal compliance.
+    </div>
+
+    <section class="on-this-page">
+      <h2>On this page</h2>
+      <div class="pills-grid">
+        <a href="#privacy" class="pill">Privacy policy</a>
+        <a href="#children" class="pill">Children &amp; student safety</a>
+        <a href="#terms" class="pill">Terms of use</a>
+        <a href="#acceptable" class="pill">Acceptable use</a>
+        <a href="#ai" class="pill">AI &amp; learning disclaimer</a>
+        <a href="#payments" class="pill">Premium, payments &amp; ACodes</a>
+        <a href="#rewards" class="pill">Coins &amp; rewards</a>
+        <a href="#refunds" class="pill">Refunds &amp; complaints</a>
+        <a href="#changes" class="pill">Policy changes</a>
+      </div>
+    </section>
+
+    <div class="content-card">
+      <div class="effective-date">
+        Privacy Policy · Effective date: 6 November 2026
+      </div>
+
+      <!-- Section 1 -->
+      <section id="privacy" class="policy-section">
+        <h2>1. Privacy Policy</h2>
+        <p>AcademicLevel ("AcademicLevel", "we", "us") provides online learning, quizzes, courses, an AI study assistant called Nova, learner profiles, learning points and optional paid plans. Contact: <a href="mailto:academiclevels@gmail.com">academiclevels@gmail.com</a>.</p>
+
+        <h3>Information the service processes</h3>
+        <ul>
+          <li><strong>Account and sign-in information:</strong> account identifiers and the email address made available by the sign-in service, to authenticate you and associate your learner profile with your account.</li>
+          <li><strong>Learner profile:</strong> the learner name you enter, selected class/grade, learning coins, completed levels, quiz count, course progress and Premium plan/expiry information.</li>
+          <li><strong>Learning and AI inputs:</strong> when you use Nova or generate a quiz, the app sends the relevant prompt or learning request, class, subject, course/level details and, for Nova chat, recent conversation messages needed to answer.</li>
+          <li><strong>Device storage:</strong> the app uses browser local storage to remember settings and learning progress on the device. Some profile data is also saved to your signed-in AcademicLevel account so it can sync across devices.</li>
+          <li><strong>Support messages:</strong> if you email us, we receive the email address and the information you choose to include.</li>
+        </ul>
+
+        <div class="notice-box">
+          <strong>Security Notice:</strong> Do not enter passwords, government ID numbers, home addresses, precise location, financial account details, or other highly sensitive information into learner profiles, quizzes or Nova chats.
+        </div>
+
+        <h3>Why information is used</h3>
+        <ul>
+          <li>To sign you in, maintain your learner profile and sync progress.</li>
+          <li>To provide grade-appropriate quizzes, courses, AI study responses, certificates and learning features.</li>
+          <li>To maintain coins, plan status and ACode creation/redemption records.</li>
+          <li>To respond to support, protect the service, troubleshoot errors and prevent misuse.</li>
+        </ul>
+
+        <h3>Service providers and sharing</h3>
+        <p>AcademicLevel uses Render hosting and SQLite backend database services to operate the app. Information necessary for those services may be processed by the relevant provider under its own terms and privacy practices. We do not operate those providers' infrastructure. We do not intentionally make learner profiles or private chat histories public. We may disclose information where required by law, to protect users or the service, or as part of a legitimate business transfer. We do not state that no third-party processing occurs.</p>
+
+        <h3>Storage, security and retention</h3>
+        <p>We use account access controls and the hosting platform's security features, but no internet service can promise absolute security. Account and learning data may remain in cloud backups or local browser storage for a period needed to provide the service, resolve issues or meet legal obligations. Local data may remain on a device after sign-out until browser storage is cleared.</p>
+
+        <h3>Your choices and requests</h3>
+        <p>You or your parent/guardian may ask to access, correct or delete learner information, withdraw consent where applicable, or raise a privacy concern by emailing <a href="mailto:academiclevels@gmail.com">academiclevels@gmail.com</a> with the subject "Privacy Request". Include the account email and enough detail to identify the request; do not send passwords or identity documents unless we specifically explain a safe and necessary process. We may need to verify authority before acting. We will respond within a reasonable time and handle requests under applicable law.</p>
+
+        <h3>Cookies and similar technologies</h3>
+        <p>The app uses browser local storage for core functionality. Hosting, authentication or embedded service providers may use their own cookies or similar technologies. Browser settings can restrict storage, but doing so may affect sign-in or saved progress.</p>
+      </section>
+
+      <!-- Section 2 -->
+      <section id="children" class="policy-section">
+        <h2>2. Children &amp; Student Safety</h2>
+        <p>AcademicLevel is intended for learning and should be used with parent, guardian or teacher awareness, especially by children.</p>
+        <ul>
+          <li>Parents/guardians should review this policy, supervise account creation and use, and contact us about a child's account or personal information.</li>
+          <li>Do not share personal contact details, school address, passwords, photos, precise location or private family information in Nova chats or public/support content.</li>
+          <li>Nova is an automated study helper, not a person, counsellor, teacher replacement or emergency service. Do not rely on it for safety, health or other urgent decisions.</li>
+          <li>If you believe a child's information has been submitted without appropriate permission, contact <a href="mailto:academiclevels@gmail.com">academiclevels@gmail.com</a> so we can review the issue.</li>
+          <li>We aim to handle children's information carefully. This policy alone does not establish that every parental-consent, age-assurance or other child-specific legal requirement has been technically implemented. The service owner must confirm and implement the applicable requirements before broad public release.</li>
+        </ul>
+      </section>
+
+      <!-- Section 3 -->
+      <section id="terms" class="policy-section">
+        <h2>3. Terms of Use</h2>
+        <p>By accessing AcademicLevel, you agree to use it lawfully and follow these terms. If you are under the age of majority where you live, use the service with permission and supervision from a parent or guardian.</p>
+        <ul>
+          <li>Provide a learner name and class that you are permitted to use. Keep sign-in credentials private.</li>
+          <li>Use the service for personal educational purposes. Do not copy, resell, reverse engineer, disrupt or attempt to gain unauthorised access to the app or its systems.</li>
+          <li>Do not impersonate another learner, manipulate progress or rewards, exploit bugs, or misuse ACodes.</li>
+          <li>Features, question banks, AI responses, availability and pricing may change. We may suspend access where needed to protect users, the service or legal compliance.</li>
+          <li>We aim for reliable access but do not guarantee uninterrupted availability, error-free content or compatibility with every device.</li>
+          <li>These terms do not remove rights that cannot legally be excluded. Mandatory consumer and other applicable laws continue to apply.</li>
+        </ul>
+      </section>
+
+      <!-- Section 4 -->
+      <section id="acceptable" class="policy-section">
+        <h2>4. Acceptable Use &amp; Community Safety</h2>
+        <p>Do not use AcademicLevel to harass, threaten, bully, share hateful or sexually explicit material, cheat other users, distribute malware, probe systems without permission, or submit unlawful or harmful content. Do not use Nova to request dangerous instructions or to process another person's private information without permission. We may restrict accounts or report serious unlawful activity where appropriate.</p>
+      </section>
+
+      <!-- Section 5 -->
+      <section id="ai" class="policy-section">
+        <h2>5. AI &amp; Educational Disclaimer</h2>
+        <p>Nova and AI-generated quizzes can be inaccurate, incomplete, outdated or unsuitable for a particular syllabus. Check important answers against textbooks, teachers and trusted sources. AcademicLevel is a supplementary learning tool, not a substitute for formal teaching, assessment, professional advice or supervision. Do not use AI output as the sole basis for important decisions.</p>
+      </section>
+
+      <!-- Section 6 -->
+      <section id="payments" class="policy-section">
+        <h2>6. Premium Plans, Payments &amp; ACodes</h2>
+        <ul>
+          <li>AcademicLevel Lite is listed at ₹49 for 2 months (60 days); AcademicLevel Plus is listed at ₹129 for 6 months (180 days). The price and plan shown at checkout should be checked before paying.</li>
+          <li>Payments are made through the displayed UPI QR/ID outside the app. A parent or guardian must supervise purchases by a child.</li>
+          <li>Payment is not automatically verified by AcademicLevel. The activation button is a user confirmation flow and does not independently check a bank or UPI transaction. Do not activate until the payer/guardian has confirmed the payment in their own payment app.</li>
+          <li>ACodes are intended for one learner and one redemption. Treat a code like a voucher; do not publish it or share it with strangers. ACode creation in the app is not proof that payment was received.</li>
+          <li>Keep your payment receipt. For an incorrect activation, duplicate payment or payment dispute, contact <a href="mailto:academiclevels@gmail.com">academiclevels@gmail.com</a> with the plan, date and transaction reference. Never email a UPI PIN, OTP or password.</li>
+        </ul>
+      </section>
+
+      <!-- Section 7 -->
+      <section id="rewards" class="policy-section">
+        <h2>7. Learning Coins &amp; Rewards</h2>
+        <p>Learning coins are in-app points, not cash, stored value, a bank balance or cryptocurrency. They cannot be withdrawn or transferred for money. Reward-store selections may create an email request rather than an automatically confirmed order. A request is not an order confirmation; availability, exact item, delivery details and any real-world payment must be confirmed separately by AcademicLevel. Ask a parent/guardian before requesting a physical reward or gift card.</p>
+      </section>
+
+      <!-- Section 8 -->
+      <section id="refunds" class="policy-section">
+        <h2>8. Refunds, Cancellations &amp; Complaints</h2>
+        <ul>
+          <li>For payment errors, accidental purchases, duplicate transactions, access problems, cancellation requests or reward fulfilment concerns, email <a href="mailto:academiclevels@gmail.com">academiclevels@gmail.com</a>. Include the account email, plan/order details and payment reference, with sensitive payment credentials removed. Each request will be reviewed under the facts and applicable consumer law. This page does not promise that every purchase is refundable or non-refundable, and does not override statutory rights.</li>
+          <li>For privacy complaints, use the subject "Privacy Complaint". We will acknowledge and review complaints and provide a response or next steps. You may also exercise rights or approach the appropriate authority as provided by applicable law.</li>
+        </ul>
+      </section>
+
+      <!-- Section 9 -->
+      <section id="changes" class="policy-section">
+        <h2>9. Changes to These Policies</h2>
+        <p>We may update these policies when the app, providers or legal requirements change. The effective date at the top will be updated when a revised version is published. Please review this page periodically. Material changes may also be communicated through the app where appropriate.</p>
+      </section>
+
+      <!-- Contact -->
+      <div class="contact-box">
+        <h3>Contact AcademicLevel</h3>
+        <p>For privacy requests, parent/guardian questions, account deletion, payments, refunds, complaints or general support:</p>
+        <p style="margin-top: 0.5rem;">
+          <strong>Email:</strong> <a href="mailto:academiclevels@gmail.com">academiclevels@gmail.com</a><br>
+          <span style="font-size: 0.85rem; color: #64748b;">Subject suggestion: Privacy Request / Parent Query / Payment Support</span>
+        </p>
+        <p style="margin-top: 0.5rem;">
+          <strong>Website:</strong> <a href="https://academiclevel.in/">academiclevel.in</a>
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2020–<script>document.write(new Date().getFullYear())</script> ZINGQUARK INDIA TECHNOLOGIES PVT LTD (AcademicLevel) · Learn kindly. Keep growing. ✦</p>
+  </footer>
+
+</body>
+</html>

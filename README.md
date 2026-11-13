@@ -1,4 +1,4 @@
-# AcademicLevel Platform Architecture Specification (v1.0.0-PROD)
+# AcademicLevel Platform Architecture Specification (v2.15.1s)
 **"Learn in your era" — India's Premier K-12 AI-Powered Educational Platform**
 
 ---
