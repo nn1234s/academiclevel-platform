@@ -8,8 +8,8 @@ interface FAQItem {
 
 const FAQS: FAQItem[] = [
   {
-    q: 'How does the Free Tier quota work?',
-    a: 'Every student receives 25 complimentary adaptive quizzes OR 3 completed course levels, whichever comes first. When you reach either threshold, you can upgrade to Lite (₹49 for 60 days) or Plus (₹129 for 180 days). Your certificates, coin balances, and profile remain 100% safe.'
+    q: 'What is included in the Concept Booster plan?',
+    a: 'Every student receives 60 days of full, unlimited adaptive AI quizzes across all subjects. To unlock extended access, Olympiad mock tests, verified parent analytics, and 1-on-1 Socratic tutoring, you can upgrade to PLUS (₹129 for 180 days). Your certificates, coin balances, and study profile remain 100% safe.'
   },
   {
     q: 'Which school boards are supported?',

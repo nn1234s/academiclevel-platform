@@ -157,6 +157,13 @@ export async function pullAllFromTurso(localDb) {
   if (!TURSO_CONFIG.url || !TURSO_CONFIG.authToken) return false;
 
   console.log('[Turso] Checking cloud database for stored learner records...');
+
+  // Enforce zero-tolerance purge of dummy test accounts across local and cloud
+  try {
+    localDb.prepare("DELETE FROM learners WHERE email LIKE '%@example.com' OR email LIKE '%@academiclevel.test' OR email LIKE '%@test.com'").run();
+    await executeTurso("DELETE FROM learners WHERE email LIKE '%@example.com' OR email LIKE '%@academiclevel.test' OR email LIKE '%@test.com'");
+  } catch {}
+
   const tables = [
     'learners', 'subscriptions', 'coin_ledger', 'gift_requests',
     'quiz_attempts', 'course_progress', 'certificates', 'acodes',
@@ -167,7 +174,14 @@ export async function pullAllFromTurso(localDb) {
   let totalRestored = 0;
   for (const table of tables) {
     try {
-      const rows = await queryTurso(`SELECT * FROM ${table};`);
+      let rows = await queryTurso(`SELECT * FROM ${table};`);
+      if (table === 'learners' && Array.isArray(rows)) {
+        rows = rows.filter(r => {
+          const em = (r.email || '').toLowerCase();
+          return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
+        });
+      }
+
       if (rows && rows.length > 0) {
         const cols = Object.keys(rows[0]);
         const placeholders = cols.map(() => '?').join(', ');
@@ -195,6 +209,12 @@ export async function pushAllToTurso(localDb) {
   if (!TURSO_CONFIG.url || !TURSO_CONFIG.authToken) return false;
 
   console.log('[Turso] Pushing local SQLite data to Turso cloud...');
+
+  // Ensure cloud database does not receive or keep dummy test accounts
+  try {
+    await executeTurso("DELETE FROM learners WHERE email LIKE '%@example.com' OR email LIKE '%@academiclevel.test' OR email LIKE '%@test.com'");
+  } catch {}
+
   const tables = [
     'learners', 'subscriptions', 'coin_ledger', 'gift_requests',
     'quiz_attempts', 'course_progress', 'certificates', 'acodes',
@@ -204,8 +224,16 @@ export async function pushAllToTurso(localDb) {
 
   for (const table of tables) {
     try {
-      const rows = localDb.prepare(`SELECT * FROM ${table}`).all();
+      let rows = localDb.prepare(`SELECT * FROM ${table}`).all();
       if (!rows || rows.length === 0) continue;
+
+      if (table === 'learners') {
+        rows = rows.filter(r => {
+          const em = (r.email || '').toLowerCase();
+          return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
+        });
+      }
+      if (rows.length === 0) continue;
 
       const cols = Object.keys(rows[0]);
       const placeholders = cols.map(() => '?').join(', ');

@@ -50,6 +50,29 @@ class StorageRLSLayerClass {
   }
 
   private initDatabase() {
+    // Immediate purge of any legacy fake test accounts from client localStorage
+    if (typeof window !== 'undefined') {
+      try {
+        const rawLearners = localStorage.getItem(STORAGE_KEYS.LEARNERS);
+        if (rawLearners) {
+          const parsed = JSON.parse(rawLearners);
+          if (Array.isArray(parsed)) {
+            const cleaned = parsed.filter((l: any) => {
+              if (!l || !l.email) return false;
+              const em = String(l.email).toLowerCase();
+              if (em.includes('@example.com') || em.includes('@academiclevel.test') || em.includes('@test.com')) return false;
+              if (em.startsWith('audit_') || em.startsWith('pwd_test_') || em.startsWith('brute_') || em.startsWith('legacy_') || em.startsWith('scholar_') || em.startsWith('kid_') || em.startsWith('aarav_') || em.startsWith('bhavya_') || em.startsWith('test_quota_')) return false;
+              return true;
+            });
+            if (cleaned.length !== parsed.length) {
+              localStorage.setItem(STORAGE_KEYS.LEARNERS, JSON.stringify(cleaned));
+              this.memoryCache.set(STORAGE_KEYS.LEARNERS, cleaned);
+            }
+          }
+        }
+      } catch {}
+    }
+
     // Seed default ACodes if empty
     const acodes = this.readRaw<ACode[]>(STORAGE_KEYS.ACODES, []);
     if (acodes.length === 0) {
@@ -124,13 +147,18 @@ class StorageRLSLayerClass {
 
   public isAdminAuthorized(adminEmail?: string): boolean {
     if (typeof window === 'undefined') return true;
-    const token = sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token');
-    if (token) return true;
+    const cleanEmail = (adminEmail || '').trim().toLowerCase();
+    if (cleanEmail) {
+      // If a specific email is passed, it MUST strictly match the Super-Admin address
+      return cleanEmail === SUPER_ADMIN_EMAIL.toLowerCase() || cleanEmail === 'naitiknanda1235@gmail.com';
+    }
     const session = this.getCurrentSession();
     if (session?.role === 'SUPER_ADMIN') return true;
+    const token = sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token');
     const storedEmail = sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email');
-    if (storedEmail && adminEmail && storedEmail.toLowerCase() === adminEmail.toLowerCase()) return true;
-    if (adminEmail && (adminEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase() || adminEmail.toLowerCase().includes('naitik'))) return true;
+    if (token && storedEmail && (storedEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase() || storedEmail.toLowerCase() === 'naitiknanda1235@gmail.com')) {
+      return true;
+    }
     return false;
   }
 
@@ -216,41 +244,20 @@ class StorageRLSLayerClass {
         } catch {}
 
         if (Array.isArray(serverVal)) {
-          if (Array.isArray(localVal)) {
-            // Merge arrays using identifier ('id', 'code', 'utrReference')
-            const mergedMap = new Map<string, any>();
-            serverVal.forEach(item => {
-              const id = item.id || item.code || item.utrReference || item.timestampUtc;
-              if (id) mergedMap.set(String(id), item);
+          let cleanServerVal = serverVal;
+          if (k === STORAGE_KEYS.LEARNERS) {
+            cleanServerVal = serverVal.filter(l => {
+              if (!l || !l.email) return false;
+              const em = String(l.email).toLowerCase();
+              return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
             });
-
-            localVal.forEach(item => {
-              const id = item.id || item.code || item.utrReference || item.timestampUtc;
-              if (id) {
-                if (!mergedMap.has(String(id))) {
-                  mergedMap.set(String(id), item);
-                  hasLocalUploads = true;
-                }
-              }
-            });
-
-            const merged = Array.from(mergedMap.values());
-            localStorage.setItem(k, JSON.stringify(merged));
-            this.memoryCache.set(k, merged);
-            if (hasLocalUploads) {
-              localDataToUpload[k] = merged;
-            }
-          } else {
-            localStorage.setItem(k, JSON.stringify(serverVal));
-            this.memoryCache.set(k, serverVal);
           }
+          // Server is the single source of truth. Overwrite client cache without resurrecting deleted accounts.
+          localStorage.setItem(k, JSON.stringify(cleanServerVal));
+          this.memoryCache.set(k, cleanServerVal);
         } else if (serverVal !== undefined && serverVal !== null) {
           localStorage.setItem(k, JSON.stringify(serverVal));
           this.memoryCache.set(k, serverVal);
-        } else if (localVal !== null && localVal !== undefined) {
-          // Upload local data to server
-          localDataToUpload[k] = localVal;
-          hasLocalUploads = true;
         }
       });
 
@@ -335,7 +342,24 @@ class StorageRLSLayerClass {
       this.recordSecurityViolation(adminEmail, 'SUPER_ADMIN_BREACH_ATTEMPT', 'ALL_LEARNERS');
       throw new Error('Access denied: 403 Forbidden. Only Super-Admin may access all learners.');
     }
-    return this.readRaw<Learner[]>(STORAGE_KEYS.LEARNERS, []);
+    const all = this.readRaw<Learner[]>(STORAGE_KEYS.LEARNERS, []);
+    return all.filter(l => {
+      if (!l || !l.email) return false;
+      const em = String(l.email).toLowerCase();
+      return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
+    });
+  }
+
+  public setLearnersAdmin(learners: Learner[], adminEmail: string): void {
+    if (!this.isAdminAuthorized(adminEmail)) {
+      throw new Error('Access denied: 403 Forbidden.');
+    }
+    const clean = learners.filter(l => {
+      if (!l || !l.email) return false;
+      const em = String(l.email).toLowerCase();
+      return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
+    });
+    this.writeRaw(STORAGE_KEYS.LEARNERS, clean);
   }
 
   // ==========================================

@@ -406,9 +406,47 @@ apiRouter.post('/auth/register', authLimiter, (req, res) => {
       new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
     );
 
+    // Auto-Grant 60 Days of Unlimited Quizzes (Concept Booster / LITE Plan) on signup
+    const subId = 'sub_reg_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+    const subExpiresAt = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString();
+    const invoiceNum = 'INV-WELCOME-' + Math.floor(100000 + Math.random() * 900000);
+
+    db.prepare(`
+      INSERT INTO subscriptions (
+        id, learnerId, planTier, status, paymentMethod,
+        amountInr, durationDays, startsAt, expiresAt,
+        verifiedByAdmin, verifiedAt, invoiceNumber, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      subId, learnerId, 'LITE', 'ACTIVE', 'CONCEPT_BOOSTER_AUTO',
+      49, 60, now, subExpiresAt,
+      'SYSTEM_AUTO', now, invoiceNum, now
+    );
+
+    replicateUpsertAsync('subscriptions', {
+      id: subId,
+      learnerId: learnerId,
+      planTier: 'LITE',
+      status: 'ACTIVE',
+      paymentMethod: 'CONCEPT_BOOSTER_AUTO',
+      amountInr: 49,
+      durationDays: 60,
+      startsAt: now,
+      expiresAt: subExpiresAt,
+      verifiedByAdmin: 'SYSTEM_AUTO',
+      verifiedAt: now,
+      invoiceNumber: invoiceNum,
+      createdAt: now
+    });
+
     const newLearner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
     delete newLearner.passwordHash;
     delete newLearner.passwordSalt;
+
+    newLearner.hasActiveSubscription = true;
+    newLearner.activePlan = 'LITE';
+    newLearner.planTier = 'LITE';
+    newLearner.subscriptionExpiresAt = subExpiresAt;
 
     res.json({ success: true, learner: newLearner, token });
   } catch (err) {
@@ -454,6 +492,27 @@ function getActiveSubscriptionForLearner(learner) {
       ORDER BY createdAt DESC LIMIT 1
     `).get();
     if (activeSub) return activeSub;
+  }
+
+  // 3. Default 60-day Concept Booster pass for registered learners
+  const createdAtMs = learner.createdAt ? new Date(learner.createdAt).getTime() : Date.now();
+  const expiresAtMs = createdAtMs + 60 * 24 * 60 * 60 * 1000;
+  if (Date.now() < expiresAtMs) {
+    return {
+      id: 'sub_auto_' + learner.id,
+      learnerId: learner.id,
+      planTier: 'LITE',
+      status: 'ACTIVE',
+      paymentMethod: 'CONCEPT_BOOSTER_AUTO',
+      amountInr: 49,
+      durationDays: 60,
+      startsAt: learner.createdAt || new Date().toISOString(),
+      expiresAt: new Date(expiresAtMs).toISOString(),
+      verifiedByAdmin: 'SYSTEM_AUTO',
+      verifiedAt: learner.createdAt || new Date().toISOString(),
+      invoiceNumber: 'INV-AUTO-60D',
+      createdAt: learner.createdAt || new Date().toISOString()
+    };
   }
 
   return null;
@@ -2274,7 +2333,13 @@ function adminAuth(req, res, next) {
 
 apiRouter.get('/admin/learners', adminAuth, (req, res) => {
   try {
-    const learners = db.prepare('SELECT * FROM learners ORDER BY createdAt DESC').all();
+    const learners = db.prepare(`
+      SELECT * FROM learners 
+      WHERE email NOT LIKE '%@example.com' 
+        AND email NOT LIKE '%@academiclevel.test' 
+        AND email NOT LIKE '%@test.com'
+      ORDER BY createdAt DESC
+    `).all();
     const subs = db.prepare(`SELECT * FROM subscriptions WHERE status = 'ACTIVE' AND (expiresAt IS NULL OR datetime(expiresAt) > datetime('now'))`).all();
     const pendingSubs = db.prepare(`SELECT * FROM subscriptions WHERE status = 'PENDING_VERIFICATION'`).all();
 
@@ -3449,8 +3514,14 @@ apiRouter.get('/storage', (req, res) => {
     }));
 
     if (isAdmin) {
-      // Full, unredacted database dump strictly for verified Super Admin
-      const learners = db.prepare('SELECT * FROM learners').all();
+      // Full, unredacted database dump strictly for verified Super Admin (excluding test dummy accounts)
+      const learners = db.prepare(`
+        SELECT * FROM learners 
+        WHERE email NOT LIKE '%@example.com' 
+          AND email NOT LIKE '%@academiclevel.test' 
+          AND email NOT LIKE '%@test.com'
+        ORDER BY createdAt DESC
+      `).all();
       const subs = db.prepare('SELECT * FROM subscriptions').all();
       const ledger = db.prepare('SELECT * FROM coin_ledger').all();
       const gifts = db.prepare('SELECT * FROM gift_requests').all();

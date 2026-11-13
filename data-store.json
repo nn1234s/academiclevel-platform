@@ -173,23 +173,6 @@
   ],
   "al_prod_subscriptions_v1": [
     {
-      "id": "sub_test_admin_1794318878819",
-      "learnerId": "lrn_test",
-      "planTier": "PLUS",
-      "status": "ACTIVE",
-      "paymentMethod": "UPI_QR",
-      "utrReference": null,
-      "payerUpiId": null,
-      "amountInr": 99,
-      "durationDays": 180,
-      "startsAt": "2026-11-10T13:54:38.821Z",
-      "expiresAt": "2027-05-09T13:54:38.821Z",
-      "verifiedByAdmin": "naitiknanda1235@gmail.com",
-      "verifiedAt": "2026-11-10T13:54:38.821Z",
-      "invoiceNumber": "INV-TEST",
-      "createdAt": "2026-11-10T13:54:38.819Z"
-    },
-    {
       "id": "admin_grant_mw9bysnn_ibr6",
       "learnerId": "lrn_mw9bph4q_xacr",
       "planTier": "PLUS",
