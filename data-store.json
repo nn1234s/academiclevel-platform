@@ -27,7 +27,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": "2026-11-09T13:30:06.834Z",
       "createdAt": "2026-11-09T13:29:42.565Z",
-      "updatedAt": "2026-11-12T15:12:19.844Z",
+      "updatedAt": "2026-11-13T13:10:27.793Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -61,7 +61,7 @@
       "avatarFrame": "Emerald",
       "lastSpinTimestampUtc": "2026-11-09T13:57:04.753Z",
       "createdAt": "2026-11-09T13:46:57.966Z",
-      "updatedAt": "2026-11-12T15:12:19.856Z",
+      "updatedAt": "2026-11-13T13:10:27.806Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -95,7 +95,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-09T13:55:04.826Z",
-      "updatedAt": "2026-11-12T15:12:19.856Z",
+      "updatedAt": "2026-11-13T13:10:27.806Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -109,7 +109,7 @@
       "phone": "9861439460",
       "parentName": null,
       "parentEmail": null,
-      "parentPin": null,
+      "parentPin": "1234",
       "board": "CBSE",
       "grade": 10,
       "role": "STUDENT",
@@ -129,7 +129,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13 05:20:09",
-      "updatedAt": "2026-11-13 05:20:09",
+      "updatedAt": "2026-11-13T13:10:27.807Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -143,7 +143,7 @@
       "phone": null,
       "parentName": null,
       "parentEmail": null,
-      "parentPin": null,
+      "parentPin": "1234",
       "board": "CBSE",
       "grade": 1,
       "role": "STUDENT",
@@ -163,7 +163,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13T06:42:32.181Z",
-      "updatedAt": "2026-11-13T06:42:32.181Z",
+      "updatedAt": "2026-11-13T13:10:27.807Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -266,7 +266,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "DAILY_SPIN_WHEEL",
       "balanceAfter": 13,
-      "metadataJson": "{\"isJackpot\":false,\"qualifiedReferralsCount\":0}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:30:06.834Z",
       "signatureHash": "SIG_000015c31b45"
     },
@@ -277,7 +277,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "MALL_PURCHASE",
       "balanceAfter": 9979,
-      "metadataJson": "{\"item\":\"AVATAR_FRAME_EMERALD\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:47:52.902Z",
       "signatureHash": "SIG_00003eb789d5"
     },
@@ -288,7 +288,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "MALL_PURCHASE",
       "balanceAfter": 9984,
-      "metadataJson": "{\"item\":\"STREAK_FREEZE_1X\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:47:55.309Z",
       "signatureHash": "SIG_0000036822a4"
     },
@@ -299,7 +299,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "MALL_PURCHASE",
       "balanceAfter": 9984,
-      "metadataJson": "{\"item\":\"STREAK_FREEZE_1X\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:47:55.877Z",
       "signatureHash": "SIG_00000878243a"
     },
@@ -310,7 +310,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "MALL_PURCHASE",
       "balanceAfter": 9984,
-      "metadataJson": "{\"item\":\"STREAK_FREEZE_1X\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:47:56.061Z",
       "signatureHash": "SIG_00001f08bdfc"
     },
@@ -321,7 +321,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "MALL_PURCHASE",
       "balanceAfter": 9984,
-      "metadataJson": "{\"item\":\"STREAK_FREEZE_1X\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:47:56.237Z",
       "signatureHash": "SIG_000014b10fc8"
     },
@@ -332,7 +332,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "MALL_PURCHASE",
       "balanceAfter": 9984,
-      "metadataJson": "{\"item\":\"STREAK_FREEZE_1X\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:47:56.429Z",
       "signatureHash": "SIG_000078c997f0"
     },
@@ -343,7 +343,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "MALL_PURCHASE",
       "balanceAfter": 9984,
-      "metadataJson": "{\"item\":\"STREAK_FREEZE_1X\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:47:56.613Z",
       "signatureHash": "SIG_000039206970"
     },
@@ -354,7 +354,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "MALL_PURCHASE",
       "balanceAfter": 9984,
-      "metadataJson": "{\"item\":\"STREAK_FREEZE_1X\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:47:56.813Z",
       "signatureHash": "SIG_00004b10becd"
     },
@@ -365,7 +365,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "MALL_PURCHASE",
       "balanceAfter": 9984,
-      "metadataJson": "{\"item\":\"STREAK_FREEZE_1X\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:47:57.021Z",
       "signatureHash": "SIG_00006758c31b"
     },
@@ -376,7 +376,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "MALL_PURCHASE",
       "balanceAfter": 9984,
-      "metadataJson": "{\"item\":\"STREAK_FREEZE_1X\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:47:57.221Z",
       "signatureHash": "SIG_000022bca7c2"
     },
@@ -387,7 +387,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "MALL_PURCHASE",
       "balanceAfter": 9969,
-      "metadataJson": "{\"item\":\"FORMULA_GUIDE\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:47:58.749Z",
       "signatureHash": "SIG_0000093f2099"
     },
@@ -398,7 +398,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "DAILY_SPIN_WHEEL",
       "balanceAfter": 9974,
-      "metadataJson": "{\"isJackpot\":false,\"qualifiedReferralsCount\":0}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T13:57:04.752Z",
       "signatureHash": "SIG_00004aeddf38"
     },
@@ -409,7 +409,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "ADMIN_ADJUSTMENT",
       "balanceAfter": 50010,
-      "metadataJson": "{\"admin\":\"admin@academiclevel.in\",\"note\":\"Admin bonus grant\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T14:01:57.196Z",
       "signatureHash": "SIG_00001e60e7c7"
     },
@@ -420,7 +420,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "ADMIN_ADJUSTMENT",
       "balanceAfter": 250010,
-      "metadataJson": "{\"admin\":\"admin@academiclevel.in\",\"note\":\"Admin bonus grant\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T14:02:00.149Z",
       "signatureHash": "SIG_00002e56b95a"
     },
@@ -431,7 +431,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "ADMIN_ADJUSTMENT",
       "balanceAfter": 200010,
-      "metadataJson": "{\"admin\":\"admin@academiclevel.in\",\"note\":\"Scolarship\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T14:03:26.725Z",
       "signatureHash": "SIG_0000198d0b86"
     },
@@ -442,7 +442,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "GIFT_STORE_REDEMPTION",
       "balanceAfter": 10,
-      "metadataJson": "{\"level\":1,\"rsAmount\":20,\"brand\":\"AMAZON\",\"email\":\"wewewe@gmail.com\",\"phone\":\"9861439460\",\"dispatchedTo\":\"academiclevels@gmail.com\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T14:04:06.004Z",
       "signatureHash": "SIG_00001cf1a8e6"
     },
@@ -453,7 +453,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "ADMIN_ADJUSTMENT",
       "balanceAfter": 1000010,
-      "metadataJson": "{\"admin\":\"admin@academiclevel.in\",\"note\":\"Admin bonus grant\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T14:05:53.051Z",
       "signatureHash": "SIG_00007fb520ea"
     },
@@ -464,7 +464,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "GIFT_STORE_REDEMPTION",
       "balanceAfter": 10,
-      "metadataJson": "{\"level\":9,\"rsAmount\":100,\"brand\":\"AMAZON\",\"email\":\"wewewe@gmail.com\",\"phone\":\"99999999\",\"dispatchedTo\":\"academiclevels@gmail.com\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T14:06:16.885Z",
       "signatureHash": "SIG_000022978f94"
     }
