@@ -32,6 +32,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onExploreC
     }
   };
 
+  const handleAwardClick = (e: React.MouseEvent) => {
+    if (onNavigate) {
+      e.preventDefault();
+      onNavigate('INNOVATIVE_EDTECH');
+    }
+  };
+
   return (
     <div className="space-y-24 text-slate-100">
       {/* HERO SECTION */}
@@ -46,15 +53,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onExploreC
           </div>
 
           <a
-            href="https://edtechcenturyblog.blogspot.com/2026/11/academiclevel-most-innovative-edtech.html"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/most-innovative-edtech"
+            onClick={handleAwardClick}
             title="Read independent recognition on EdTech Century"
-            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 backdrop-blur-md transition-all group shadow-sm"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 backdrop-blur-md transition-all group shadow-sm cursor-pointer"
           >
             <Award className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
-            <span>Voted Most Innovative EdTech by EdTech Century</span>
-            <ExternalLink className="w-3 h-3 text-amber-400/80" />
+            <span>🏆 Voted #1 Most Innovative EdTech by EdTech Century</span>
           </a>
 
           <a
@@ -98,14 +103,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onExploreC
         {/* Trust Badges */}
         <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
           <a
-            href="https://edtechcenturyblog.blogspot.com/2026/11/academiclevel-most-innovative-edtech.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center space-x-1.5 text-amber-300/90 hover:text-amber-200 transition-colors font-semibold"
+            href="/most-innovative-edtech"
+            onClick={handleAwardClick}
+            className="flex items-center space-x-1.5 text-amber-300/90 hover:text-amber-200 transition-colors font-semibold cursor-pointer"
           >
             <Award className="w-4 h-4 text-amber-400" />
-            <span>Featured: Most Innovative EdTech (EdTech Century)</span>
-            <ExternalLink className="w-3 h-3" />
+            <span>🏆 Featured: #1 Most Innovative EdTech (EdTech Century)</span>
           </a>
           <div className="flex items-center space-x-1.5">
             <Check className="w-4 h-4 text-emerald-400" />
