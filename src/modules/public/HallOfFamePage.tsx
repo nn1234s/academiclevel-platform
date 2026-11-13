@@ -39,19 +39,12 @@ export const HallOfFamePage: React.FC<HallOfFamePageProps> = ({ onNavigateHome }
             We value the security of our learning community. If you discover a technical vulnerability on our platform,
             please report it responsibly to{' '}
             <a
-              href="mailto:security@academiclevel.in"
+              href="mailto:securityacademiclevels@gmail.com"
               className="text-blue-600 font-semibold hover:underline"
             >
-              security@academiclevel.in
+              securityacademiclevels@gmail.com
             </a>{' '}
-            (or{' '}
-            <a
-              href="mailto:security@yourdomain.com"
-              className="text-blue-600 font-semibold hover:underline"
-            >
-              security@yourdomain.com
-            </a>
-            ) before disclosing it publicly. Valid high-impact reports are recognized below.
+            before disclosing it publicly. Valid high-impact reports are recognized below.
           </p>
         </section>
 
