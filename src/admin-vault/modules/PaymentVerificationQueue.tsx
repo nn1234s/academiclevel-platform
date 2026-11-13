@@ -117,6 +117,8 @@ export const PaymentVerificationQueue: React.FC = () => {
     const searchLower = searchTerm.toLowerCase();
     return (
       (learner?.fullName && learner.fullName.toLowerCase().includes(searchLower)) ||
+      (learner?.email && learner.email.toLowerCase().includes(searchLower)) ||
+      (learner?.phone && learner.phone.toLowerCase().includes(searchLower)) ||
       (s.payerUpiId && s.payerUpiId.toLowerCase().includes(searchLower)) ||
       (s.utrReference && s.utrReference.toLowerCase().includes(searchLower)) ||
       (s.planTier && s.planTier.toLowerCase().includes(searchLower)) ||
