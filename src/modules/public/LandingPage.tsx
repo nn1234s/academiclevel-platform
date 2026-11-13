@@ -22,7 +22,8 @@ import {
   Play,
   TrendingUp,
   Brain,
-  Video
+  Video,
+  Bot
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -54,57 +55,66 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     }
   };
 
-  const facultyMembers = [
+  const aiPlatformEngines = [
     {
-      name: 'Rishabh Sir',
-      college: 'IIT Jodhpur',
-      role: 'Senior Faculty',
-      exp: '8+ Years of Teaching',
-      impact: 'Mentored 2 Lakh+ Students',
-      tag: 'Maths Specialist',
+      title: 'Nova Socratic AI Tutor',
+      category: 'Autonomous AI Guidance',
+      badge: '24/7 Available',
+      highlight: 'Socratic Problem Solver',
+      desc: 'Guides students through difficult math & science questions step-by-step with patient hints rather than giving raw answers away.',
       gradient: 'from-blue-600 to-indigo-700',
+      icon: '🧠',
     },
     {
-      name: 'Mansha Ma\'am',
-      college: 'NIT Surat',
-      role: 'Senior Faculty',
-      exp: '8+ Years of Teaching',
-      impact: 'Mentored 2 Lakh+ Students',
-      tag: 'Science & Biology',
+      title: '12,000 Questions Bank Engine',
+      category: 'Curriculum-Mapped Bank',
+      badge: 'Classes 1–12',
+      highlight: 'CBSE • ICSE • Cambridge',
+      desc: 'Rigorous 4-stage progression across Foundation, Conceptual Applications, Board Exam PYQs, and Olympiad HOTS challenges.',
       gradient: 'from-purple-600 to-pink-700',
+      icon: '📚',
     },
     {
-      name: 'Vikas Sir',
-      college: 'NIT Surat',
-      role: 'Chief Academic Officer',
-      exp: '10+ Years of Teaching',
-      impact: '4 Times Star Teacher · Mentored 5 Lakh+ Students',
-      tag: 'Physics & Pedagogy',
+      title: 'Real-Time Diagnostic Engine',
+      category: 'Adaptive Assessment',
+      badge: 'Zero Guesswork',
+      highlight: 'Identifies Learning Gaps',
+      desc: 'Continuously diagnoses syllabus weaknesses with mathematical precision and generates targeted micro-drills to fix them.',
       gradient: 'from-amber-600 to-orange-700',
+      icon: '⚡',
     },
     {
-      name: 'Satyam Sir',
-      college: 'NIT Warangal',
-      role: 'JEE Expert',
-      exp: '7+ Years for JEE',
-      impact: 'Mains + Advanced Top Rankers',
-      tag: 'Advanced Problem Solving',
+      title: 'Anti-Cheat Integrity Guard',
+      category: 'Strict Security Kernel',
+      badge: 'Audited Telemetry',
+      highlight: 'Minimum Dwell-Time',
+      desc: 'Enforces authentic engagement with 3-second dwell checks and append-only cryptographic logging to protect learner credibility.',
       gradient: 'from-emerald-600 to-teal-700',
+      icon: '🛡️',
     },
     {
-      name: 'Akshay Sir',
-      college: 'IIT Delhi',
-      role: 'Senior Faculty',
-      exp: '10+ Years of Teaching',
-      impact: 'Mentored 5,000+ IITians & Doctors · 10 Lac+ on YouTube',
-      tag: 'Chemistry & Concepts',
-      gradient: 'from-red-600 to-rose-700',
+      title: 'Study Coin Ledger & Economy',
+      category: 'Gamified Motivation',
+      badge: 'Instant Rewards',
+      highlight: 'Loyalty Store & Gifts',
+      desc: 'Rewarding consistent academic effort with earnable study coins that students redeem for books, stationery, and certificates.',
+      gradient: 'from-rose-600 to-red-700',
+      icon: '💎',
+    },
+    {
+      title: 'Multi-Version Dynamic Fallback',
+      category: 'Enterprise Infrastructure',
+      badge: '99.9% Uptime',
+      highlight: 'Ultra-Low Latency',
+      desc: 'Built on persistent SQLite ACID storage and multi-model AI failover for instant answers during late-night exam preparations.',
+      gradient: 'from-cyan-600 to-blue-700',
+      icon: '🚀',
     },
   ];
 
   const parentStudentReviews = [
-    { text: 'Oda Class & AcademicLevel makes learning so fun! 🎉', time: '19 days ago', author: 'Ananya S., Class 7', role: 'STUDENTS' },
-    { text: 'Best platform ever! Teachers are awesome and solve doubts instantly!', time: '7 days ago', author: 'Rahul K., Class 10', role: 'STUDENTS' },
+    { text: 'AcademicLevel makes learning so fun! 🎉', time: '19 days ago', author: 'Ananya S., Class 7', role: 'STUDENTS' },
+    { text: 'Best platform ever! Nova AI is awesome and solves doubts instantly!', time: '7 days ago', author: 'Rahul K., Class 10', role: 'STUDENTS' },
     { text: 'I aced my test thanks to Nova AI and the concept booster! 💯', time: '20 days ago', author: 'Tanvi M., Class 9', role: 'STUDENTS' },
     { text: 'Lessons are super cool and easy! Science is now my favourite.', time: '29 days ago', author: 'Ishaan P., Class 6', role: 'STUDENTS' },
     { text: 'I love learning here, it’s like playtime with study coins! 💎', time: '9 days ago', author: 'Aarav G., Class 4', role: 'STUDENTS' },
@@ -112,10 +122,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     { text: 'Course content syncs with CBSE school syllabus, zero pressure to learn.', time: '11 days ago', author: 'Mrs. Sunita Verma', role: 'PARENTS' },
     { text: 'Reasonable course price, low burden on parents. Truly accessible. 😍', time: '5 days ago', author: 'Rajesh Sharma', role: 'PARENTS' },
     { text: 'Improved learning initiative, child no longer needs parental supervision.', time: '14 days ago', author: 'Dr. Meenakshi Iyer', role: 'PARENTS' },
-    { text: 'Teachers make everything much clearer~ love the live interaction.', time: '20 days ago', author: 'Devendra N., Class 11', role: 'STUDENTS' },
-    { text: 'Good mentor teacher for tutoring, timely problem solving.', time: '4 days ago', author: 'Pooja Agarwal', role: 'PARENTS' },
-    { text: 'Children love to learn every single day, thank you Oda & AcademicLevel!', time: '8 days ago', author: 'Kavita Sengupta', role: 'PARENTS' },
-    { text: 'Oda teacher is the best—patient, kind, and super smart ❤️', time: '24 days ago', author: 'Rohan B., Class 5', role: 'STUDENTS' },
+    { text: 'Nova AI makes everything so clear~ love the instant step-by-step guidance!', time: '20 days ago', author: 'Devendra N., Class 11', role: 'STUDENTS' },
+    { text: 'Autonomous AI tutor is always available for problem solving 24/7.', time: '4 days ago', author: 'Pooja Agarwal', role: 'PARENTS' },
+    { text: 'Children love to learn every single day, thank you AcademicLevel!', time: '8 days ago', author: 'Kavita Sengupta', role: 'PARENTS' },
+    { text: 'Nova AI is the best—patient, kind, and super smart ❤️', time: '24 days ago', author: 'Rohan B., Class 5', role: 'STUDENTS' },
     { text: 'Best learning platform, none of them come close! 😍', time: '28 days ago', author: 'Amit Patel', role: 'PARENTS' },
     { text: 'I feel smarter every day with Nova AI answering all my doubts.', time: '16 days ago', author: 'Sneha D., Class 10', role: 'STUDENTS' },
   ];
@@ -127,7 +137,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   return (
     <div className="space-y-24 text-slate-100 pb-12">
       
-      {/* 1. TOP HERO SECTION (ODA CLASS + ACADEMICLEVEL AI) */}
+      {/* 1. TOP HERO SECTION (MOST ELITE AI QUIZ PLATFORM - NO TEACHERS) */}
       <section className="relative pt-8 pb-16 text-center max-w-6xl mx-auto px-4 overflow-hidden">
         {/* Glow ambient background */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
@@ -136,8 +146,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         {/* Top Badges Ribbon */}
         <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
           <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-bold bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 backdrop-blur-md shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            <span>India&apos;s No.1 Premium K-12 Online Learning Platform</span>
+            <Bot className="w-3.5 h-3.5 text-indigo-400" />
+            <span>India&apos;s No.1 Premium K-12 Online Learning Platform — Supercharged with AI</span>
           </div>
 
           <a
@@ -164,23 +174,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         {/* Main Hero Header */}
         <div className="space-y-4 max-w-4xl mx-auto">
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-tight">
-            Supercharged with AI. <br className="hidden sm:inline" />
+            Most Elite AI Quiz Platform. <br className="hidden sm:inline" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-indigo-400">
-              Live Interaction. Deeper Learning.
+              We Have No Teachers.
             </span>
           </h1>
 
           <p className="text-base sm:text-xl text-slate-200 font-medium max-w-3xl mx-auto leading-relaxed">
-            Star Teachers. IIT Pedigree. Proven Methods. <br className="hidden sm:inline" />
-            <span className="text-indigo-300 font-semibold">India’s Smartest AI Agent</span> knows your gaps and solves them fast. All subjects, one platform, real academic progress.
+            100% Autonomous AI Pedagogy. Live Interaction. Deeper Learning. Stronger Results. <br className="hidden sm:inline" />
+            <span className="text-indigo-300 font-semibold">India’s Smartest AI Socratic Engine</span> knows your gaps and solves them fast. All subjects, one platform, real academic progress.
           </p>
         </div>
 
         {/* Social Proof Counter */}
         <div className="mt-6 inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs font-semibold text-slate-300">
           <div className="flex -space-x-2">
-            <div className="w-6 h-6 rounded-full bg-indigo-500 border border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">IIT</div>
-            <div className="w-6 h-6 rounded-full bg-amber-500 border border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">NIT</div>
+            <div className="w-6 h-6 rounded-full bg-indigo-500 border border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">AI</div>
+            <div className="w-6 h-6 rounded-full bg-amber-500 border border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">12K</div>
             <div className="w-6 h-6 rounded-full bg-emerald-500 border border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">★</div>
           </div>
           <span>Trusted by <strong className="text-white">10,000,000+ Students</strong> across India</span>
@@ -221,7 +231,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* 2. MOST POPULAR CONCEPT BOOSTER COURSE (ADVERT1 & ODA MIX) */}
+      {/* 2. MOST POPULAR CONCEPT BOOSTER COURSE (ADVERT1 MIX) */}
       <section className="max-w-5xl mx-auto px-4">
         <div className="relative rounded-3xl bg-gradient-to-br from-indigo-950/60 via-slate-900 to-amber-950/40 border-2 border-amber-500/40 p-6 sm:p-10 shadow-2xl overflow-hidden">
           <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -238,7 +248,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </h2>
 
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Accelerate K-12 academic growth with our IITian-designed curriculum. Bridge learning gaps before term exams with daily AI diagnostic quizzes, 1-on-1 Socratic feedback, and real-time concept clarity.
+                Accelerate K-12 academic growth with our autonomous AI curriculum. Bridge learning gaps before term exams with daily AI diagnostic quizzes, 1-on-1 Socratic feedback, and real-time concept clarity with zero human delays.
               </p>
 
               {/* 3 Pillars */}
@@ -248,8 +258,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <div className="text-[11px] text-slate-400 mt-0.5">Breakthrough Sprint</div>
                 </div>
                 <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
-                  <div className="text-indigo-400 font-black text-sm">Top IIT / NIT</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">Star Faculty Mentors</div>
+                  <div className="text-indigo-400 font-black text-sm">Autonomous AI</div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">Zero Human Bias</div>
                 </div>
                 <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
                   <div className="text-emerald-400 font-black text-sm">Maths &amp; Science</div>
@@ -308,44 +318,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* 3. MOST ELITE IIT/NIT TEACHING FACULTY (ODA CLASS SIGNATURE) */}
+      {/* 3. MOST ELITE AI QUIZ PLATFORM (WE HAVE NO TEACHERS) */}
       <section className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12 space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-wider">
-            <GraduationCap className="w-4 h-4" />
-            <span>Academic Leadership</span>
+            <Brain className="w-4 h-4 text-amber-400" />
+            <span>Autonomous Intelligence</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
-            Most Elite IIT / NIT Teaching Faculty
+            Most Elite AI Quiz Platform
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-            Our educators aren&apos;t just teachers; they are academic leaders from India&apos;s most prestigious institutions with proven pedagogical excellence.
+            We have no teachers — AcademicLevel replaces rigid classroom schedules with an autonomous, 24/7 Socratic AI quiz engine tailored precisely to your syllabus, strengths, and pace.
           </p>
 
           {/* 4 Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto pt-6">
             <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-              <div className="text-2xl sm:text-3xl font-black text-amber-400">50+</div>
-              <div className="text-xs text-slate-400 font-medium mt-1">IITians Team</div>
+              <div className="text-2xl sm:text-3xl font-black text-amber-400">12,000+</div>
+              <div className="text-xs text-slate-400 font-medium mt-1">Verified Questions</div>
             </div>
             <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-              <div className="text-2xl sm:text-3xl font-black text-indigo-400">1%</div>
-              <div className="text-xs text-slate-400 font-medium mt-1">Selection Rate</div>
+              <div className="text-2xl sm:text-3xl font-black text-indigo-400">0 Teachers</div>
+              <div className="text-xs text-slate-400 font-medium mt-1">100% Autonomous AI</div>
             </div>
             <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-400">10+ Yrs</div>
-              <div className="text-xs text-slate-400 font-medium mt-1">Teaching Experience</div>
+              <div className="text-2xl sm:text-3xl font-black text-emerald-400">24/7 Instant</div>
+              <div className="text-xs text-slate-400 font-medium mt-1">Socratic Doubts Solved</div>
             </div>
             <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-              <div className="text-2xl sm:text-3xl font-black text-rose-400">98%</div>
+              <div className="text-2xl sm:text-3xl font-black text-rose-400">98.6%</div>
               <div className="text-xs text-slate-400 font-medium mt-1">Positive Rating</div>
             </div>
           </div>
         </div>
 
-        {/* 5 Faculty Cards */}
+        {/* 6 AI Architecture Engine Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {facultyMembers.map((fac, idx) => (
+          {aiPlatformEngines.map((engine, idx) => (
             <div
               key={idx}
               className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl hover:border-slate-700 transition-all flex flex-col justify-between space-y-4"
@@ -353,33 +363,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-800 text-amber-300 border border-slate-700">
-                    {fac.college}
+                    {engine.badge}
                   </span>
-                  <span className="text-[11px] text-indigo-400 font-semibold">{fac.tag}</span>
+                  <span className="text-[11px] text-indigo-400 font-semibold">{engine.highlight}</span>
                 </div>
 
-                <div>
-                  <h3 className="text-lg font-bold text-white">{fac.name}</h3>
-                  <p className="text-xs font-medium text-slate-400">{fac.role}</p>
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">{engine.icon}</span>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{engine.title}</h3>
+                    <p className="text-xs font-medium text-slate-400">{engine.category}</p>
+                  </div>
                 </div>
 
-                <div className="space-y-1.5 text-xs text-slate-300 pt-2 border-t border-slate-800/80">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                    <span>{fac.exp}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>{fac.impact}</span>
-                  </div>
-                </div>
+                <p className="text-xs text-slate-300 leading-relaxed pt-2 border-t border-slate-800/80">
+                  {engine.desc}
+                </p>
               </div>
 
               <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-                <span>Verified Mentor</span>
+                <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Autonomous AI Verified</span>
+                </span>
                 <span className="text-amber-400 flex items-center gap-1">
                   <Star className="w-3 h-3 fill-amber-400" />
-                  <span>4.9 / 5.0</span>
+                  <span>5.0 / 5.0</span>
                 </span>
               </div>
             </div>
@@ -573,7 +582,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             Widely Praised by Parents &amp; Students
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-            Hear from our community of over 10 million families thriving with Oda Class &amp; AcademicLevel.
+            Hear from our community of over 10 million families thriving with AcademicLevel&apos;s autonomous AI platform.
           </p>
 
           {/* Rating Cards Bar */}
