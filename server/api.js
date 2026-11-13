@@ -238,19 +238,23 @@ apiRouter.post('/auth/register', (req, res) => {
 
     const { hash: passwordHash, salt: passwordSalt } = hashStudentPassword(cleanPassword);
 
+    const phoneFromEmail = cleanEmail.match(/(\d{10})@special49/);
+    const phoneToSet = req.body.phone ? String(req.body.phone).trim() : (phoneFromEmail ? phoneFromEmail[1] : null);
+
     db.prepare(`
       INSERT INTO learners (
-        id, email, fullName, board, grade, parentName, parentPin,
+        id, email, fullName, phone, board, grade, parentName, parentPin,
         role, isActive, quizzesCompletedCount, levelsCompletedCount,
         classChangesUsedPremium, classChangesUsedPostExpiry, referralCode,
         referredBy, referralQualified, currentStreakDays, longestStreakDays,
         lastStudyDate, streakFreezesAvailable, coinBalance, passwordHash, passwordSalt,
         createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       learnerId,
       cleanEmail,
       String(fullName).trim(),
+      phoneToSet,
       board,
       Number(grade),
       parentName ? String(parentName).trim() : null,
@@ -332,7 +336,21 @@ apiRouter.post('/auth/login', (req, res) => {
       });
     }
 
-    let learner = db.prepare('SELECT * FROM learners WHERE email = ?').get(cleanEmail);
+    const phoneDigits = cleanEmail.replace(/[^0-9]/g, '');
+    let learner = db.prepare(`
+      SELECT * FROM learners 
+      WHERE email = ? 
+         OR (phone IS NOT NULL AND phone = ?)
+         OR (phone IS NOT NULL AND phone = ?)
+         OR (phone IS NOT NULL AND phone = ?)
+         OR email = ?
+    `).get(
+      cleanEmail,
+      cleanEmail,
+      phoneDigits,
+      phoneDigits.length >= 10 ? phoneDigits.slice(-10) : phoneDigits,
+      phoneDigits.length >= 10 ? `${phoneDigits.slice(-10)}@special49.academiclevel.in` : cleanEmail
+    );
 
     // If an authorized admin email logs in via student portal
     if (isAuthorizedAdminEmail(cleanEmail)) {
