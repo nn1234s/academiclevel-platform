@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useAuth } from './core/auth/AuthContext';
+import { StorageRLSLayer } from './core/storage/StorageRLSLayer';
 import { Board, Grade, LevelNode, Question } from './core/types';
 import { QuotaService } from './services/quotaService';
 import { ErrorBoundary } from './modules/shared/ErrorBoundary';
@@ -42,6 +43,7 @@ import { StreakEngine } from './modules/student/StreakEngine';
 import { OfflineBankView } from './modules/student/OfflineBankView';
 import { ACodesRedemption } from './modules/student/ACodesRedemption';
 import { UPIQRCheckout } from './modules/student/UPIQRCheckout';
+import { WorldwideScholarships } from './modules/student/WorldwideScholarships';
 
 // Icons
 import {
@@ -69,32 +71,83 @@ const AdminVaultShell = lazy(() =>
   import('./admin-vault/AdminVaultShell').then(m => ({ default: m.AdminVaultShell }))
 );
 
-function resolveRouteFromPath(path: string, isAuth: boolean): string {
+interface RouteResolution {
+  route: string;
+  intendedProtected?: string;
+}
+
+const PROTECTED_STUDENT_ROUTES: Record<string, string> = {
+  '/dashboard': 'DASHBOARD',
+  '/courses': 'COURSES',
+  '/levels': 'LEVELS',
+  '/quiz': 'QUIZ',
+  '/nova': 'NOVA_AI',
+  '/nova-ai': 'NOVA_AI',
+  '/community': 'COMMUNITY',
+  '/spin': 'SPIN_WHEEL',
+  '/spin-wheel': 'SPIN_WHEEL',
+  '/referral': 'REFERRAL',
+  '/referrals': 'REFERRAL',
+  '/coins': 'COIN_MALL',
+  '/coin-mall': 'COIN_MALL',
+  '/gifts': 'GIFT_STORE',
+  '/gift-store': 'GIFT_STORE',
+  '/certificates': 'CERTIFICATES',
+  '/master-certificate': 'MASTER_CERT',
+  '/profile': 'PROFILE',
+  '/streaks': 'STREAKS',
+  '/offline-bank': 'OFFLINE_BANK',
+  '/premium': 'PREMIUM',
+  '/qotd': 'QOTD',
+  '/challenges': 'CHALLENGES',
+  '/scholarships': 'SCHOLARSHIPS'
+};
+
+const ADS_ROUTES: Record<string, boolean> = {
+  '/special49': true,
+  '/special': true,
+  '/offer': true,
+  '/offer49': true,
+  '/special-offer': true,
+  '/advert': true,
+  '/advert1': true,
+  '/advert2': true,
+  '/yt': true,
+  '/youtube': true,
+  '/yt49': true,
+  '/ad-yt': true,
+  '/ads': true,
+  '/ad': true
+};
+
+function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
   const p = path.toLowerCase().replace(/\/$/, '');
-  if (p === '/adminservice' || p === '/ops-vault-al99') return 'ADMIN_VAULT';
-  if (
-    p === '/special49' ||
-    p === '/special' ||
-    p === '/offer' ||
-    p === '/offer49' ||
-    p === '/special-offer' ||
-    p === '/ads' ||
-    p === '/ad' ||
-    p === '/advert' ||
-    p === '/advert1' ||
-    p === '/advert2' ||
-    p === '/yt' ||
-    p === '/youtube' ||
-    p === '/yt49' ||
-    p === '/ad-yt'
-  ) return 'SPECIAL_49_FUNNEL';
-  if (p === '/pricing') return 'PRICING';
-  if (p === '/about') return 'ABOUT';
-  if (p === '/faq') return 'FAQ';
-  if (p === '/privacy' || p === '/policies' || p === '/policies.html' || p === '/policy' || p === '/privacy.html') return 'PRIVACY';
-  if (p === '/terms' || p === '/terms.html' || p === '/terms-of-use') return 'TERMS';
-  if (p === '/safety' || p === '/children' || p === '/student-safety') return 'SAFETY';
-  if (p === '/halloffame' || p === '/hall-of-fame' || p === '/security' || p === '/security/hall-of-fame') return 'HALL_OF_FAME';
+
+  // 1. Super-Admin Vault
+  if (p === '/adminservice' || p === '/ops-vault-al99') {
+    return { route: 'ADMIN_VAULT' };
+  }
+
+  // 2. Advertising & Campaign Landing Pages (Additional Module)
+  if (ADS_ROUTES[p]) {
+    if (isAuth) {
+      // Intelligently redirect already-authenticated students
+      if (p === '/ad' || p === '/ads') {
+        return { route: 'DASHBOARD' };
+      }
+      return { route: 'PREMIUM' };
+    }
+    return { route: 'SPECIAL_49_FUNNEL' };
+  }
+
+  // 3. Public static pages
+  if (p === '/pricing') return { route: 'PRICING' };
+  if (p === '/about') return { route: 'ABOUT' };
+  if (p === '/faq') return { route: 'FAQ' };
+  if (p === '/privacy' || p === '/policies' || p === '/policies.html' || p === '/policy' || p === '/privacy.html') return { route: 'PRIVACY' };
+  if (p === '/terms' || p === '/terms.html' || p === '/terms-of-use') return { route: 'TERMS' };
+  if (p === '/safety' || p === '/children' || p === '/student-safety') return { route: 'SAFETY' };
+  if (p === '/halloffame' || p === '/hall-of-fame' || p === '/security' || p === '/security/hall-of-fame') return { route: 'HALL_OF_FAME' };
   if (
     p === '/innovative-edtech' ||
     p === '/most-innovative-edtech' ||
@@ -102,32 +155,28 @@ function resolveRouteFromPath(path: string, isAuth: boolean): string {
     p === '/awards' ||
     p === '/edtech-century' ||
     p === '/edtech-award'
-  ) return 'INNOVATIVE_EDTECH';
+  ) return { route: 'INNOVATIVE_EDTECH' };
 
-  if (p === '/curriculum' || p === '/courses') return isAuth ? 'COURSES' : 'PUBLIC_COURSES';
-  if (p.startsWith('/verify')) return 'VERIFY_CERTIFICATE';
+  if (p === '/curriculum') return { route: isAuth ? 'COURSES' : 'PUBLIC_COURSES' };
+  if (p.startsWith('/verify')) return { route: 'VERIFY_CERTIFICATE' };
 
-  if (isAuth) {
-    if (p === '' || p === '/dashboard') return 'DASHBOARD';
-    if (p === '/nova' || p === '/nova-ai') return 'NOVA_AI';
-    if (p === '/community') return 'COMMUNITY';
-    if (p === '/spin' || p === '/spin-wheel') return 'SPIN_WHEEL';
-    if (p === '/referral' || p === '/referrals') return 'REFERRAL';
-    if (p === '/coins' || p === '/coin-mall') return 'COIN_MALL';
-    if (p === '/gifts' || p === '/gift-store') return 'GIFT_STORE';
-    if (p === '/certificates') return 'CERTIFICATES';
-    if (p === '/master-certificate') return 'MASTER_CERT';
-    if (p === '/profile') return 'PROFILE';
-    if (p === '/streaks') return 'STREAKS';
-    if (p === '/offline-bank') return 'OFFLINE_BANK';
-    if (p === '/premium') return 'PREMIUM';
-    if (p === '/qotd') return 'QOTD';
-    if (p === '/challenges') return 'CHALLENGES';
-  } else {
-    if (p === '') return 'HOME';
+  // 4. Protected Student Routes
+  if (PROTECTED_STUDENT_ROUTES[p]) {
+    const targetRoute = PROTECTED_STUDENT_ROUTES[p];
+    if (isAuth) {
+      return { route: targetRoute };
+    }
+    // Deep link requested while unauthenticated: remember intended destination
+    return { route: 'HOME', intendedProtected: targetRoute };
   }
 
-  return p === '' ? (isAuth ? 'DASHBOARD' : 'HOME') : 'NOT_FOUND';
+  // 5. Root Path
+  if (p === '') {
+    return { route: isAuth ? 'DASHBOARD' : 'HOME' };
+  }
+
+  // 6. Unknown Path -> 404
+  return { route: 'NOT_FOUND' };
 }
 
 function getPathForRoute(route: string): string {
@@ -149,6 +198,8 @@ function getPathForRoute(route: string): string {
     case 'VERIFY_CERTIFICATE': return '/verify';
     case 'DASHBOARD': return '/';
     case 'COURSES': return '/courses';
+    case 'LEVELS': return '/levels';
+    case 'QUIZ': return '/quiz';
     case 'NOVA_AI': return '/nova-ai';
     case 'COMMUNITY': return '/community';
     case 'SPIN_WHEEL': return '/spin-wheel';
@@ -163,17 +214,23 @@ function getPathForRoute(route: string): string {
     case 'PREMIUM': return '/premium';
     case 'QOTD': return '/qotd';
     case 'CHALLENGES': return '/challenges';
+    case 'SCHOLARSHIPS': return '/scholarships';
     default: return '/';
   }
 }
 
 export const App: React.FC = () => {
-  const { currentLearner, isAuthenticated, isSuperAdmin, logout, refreshCurrentLearner } = useAuth();
+  const { currentLearner, isAuthenticated, isAuthLoading, isSuperAdmin, logout, refreshCurrentLearner } = useAuth();
+
+  // Pending redirect for unauthenticated deep link return-to-page
+  const [pendingRedirectRoute, setPendingRedirectRoute] = useState<string | null>(null);
 
   // Route state
   const [currentRoute, setCurrentRoute] = useState<string>(() => {
     if (typeof window !== 'undefined') {
-      return resolveRouteFromPath(window.location.pathname, false);
+      const hasInitialSession = StorageRLSLayer.getCurrentSession() !== null;
+      const { route } = resolveRouteFromPath(window.location.pathname, hasInitialSession);
+      return route;
     }
     return 'HOME';
   });
@@ -197,18 +254,52 @@ export const App: React.FC = () => {
   // Mobile drawer
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Authenticated learners are automatically sent to their workspace dashboard (no public landing)
+  // On initial mount: if visitor requested protected deep link while unauthenticated, trigger login
   useEffect(() => {
-    if (isAuthenticated && currentRoute === 'HOME') {
-      setCurrentRoute('DASHBOARD');
+    if (typeof window !== 'undefined') {
+      const hasInitialSession = StorageRLSLayer.getCurrentSession() !== null;
+      const { intendedProtected } = resolveRouteFromPath(window.location.pathname, hasInitialSession);
+      if (intendedProtected && !hasInitialSession) {
+        setPendingRedirectRoute(intendedProtected);
+        setAuthModalMode('LOGIN');
+        setAuthModalOpen(true);
+      }
     }
-  }, [isAuthenticated, currentRoute]);
+  }, []);
 
-  // Synchronize URL popstate
+  // When user is confirmed authenticated:
+  // 1. If there is a pending redirect route, immediately navigate to it!
+  // 2. If at HOME, go to DASHBOARD.
+  // 3. If currently showing NOT_FOUND, re-resolve in case it was a protected route waiting for auth resolution.
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (pendingRedirectRoute) {
+        const dest = pendingRedirectRoute;
+        setPendingRedirectRoute(null);
+        navigateTo(dest);
+      } else if (currentRoute === 'HOME') {
+        setCurrentRoute('DASHBOARD');
+      } else if (currentRoute === 'NOT_FOUND') {
+        const { route } = resolveRouteFromPath(window.location.pathname, true);
+        if (route !== 'NOT_FOUND') {
+          setCurrentRoute(route);
+        }
+      }
+    }
+  }, [isAuthenticated, pendingRedirectRoute, currentRoute]);
+
+  // Synchronize URL popstate (browser back/forward)
   useEffect(() => {
     const handlePopState = () => {
-      const resolved = resolveRouteFromPath(window.location.pathname, isAuthenticated);
-      setCurrentRoute(resolved);
+      const { route, intendedProtected } = resolveRouteFromPath(window.location.pathname, isAuthenticated);
+      if (intendedProtected && !isAuthenticated) {
+        setPendingRedirectRoute(intendedProtected);
+        setCurrentRoute('HOME');
+        setAuthModalMode('LOGIN');
+        setAuthModalOpen(true);
+      } else {
+        setCurrentRoute(route);
+      }
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -260,9 +351,17 @@ export const App: React.FC = () => {
     currentRoute === 'ADVERT1_FUNNEL' ||
     currentRoute === 'YT_ADS_FUNNEL'
   ) {
+    // If student is already authenticated, intelligently direct them to Premium Center / Dashboard
+    // without forcing them through the raw ad conversion funnel (Additional Module requirement)
+    if (isAuthenticated) {
+      navigateTo('PREMIUM');
+      return null;
+    }
+
     return (
       <Special49AdsLandingPage
         onSuccessRegistered={() => {
+          refreshCurrentLearner();
           navigateTo('DASHBOARD');
         }}
       />
@@ -602,10 +701,28 @@ export const App: React.FC = () => {
                   Membership Center (UPI)
                 </button>
                 <button
-                  onClick={() => navigateTo('PROFILE')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
+                  onClick={() => navigateTo('SCHOLARSHIPS')}
+                  className="w-full text-left p-2.5 rounded-xl text-amber-300 hover:bg-slate-800 flex items-center space-x-2"
                 >
-                  Student Profile & Parent PIN
+                  <Trophy className="w-4 h-4 text-amber-400" />
+                  <span>Worldwide Scholarships</span>
+                </button>
+                <button
+                  onClick={() => navigateTo('PROFILE')}
+                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
+                >
+                  <User className="w-4 h-4 text-slate-400" />
+                  <span>Student Profile & Parent PIN</span>
+                </button>
+                <button
+                  onClick={() => {
+                    logout();
+                    navigateTo('HOME');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-rose-400 font-bold hover:bg-rose-500/10 flex items-center space-x-2 border-t border-slate-800 mt-2 pt-3"
+                >
+                  <LogOut className="w-4 h-4 text-rose-400" />
+                  <span>Log Out ({currentLearner?.fullName.split(' ')[0] || 'Student'})</span>
                 </button>
               </>
             )}
@@ -782,6 +899,19 @@ export const App: React.FC = () => {
                 <StudentProfile
                   learner={currentLearner}
                   onRefreshLearner={() => refreshCurrentLearner()}
+                  onLogout={() => {
+                    logout();
+                    navigateTo('HOME');
+                  }}
+                />
+              )}
+
+              {currentRoute === 'SCHOLARSHIPS' && (
+                <WorldwideScholarships
+                  learner={currentLearner}
+                  activeGrade={effectiveGrade}
+                  onRefreshLearner={() => refreshCurrentLearner()}
+                  onStartQuiz={(g) => navigateTo('QUIZ', { grade: g })}
                 />
               )}
 
@@ -894,6 +1024,16 @@ export const App: React.FC = () => {
         <AuthModal
           isOpen={authModalOpen}
           onClose={() => setAuthModalOpen(false)}
+          onSuccess={mode => {
+            refreshCurrentLearner();
+            if (pendingRedirectRoute) {
+              const dest = pendingRedirectRoute;
+              setPendingRedirectRoute(null);
+              navigateTo(dest);
+            } else {
+              navigateTo('DASHBOARD');
+            }
+          }}
           initialMode={authModalMode}
         />
 

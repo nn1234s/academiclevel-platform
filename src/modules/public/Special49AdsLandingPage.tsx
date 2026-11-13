@@ -263,7 +263,7 @@ const CLASS_SYLLABUS_INFO: Record<Grade, {
 };
 
 export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = ({ onSuccessRegistered }) => {
-  const { registerStudent } = useAuth();
+  const { currentLearner, isAuthenticated, registerStudent, loginStudent } = useAuth();
 
   const [selectedClass, setSelectedClass] = useState<Grade>(5);
   const [selectedBoard, setSelectedBoard] = useState<Board>('CBSE');
@@ -273,6 +273,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
   // Quick enroll modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'REGISTER' | 'LOGIN'>('REGISTER');
   const [studentName, setStudentName] = useState('');
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -322,26 +323,65 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       return;
     }
 
+    const cleanInput = emailOrPhone.trim().toLowerCase();
+    const cleanPassword = password.trim();
+
+    if (modalMode === 'LOGIN') {
+      if (!cleanInput) {
+        setErrorMessage('Please enter your registered mobile number or email.');
+        return;
+      }
+      if (!cleanPassword || cleanPassword.length < 6) {
+        setErrorMessage('Please enter your account password (at least 6 characters).');
+        return;
+      }
+
+      const loginEmail = cleanInput.includes('@')
+        ? cleanInput
+        : `${cleanInput.replace(/[^0-9]/g, '') || 'special'}@special49.academiclevel.in`;
+
+      setIsSubmitting(true);
+      try {
+        const res = await loginStudent(loginEmail, cleanPassword);
+        setIsSubmitting(false);
+        if (res.success) {
+          const session = StorageRLSLayer.getCurrentSession();
+          if (session) {
+            setCreatedLearnerId(session.learnerId);
+          }
+          setIsModalOpen(false);
+          onSuccessRegistered();
+        } else {
+          setErrorMessage(res.error || 'Login failed. Please check your credentials.');
+        }
+      } catch (err: any) {
+        setIsSubmitting(false);
+        setErrorMessage(err.message || 'Login failed.');
+      }
+      return;
+    }
+
+    // Modal Mode: REGISTER
     if (!studentName.trim()) {
       setErrorMessage('Please enter student full name.');
       return;
     }
 
-    if (!password || password.trim().length < 6) {
+    if (!cleanPassword || cleanPassword.length < 6) {
       setErrorMessage('Please create an account password of at least 6 characters.');
       return;
     }
 
-    const email = emailOrPhone.includes('@')
-      ? emailOrPhone.trim().toLowerCase()
-      : `${emailOrPhone.replace(/[^0-9]/g, '') || 'special'}@special49.academiclevel.in`;
+    const email = cleanInput.includes('@')
+      ? cleanInput
+      : `${cleanInput.replace(/[^0-9]/g, '') || 'special'}@special49.academiclevel.in`;
 
     setIsSubmitting(true);
     try {
       const res = await registerStudent({
         fullName: studentName.trim(),
         email,
-        password: password.trim(),
+        password: cleanPassword,
         board: selectedBoard,
         grade: selectedClass,
         parentName: parentName.trim() || 'Parent'
@@ -358,7 +398,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
           PaymentService.submitUpiPayment(
             session.learnerId,
             'LITE',
-            emailOrPhone.trim().includes('@') ? emailOrPhone.trim() : `${emailOrPhone.replace(/[^0-9]/g, '') || '9861439460'}@upi`,
+            cleanInput.includes('@') ? cleanInput : `${cleanInput.replace(/[^0-9]/g, '') || '9861439460'}@upi`,
             undefined
           ).catch(err => console.warn('Payment intent registration warning:', err));
 
@@ -381,6 +421,24 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-[#ff7300] selection:text-white">
+
+      {/* Authenticated Student Banner (Additional Module requirement) */}
+      {isAuthenticated && currentLearner && (
+        <div className="bg-indigo-950 text-indigo-100 px-4 py-2.5 text-xs border-b border-indigo-800 flex flex-wrap items-center justify-between gap-2 sticky top-0 z-50">
+          <div className="flex items-center space-x-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Signed in as <strong>{currentLearner.fullName}</strong> ({currentLearner.email})</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={onSuccessRegistered}
+              className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-xs transition-colors"
+            >
+              Go to Scholar Workspace →
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ======================================================== */}
       {/* 1. TOP STICKY SPECIAL 49 OFFER PROMO BAR                 */}
@@ -1057,36 +1115,85 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               <X className="w-4 h-4" />
             </button>
 
-            <div className="text-center mb-6">
+            <div className="text-center mb-4">
               <span className="px-3 py-1 bg-orange-100 text-orange-600 text-[10px] font-black uppercase tracking-wider rounded-full inline-block mb-2">
                 Special 49 Offer
               </span>
               <h3 className="text-xl font-black text-slate-900">
-                Unlock Class {selectedClass} Access
+                {modalMode === 'REGISTER' ? `Unlock Class ${selectedClass} Access` : 'Sign In to Your Account'}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Special ₹49 for 60 Days • Original ₹499 (90% OFF)
+                {modalMode === 'REGISTER'
+                  ? 'Special ₹49 for 60 Days • Original ₹499 (90% OFF)'
+                  : 'Enter your credentials to continue your syllabus practice'}
               </p>
             </div>
 
+            {/* Mode Switch Tabs */}
+            <div className="flex bg-slate-100 p-1 rounded-xl mb-4 text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => {
+                  setModalMode('REGISTER');
+                  setErrorMessage('');
+                }}
+                className={`flex-1 py-1.5 rounded-lg transition-all ${
+                  modalMode === 'REGISTER'
+                    ? 'bg-white text-orange-600 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                Create Account
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setModalMode('LOGIN');
+                  setErrorMessage('');
+                }}
+                className={`flex-1 py-1.5 rounded-lg transition-all ${
+                  modalMode === 'LOGIN'
+                    ? 'bg-white text-orange-600 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                Sign In (Existing)
+              </button>
+            </div>
+
             {errorMessage && (
-              <div className="p-3 mb-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
-                {errorMessage}
+              <div className="p-3 mb-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold space-y-2">
+                <div>{errorMessage}</div>
+                {modalMode === 'REGISTER' && errorMessage.toLowerCase().includes('already exists') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setModalMode('LOGIN');
+                      setErrorMessage('');
+                      setPassword('');
+                    }}
+                    className="w-full py-1.5 px-3 bg-orange-600 text-white rounded-lg font-bold text-center block shadow hover:bg-orange-700 transition-colors"
+                  >
+                    Account already exists! Click here to Sign In
+                  </button>
+                )}
               </div>
             )}
 
             <form onSubmit={handleEnrollSubmit} className="space-y-3.5 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Student Full Name *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Aarav Sharma"
-                  value={studentName}
-                  onChange={e => setStudentName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00]"
-                />
-              </div>
+              {modalMode === 'REGISTER' && (
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Student Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Aarav Sharma"
+                    value={studentName}
+                    onChange={e => setStudentName(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00]"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Parent Mobile Number or Email *</label>
@@ -1109,7 +1216,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
-                    placeholder="Create a password for student login"
+                    placeholder={modalMode === 'REGISTER' ? 'Create a password for student login' : 'Enter your password'}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00] pr-10"
@@ -1125,44 +1232,48 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Class</label>
-                  <select
-                    value={selectedClass}
-                    onChange={e => setSelectedClass(Number(e.target.value) as Grade)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-[#f95a00]"
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
-                      <option key={g} value={g}>Class {g}</option>
-                    ))}
-                  </select>
-                </div>
+              {modalMode === 'REGISTER' && (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Class</label>
+                      <select
+                        value={selectedClass}
+                        onChange={e => setSelectedClass(Number(e.target.value) as Grade)}
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-[#f95a00]"
+                      >
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
+                          <option key={g} value={g}>Class {g}</option>
+                        ))}
+                      </select>
+                    </div>
 
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Board</label>
-                  <select
-                    value={selectedBoard}
-                    onChange={e => setSelectedBoard(e.target.value as Board)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-[#f95a00]"
-                  >
-                    <option value="CBSE">CBSE Board</option>
-                    <option value="ICSE">ICSE Board</option>
-                    <option value="STATE">State Board</option>
-                  </select>
-                </div>
-              </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Board</label>
+                      <select
+                        value={selectedBoard}
+                        onChange={e => setSelectedBoard(e.target.value as Board)}
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-[#f95a00]"
+                      >
+                        <option value="CBSE">CBSE Board</option>
+                        <option value="ICSE">ICSE Board</option>
+                        <option value="STATE">State Board</option>
+                      </select>
+                    </div>
+                  </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Parent Name (Optional)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Rajesh Sharma"
-                  value={parentName}
-                  onChange={e => setParentName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00]"
-                />
-              </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Parent Name (Optional)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Rajesh Sharma"
+                      value={parentName}
+                      onChange={e => setParentName(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00]"
+                    />
+                  </div>
+                </>
+              )}
 
               {/* Authentic reCAPTCHA v2 Widget */}
               <div className="pt-2">
@@ -1186,7 +1297,13 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 disabled={isSubmitting}
                 className="w-full py-3.5 bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] text-white font-black text-sm rounded-xl shadow-lg shadow-orange-500/30 transition-all flex items-center justify-center space-x-2 mt-4"
               >
-                <span>{isSubmitting ? 'Registering...' : 'PROCEED TO PAY ₹49 (UPI / QR)'}</span>
+                <span>
+                  {isSubmitting
+                    ? 'Processing...'
+                    : modalMode === 'REGISTER'
+                    ? 'PROCEED TO PAY ₹49 (UPI / QR)'
+                    : 'SIGN IN & ENTER WORKSPACE'}
+                </span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>

@@ -6,6 +6,7 @@ import { ApiClient } from '../api/apiClient';
 interface AuthContextType {
   currentLearner: Learner | null;
   isAuthenticated: boolean;
+  isAuthLoading: boolean;
   isSuperAdmin: boolean;
   activeBoard: Board;
   activeGrade: Grade;
@@ -29,37 +30,54 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentLearner, setCurrentLearner] = useState<Learner | null>(null);
+  const [currentLearner, setCurrentLearner] = useState<Learner | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const session = StorageRLSLayer.getCurrentSession();
+        if (session && session.learnerId) {
+          return StorageRLSLayer.getLearnerById(session.learnerId, session.learnerId);
+        }
+      } catch {}
+    }
+    return null;
+  });
+  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    let isMounted = true;
     const hydrateAndSyncSession = async () => {
-      // First attempt to read local session for zero-flicker startup
-      const session = StorageRLSLayer.getCurrentSession();
-      if (session && session.learnerId) {
-        const localLearner = StorageRLSLayer.getLearnerById(session.learnerId, session.learnerId);
-        if (localLearner) {
-          setCurrentLearner(localLearner);
-        }
-
-        // Live check with backend SQLite database
-        try {
-          const studentData = await ApiClient.getStudent(session.learnerId);
-          if (studentData.success && studentData.learner) {
-            if (studentData.activeSub) {
-              StorageRLSLayer.saveSubscription(studentData.activeSub);
-              studentData.learner.hasActiveSubscription = true;
-              studentData.learner.activePlan = studentData.activeSub.planTier;
-              studentData.learner.subscriptionExpiresAt = studentData.activeSub.expiresAt;
-              (studentData.learner as any).activeSub = studentData.activeSub;
-            }
-            StorageRLSLayer.saveLearner(studentData.learner, studentData.learner.id);
-            setCurrentLearner(studentData.learner);
+      try {
+        // First attempt to read local session for zero-flicker startup
+        const session = StorageRLSLayer.getCurrentSession();
+        if (session && session.learnerId) {
+          const localLearner = StorageRLSLayer.getLearnerById(session.learnerId, session.learnerId);
+          if (localLearner && isMounted) {
+            setCurrentLearner(localLearner);
           }
-        } catch {}
-      }
 
-      // Background server storage sync (for admins)
-      StorageRLSLayer.syncWithServer().catch(() => {});
+          // Live check with backend SQLite database
+          try {
+            const studentData = await ApiClient.getStudent(session.learnerId);
+            if (studentData.success && studentData.learner && isMounted) {
+              if (studentData.activeSub) {
+                StorageRLSLayer.saveSubscription(studentData.activeSub);
+                studentData.learner.hasActiveSubscription = true;
+                studentData.learner.activePlan = studentData.activeSub.planTier;
+                studentData.learner.subscriptionExpiresAt = studentData.activeSub.expiresAt;
+                (studentData.learner as any).activeSub = studentData.activeSub;
+              }
+              StorageRLSLayer.saveLearner(studentData.learner, studentData.learner.id);
+              setCurrentLearner(studentData.learner);
+            }
+          } catch {}
+        }
+        // Background server storage sync (for admins)
+        StorageRLSLayer.syncWithServer().catch(() => {});
+      } finally {
+        if (isMounted) {
+          setIsAuthLoading(false);
+        }
+      }
     };
 
     hydrateAndSyncSession();
@@ -69,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const session = StorageRLSLayer.getCurrentSession();
       if (session && session.learnerId) {
         ApiClient.getStudent(session.learnerId).then(studentData => {
-          if (studentData.success && studentData.learner) {
+          if (studentData.success && studentData.learner && isMounted) {
             if (studentData.activeSub) {
               StorageRLSLayer.saveSubscription(studentData.activeSub);
               studentData.learner.hasActiveSubscription = true;
@@ -84,16 +102,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
+    // Multi-tab session synchronization: immediately sync when another tab logs in/out
+    const onStorageChange = (e: StorageEvent) => {
+      if (e.key === 'al_prod_session_v1' || e.key === 'al_student_token' || e.key === 'al_admin_token') {
+        const session = StorageRLSLayer.getCurrentSession();
+        if (!session) {
+          if (isMounted) setCurrentLearner(null);
+        } else if (session.learnerId) {
+          const l = StorageRLSLayer.getLearnerById(session.learnerId, session.learnerId);
+          if (l && isMounted) setCurrentLearner(l);
+        }
+      }
+    };
+
     window.addEventListener('focus', onFocusOrVisible);
+    window.addEventListener('storage', onStorageChange);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') onFocusOrVisible();
     });
 
-    // Auto-poll every 12 seconds so admin manual grants reflect immediately on the student's screen
-    const interval = setInterval(onFocusOrVisible, 12000);
+    // Auto-poll every 15 seconds so admin manual grants reflect smoothly
+    const interval = setInterval(onFocusOrVisible, 15000);
 
     return () => {
+      isMounted = false;
       window.removeEventListener('focus', onFocusOrVisible);
+      window.removeEventListener('storage', onStorageChange);
       clearInterval(interval);
     };
   }, []);
@@ -372,12 +406,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         sessionStorage.removeItem('al_admin_token');
         sessionStorage.removeItem('al_admin_email');
+        sessionStorage.removeItem('al_admin_passkey');
         localStorage.removeItem('al_admin_token');
         localStorage.removeItem('al_admin_email');
+        localStorage.removeItem('al_admin_passkey');
         sessionStorage.removeItem('al_student_token');
         localStorage.removeItem('al_student_token');
+        localStorage.removeItem('al_prod_session_v1');
       } catch {}
     }
+    // Terminate server session asynchronously
+    ApiClient.logout().catch(() => {});
     StorageRLSLayer.setSession(null);
     setCurrentLearner(null);
   };
@@ -451,6 +490,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         currentLearner,
         isAuthenticated: !!currentLearner,
+        isAuthLoading,
         isSuperAdmin,
         activeBoard: currentLearner?.board || 'CBSE',
         activeGrade: currentLearner?.grade || 10,

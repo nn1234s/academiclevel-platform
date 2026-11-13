@@ -89,6 +89,14 @@ export class ApiClient {
     return this.request(`/auth/me${query}`);
   }
 
+  public static async logout(): Promise<{ success: boolean }> {
+    try {
+      return await this.request('/auth/logout', { method: 'POST' });
+    } catch {
+      return { success: true };
+    }
+  }
+
   // ==========================================
   // Student Actions & Quotas
   // ==========================================

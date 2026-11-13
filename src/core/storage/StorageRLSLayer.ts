@@ -324,7 +324,16 @@ class StorageRLSLayerClass {
   }
 
   public setSession(session: { learnerId: string; email: string; role: 'STUDENT' | 'SUPER_ADMIN' } | null) {
-    this.writeRaw(STORAGE_KEYS.CURRENT_SESSION, session);
+    if (!session) {
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.removeItem(STORAGE_KEYS.CURRENT_SESSION);
+        } catch {}
+      }
+      this.memoryCache.delete(STORAGE_KEYS.CURRENT_SESSION);
+    } else {
+      this.writeRaw(STORAGE_KEYS.CURRENT_SESSION, session);
+    }
   }
 
   // ==========================================

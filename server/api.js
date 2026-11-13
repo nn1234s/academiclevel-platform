@@ -4,6 +4,18 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { db, initDatabaseSchema, exportDbToJsonStore } from './db.js';
+import { replicateUpsertAsync } from './tursoClient.js';
+
+// Safe non-blocking Turso replication helper
+export function safeReplicateAsync(table, record) {
+  try {
+    if (typeof replicateUpsertAsync === 'function') {
+      replicateUpsertAsync(table, record);
+    }
+  } catch (err) {
+    console.warn(`[Turso Replication Non-fatal: ${table}]`, err?.message);
+  }
+}
 
 // Auto-load .env configuration if present
 try {
@@ -431,7 +443,7 @@ apiRouter.post('/auth/register', authLimiter, (req, res) => {
       'SYSTEM_AUTO', now, invoiceNum, now
     );
 
-    replicateUpsertAsync('subscriptions', {
+    safeReplicateAsync('subscriptions', {
       id: subId,
       learnerId: learnerId,
       planTier: 'LITE',
@@ -448,6 +460,9 @@ apiRouter.post('/auth/register', authLimiter, (req, res) => {
     });
 
     const newLearner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    if (newLearner) {
+      safeReplicateAsync('learners', newLearner);
+    }
     delete newLearner.passwordHash;
     delete newLearner.passwordSalt;
 
@@ -705,6 +720,20 @@ apiRouter.get('/auth/me', (req, res) => {
     }
 
     res.json({ success: true, learner, activeSub: activeSub || null });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/auth/logout', (req, res) => {
+  try {
+    const token = req.headers['x-session-token'] ||
+      req.headers['x-admin-token'] ||
+      (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.substring(7) : null);
+    if (token) {
+      db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
+    }
+    res.json({ success: true, message: 'Session terminated successfully.' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
