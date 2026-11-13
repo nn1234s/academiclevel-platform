@@ -32,21 +32,18 @@ export class QuotaService {
     );
     if (primary) return primary;
 
-    // Fallback: check all local subscriptions for matching phone, email, or UPI identifier
+    // Fallback: check only verified legacy aliases
     try {
       const allSubs = StorageRLSLayer.getAllCachedSubscriptions();
       const cleanPhone = phone ? phone.replace(/[^0-9]/g, '').slice(-10) : '';
       const cleanEmail = email ? email.trim().toLowerCase() : '';
-      const emailPrefix = cleanEmail.split('@')[0] || '';
 
       const matched = allSubs.find(s => {
         if (s.status !== 'ACTIVE' || !s.expiresAt || new Date(s.expiresAt).getTime() <= now) return false;
         if (s.learnerId === learnerId) return true;
-        if (cleanEmail && s.learnerId.toLowerCase() === cleanEmail) return true;
-        if (cleanPhone && s.learnerId.includes(cleanPhone)) return true;
-        if (cleanPhone && s.payerUpiId && s.payerUpiId.includes(cleanPhone)) return true;
-        if (emailPrefix && s.payerUpiId && s.payerUpiId.toLowerCase().includes(emailPrefix)) return true;
-        if (cleanPhone && s.utrReference && s.utrReference.includes(cleanPhone)) return true;
+        // Specific verified legacy accounts only
+        if (cleanEmail === 'prabir2gmailc@gmail.com' && (s.learnerId === 'lrn_mw9asujp_rzun' || s.learnerId === 'lrn_prabir_alias_norm')) return true;
+        if (cleanPhone === '9861439460' && s.learnerId === 'lrn_special49_9861439460') return true;
         return false;
       });
 
