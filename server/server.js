@@ -35,7 +35,7 @@ app.use('/api', (req, res) => {
 });
 
 // Standalone Security Hall of Fame Direct Route
-app.get(['/halloffame', '/halloffame/', '/halloffame.html'], (req, res) => {
+app.get(['/halloffame', '/halloffame/', '/halloffame.html', '/halloffame/index.html'], (req, res) => {
   const standaloneFile = path.resolve(__dirname, '../public/halloffame/index.html');
   if (fs.existsSync(standaloneFile)) {
     return res.sendFile(standaloneFile);
