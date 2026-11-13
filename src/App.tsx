@@ -17,6 +17,7 @@ import { AboutPage } from './modules/public/AboutPage';
 import { FAQPage } from './modules/public/FAQPage';
 import { LegalPages } from './modules/public/LegalPages';
 import { CertificateVerificationView } from './modules/public/CertificateVerificationView';
+import { HallOfFamePage } from './modules/public/HallOfFamePage';
 
 // Student Modules
 import { StudentDashboard } from './modules/student/StudentDashboard';
@@ -91,6 +92,7 @@ function resolveRouteFromPath(path: string, isAuth: boolean): string {
   if (p === '/privacy') return 'PRIVACY';
   if (p === '/terms') return 'TERMS';
   if (p === '/safety') return 'SAFETY';
+  if (p === '/halloffame' || p === '/hall-of-fame' || p === '/security' || p === '/security/hall-of-fame') return 'HALL_OF_FAME';
 
   if (p === '/curriculum' || p === '/courses') return isAuth ? 'COURSES' : 'PUBLIC_COURSES';
   if (p.startsWith('/verify')) return 'VERIFY_CERTIFICATE';
@@ -132,6 +134,7 @@ function getPathForRoute(route: string): string {
     case 'PRIVACY': return '/privacy';
     case 'TERMS': return '/terms';
     case 'SAFETY': return '/safety';
+    case 'HALL_OF_FAME': return '/halloffame';
     case 'VERIFY_CERTIFICATE': return '/verify';
     case 'DASHBOARD': return '/';
     case 'COURSES': return '/courses';
@@ -323,6 +326,15 @@ export const App: React.FC = () => {
                   >
                     FAQ
                   </button>
+                  <button
+                    onClick={() => navigateTo('HALL_OF_FAME')}
+                    className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1 ${
+                      currentRoute === 'HALL_OF_FAME' ? 'text-blue-400 font-bold bg-blue-500/10' : 'text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Hall of Fame</span>
+                  </button>
                 </>
               ) : (
                 /* Authenticated Student Navigation */
@@ -483,6 +495,13 @@ export const App: React.FC = () => {
                 >
                   FAQ
                 </button>
+                <button
+                  onClick={() => navigateTo('HALL_OF_FAME')}
+                  className="w-full text-left p-2.5 rounded-xl text-blue-400 font-semibold hover:bg-slate-800 flex items-center space-x-2"
+                >
+                  <ShieldCheck className="w-4 h-4 text-blue-400" />
+                  <span>Security Hall of Fame</span>
+                </button>
               </>
             ) : (
               <>
@@ -569,6 +588,7 @@ export const App: React.FC = () => {
                 setAuthModalOpen(true);
               }}
               onExploreCourse={(b, g) => navigateTo('PUBLIC_COURSES')}
+              onNavigate={navigateTo}
             />
           )}
           {currentRoute === 'PUBLIC_COURSES' && (
@@ -600,6 +620,9 @@ export const App: React.FC = () => {
           {currentRoute === 'PRIVACY' && <LegalPages pageType="PRIVACY" />}
           {currentRoute === 'TERMS' && <LegalPages pageType="TERMS" />}
           {currentRoute === 'SAFETY' && <LegalPages pageType="SAFETY" />}
+          {currentRoute === 'HALL_OF_FAME' && (
+            <HallOfFamePage onNavigateHome={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')} />
+          )}
           {currentRoute === 'VERIFY_CERTIFICATE' && (
             <CertificateVerificationView
               token={typeof window !== 'undefined' ? window.location.pathname.replace(/^\/verify\/?/, '') : ''}
@@ -826,6 +849,13 @@ export const App: React.FC = () => {
               </button>
               <button onClick={() => navigateTo('FAQ')} className="hover:text-slate-300">
                 FAQ
+              </button>
+              <button
+                onClick={() => navigateTo('HALL_OF_FAME')}
+                className="hover:text-blue-300 text-blue-400 font-semibold flex items-center gap-1 transition-colors"
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Security Hall of Fame</span>
               </button>
             </div>
 
