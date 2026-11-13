@@ -193,7 +193,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="w-6 h-6 rounded-full bg-amber-500 border border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">12K</div>
             <div className="w-6 h-6 rounded-full bg-emerald-500 border border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">★</div>
           </div>
-          <span>Trusted by <strong className="text-white">10,000,000+ Students</strong> across India</span>
+          <span>Trusted by <strong className="text-white">4,000+ Students</strong> across India</span>
         </div>
 
         {/* Action CTAs */}
@@ -582,7 +582,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             Widely Praised by Parents &amp; Students
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-            Hear from our community of over 10 million families thriving with AcademicLevel&apos;s autonomous AI platform.
+            Hear from our community of over 4,000 students and parents thriving with AcademicLevel&apos;s autonomous AI platform.
           </p>
 
           {/* Rating Cards Bar */}
@@ -593,17 +593,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
             <div className="px-5 py-3 rounded-2xl bg-slate-900 border border-slate-800 text-center">
               <div className="text-2xl font-black text-amber-400 flex items-center justify-center gap-1">
-                <span>4.6</span>
+                <span>4.8</span>
                 <Star className="w-4 h-4 fill-amber-400" />
               </div>
-              <div className="text-[11px] text-slate-400">App Store Rating</div>
+              <div className="text-[11px] text-slate-400">Learner Feedback Rating</div>
             </div>
             <div className="px-5 py-3 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-              <div className="text-2xl font-black text-indigo-400 flex items-center justify-center gap-1">
-                <span>4.5</span>
-                <Star className="w-4 h-4 fill-indigo-400" />
-              </div>
-              <div className="text-[11px] text-slate-400">Play Store Rating</div>
+              <div className="text-2xl font-black text-indigo-400">4,000+</div>
+              <div className="text-[11px] text-slate-400">Active Students</div>
             </div>
           </div>
 

@@ -485,7 +485,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   <div className="mt-6 -mb-8 mx-auto w-fit">
                     <div className="bg-white text-[#f95a00] font-black text-xs px-6 py-2 rounded-full shadow-lg border border-orange-100 tracking-wider flex items-center gap-1.5">
                       <span className="text-amber-500 font-bold">★</span>
-                      <span>4.8 Positive Review (25,000+ Students)</span>
+                      <span>4.8 Positive Review (4,000+ Students)</span>
                     </div>
                   </div>
                 </div>
@@ -915,7 +915,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               Why Parents Choose AcademicLevel Over ₹3,000/mo Tuition
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mt-1">
-              See why 25,000+ Indian families switched to self-paced AI mastery.
+              See why 4,000+ Indian families switched to self-paced AI mastery.
             </p>
           </div>
 
