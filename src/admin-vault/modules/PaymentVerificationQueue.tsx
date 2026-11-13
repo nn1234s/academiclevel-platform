@@ -25,6 +25,9 @@ export const PaymentVerificationQueue: React.FC = () => {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>(() =>
     StorageRLSLayer.getAllSubscriptionsAdmin(SUPER_ADMIN_EMAIL)
   );
+  const [learnersList, setLearnersList] = useState<Learner[]>(() =>
+    StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL)
+  );
   const [actionNotice, setActionNotice] = useState<string>('');
   const [rejectReason, setRejectReason] = useState<string>('');
   const [rejectingSubId, setRejectingSubId] = useState<string | null>(null);
@@ -33,13 +36,28 @@ export const PaymentVerificationQueue: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filterTab, setFilterTab] = useState<'PENDING' | 'APPROVED' | 'ALL'>('PENDING');
 
+  // Quick manual grant modal state
+  const [showGrantModal, setShowGrantModal] = useState<boolean>(false);
+  const [grantTargetId, setGrantTargetId] = useState<string>('');
+  const [grantTier, setGrantTier] = useState<'LITE' | 'PLUS'>('PLUS');
+  const [grantDays, setGrantDays] = useState<number>(365);
+  const [isGranting, setIsGranting] = useState<boolean>(false);
+
   const refreshList = async () => {
     try {
-      const res = await ApiClient.adminGetPaymentsQueue(SUPER_ADMIN_EMAIL);
-      if (res.success && Array.isArray(res.subscriptions)) {
-        res.subscriptions.forEach(s => StorageRLSLayer.saveSubscription(s));
-        setSubscriptions(res.subscriptions);
-        // Also sync storage in background for learner details
+      const [queueRes, learnersRes] = await Promise.all([
+        ApiClient.adminGetPaymentsQueue(SUPER_ADMIN_EMAIL),
+        ApiClient.adminGetLearners(SUPER_ADMIN_EMAIL).catch(() => ({ success: false, learners: [] }))
+      ]);
+
+      if (learnersRes.success && Array.isArray(learnersRes.learners)) {
+        setLearnersList(learnersRes.learners);
+        learnersRes.learners.forEach(l => StorageRLSLayer.saveLearner(l, l.id));
+      }
+
+      if (queueRes.success && Array.isArray(queueRes.subscriptions)) {
+        queueRes.subscriptions.forEach(s => StorageRLSLayer.saveSubscription(s));
+        setSubscriptions(queueRes.subscriptions);
         StorageRLSLayer.syncWithServer().catch(() => {});
         return;
       }
@@ -48,6 +66,7 @@ export const PaymentVerificationQueue: React.FC = () => {
     }
     await StorageRLSLayer.syncWithServer();
     setSubscriptions(StorageRLSLayer.getAllSubscriptionsAdmin(SUPER_ADMIN_EMAIL));
+    setLearnersList(StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL));
   };
 
   // Auto-refresh every 8 seconds to listen for incoming payments
@@ -101,19 +120,78 @@ export const PaymentVerificationQueue: React.FC = () => {
     }
   };
 
+  const handleManualGrantSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!grantTargetId) return;
+    setIsGranting(true);
+    try {
+      const res = await PaymentService.grantPremiumDirect(
+        SUPER_ADMIN_EMAIL,
+        grantTargetId,
+        grantTier,
+        grantDays,
+        `Quick grant from Payment Queue (${grantDays} days)`
+      );
+      if (res.success) {
+        setActionNotice(`🎉 Successfully granted ${grantTier} (${grantDays} days)! Subscription is now ACTIVE.`);
+        setShowGrantModal(false);
+        setGrantTargetId('');
+        await refreshList();
+        setFilterTab('APPROVED');
+        setTimeout(() => setActionNotice(''), 5000);
+      } else {
+        setActionNotice(res.error || 'Failed to grant premium.');
+      }
+    } catch (err: any) {
+      setActionNotice(err.message || 'Error occurred.');
+    } finally {
+      setIsGranting(false);
+    }
+  };
+
+  const getLearnerForSub = (sub: Subscription): Learner | null => {
+    const direct = learnersList.find(l => l.id === sub.learnerId);
+    if (direct) return direct;
+
+    const local = StorageRLSLayer.getLearnerById(sub.learnerId, sub.learnerId);
+    if (local) return local;
+
+    const byEmail = learnersList.find(l => l.email.toLowerCase() === sub.learnerId.toLowerCase());
+    if (byEmail) return byEmail;
+
+    const cleanPhone = (sub.learnerId || '').replace(/[^0-9]/g, '');
+    if (cleanPhone.length >= 10) {
+      const byPhone = learnersList.find(l => (l.phone && l.phone.includes(cleanPhone.slice(-10))) || l.email.includes(cleanPhone.slice(-10)));
+      if (byPhone) return byPhone;
+    }
+
+    if (sub.payerUpiId) {
+      const byUpi = learnersList.find(l => {
+        const phone = l.phone ? l.phone.replace(/[^0-9]/g, '').slice(-10) : '';
+        const emailPrefix = l.email.split('@')[0];
+        return (phone && sub.payerUpiId?.includes(phone)) || (emailPrefix && sub.payerUpiId?.toLowerCase().includes(emailPrefix.toLowerCase()));
+      });
+      if (byUpi) return byUpi;
+    }
+
+    return null;
+  };
+
   const pendingSubs = subscriptions.filter(s => s.status === 'PENDING_VERIFICATION');
   const approvedSubs = subscriptions.filter(s => s.status === 'ACTIVE');
   const allSubs = subscriptions;
 
   const currentDisplayList =
-    filterTab === 'PENDING'
+    searchTerm.trim().length > 0
+      ? allSubs
+      : filterTab === 'PENDING'
       ? pendingSubs
       : filterTab === 'APPROVED'
       ? approvedSubs
       : allSubs;
 
   const filteredSubs = currentDisplayList.filter(s => {
-    const learner = StorageRLSLayer.getLearnerById(s.learnerId, s.learnerId);
+    const learner = getLearnerForSub(s);
     const searchLower = searchTerm.toLowerCase();
     return (
       (learner?.fullName && learner.fullName.toLowerCase().includes(searchLower)) ||
@@ -156,6 +234,14 @@ export const PaymentVerificationQueue: React.FC = () => {
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
             <span>Live Auto-Sync Active</span>
           </div>
+
+          <button
+            onClick={() => setShowGrantModal(true)}
+            className="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-bold rounded-xl flex items-center space-x-1.5 transition-all shadow"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>+ Quick Grant Student</span>
+          </button>
 
           <button
             onClick={refreshList}
@@ -296,10 +382,22 @@ export const PaymentVerificationQueue: React.FC = () => {
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               When a student submits their UPI payment on the website, their card will appear right here with a Tick button.
             </p>
+            {filterTab === 'PENDING' && approvedSubs.length > 0 && (
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setFilterTab('ALL')}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all inline-flex items-center space-x-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span>View All Active & Paid Scholars ({approvedSubs.length})</span>
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           filteredSubs.map(sub => {
-            const learner: Learner | null = StorageRLSLayer.getLearnerById(sub.learnerId, sub.learnerId);
+            const learner: Learner | null = getLearnerForSub(sub);
             const isPending = sub.status === 'PENDING_VERIFICATION';
 
             return (
@@ -472,6 +570,96 @@ export const PaymentVerificationQueue: React.FC = () => {
                 Confirm Rejection
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* QUICK GRANT MODAL */}
+      {showGrantModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-6 text-slate-100 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center space-x-2">
+                <Sparkles className="w-5 h-5 text-amber-400" />
+                <h3 className="text-base font-bold text-white">Manual Grant Premium to Student</h3>
+              </div>
+              <button onClick={() => setShowGrantModal(false)} className="text-slate-400 hover:text-white p-1">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleManualGrantSubmit} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block text-slate-300 font-bold mb-1">Select or Enter Student ID / Email / Phone:</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 9861439460 or prabir@gmail.com or choose below"
+                  value={grantTargetId}
+                  onChange={e => setGrantTargetId(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3 py-2 text-white font-mono"
+                />
+                {learnersList.length > 0 && (
+                  <select
+                    onChange={e => setGrantTargetId(e.target.value)}
+                    value={grantTargetId}
+                    className="w-full mt-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-slate-300 text-[11px]"
+                  >
+                    <option value="">-- Or choose from registered students ({learnersList.length}) --</option>
+                    {learnersList.map(l => (
+                      <option key={l.id} value={l.id}>
+                        {l.fullName} ({l.email} {l.phone ? `• ${l.phone}` : ''})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-slate-300 font-bold mb-1">Membership Tier:</label>
+                  <select
+                    value={grantTier}
+                    onChange={e => setGrantTier(e.target.value as any)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-bold"
+                  >
+                    <option value="PLUS">PLUS Plan (Unlimited)</option>
+                    <option value="LITE">LITE Plan</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-bold mb-1">Validity (Days):</label>
+                  <select
+                    value={grantDays}
+                    onChange={e => setGrantDays(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-bold"
+                  >
+                    <option value={30}>30 Days (1 Month)</option>
+                    <option value={60}>60 Days (2 Months)</option>
+                    <option value={180}>180 Days (Semester)</option>
+                    <option value={365}>365 Days (Full Year)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setShowGrantModal(false)}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isGranting || !grantTargetId}
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold shadow flex items-center space-x-1.5"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>{isGranting ? 'Granting...' : `Confirm & Activate (${grantDays}d)`}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -348,7 +348,18 @@ class StorageRLSLayerClass {
       return [];
     }
     const all = this.readRaw<Subscription[]>(STORAGE_KEYS.SUBSCRIPTIONS, []);
-    return all.filter(s => s.learnerId === learnerId);
+    const cleanPhone = (learnerId || '').replace(/[^0-9]/g, '');
+    const phone10 = cleanPhone.length >= 10 ? cleanPhone.slice(-10) : '';
+
+    return all.filter(s => 
+      s.learnerId === learnerId || 
+      (phone10 && s.learnerId.includes(phone10)) ||
+      (phone10 && s.payerUpiId && s.payerUpiId.includes(phone10))
+    );
+  }
+
+  public getAllCachedSubscriptions(): Subscription[] {
+    return this.readRaw<Subscription[]>(STORAGE_KEYS.SUBSCRIPTIONS, []);
   }
 
   public getAllSubscriptionsAdmin(adminEmail: string): Subscription[] {

@@ -320,6 +320,78 @@ apiRouter.post('/auth/register', (req, res) => {
   }
 });
 
+function getActiveSubscriptionForLearner(learner) {
+  if (!learner) return null;
+  const learnerPhone = (learner.phone || '').trim();
+  const phoneDigits = learnerPhone.replace(/[^0-9]/g, '');
+  const phone10 = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : '';
+  const learnerEmail = (learner.email || '').trim().toLowerCase();
+  const emailPrefix = learnerEmail.split('@')[0] || '';
+
+  const activeSub = db.prepare(`
+    SELECT s.* FROM subscriptions s
+    WHERE (
+      s.learnerId = ?
+      OR s.learnerId IN (SELECT id FROM learners WHERE email = ? OR (phone IS NOT NULL AND phone != '' AND (phone = ? OR phone = ?)))
+      OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
+      OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
+    )
+    AND s.status = 'ACTIVE' 
+    AND (s.expiresAt IS NULL OR datetime(s.expiresAt) > datetime('now'))
+    ORDER BY s.createdAt DESC LIMIT 1
+  `).get(
+    learner.id,
+    learnerEmail,
+    learnerPhone,
+    phone10,
+    phone10 || learnerPhone,
+    phone10 || learnerPhone,
+    emailPrefix,
+    emailPrefix
+  );
+
+  if (activeSub && activeSub.learnerId !== learner.id) {
+    try {
+      db.prepare('UPDATE subscriptions SET learnerId = ? WHERE id = ?').run(learner.id, activeSub.id);
+      activeSub.learnerId = learner.id;
+    } catch {}
+  }
+
+  return activeSub || null;
+}
+
+function getPendingSubscriptionForLearner(learner) {
+  if (!learner) return null;
+  const learnerPhone = (learner.phone || '').trim();
+  const phoneDigits = learnerPhone.replace(/[^0-9]/g, '');
+  const phone10 = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : '';
+  const learnerEmail = (learner.email || '').trim().toLowerCase();
+  const emailPrefix = learnerEmail.split('@')[0] || '';
+
+  const pendingSub = db.prepare(`
+    SELECT s.* FROM subscriptions s
+    WHERE (
+      s.learnerId = ?
+      OR s.learnerId IN (SELECT id FROM learners WHERE email = ? OR (phone IS NOT NULL AND phone != '' AND (phone = ? OR phone = ?)))
+      OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
+      OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
+    )
+    AND s.status = 'PENDING_VERIFICATION'
+    ORDER BY s.createdAt DESC LIMIT 1
+  `).get(
+    learner.id,
+    learnerEmail,
+    learnerPhone,
+    phone10,
+    phone10 || learnerPhone,
+    phone10 || learnerPhone,
+    emailPrefix,
+    emailPrefix
+  );
+
+  return pendingSub || null;
+}
+
 apiRouter.post('/auth/login', (req, res) => {
   try {
     const { email, password } = req.body;
@@ -426,7 +498,19 @@ apiRouter.post('/auth/login', (req, res) => {
     delete learner.passwordHash;
     delete learner.passwordSalt;
 
-    res.json({ success: true, learner, token });
+    const activeSub = getActiveSubscriptionForLearner(learner);
+    if (activeSub) {
+      learner.hasActiveSubscription = true;
+      learner.activePlan = activeSub.planTier;
+      learner.planTier = activeSub.planTier;
+      learner.subscriptionExpiresAt = activeSub.expiresAt;
+      learner.subscriptionId = activeSub.id;
+    } else {
+      learner.hasActiveSubscription = false;
+      learner.activePlan = null;
+    }
+
+    res.json({ success: true, learner, token, activeSub: activeSub || null });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -457,7 +541,20 @@ apiRouter.get('/auth/me', (req, res) => {
     if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
     delete learner.passwordHash;
     delete learner.passwordSalt;
-    res.json({ success: true, learner });
+
+    const activeSub = getActiveSubscriptionForLearner(learner);
+    if (activeSub) {
+      learner.hasActiveSubscription = true;
+      learner.activePlan = activeSub.planTier;
+      learner.planTier = activeSub.planTier;
+      learner.subscriptionExpiresAt = activeSub.expiresAt;
+      learner.subscriptionId = activeSub.id;
+    } else {
+      learner.hasActiveSubscription = false;
+      learner.activePlan = null;
+    }
+
+    res.json({ success: true, learner, activeSub: activeSub || null });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -468,21 +565,49 @@ apiRouter.get('/auth/me', (req, res) => {
 // ==========================================
 apiRouter.get('/students/:id', (req, res) => {
   try {
-    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
+    const rawParam = String(req.params.id || '').trim();
+    const cleanEmail = rawParam.toLowerCase();
+    const phoneDigits = rawParam.replace(/[^0-9]/g, '');
+    const phone10 = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : '';
+
+    let learner = db.prepare(`
+      SELECT * FROM learners 
+      WHERE id = ? 
+         OR email = ? 
+         OR (phone IS NOT NULL AND phone = ?)
+         OR (phone IS NOT NULL AND phone = ?)
+         OR email LIKE ?
+         OR email LIKE ?
+    `).get(
+      rawParam,
+      cleanEmail,
+      rawParam,
+      phone10 || rawParam,
+      `%${phone10 || '___nomatch___'}%`,
+      `%${cleanEmail}%`
+    );
+
     if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
 
-    // Active subscription
-    const activeSub = db.prepare(`
-      SELECT * FROM subscriptions
-      WHERE learnerId = ? AND status = 'ACTIVE' AND (expiresAt IS NULL OR datetime(expiresAt) > datetime('now'))
-      ORDER BY createdAt DESC LIMIT 1
-    `).get(learner.id);
+    const learnerPhone = (learner.phone || phone10 || '').trim();
+    const learnerEmail = (learner.email || '').trim().toLowerCase();
+    const emailPrefix = learnerEmail.split('@')[0] || '';
 
-    const pendingSub = db.prepare(`
-      SELECT * FROM subscriptions
-      WHERE learnerId = ? AND status = 'PENDING_VERIFICATION'
-      ORDER BY createdAt DESC LIMIT 1
-    `).get(learner.id);
+    // Active & Pending subscriptions: check learner.id, email, phone, and any linked account aliases
+    const activeSub = getActiveSubscriptionForLearner(learner);
+    const pendingSub = getPendingSubscriptionForLearner(learner);
+
+    // Attach active subscription properties directly onto learner object for instant front-end hydration
+    if (activeSub) {
+      learner.hasActiveSubscription = true;
+      learner.activePlan = activeSub.planTier;
+      learner.planTier = activeSub.planTier;
+      learner.subscriptionExpiresAt = activeSub.expiresAt;
+      learner.subscriptionId = activeSub.id;
+    } else {
+      learner.hasActiveSubscription = false;
+      learner.activePlan = null;
+    }
 
     delete learner.passwordHash;
     delete learner.passwordSalt;
@@ -673,9 +798,21 @@ apiRouter.post('/payments/submit', (req, res) => {
       return res.status(400).json({ success: false, error: 'Learner ID, tier, and Payer UPI ID are required.' });
     }
 
-    if (!String(payerUpiId).includes('@')) {
-      return res.status(400).json({ success: false, error: 'Please enter a valid Payer UPI ID (e.g. name@okhdfcbank).' });
-    }
+    const cleanPayerUpi = String(payerUpiId).trim();
+    const finalPayerUpi = cleanPayerUpi.includes('@') ? cleanPayerUpi : `${cleanPayerUpi.replace(/[^a-zA-Z0-9._-]/g, '')}@upi`;
+
+    // Resolve learner to canonical ID
+    const rawParam = String(learnerId).trim();
+    const cleanEmail = rawParam.toLowerCase();
+    const phoneDigits = rawParam.replace(/[^0-9]/g, '');
+    const phone10 = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : '';
+
+    const canonicalLearner = db.prepare(`
+      SELECT * FROM learners 
+      WHERE id = ? OR email = ? OR (phone IS NOT NULL AND phone = ?) OR email LIKE ?
+    `).get(rawParam, cleanEmail, phone10 || rawParam, `%${phone10 || '___nomatch___'}%`);
+
+    const targetLearnerId = canonicalLearner ? canonicalLearner.id : rawParam;
 
     const cleanUtr = utrReference ? String(utrReference).trim() : null;
     let finalUtr = cleanUtr;
@@ -684,8 +821,15 @@ apiRouter.post('/payments/submit', (req, res) => {
       if (!/^[0-9]{12}$/.test(cleanUtr)) {
         return res.status(400).json({ success: false, error: 'UTR must be exactly 12 numeric digits.' });
       }
-      const existingUtr = db.prepare('SELECT id FROM subscriptions WHERE utrReference = ?').get(cleanUtr);
-      if (existingUtr) {
+      const existingUtrSub = db.prepare('SELECT * FROM subscriptions WHERE utrReference = ?').get(cleanUtr);
+      if (existingUtrSub) {
+        if (existingUtrSub.learnerId === targetLearnerId || (canonicalLearner && existingUtrSub.learnerId === canonicalLearner.email)) {
+          return res.json({
+            success: true,
+            message: 'Your payment reference is recorded and is under verification.',
+            subscription: existingUtrSub
+          });
+        }
         return res.status(400).json({ success: false, error: 'Duplicate UTR Reference! This transaction reference has already been submitted.' });
       }
     } else {
@@ -694,34 +838,54 @@ apiRouter.post('/payments/submit', (req, res) => {
 
     const price = tier === 'PLUS' ? 129 : 49;
     const durationDays = tier === 'PLUS' ? 180 : 60;
-    const subId = 'sub_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
-    const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
-    const now = new Date().toISOString();
 
-    db.prepare(`
-      INSERT INTO subscriptions (
-        id, learnerId, planTier, status, paymentMethod,
-        utrReference, payerUpiId, amountInr, durationDays,
-        invoiceNumber, createdAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      subId,
-      learnerId,
-      tier,
-      'PENDING_VERIFICATION',
-      'UPI_QR',
-      finalUtr,
-      String(payerUpiId).trim(),
-      price,
-      durationDays,
-      invoiceNumber,
-      now
-    );
+    // Check if there is already a pending subscription for this student
+    const existingPending = db.prepare(`
+      SELECT * FROM subscriptions 
+      WHERE (learnerId = ? OR learnerId = ? OR (payerUpiId IS NOT NULL AND payerUpiId = ?))
+        AND status = 'PENDING_VERIFICATION'
+      ORDER BY createdAt DESC LIMIT 1
+    `).get(targetLearnerId, rawParam, finalPayerUpi);
 
-    const subscription = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(subId);
+    let subscription = null;
+    if (existingPending) {
+      db.prepare(`
+        UPDATE subscriptions 
+        SET planTier = ?, payerUpiId = ?, utrReference = ?, amountInr = ?, durationDays = ?
+        WHERE id = ?
+      `).run(tier, finalPayerUpi, finalUtr, price, durationDays, existingPending.id);
+      subscription = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(existingPending.id);
+    } else {
+      const subId = 'sub_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+      const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+      const now = new Date().toISOString();
+
+      db.prepare(`
+        INSERT INTO subscriptions (
+          id, learnerId, planTier, status, paymentMethod,
+          utrReference, payerUpiId, amountInr, durationDays,
+          invoiceNumber, createdAt
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        subId,
+        targetLearnerId,
+        tier,
+        'PENDING_VERIFICATION',
+        'UPI_QR',
+        finalUtr,
+        finalPayerUpi,
+        price,
+        durationDays,
+        invoiceNumber,
+        now
+      );
+
+      subscription = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(subId);
+    }
+
     res.json({
       success: true,
-      message: 'Thank you for your purchase. Due to server side checks, we will grant after 1 day.',
+      message: 'Payment submitted for verification. Our verification desk will review and activate your subscription swiftly.',
       subscription
     });
   } catch (err) {
@@ -731,10 +895,31 @@ apiRouter.post('/payments/submit', (req, res) => {
 
 apiRouter.get('/payments/my-subscriptions', (req, res) => {
   try {
-    const learnerId = req.query.learnerId;
-    if (!learnerId) return res.status(400).json({ success: false, error: 'learnerId is required.' });
+    const rawParam = String(req.query.learnerId || '').trim();
+    if (!rawParam) return res.status(400).json({ success: false, error: 'learnerId is required.' });
 
-    const subs = db.prepare('SELECT * FROM subscriptions WHERE learnerId = ? ORDER BY createdAt DESC').all(learnerId);
+    const cleanEmail = rawParam.toLowerCase();
+    const phoneDigits = rawParam.replace(/[^0-9]/g, '');
+    const phone10 = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : '';
+
+    const canonical = db.prepare(`
+      SELECT * FROM learners 
+      WHERE id = ? OR email = ? OR (phone IS NOT NULL AND phone = ?) OR email LIKE ?
+    `).get(rawParam, cleanEmail, phone10 || rawParam, `%${phone10 || '___nomatch___'}%`);
+
+    const targetId = canonical ? canonical.id : rawParam;
+    const targetEmail = canonical ? canonical.email : cleanEmail;
+    const targetPhone = canonical ? canonical.phone : phone10;
+
+    const subs = db.prepare(`
+      SELECT s.* FROM subscriptions s
+      WHERE s.learnerId = ? 
+         OR s.learnerId = ?
+         OR s.learnerId IN (SELECT id FROM learners WHERE email = ? OR (phone IS NOT NULL AND phone != '' AND phone = ?))
+         OR (s.payerUpiId IS NOT NULL AND ? != '' AND s.payerUpiId LIKE '%' || ? || '%')
+      ORDER BY s.createdAt DESC
+    `).all(targetId, rawParam, targetEmail, targetPhone || '', targetPhone || '', targetPhone || '');
+
     res.json({ success: true, subscriptions: subs });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -2016,37 +2201,64 @@ apiRouter.get('/admin/learners', adminAuth, (req, res) => {
 apiRouter.post('/admin/learners/:id/grant-premium', adminAuth, (req, res) => {
   try {
     const { tier, durationDays, note } = req.body;
-    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
+    const rawId = String(req.params.id || '').trim();
+    const cleanEmail = rawId.toLowerCase();
+    const phoneDigits = rawId.replace(/[^0-9]/g, '');
+    const phone10 = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : '';
+
+    let learner = db.prepare(`
+      SELECT * FROM learners 
+      WHERE id = ? OR email = ? OR (phone IS NOT NULL AND phone = ?) OR email LIKE ?
+    `).get(rawId, cleanEmail, phone10 || rawId, `%${phone10 || '___nomatch___'}%`);
+
     if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
 
-    // Revoke any prior active/pending subscriptions
-    db.prepare(`UPDATE subscriptions SET status = 'REVOKED' WHERE learnerId = ? AND (status = 'ACTIVE' OR status = 'PENDING_VERIFICATION')`).run(learner.id);
+    const learnerPhone = (learner.phone || phone10 || '').trim();
+    const learnerEmail = (learner.email || '').trim().toLowerCase();
+
+    // Find all linked learner IDs (accounts with same phone or email)
+    const linkedLearners = db.prepare(`
+      SELECT id, fullName FROM learners 
+      WHERE id = ? 
+         OR (email IS NOT NULL AND email = ?)
+         OR (phone IS NOT NULL AND phone != '' AND (phone = ? OR phone = ?))
+    `).all(learner.id, learnerEmail, learnerPhone, phone10);
+
+    const targetLearnerIds = Array.from(new Set([learner.id, ...linkedLearners.map(l => l.id)]));
 
     const now = new Date();
     const expiry = new Date(now.getTime() + Number(durationDays || 60) * 24 * 60 * 60 * 1000);
-    const subId = 'admin_grant_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
 
-    db.prepare(`
-      INSERT INTO subscriptions (
-        id, learnerId, planTier, status, paymentMethod, amountInr,
-        durationDays, startsAt, expiresAt, verifiedByAdmin, verifiedAt,
-        invoiceNumber, createdAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      subId,
-      learner.id,
-      tier || 'PLUS',
-      'ACTIVE',
-      'ADMIN_TRIAL',
-      0,
-      Number(durationDays || 60),
-      now.toISOString(),
-      expiry.toISOString(),
-      SUPER_ADMIN_EMAIL,
-      now.toISOString(),
-      `ADMIN-${Math.floor(100000 + Math.random() * 900000)}`,
-      now.toISOString()
-    );
+    // Apply active subscription across all linked accounts
+    for (const lid of targetLearnerIds) {
+      db.prepare(`UPDATE subscriptions SET status = 'REVOKED' WHERE learnerId = ? AND (status = 'ACTIVE' OR status = 'PENDING_VERIFICATION')`).run(lid);
+
+      const subId = 'admin_grant_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+      db.prepare(`
+        INSERT INTO subscriptions (
+          id, learnerId, planTier, status, paymentMethod, amountInr,
+          durationDays, startsAt, expiresAt, verifiedByAdmin, verifiedAt,
+          invoiceNumber, createdAt
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        subId,
+        lid,
+        tier || 'PLUS',
+        'ACTIVE',
+        'ADMIN_TRIAL',
+        0,
+        Number(durationDays || 60),
+        now.toISOString(),
+        expiry.toISOString(),
+        SUPER_ADMIN_EMAIL,
+        now.toISOString(),
+        `ADMIN-${Math.floor(100000 + Math.random() * 900000)}`,
+        now.toISOString()
+      );
+
+      // Ensure learner account is active
+      db.prepare(`UPDATE learners SET isActive = 1, updatedAt = datetime('now') WHERE id = ?`).run(lid);
+    }
 
     // Audit log
     db.prepare(`
@@ -2059,10 +2271,10 @@ apiRouter.post('/admin/learners/:id/grant-premium', adminAuth, (req, res) => {
       'GRANT_PREMIUM_DIRECT',
       learner.id,
       'INFO',
-      `Super-Admin granted ${tier} (${durationDays} days) to learner ${learner.fullName}. Note: ${note || 'Admin grant'}`
+      `Super-Admin granted ${tier || 'PLUS'} (${durationDays} days) to learner ${learner.fullName} (and ${targetLearnerIds.length - 1} linked accounts). Note: ${note || 'Admin grant'}`
     );
 
-    res.json({ success: true, message: `Granted ${tier} (${durationDays} days) to ${learner.fullName}.` });
+    res.json({ success: true, message: `Granted ${tier || 'PLUS'} (${durationDays} days) to ${learner.fullName}.` });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

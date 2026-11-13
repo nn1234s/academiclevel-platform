@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../core/auth/AuthContext';
 import { Learner, Board, Grade, Subject } from '../../core/types';
 import { QuotaService } from '../../services/quotaService';
@@ -47,6 +47,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   onOpenUpgradeModal,
 }) => {
   const { refreshCurrentLearner } = useAuth();
+
+  useEffect(() => {
+    refreshCurrentLearner();
+  }, []);
   const isSuperAdmin = learner.role === 'SUPER_ADMIN';
   // Normal students always see the UI according to their sign up class (learner.grade)
   const activeGrade: Grade = (isSuperAdmin && activeGradeOverride) ? activeGradeOverride : (learner.grade || 10);
