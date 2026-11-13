@@ -120,6 +120,20 @@ const ADS_ROUTES: Record<string, boolean> = {
   '/ad': true
 };
 
+function checkHasPaidSubscription(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const session = StorageRLSLayer.getCurrentSession();
+    if (!session || !session.learnerId) return false;
+    const learner = StorageRLSLayer.getLearnerById(session.learnerId, session.learnerId);
+    if (learner?.hasActiveSubscription || (learner as any)?.activeSub) return true;
+    const subs = StorageRLSLayer.getSubscriptionsForLearner(session.learnerId, session.learnerId);
+    return subs.some(s => s.status === 'ACTIVE' && (!s.expiresAt || new Date(s.expiresAt).getTime() > Date.now()));
+  } catch {
+    return false;
+  }
+}
+
 function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
   const p = path.toLowerCase().replace(/\/$/, '');
 
@@ -131,8 +145,8 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
   // 2. Advertising & Campaign Landing Pages (Additional Module)
   if (ADS_ROUTES[p]) {
     if (isAuth) {
-      // Intelligently redirect already-authenticated students
-      if (p === '/ad' || p === '/ads') {
+      // For those who already paid, the ads page must go to DASHBOARD!
+      if (checkHasPaidSubscription() || p === '/ad' || p === '/ads') {
         return { route: 'DASHBOARD' };
       }
       return { route: 'PREMIUM' };
@@ -351,10 +365,20 @@ export const App: React.FC = () => {
     currentRoute === 'ADVERT1_FUNNEL' ||
     currentRoute === 'YT_ADS_FUNNEL'
   ) {
-    // If student is already authenticated, intelligently direct them to Premium Center / Dashboard
-    // without forcing them through the raw ad conversion funnel (Additional Module requirement)
+    // If student is already authenticated, intelligently direct them to Dashboard or Premium Center
+    // For those who already paid, the ads page goes to DASHBOARD!
     if (isAuthenticated) {
-      navigateTo('PREMIUM');
+      const hasPaid = Boolean(
+        currentLearner?.hasActiveSubscription ||
+        (currentLearner as any)?.activeSub ||
+        checkHasPaidSubscription()
+      );
+
+      if (hasPaid) {
+        navigateTo('DASHBOARD');
+      } else {
+        navigateTo('PREMIUM');
+      }
       return null;
     }
 

@@ -161,12 +161,12 @@ const ADS_ROUTES = {
   '/ad': true
 };
 
-function resolveRouteFromPath(path, isAuth) {
+function resolveRouteFromPath(path, isAuth, hasPaid = true) {
   const p = path.toLowerCase().replace(/\/$/, '');
   if (p === '/adminservice' || p === '/ops-vault-al99') return { route: 'ADMIN_VAULT' };
   if (ADS_ROUTES[p]) {
     if (isAuth) {
-      if (p === '/ad' || p === '/ads') return { route: 'DASHBOARD' };
+      if (hasPaid || p === '/ad' || p === '/ads') return { route: 'DASHBOARD' };
       return { route: 'PREMIUM' };
     }
     return { route: 'SPECIAL_49_FUNNEL' };
@@ -203,12 +203,13 @@ check('Authenticated students access /certificates, /nova-ai, /profile directly 
 );
 
 // ----------------------------------------------------
-// TEST 8: Additional Module - Ad page /special49 redirects authenticated students to PREMIUM
+// TEST 8: Ads route /special49 redirects already paid students to DASHBOARD
 // ----------------------------------------------------
-const adAuthSpecial49 = resolveRouteFromPath('/special49', true);
-const adAuthOffer = resolveRouteFromPath('/offer', true);
-check('Additional Module: Authenticated student visiting /special49 or /offer is redirected to PREMIUM',
-  adAuthSpecial49.route === 'PREMIUM' && adAuthOffer.route === 'PREMIUM'
+const adAuthPaidSpecial49 = resolveRouteFromPath('/special49', true, true);
+const adAuthPaidOffer = resolveRouteFromPath('/offer', true, true);
+const adAuthUnpaidSpecial49 = resolveRouteFromPath('/special49', true, false);
+check('Already paid students visiting /special49 or /offer go directly to DASHBOARD',
+  adAuthPaidSpecial49.route === 'DASHBOARD' && adAuthPaidOffer.route === 'DASHBOARD' && adAuthUnpaidSpecial49.route === 'PREMIUM'
 );
 
 // ----------------------------------------------------
