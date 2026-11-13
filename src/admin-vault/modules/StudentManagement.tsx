@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
+import { StorageRLSLayer, SUPER_ADMIN_EMAIL, isTestOrDummyAccount } from '../../core/storage/StorageRLSLayer';
 import { Learner, Board, Grade, Subscription } from '../../core/types';
 import { PaymentService } from '../../services/paymentService';
 import { QuotaService } from '../../services/quotaService';
@@ -30,10 +30,7 @@ import {
 
 export const StudentManagement: React.FC = () => {
   const [learners, setLearners] = useState<Learner[]>(() =>
-    StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL).filter(l => {
-      const em = (l?.email || '').toLowerCase();
-      return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
-    })
+    StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL).filter(l => !isTestOrDummyAccount(l?.email, l?.fullName))
   );
   const [search, setSearch] = useState('');
   const [boardFilter, setBoardFilter] = useState<string>('ALL');
@@ -77,10 +74,7 @@ export const StudentManagement: React.FC = () => {
       if (res.ok) {
         const data = await res.json();
         if (data.success && Array.isArray(data.learners)) {
-          const clean = data.learners.filter((l: Learner) => {
-            const em = (l?.email || '').toLowerCase();
-            return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
-          });
+          const clean = data.learners.filter((l: Learner) => !isTestOrDummyAccount(l?.email, l?.fullName));
           setLearners(clean);
           StorageRLSLayer.setLearnersAdmin(clean, SUPER_ADMIN_EMAIL);
           if (controllingLearner) {
@@ -93,10 +87,7 @@ export const StudentManagement: React.FC = () => {
     } catch {}
 
     await StorageRLSLayer.syncWithServer();
-    const updated = StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL).filter(l => {
-      const em = (l?.email || '').toLowerCase();
-      return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
-    });
+    const updated = StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL).filter(l => !isTestOrDummyAccount(l?.email, l?.fullName));
     setLearners(updated);
     if (controllingLearner) {
       const refreshedTarget = updated.find(l => l.id === controllingLearner.id);

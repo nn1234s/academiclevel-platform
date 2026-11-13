@@ -39,6 +39,30 @@ const STORAGE_KEYS = {
 
 export const SUPER_ADMIN_EMAIL = 'admin@academiclevel.in';
 
+export const isTestOrDummyAccount = (email?: string, name?: string): boolean => {
+  if (!email) return false;
+  const em = String(email).toLowerCase();
+  if (em.includes('@example.com') || em.includes('@academiclevel.test') || em.includes('@test.com')) return true;
+  if (
+    em.startsWith('audit_') ||
+    em.startsWith('pwd_test_') ||
+    em.startsWith('brute_') ||
+    em.startsWith('legacy_') ||
+    em.startsWith('scholar_') ||
+    em.startsWith('kid_') ||
+    em.startsWith('aarav_') ||
+    em.startsWith('bhavya_') ||
+    em.startsWith('test_quota_') ||
+    em.startsWith('test_pay_') ||
+    em.startsWith('sec_u')
+  ) return true;
+  if (name) {
+    const nm = String(name).toLowerCase();
+    if (nm.includes('test student') || nm.includes('test kid') || nm.includes('scholar tester') || nm.includes('security user')) return true;
+  }
+  return false;
+};
+
 class StorageRLSLayerClass {
   private memoryCache: Map<string, any> = new Map();
 
@@ -50,24 +74,29 @@ class StorageRLSLayerClass {
   }
 
   private initDatabase() {
-    // Immediate purge of any legacy fake test accounts from client localStorage
+    // Immediate purge of any legacy fake test accounts and 999-day test subscriptions from client localStorage
     if (typeof window !== 'undefined') {
       try {
         const rawLearners = localStorage.getItem(STORAGE_KEYS.LEARNERS);
         if (rawLearners) {
           const parsed = JSON.parse(rawLearners);
           if (Array.isArray(parsed)) {
-            const cleaned = parsed.filter((l: any) => {
-              if (!l || !l.email) return false;
-              const em = String(l.email).toLowerCase();
-              if (em.includes('@example.com') || em.includes('@academiclevel.test') || em.includes('@test.com')) return false;
-              if (em.startsWith('audit_') || em.startsWith('pwd_test_') || em.startsWith('brute_') || em.startsWith('legacy_') || em.startsWith('scholar_') || em.startsWith('kid_') || em.startsWith('aarav_') || em.startsWith('bhavya_') || em.startsWith('test_quota_')) return false;
+            const cleaned = parsed.filter((l: any) => !isTestOrDummyAccount(l?.email, l?.fullName));
+            localStorage.setItem(STORAGE_KEYS.LEARNERS, JSON.stringify(cleaned));
+            this.memoryCache.set(STORAGE_KEYS.LEARNERS, cleaned);
+          }
+        }
+        const rawSubs = localStorage.getItem(STORAGE_KEYS.SUBSCRIPTIONS);
+        if (rawSubs) {
+          const parsed = JSON.parse(rawSubs);
+          if (Array.isArray(parsed)) {
+            const cleaned = parsed.filter((s: any) => {
+              if (!s) return false;
+              if (s.durationDays > 365) return false;
               return true;
             });
-            if (cleaned.length !== parsed.length) {
-              localStorage.setItem(STORAGE_KEYS.LEARNERS, JSON.stringify(cleaned));
-              this.memoryCache.set(STORAGE_KEYS.LEARNERS, cleaned);
-            }
+            localStorage.setItem(STORAGE_KEYS.SUBSCRIPTIONS, JSON.stringify(cleaned));
+            this.memoryCache.set(STORAGE_KEYS.SUBSCRIPTIONS, cleaned);
           }
         }
       } catch {}
@@ -118,12 +147,20 @@ class StorageRLSLayerClass {
 
   private readRaw<T>(key: string, defaultValue: T): T {
     if (typeof window === 'undefined') {
-      return (this.memoryCache.get(key) as T) || defaultValue;
+      const cached = (this.memoryCache.get(key) as T) || defaultValue;
+      if (key === STORAGE_KEYS.LEARNERS && Array.isArray(cached)) {
+        return (cached as any).filter((l: any) => !isTestOrDummyAccount(l?.email, l?.fullName)) as any;
+      }
+      return cached;
     }
     try {
       const item = localStorage.getItem(key);
       if (!item) return defaultValue;
-      return JSON.parse(item) as T;
+      const parsed = JSON.parse(item) as T;
+      if (key === STORAGE_KEYS.LEARNERS && Array.isArray(parsed)) {
+        return (parsed as any).filter((l: any) => !isTestOrDummyAccount(l?.email, l?.fullName)) as any;
+      }
+      return parsed;
     } catch {
       return defaultValue;
     }
@@ -343,22 +380,14 @@ class StorageRLSLayerClass {
       throw new Error('Access denied: 403 Forbidden. Only Super-Admin may access all learners.');
     }
     const all = this.readRaw<Learner[]>(STORAGE_KEYS.LEARNERS, []);
-    return all.filter(l => {
-      if (!l || !l.email) return false;
-      const em = String(l.email).toLowerCase();
-      return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
-    });
+    return all.filter(l => !isTestOrDummyAccount(l?.email, l?.fullName));
   }
 
   public setLearnersAdmin(learners: Learner[], adminEmail: string): void {
     if (!this.isAdminAuthorized(adminEmail)) {
       throw new Error('Access denied: 403 Forbidden.');
     }
-    const clean = learners.filter(l => {
-      if (!l || !l.email) return false;
-      const em = String(l.email).toLowerCase();
-      return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
-    });
+    const clean = learners.filter(l => !isTestOrDummyAccount(l?.email, l?.fullName));
     this.writeRaw(STORAGE_KEYS.LEARNERS, clean);
   }
 

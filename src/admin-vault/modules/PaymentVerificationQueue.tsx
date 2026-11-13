@@ -58,13 +58,11 @@ export const PaymentVerificationQueue: React.FC = () => {
       if (queueRes.success && Array.isArray(queueRes.subscriptions)) {
         queueRes.subscriptions.forEach(s => StorageRLSLayer.saveSubscription(s));
         setSubscriptions(queueRes.subscriptions);
-        StorageRLSLayer.syncWithServer().catch(() => {});
         return;
       }
     } catch (e) {
       console.warn('Failed to fetch admin payment queue from backend:', e);
     }
-    await StorageRLSLayer.syncWithServer();
     setSubscriptions(StorageRLSLayer.getAllSubscriptionsAdmin(SUPER_ADMIN_EMAIL));
     setLearnersList(StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL));
   };

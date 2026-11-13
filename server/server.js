@@ -13,6 +13,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DIST_PATH = path.resolve(__dirname, '../dist');
 
+// Enable reverse proxy trust (Cloudflare, Render, AWS, Load Balancers)
+app.set('trust proxy', true);
+
 // Disable Express fingerprinting
 app.disable('x-powered-by');
 

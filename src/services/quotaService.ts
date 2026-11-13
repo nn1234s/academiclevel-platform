@@ -85,7 +85,11 @@ export class QuotaService {
       const plan = anyLearner.activePlan || sub?.planTier || anyLearner.planTier || 'LITE';
       const expiresAt = anyLearner.subscriptionExpiresAt || sub?.expiresAt || new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString();
       const msLeft = new Date(expiresAt).getTime() - Date.now();
-      const daysRemaining = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+      let daysRemaining = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+      // Guard: Concept Booster is strictly capped to 60 days, and PLUS is capped to 365 days max (eliminates 999 days artifact)
+      if (plan === 'LITE' && daysRemaining > 60) daysRemaining = 60;
+      if (daysRemaining > 365) daysRemaining = 365;
+
       return {
         isLocked: daysRemaining <= 0,
         quizzesCompleted: learner.quizzesCompletedCount,
@@ -103,7 +107,10 @@ export class QuotaService {
     const activeSub = this.getActiveSubscription(learner.id, learner.email, learner.phone);
     if (activeSub && activeSub.expiresAt) {
       const msLeft = new Date(activeSub.expiresAt).getTime() - Date.now();
-      const daysRemaining = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+      let daysRemaining = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+      if (activeSub.planTier === 'LITE' && daysRemaining > 60) daysRemaining = 60;
+      if (daysRemaining > 365) daysRemaining = 365;
+
       return {
         isLocked: daysRemaining <= 0,
         quizzesCompleted: learner.quizzesCompletedCount,
@@ -121,7 +128,7 @@ export class QuotaService {
     const createdAtMs = learner.createdAt ? new Date(learner.createdAt).getTime() : Date.now();
     const defaultExpiryMs = createdAtMs + 60 * 24 * 60 * 60 * 1000;
     const msLeft = defaultExpiryMs - Date.now();
-    const daysRemaining = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+    const daysRemaining = Math.min(60, Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24))));
     const isExpired = daysRemaining <= 0;
 
     return {
