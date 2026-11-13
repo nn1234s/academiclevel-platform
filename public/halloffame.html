@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Hall of Fame</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+      margin: 0;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    h1 {
+      font-size: 2rem;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: #475569;
+      font-size: 1rem;
+    }
+    .policy-box {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+    .policy-box h2 {
+      font-size: 1.1rem;
+      margin-top: 0;
+      color: #0f172a;
+    }
+    .year-section {
+      margin-bottom: 2rem;
+    }
+    .year-title {
+      font-size: 1.25rem;
+      color: #2563eb;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.4rem;
+      margin-bottom: 1rem;
+    }
+    .researcher-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+    .researcher-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 0.5rem 0;
+    }
+    .bug-list {
+      margin: 0;
+      padding-left: 1.25rem;
+      color: #334155;
+      font-size: 0.95rem;
+    }
+    .bug-list li {
+      margin-bottom: 0.25rem;
+    }
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+    a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .back-home {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      color: #2563eb;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <a href="/" class="back-home">&larr; Back to AcademicLevel Home</a>
+
+    <header>
+      <h1>Security Hall of Fame</h1>
+      <p class="subtitle">A big thank you to the security researchers who helped keep our students and platform safe.</p>
+    </header>
+
+    <section class="policy-box">
+      <h2>Responsible Disclosure</h2>
+      <p>
+        We value the security of our learning community. If you discover a technical vulnerability on our platform, please report it responsibly to <a href="mailto:security@yourdomain.com">security@yourdomain.com</a> before disclosing it publicly. Valid high-impact reports are recognized below.
+      </p>
+    </section>
+
+    <section class="year-section">
+      <h2 class="year-title">2026</h2>
+
+      <div class="researcher-card">
+        <h3 class="researcher-name">Prabir Kumar Nanda</h3>
+        <ul class="bug-list">
+          <li>Authentication and login flow vulnerabilities</li>
+          <li>Password security and recovery flaws</li>
+          <li>Quiz scoring and answer counting logic bugs</li>
+        </ul>
+      </div>
+
+      <div class="researcher-card">
+        <h3 class="researcher-name">Preetish Priyadarshini</h3>
+        <ul class="bug-list">
+          <li>Multiple core application code and logic vulnerabilities</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer>
+      <p>Note: We currently offer public recognition only and do not run a paid cash bounty program.</p>
+    </footer>
+  </div>
+
+</body>
+</html>

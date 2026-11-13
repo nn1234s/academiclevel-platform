@@ -18,11 +18,19 @@ import {
 interface LandingPageProps {
   onOpenAuth: (mode: 'REGISTER' | 'LOGIN') => void;
   onExploreCourse: (board: Board, grade: Grade) => void;
+  onNavigate?: (route: string) => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onExploreCourse }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onExploreCourse, onNavigate }) => {
   const [selectedBoard, setSelectedBoard] = useState<Board>('CBSE');
   const [selectedGrade, setSelectedGrade] = useState<Grade>(10);
+
+  const handleHallOfFameClick = (e: React.MouseEvent) => {
+    if (onNavigate) {
+      e.preventDefault();
+      onNavigate('HALL_OF_FAME');
+    }
+  };
 
   return (
     <div className="space-y-24 text-slate-100">
@@ -47,6 +55,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onExploreC
             <Award className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
             <span>Voted Most Innovative EdTech by EdTech Century</span>
             <ExternalLink className="w-3 h-3 text-amber-400/80" />
+          </a>
+
+          <a
+            href="/halloffame"
+            onClick={handleHallOfFameClick}
+            title="View Recognized Security Researchers"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-300 backdrop-blur-md transition-all group shadow-sm cursor-pointer"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
+            <span>🛡️ Security Hall of Fame</span>
           </a>
         </div>
 
@@ -101,6 +119,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onExploreC
             <Check className="w-4 h-4 text-emerald-400" />
             <span>Offline Question Bank Fallback</span>
           </div>
+          <a
+            href="/halloffame"
+            onClick={handleHallOfFameClick}
+            className="flex items-center space-x-1.5 text-blue-400/90 hover:text-blue-300 transition-colors font-semibold cursor-pointer"
+          >
+            <ShieldCheck className="w-4 h-4 text-blue-400" />
+            <span>Security Hall of Fame (2026 Researchers)</span>
+          </a>
         </div>
       </section>
 
