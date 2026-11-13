@@ -1956,8 +1956,8 @@ function adminAuth(req, res, next) {
 
   const hasValidToken = adminToken && isValidAdminSession(String(adminToken).trim());
   const hasValidDirectPasskey =
-    adminPasskey &&
-    isAuthorizedAdminPasskey(String(adminPasskey).trim()) &&
+    ((adminPasskey && isAuthorizedAdminPasskey(String(adminPasskey).trim())) ||
+     (adminToken && isAuthorizedAdminPasskey(String(adminToken).trim()))) &&
     (!adminEmail || isAuthorizedAdminEmail(String(adminEmail).trim().toLowerCase()));
 
   if (!hasValidToken && !hasValidDirectPasskey) {

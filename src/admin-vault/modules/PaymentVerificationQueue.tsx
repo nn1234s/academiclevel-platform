@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
 import { PaymentService } from '../../services/paymentService';
 import { Subscription, Learner } from '../../core/types';
+import { ApiClient } from '../../core/api/apiClient';
 import {
   Check,
   X,
@@ -33,6 +34,18 @@ export const PaymentVerificationQueue: React.FC = () => {
   const [filterTab, setFilterTab] = useState<'PENDING' | 'APPROVED' | 'ALL'>('PENDING');
 
   const refreshList = async () => {
+    try {
+      const res = await ApiClient.adminGetPaymentsQueue(SUPER_ADMIN_EMAIL);
+      if (res.success && Array.isArray(res.subscriptions)) {
+        res.subscriptions.forEach(s => StorageRLSLayer.saveSubscription(s));
+        setSubscriptions(res.subscriptions);
+        // Also sync storage in background for learner details
+        StorageRLSLayer.syncWithServer().catch(() => {});
+        return;
+      }
+    } catch (e) {
+      console.warn('Failed to fetch admin payment queue from backend:', e);
+    }
     await StorageRLSLayer.syncWithServer();
     setSubscriptions(StorageRLSLayer.getAllSubscriptionsAdmin(SUPER_ADMIN_EMAIL));
   };
@@ -52,12 +65,12 @@ export const PaymentVerificationQueue: React.FC = () => {
     setTimeout(() => setCopiedUpi(null), 2000);
   };
 
-  const handleApproveTick = (subId: string, studentName: string) => {
+  const handleApproveTick = async (subId: string, studentName: string) => {
     try {
-      const res = PaymentService.approvePaymentAdmin(SUPER_ADMIN_EMAIL, subId);
+      const res = await PaymentService.approvePaymentAdmin(SUPER_ADMIN_EMAIL, subId);
       if (res.success) {
         setActionNotice(`✔ Successfully TICKED & APPROVED ${studentName}! Subscription is now ACTIVE.`);
-        refreshList();
+        await refreshList();
         setTimeout(() => setActionNotice(''), 4500);
       } else {
         setActionNotice(res.error || 'Approval failed.');
@@ -67,19 +80,21 @@ export const PaymentVerificationQueue: React.FC = () => {
     }
   };
 
-  const handleReject = (subId: string) => {
+  const handleReject = async (subId: string) => {
     if (!rejectReason.trim()) {
       alert('Please specify a rejection reason.');
       return;
     }
     try {
-      const res = PaymentService.rejectPaymentAdmin(SUPER_ADMIN_EMAIL, subId, rejectReason.trim());
+      const res = await PaymentService.rejectPaymentAdmin(SUPER_ADMIN_EMAIL, subId, rejectReason.trim());
       if (res.success) {
         setActionNotice(`Payment rejected.`);
         setRejectingSubId(null);
         setRejectReason('');
-        refreshList();
+        await refreshList();
         setTimeout(() => setActionNotice(''), 3500);
+      } else {
+        setActionNotice(res.error || 'Rejection failed.');
       }
     } catch (err: any) {
       setActionNotice(err.message || 'Error occurred.');

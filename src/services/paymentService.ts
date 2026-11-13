@@ -128,10 +128,24 @@ export class PaymentService {
       finalUtr = `UPI-REF-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
     }
 
+    // Call real SQLite backend endpoint POST /api/payments/submit
+    let serverSub: Subscription | undefined;
+    try {
+      const res = await ApiClient.submitPayment(learnerId, tier, payerUpiId.trim(), finalUtr);
+      if (res.success && res.subscription) {
+        serverSub = res.subscription;
+      }
+    } catch (apiErr: any) {
+      console.warn('Backend payment submission warning:', apiErr.message);
+      if (apiErr.message && apiErr.message.includes('Duplicate UTR Reference')) {
+        return { success: false, error: apiErr.message };
+      }
+    }
+
     const plan = PLAN_PRICING[tier];
     const subId = 'sub_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
 
-    const subscription: Subscription = {
+    const subscription: Subscription = serverSub || {
       id: subId,
       learnerId,
       planTier: tier,
@@ -157,42 +171,47 @@ export class PaymentService {
    * Super-Admin One-Tick Approval of Pending Payment
    * ONLY executable by authenticated administrator
    */
-  public static approvePaymentAdmin(
+  public static async approvePaymentAdmin(
     adminEmail: string,
     subscriptionId: string
-  ): { success: boolean; error?: string } {
+  ): Promise<{ success: boolean; error?: string }> {
     if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       StorageRLSLayer.recordSecurityViolation(adminEmail, 'UNAUTHORIZED_PAYMENT_APPROVAL_ATTEMPT', subscriptionId);
       throw new Error('403 Forbidden: Only Super-Admin may approve subscriptions.');
     }
 
-    const allSubs = StorageRLSLayer.getAllSubscriptionsAdmin(adminEmail);
-    const sub = allSubs.find(s => s.id === subscriptionId);
-    if (!sub) return { success: false, error: 'Subscription not found.' };
-
-    if (sub.status === 'ACTIVE') {
-      return { success: false, error: 'Subscription is already active.' };
+    try {
+      await ApiClient.adminApprovePayment(adminEmail, subscriptionId);
+    } catch (apiErr: any) {
+      console.warn('Backend adminApprovePayment error:', apiErr.message);
     }
 
-    const now = new Date();
-    const expiry = new Date(now.getTime() + sub.durationDays * 24 * 60 * 60 * 1000);
+    const allSubs = StorageRLSLayer.getAllSubscriptionsAdmin(adminEmail);
+    const sub = allSubs.find(s => s.id === subscriptionId);
+    if (sub) {
+      if (sub.status === 'ACTIVE') {
+        return { success: false, error: 'Subscription is already active.' };
+      }
 
-    sub.status = 'ACTIVE';
-    sub.startsAt = now.toISOString();
-    sub.expiresAt = expiry.toISOString();
-    sub.verifiedByAdmin = adminEmail;
-    sub.verifiedAt = now.toISOString();
+      const now = new Date();
+      const expiry = new Date(now.getTime() + sub.durationDays * 24 * 60 * 60 * 1000);
 
-    StorageRLSLayer.saveSubscription(sub);
-    ApiClient.adminApprovePayment(adminEmail, sub.id).catch(() => {});
+      sub.status = 'ACTIVE';
+      sub.startsAt = now.toISOString();
+      sub.expiresAt = expiry.toISOString();
+      sub.verifiedByAdmin = adminEmail;
+      sub.verifiedAt = now.toISOString();
 
-    // Audit log
-    StorageRLSLayer.recordAdminAction(
-      adminEmail,
-      'APPROVE_UPI_PAYMENT',
-      sub.id,
-      `Activated ${sub.planTier} plan (${sub.durationDays} days) for learner ${sub.learnerId}. UTR: ${sub.utrReference}`
-    );
+      StorageRLSLayer.saveSubscription(sub);
+
+      // Audit log
+      StorageRLSLayer.recordAdminAction(
+        adminEmail,
+        'APPROVE_UPI_PAYMENT',
+        sub.id,
+        `Activated ${sub.planTier} plan (${sub.durationDays} days) for learner ${sub.learnerId}. UTR: ${sub.utrReference}`
+      );
+    }
 
     return { success: true };
   }
@@ -200,32 +219,37 @@ export class PaymentService {
   /**
    * Super-Admin Rejection of Invalid UTR
    */
-  public static rejectPaymentAdmin(
+  public static async rejectPaymentAdmin(
     adminEmail: string,
     subscriptionId: string,
     reason: string
-  ): { success: boolean; error?: string } {
+  ): Promise<{ success: boolean; error?: string }> {
     if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden');
     }
 
+    try {
+      await ApiClient.adminRejectPayment(adminEmail, subscriptionId, reason);
+    } catch (apiErr: any) {
+      console.warn('Backend adminRejectPayment error:', apiErr.message);
+    }
+
     const allSubs = StorageRLSLayer.getAllSubscriptionsAdmin(adminEmail);
     const sub = allSubs.find(s => s.id === subscriptionId);
-    if (!sub) return { success: false, error: 'Subscription not found.' };
+    if (sub) {
+      sub.status = 'REVOKED';
+      sub.verifiedByAdmin = adminEmail;
+      sub.verifiedAt = new Date().toISOString();
 
-    sub.status = 'REVOKED';
-    sub.verifiedByAdmin = adminEmail;
-    sub.verifiedAt = new Date().toISOString();
+      StorageRLSLayer.saveSubscription(sub);
 
-    StorageRLSLayer.saveSubscription(sub);
-    ApiClient.adminRejectPayment(adminEmail, sub.id, reason).catch(() => {});
-
-    StorageRLSLayer.recordAdminAction(
-      adminEmail,
-      'REJECT_UPI_PAYMENT',
-      sub.id,
-      `Rejected subscription for learner ${sub.learnerId}. Reason: ${reason}`
-    );
+      StorageRLSLayer.recordAdminAction(
+        adminEmail,
+        'REJECT_UPI_PAYMENT',
+        sub.id,
+        `Rejected subscription for learner ${sub.learnerId}. Reason: ${reason}`
+      );
+    }
 
     return { success: true };
   }
@@ -233,14 +257,20 @@ export class PaymentService {
   /**
    * Super-Admin Direct Trial / Subscription Grant
    */
-  public static grantTrialAdmin(
+  public static async grantTrialAdmin(
     adminEmail: string,
     learnerId: string,
     days: number,
     tier: 'LITE' | 'PLUS' = 'PLUS'
-  ): { success: boolean; error?: string } {
+  ): Promise<{ success: boolean; error?: string }> {
     if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden');
+    }
+
+    try {
+      await ApiClient.adminGrantPremium(adminEmail, learnerId, tier, days, 'Admin Trial Grant');
+    } catch (apiErr: any) {
+      console.warn('Backend grantTrialAdmin error:', apiErr.message);
     }
 
     const now = new Date();
@@ -278,11 +308,11 @@ export class PaymentService {
   /**
    * Super-Admin Revocation of an active subscription
    */
-  public static revokeSubscriptionAdmin(
+  public static async revokeSubscriptionAdmin(
     adminEmail: string,
     subscriptionId: string,
     reason: string
-  ): { success: boolean; error?: string } {
+  ): Promise<{ success: boolean; error?: string }> {
     if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden');
     }
@@ -290,6 +320,12 @@ export class PaymentService {
     const allSubs = StorageRLSLayer.getAllSubscriptionsAdmin(adminEmail);
     const sub = allSubs.find(s => s.id === subscriptionId);
     if (!sub) return { success: false, error: 'Subscription not found.' };
+
+    try {
+      await ApiClient.adminRevokePremium(adminEmail, sub.learnerId);
+    } catch (apiErr: any) {
+      console.warn('Backend revokeSubscriptionAdmin error:', apiErr.message);
+    }
 
     sub.status = 'REVOKED';
     StorageRLSLayer.saveSubscription(sub);
@@ -307,15 +343,29 @@ export class PaymentService {
   /**
    * Super-Admin Direct One-Click Grant of Premium to any student
    */
-  public static grantPremiumDirect(
+  public static async grantPremiumDirect(
     adminEmail: string,
     learnerId: string,
     tier: 'LITE' | 'PLUS',
     durationDays: number,
     note?: string
-  ): { success: boolean; subscription?: Subscription; error?: string } {
+  ): Promise<{ success: boolean; subscription?: Subscription; error?: string }> {
     if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden: Only Super-Admin may grant premium.');
+    }
+
+    // Call real SQLite backend API
+    let serverSub: Subscription | undefined;
+    try {
+      const res = await ApiClient.adminGrantPremium(adminEmail, learnerId, tier, durationDays, note);
+      if (res.success) {
+        const studentRes = await ApiClient.getStudent(learnerId);
+        if (studentRes.success && studentRes.activeSub) {
+          serverSub = studentRes.activeSub;
+        }
+      }
+    } catch (apiErr: any) {
+      console.warn('Backend adminGrantPremium error:', apiErr.message);
     }
 
     const allSubs = StorageRLSLayer.getAllSubscriptionsAdmin(adminEmail);
@@ -331,7 +381,7 @@ export class PaymentService {
     const expiry = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
     const subId = 'admin_grant_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
 
-    const subscription: Subscription = {
+    const subscription: Subscription = serverSub || {
       id: subId,
       learnerId,
       planTier: tier,
@@ -362,13 +412,19 @@ export class PaymentService {
   /**
    * Super-Admin Direct One-Click Ungrant / Revocation of Premium for any student
    */
-  public static revokePremiumDirect(
+  public static async revokePremiumDirect(
     adminEmail: string,
     learnerId: string,
     reason: string = 'Super-Admin manual ungrant'
-  ): { success: boolean; revokedCount: number; error?: string } {
+  ): Promise<{ success: boolean; revokedCount: number; error?: string }> {
     if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden: Only Super-Admin may ungrant premium.');
+    }
+
+    try {
+      await ApiClient.adminRevokePremium(adminEmail, learnerId);
+    } catch (apiErr: any) {
+      console.warn('Backend adminRevokePremium error:', apiErr.message);
     }
 
     const allSubs = StorageRLSLayer.getAllSubscriptionsAdmin(adminEmail);

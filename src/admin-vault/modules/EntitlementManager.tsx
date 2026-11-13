@@ -17,27 +17,28 @@ export const EntitlementManager: React.FC = () => {
   const [trialTier, setTrialTier] = useState<'LITE' | 'PLUS'>('PLUS');
   const [notice, setNotice] = useState<string>('');
 
-  const refreshSubs = () => {
+  const refreshSubs = async () => {
+    await StorageRLSLayer.syncWithServer();
     setSubscriptions(StorageRLSLayer.getAllSubscriptionsAdmin(SUPER_ADMIN_EMAIL));
   };
 
-  const handleGrantTrial = (e: React.FormEvent) => {
+  const handleGrantTrial = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedLearnerId) return;
 
-    const res = PaymentService.grantTrialAdmin(SUPER_ADMIN_EMAIL, selectedLearnerId, trialDays, trialTier);
+    const res = await PaymentService.grantTrialAdmin(SUPER_ADMIN_EMAIL, selectedLearnerId, trialDays, trialTier);
     if (res.success) {
       setNotice(`Granted ${trialDays}-day ${trialTier} entitlement to learner.`);
-      refreshSubs();
+      await refreshSubs();
       setTimeout(() => setNotice(''), 3500);
     }
   };
 
-  const handleRevoke = (subId: string) => {
-    const res = PaymentService.revokeSubscriptionAdmin(SUPER_ADMIN_EMAIL, subId, 'Admin Manual Revocation');
+  const handleRevoke = async (subId: string) => {
+    const res = await PaymentService.revokeSubscriptionAdmin(SUPER_ADMIN_EMAIL, subId, 'Admin Manual Revocation');
     if (res.success) {
       setNotice(`Subscription ${subId} revoked.`);
-      refreshSubs();
+      await refreshSubs();
       setTimeout(() => setNotice(''), 3500);
     }
   };

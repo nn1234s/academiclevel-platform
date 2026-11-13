@@ -149,20 +149,36 @@ class StorageRLSLayerClass {
     }
   }
 
+  private getAdminHeaders(): Record<string, string> {
+    if (typeof window === 'undefined') return {};
+    const token = sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token') || '';
+    const passkey = sessionStorage.getItem('al_admin_passkey') || localStorage.getItem('al_admin_passkey') || '';
+    const email = sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email') || SUPER_ADMIN_EMAIL;
+    const headers: Record<string, string> = {};
+    if (token) headers['x-admin-token'] = token;
+    if (passkey) headers['x-admin-passkey'] = passkey;
+    if (email) headers['x-admin-email'] = email;
+    // Fallback: if token has passkey value, also set it as x-admin-passkey
+    if (!passkey && token && (token === 'naitik2026' || token === 'vault99' || token === 'admin2026')) {
+      headers['x-admin-passkey'] = token;
+    }
+    return headers;
+  }
+
   /**
    * Syncs a single key to the backend database
    */
   private async syncToServer(key: string, value: any): Promise<void> {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
     try {
-      const token = this.getAdminToken();
-      if (!token) return; // Non-admin clients do not post to raw storage
+      const headers = this.getAdminHeaders();
+      if (!headers['x-admin-token'] && !headers['x-admin-passkey']) return; // Non-admin clients do not post to raw storage
 
       await fetch('/api/storage', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-token': token
+          ...headers
         },
         body: JSON.stringify({ key, value })
       });
@@ -179,11 +195,7 @@ class StorageRLSLayerClass {
   public async syncWithServer(): Promise<boolean> {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return false;
     try {
-      const token = this.getAdminToken();
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers['x-admin-token'] = token;
-      }
+      const headers = this.getAdminHeaders();
 
       const res = await fetch('/api/storage', { headers });
       if (!res.ok) return false;
@@ -242,12 +254,12 @@ class StorageRLSLayerClass {
         }
       });
 
-      if (hasLocalUploads && Object.keys(localDataToUpload).length > 0 && token) {
+      if (hasLocalUploads && Object.keys(localDataToUpload).length > 0 && (headers['x-admin-token'] || headers['x-admin-passkey'])) {
         await fetch('/api/storage', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-admin-token': token
+            ...headers
           },
           body: JSON.stringify({ all: localDataToUpload })
         });
