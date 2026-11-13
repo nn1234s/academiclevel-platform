@@ -39,11 +39,23 @@ apiRouter.use(express.json());
 // Rate Limiting Engine (In-Memory Sliding Window)
 // ==========================================
 const rateLimitStores = {
-  global: new Map(),
   auth: new Map(),
   payments: new Map(),
   ai: new Map()
 };
+
+function getClientIp(req) {
+  const cf = req.headers['cf-connecting-ip'];
+  if (cf) return String(cf).trim();
+  const real = req.headers['x-real-ip'];
+  if (real) return String(real).trim();
+  const fwd = req.headers['x-forwarded-for'];
+  if (fwd) {
+    const parts = String(fwd).split(',');
+    if (parts.length > 0 && parts[0].trim()) return parts[0].trim();
+  }
+  return req.ip || req.socket?.remoteAddress || '127.0.0.1';
+}
 
 function checkRateLimit(store, key, limit, windowMs) {
   const now = Date.now();
@@ -62,25 +74,13 @@ function checkRateLimit(store, key, limit, windowMs) {
   return { allowed: true, remaining: limit - record.count };
 }
 
-// Global IP limiter: Generous 5,000 requests / 15 min per IP (bypasses localhost)
-apiRouter.use((req, res, next) => {
-  const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '127.0.0.1';
-  if (clientIp === '127.0.0.1' || clientIp === '::1' || clientIp.includes('127.0.0.1') || clientIp === 'localhost') {
-    return next();
-  }
-  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.global, clientIp, 5000, 15 * 60 * 1000);
-  if (!allowed) {
-    return res.status(429).json({
-      success: false,
-      error: 'Too many requests. Please slow down and try again later.',
-      retryAfterSeconds: Math.ceil(retryAfterMs / 1000)
-    });
-  }
-  next();
-});
+// NOTE: Blanket global IP rate limiting is removed to prevent accidental 429 lockouts
+// on public learning APIs, student quiz queries, curriculum loading, and admin synchronisation.
+// Rate limiting is strictly focused on auth, AI credits, and payment submission endpoints.
 
 const authLimiter = (req, res, next) => {
-  const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '127.0.0.1';
+  if (req.headers['x-admin-token'] || req.headers['x-admin-passkey']) return next();
+  const clientIp = getClientIp(req);
   if (clientIp === '127.0.0.1' || clientIp === '::1' || clientIp.includes('127.0.0.1') || clientIp === 'localhost') {
     return next();
   }
@@ -96,8 +96,12 @@ const authLimiter = (req, res, next) => {
 };
 
 const paymentLimiter = (req, res, next) => {
-  const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '127.0.0.1';
-  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.payments, clientIp, 10, 15 * 60 * 1000);
+  if (req.headers['x-admin-token'] || req.headers['x-admin-passkey']) return next();
+  const clientIp = getClientIp(req);
+  if (clientIp === '127.0.0.1' || clientIp === '::1' || clientIp.includes('127.0.0.1') || clientIp === 'localhost') {
+    return next();
+  }
+  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.payments, clientIp, 30, 15 * 60 * 1000);
   if (!allowed) {
     return res.status(429).json({
       success: false,
@@ -109,12 +113,16 @@ const paymentLimiter = (req, res, next) => {
 };
 
 const aiChatLimiter = (req, res, next) => {
-  const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '127.0.0.1';
-  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.ai, clientIp, 60, 60 * 60 * 1000);
+  if (req.headers['x-admin-token'] || req.headers['x-admin-passkey']) return next();
+  const clientIp = getClientIp(req);
+  if (clientIp === '127.0.0.1' || clientIp === '::1' || clientIp.includes('127.0.0.1') || clientIp === 'localhost') {
+    return next();
+  }
+  const { allowed, retryAfterMs } = checkRateLimit(rateLimitStores.ai, clientIp, 120, 60 * 60 * 1000);
   if (!allowed) {
     return res.status(429).json({
       success: false,
-      error: 'AI query rate limit reached (60 queries/hour). Please wait a moment before sending another query.',
+      error: 'AI query rate limit reached (120 queries/hour). Please wait a moment before sending another query.',
       retryAfterSeconds: Math.ceil(retryAfterMs / 1000)
     });
   }

@@ -100,7 +100,7 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             Payment Details Submitted for Verification
           </h2>
           <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-            Thank you! Our verification desk matches your 12-digit UTR reference with our bank ledger swiftly (typically within 15–30 minutes). You can start practicing free quizzes immediately while your pass is being activated!
+            Thank you! Your payment details have been submitted to our audit desk. Manual bank ledger reconciliation typically takes approximately one hour. You can continue practicing unlimited quizzes with your 60-day Concept Booster pass while activation is finalized!
           </p>
         </div>
 
@@ -209,7 +209,7 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             </span>
             <h2 className="text-xl font-bold text-white">Audited UPI Verification</h2>
             <p className="text-xs text-slate-400 mt-1">
-              After completing the UPI payment of <strong className="text-white">₹{plan.priceInr}</strong>, submit your Payer UPI ID (and optional 12-digit UTR) for verification.
+              After completing the UPI payment of <strong className="text-white">₹{plan.priceInr}</strong>, submit your Payer UPI ID and 12-digit bank UTR reference. Manual verification takes approximately one hour.
             </p>
           </div>
 
