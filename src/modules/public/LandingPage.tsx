@@ -137,7 +137,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   return (
     <div className="space-y-24 text-slate-100 pb-12">
       
-      {/* 1. TOP HERO SECTION (MOST ELITE AI QUIZ PLATFORM - NO TEACHERS) */}
+      {/* 1. TOP HERO SECTION (MOST ELITE AI QUIZ PLATFORM) */}
       <section className="relative pt-8 pb-16 text-center max-w-6xl mx-auto px-4 overflow-hidden">
         {/* Glow ambient background */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
@@ -176,12 +176,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-tight">
             Most Elite AI Quiz Platform. <br className="hidden sm:inline" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-indigo-400">
-              We Have No Teachers.
+              Supercharged with AI.
             </span>
           </h1>
 
           <p className="text-base sm:text-xl text-slate-200 font-medium max-w-3xl mx-auto leading-relaxed">
-            100% Autonomous AI Pedagogy. Live Interaction. Deeper Learning. Stronger Results. <br className="hidden sm:inline" />
+            Live Interaction. Deeper Learning. Stronger Results. <br className="hidden sm:inline" />
             <span className="text-indigo-300 font-semibold">India’s Smartest AI Socratic Engine</span> knows your gaps and solves them fast. All subjects, one platform, real academic progress.
           </p>
         </div>
@@ -318,7 +318,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* 3. MOST ELITE AI QUIZ PLATFORM (WE HAVE NO TEACHERS) */}
+      {/* 3. MOST ELITE AI QUIZ PLATFORM */}
       <section className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12 space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-wider">
@@ -329,7 +329,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             Most Elite AI Quiz Platform
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-            We have no teachers — AcademicLevel replaces rigid classroom schedules with an autonomous, 24/7 Socratic AI quiz engine tailored precisely to your syllabus, strengths, and pace.
+            AcademicLevel replaces rigid classroom schedules with an autonomous, 24/7 Socratic AI quiz engine tailored precisely to your syllabus, strengths, and pace.
           </p>
 
           {/* 4 Stats Grid */}
@@ -339,8 +339,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="text-xs text-slate-400 font-medium mt-1">Verified Questions</div>
             </div>
             <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-              <div className="text-2xl sm:text-3xl font-black text-indigo-400">0 Teachers</div>
-              <div className="text-xs text-slate-400 font-medium mt-1">100% Autonomous AI</div>
+              <div className="text-2xl sm:text-3xl font-black text-indigo-400">100% AI</div>
+              <div className="text-xs text-slate-400 font-medium mt-1">Autonomous Socratic Tutoring</div>
             </div>
             <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
               <div className="text-2xl sm:text-3xl font-black text-emerald-400">24/7 Instant</div>

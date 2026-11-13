@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
+// Exact reCAPTCHA v2 logo provided by user as self-contained data URI
+const RECAPTCHA_LOGO =
+  'data:image/png;base64,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';
+
 interface ReCaptchaWidgetProps {
   isVerified: boolean;
   onVerify: (verified: boolean) => void;
@@ -83,18 +87,12 @@ export const ReCaptchaWidget: React.FC<ReCaptchaWidgetProps> = ({
 
       {/* Right reCAPTCHA Brand & Badge */}
       <div className="flex flex-col items-center justify-center shrink-0 pl-2">
-        <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none">
-          {/* Top Blue Curved Arrow */}
-          <path
-            d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8z"
-            fill="#1a73e8"
-          />
-          {/* Bottom Gray Curved Arrow */}
-          <path
-            d="M12 20v3l4-4-4-4v3c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8z"
-            fill="#80868b"
-          />
-        </svg>
+        <img
+          src={RECAPTCHA_LOGO}
+          alt="reCAPTCHA"
+          className="w-7 h-auto object-contain"
+          loading="eager"
+        />
         <span className="text-[10px] text-[#555555] font-semibold tracking-wider mt-0.5">
           reCAPTCHA
         </span>

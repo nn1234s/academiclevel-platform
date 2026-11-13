@@ -873,7 +873,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
               <p className="text-xs sm:text-sm text-slate-700 italic leading-relaxed">
-                &quot;Best platform ever! Teachers are awesome and course content syncs perfectly with school.&quot;
+                &quot;Best platform ever! Nova AI is awesome and course content syncs perfectly with school.&quot;
               </p>
               <div className="mt-4 pt-3 border-t border-slate-100 text-xs font-bold text-slate-500">
                 — Parent
