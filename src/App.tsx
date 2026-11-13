@@ -863,7 +863,7 @@ export const App: React.FC = () => {
               <span className="inline-block px-2.5 py-0.5 rounded-full bg-slate-900 text-[10px] text-indigo-400 font-mono border border-slate-800">
                 v1.0.0-PROD
               </span>
-              <p className="text-[10px] text-slate-600 mt-1">© 2026 AcademicLevel Technologies Pvt. Ltd.</p>
+              <p className="text-[10px] text-slate-600 mt-1">© 2020–{new Date().getFullYear()} ZINGQUARK INDIA TECHNOLOGIES PVT LTD</p>
             </div>
           </div>
         </footer>
