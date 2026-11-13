@@ -8,7 +8,7 @@ import { CertificateService } from './services/certificateService.ts';
 import { Learner, Grade } from './core/types/index.ts';
 
 /**
- * AcademicLevel Automated Enterprise E2E Verification Suite (v1.0.0-PROD)
+ * AcademicLevel Automated Enterprise E2E Verification Suite (v2.15.1s)
  * Validates all security kernels, invariants, quotas, and business rules.
  */
 async function runVerificationSuite() {

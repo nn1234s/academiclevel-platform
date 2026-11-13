@@ -89,9 +89,9 @@ function resolveRouteFromPath(path: string, isAuth: boolean): string {
   if (p === '/pricing') return 'PRICING';
   if (p === '/about') return 'ABOUT';
   if (p === '/faq') return 'FAQ';
-  if (p === '/privacy') return 'PRIVACY';
-  if (p === '/terms') return 'TERMS';
-  if (p === '/safety') return 'SAFETY';
+  if (p === '/privacy' || p === '/policies' || p === '/policies.html' || p === '/policy' || p === '/privacy.html') return 'PRIVACY';
+  if (p === '/terms' || p === '/terms.html' || p === '/terms-of-use') return 'TERMS';
+  if (p === '/safety' || p === '/children' || p === '/student-safety') return 'SAFETY';
   if (p === '/halloffame' || p === '/hall-of-fame' || p === '/security' || p === '/security/hall-of-fame') return 'HALL_OF_FAME';
 
   if (p === '/curriculum' || p === '/courses') return isAuth ? 'COURSES' : 'PUBLIC_COURSES';
@@ -839,7 +839,7 @@ export const App: React.FC = () => {
                 <ExternalLink className="w-3 h-3" />
               </a>
               <button onClick={() => navigateTo('PRIVACY')} className="hover:text-slate-300">
-                Privacy Policy (DPDP 2023)
+                Policies &amp; Privacy
               </button>
               <button onClick={() => navigateTo('TERMS')} className="hover:text-slate-300">
                 Terms of Service
@@ -861,7 +861,7 @@ export const App: React.FC = () => {
 
             <div className="text-right">
               <span className="inline-block px-2.5 py-0.5 rounded-full bg-slate-900 text-[10px] text-indigo-400 font-mono border border-slate-800">
-                v1.0.0-PROD
+                v2.15.1s
               </span>
               <p className="text-[10px] text-slate-600 mt-1">© 2020–{new Date().getFullYear()} ZINGQUARK INDIA TECHNOLOGIES PVT LTD</p>
             </div>

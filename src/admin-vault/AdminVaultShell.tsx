@@ -184,7 +184,7 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
             </div>
 
             <div className="p-4 border-t border-slate-800 text-[10px] text-slate-500 space-y-1">
-              <p>AcademicLevel v1.0.0-PROD</p>
+              <p>AcademicLevel v2.15.1s</p>
               <p>Strict Super-Admin Lock Active</p>
             </div>
           </aside>

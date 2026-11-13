@@ -50,6 +50,22 @@ app.get(['/halloffame', '/halloffame/', '/halloffame.html'], (req, res) => {
   res.status(404).send('Security Hall of Fame file not found.');
 });
 
+// Standalone Policies & Privacy Direct Route
+app.get(['/policies', '/policies/', '/policies.html'], (req, res) => {
+  const standaloneFile = path.resolve(__dirname, '../public/policies.html');
+  if (fs.existsSync(standaloneFile)) {
+    return res.sendFile(standaloneFile);
+  }
+  const distFile = path.resolve(DIST_PATH, 'policies.html');
+  if (fs.existsSync(distFile)) {
+    return res.sendFile(distFile);
+  }
+  if (fs.existsSync(path.join(DIST_PATH, 'index.html'))) {
+    return res.sendFile(path.join(DIST_PATH, 'index.html'));
+  }
+  res.status(404).send('Policies page not found.');
+});
+
 // Serve production static assets if dist exists
 if (fs.existsSync(DIST_PATH)) {
   app.use(express.static(DIST_PATH));
