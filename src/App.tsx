@@ -18,6 +18,7 @@ import { FAQPage } from './modules/public/FAQPage';
 import { LegalPages } from './modules/public/LegalPages';
 import { CertificateVerificationView } from './modules/public/CertificateVerificationView';
 import { HallOfFamePage } from './modules/public/HallOfFamePage';
+import { InnovativeEdtechPage } from './modules/public/InnovativeEdtechPage';
 
 // Student Modules
 import { StudentDashboard } from './modules/student/StudentDashboard';
@@ -93,6 +94,14 @@ function resolveRouteFromPath(path: string, isAuth: boolean): string {
   if (p === '/terms' || p === '/terms.html' || p === '/terms-of-use') return 'TERMS';
   if (p === '/safety' || p === '/children' || p === '/student-safety') return 'SAFETY';
   if (p === '/halloffame' || p === '/hall-of-fame' || p === '/security' || p === '/security/hall-of-fame') return 'HALL_OF_FAME';
+  if (
+    p === '/innovative-edtech' ||
+    p === '/most-innovative-edtech' ||
+    p === '/award' ||
+    p === '/awards' ||
+    p === '/edtech-century' ||
+    p === '/edtech-award'
+  ) return 'INNOVATIVE_EDTECH';
 
   if (p === '/curriculum' || p === '/courses') return isAuth ? 'COURSES' : 'PUBLIC_COURSES';
   if (p.startsWith('/verify')) return 'VERIFY_CERTIFICATE';
@@ -135,6 +144,7 @@ function getPathForRoute(route: string): string {
     case 'TERMS': return '/terms';
     case 'SAFETY': return '/safety';
     case 'HALL_OF_FAME': return '/halloffame';
+    case 'INNOVATIVE_EDTECH': return '/most-innovative-edtech';
     case 'VERIFY_CERTIFICATE': return '/verify';
     case 'DASHBOARD': return '/';
     case 'COURSES': return '/courses';
@@ -335,6 +345,17 @@ export const App: React.FC = () => {
                     <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
                     <span>Hall of Fame</span>
                   </button>
+                  <button
+                    onClick={() => navigateTo('INNOVATIVE_EDTECH')}
+                    className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1.5 ${
+                      currentRoute === 'INNOVATIVE_EDTECH'
+                        ? 'text-amber-400 font-bold bg-amber-500/10 border border-amber-500/30'
+                        : 'text-amber-300/90 hover:text-amber-300'
+                    }`}
+                  >
+                    <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                    <span>#1 EdTech Award</span>
+                  </button>
                 </>
               ) : (
                 /* Authenticated Student Navigation */
@@ -502,6 +523,13 @@ export const App: React.FC = () => {
                   <ShieldCheck className="w-4 h-4 text-blue-400" />
                   <span>Security Hall of Fame</span>
                 </button>
+                <button
+                  onClick={() => navigateTo('INNOVATIVE_EDTECH')}
+                  className="w-full text-left p-2.5 rounded-xl text-amber-300 font-semibold hover:bg-slate-800 flex items-center space-x-2"
+                >
+                  <Trophy className="w-4 h-4 text-amber-400" />
+                  <span>🏆 #1 Most Innovative EdTech</span>
+                </button>
               </>
             ) : (
               <>
@@ -622,6 +650,9 @@ export const App: React.FC = () => {
           {currentRoute === 'SAFETY' && <LegalPages pageType="SAFETY" />}
           {currentRoute === 'HALL_OF_FAME' && (
             <HallOfFamePage onNavigateHome={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')} />
+          )}
+          {currentRoute === 'INNOVATIVE_EDTECH' && (
+            <InnovativeEdtechPage onBack={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')} />
           )}
           {currentRoute === 'VERIFY_CERTIFICATE' && (
             <CertificateVerificationView
@@ -829,15 +860,13 @@ export const App: React.FC = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-6">
-              <a
-                href="https://edtechcenturyblog.blogspot.com/2026/11/academiclevel-most-innovative-edtech.html"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-amber-400/90 hover:text-amber-300 flex items-center gap-1 font-semibold transition-colors"
+              <button
+                onClick={() => navigateTo('INNOVATIVE_EDTECH')}
+                className="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold transition-colors cursor-pointer"
               >
-                <span>Most Innovative EdTech (EdTech Century)</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                <span>#1 Most Innovative EdTech (EdTech Century)</span>
+              </button>
               <button onClick={() => navigateTo('PRIVACY')} className="hover:text-slate-300">
                 Policies &amp; Privacy
               </button>
