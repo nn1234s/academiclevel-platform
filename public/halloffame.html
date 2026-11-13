@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Security Hall of Fame</title>
+  <title>Security Vulnerability &amp; Bug Bounty Policy</title>
   <style>
     body {
       font-family: system-ui, -apple-system, sans-serif;
@@ -14,72 +14,116 @@
       padding: 2rem 1rem;
     }
     .container {
-      max-width: 720px;
+      max-width: 760px;
       margin: 0 auto;
     }
     header {
       text-align: center;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
     h1 {
-      font-size: 2rem;
+      font-size: 1.85rem;
       color: #0f172a;
       margin-bottom: 0.5rem;
     }
     .subtitle {
       color: #475569;
-      font-size: 1rem;
-    }
-    .policy-box {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 1.25rem 1.5rem;
-      margin-bottom: 2rem;
       font-size: 0.95rem;
     }
-    .policy-box h2 {
+    .alert-box {
+      background: #fef2f2;
+      border: 2px solid #fca5a5;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .alert-box h2 {
       font-size: 1.1rem;
       margin-top: 0;
-      color: #0f172a;
+      color: #7f1d1d;
     }
-    .year-section {
-      margin-bottom: 2rem;
+    .alert-box p {
+      margin: 0;
+      color: #991b1b;
+      font-size: 0.92rem;
     }
-    .year-title {
-      font-size: 1.25rem;
-      color: #2563eb;
-      border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 0.4rem;
-      margin-bottom: 1rem;
+    .bounty-box {
+      background: #fffbeb;
+      border: 2px solid #fcd34d;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
     }
-    .researcher-card {
+    .bounty-box h2 {
+      font-size: 1.1rem;
+      margin-top: 0;
+      color: #78350f;
+    }
+    .bounty-box p {
+      margin: 0;
+      color: #92400e;
+      font-size: 0.92rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (min-width: 640px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .card {
       background: #ffffff;
       border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 1.25rem 1.5rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      border-radius: 12px;
+      padding: 1.25rem;
+      font-size: 0.85rem;
     }
-    .researcher-name {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #0f172a;
-      margin: 0 0 0.5rem 0;
+    .card.qualifies {
+      border-color: #a7f3d0;
     }
-    .bug-list {
+    .card.qualifies h3 {
+      color: #065f46;
+      margin-top: 0;
+    }
+    .card.disqualifies {
+      border-color: #fecaca;
+    }
+    .card.disqualifies h3 {
+      color: #991b1b;
+      margin-top: 0;
+    }
+    .card ul {
       margin: 0;
-      padding-left: 1.25rem;
-      color: #334155;
-      font-size: 0.95rem;
+      padding-left: 1.2rem;
     }
-    .bug-list li {
-      margin-bottom: 0.25rem;
+    .card li {
+      margin-bottom: 0.4rem;
+    }
+    .submit-box {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .email-badge {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      background: #f1f5f9;
+      border-radius: 6px;
+      font-family: monospace;
+      font-weight: 700;
+      color: #2563eb;
+      margin-top: 0.5rem;
     }
     footer {
       text-align: center;
-      margin-top: 3rem;
-      font-size: 0.875rem;
+      margin-top: 2.5rem;
+      font-size: 0.8rem;
       color: #64748b;
     }
     a {
@@ -104,40 +148,60 @@
     <a href="/" class="back-home">&larr; Back to AcademicLevel Home</a>
 
     <header>
-      <h1>Security Hall of Fame</h1>
-      <p class="subtitle">A big thank you to the security researchers who helped keep our students and platform safe.</p>
+      <h1>Security Vulnerability &amp; Bug Bounty Policy</h1>
+      <p class="subtitle">Official terms for technical vulnerability reporting on AcademicLevel.</p>
     </header>
 
-    <section class="policy-box">
-      <h2>Responsible Disclosure</h2>
+    <div class="alert-box">
+      <h2>Zero Public Recognition Policy</h2>
       <p>
-        We value the security of our learning community. If you discover a technical vulnerability on our platform, please report it responsibly to <a href="mailto:securityacademiclevels@gmail.com">securityacademiclevels@gmail.com</a> before disclosing it publicly. Valid high-impact reports are recognized below.
+        Please note: <strong>You will receive NO public recognition, NO Hall of Fame listing, NO certificates, NO website shoutouts, and NO public acknowledgments whatsoever</strong> for reporting any bugs. All legacy recognition pages have been permanently taken down.
+      </p>
+    </div>
+
+    <div class="bounty-box">
+      <h2>Bounty Reward: ₹10 Amazon Gift Card (Amazon GC)</h2>
+      <p>
+        If you discover and responsibly report a genuine security vulnerability that our engineers verify to be <strong>VERY VERY VERY VERY critical</strong>, you are eligible to receive a <strong>₹10 Amazon Gift Card (Amazon GC)</strong> sent to your email after technical verification.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card qualifies">
+        <h3>What Qualifies (Must be VERY Critical)</h3>
+        <ul>
+          <li><strong>Remote Code Execution (RCE)</strong> directly compromising production server host or containers.</li>
+          <li><strong>Direct SQL / Database Injection</strong> resulting in unauthenticated total production data compromise.</li>
+          <li><strong>Full Server-Side Auth Bypass</strong> allowing complete unauthorized control of the Super-Admin Vault.</li>
+        </ul>
+      </div>
+
+      <div class="card disqualifies">
+        <h3>What Does NOT Qualify (Zero Bounty)</h3>
+        <ul>
+          <li>Missing HTTP security headers (CSP, HSTS, X-Frame-Options, etc.).</li>
+          <li>Rate-limiting timing quirks, public assets, or local storage inspection.</li>
+          <li>SPF, DKIM, or DMARC email record observations.</li>
+          <li>Automated scanner or pentest tool outputs without a proven functional exploit.</li>
+          <li>Minor copy, UI glitches, or expected client-side features.</li>
+        </ul>
+      </div>
+    </div>
+
+    <section class="submit-box">
+      <h2 style="margin-top: 0; font-size: 1.1rem; color: #0f172a;">How to Submit a Report</h2>
+      <p style="font-size: 0.9rem; color: #475569;">
+        Send a complete proof of concept (PoC), step-by-step reproduction steps, and HTTP request logs to:
+      </p>
+      <div class="email-badge">securityacademiclevels@gmail.com</div>
+      <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.8rem;">
+        Rules of Engagement: Do not exfiltrate or modify student records, do not perform DoS/DDoS attacks, and do not disclose details publicly prior to coordinated resolution.
       </p>
     </section>
 
-    <section class="year-section">
-      <h2 class="year-title">2026</h2>
-
-      <div class="researcher-card">
-        <h3 class="researcher-name">Prabir Kumar Nanda</h3>
-        <ul class="bug-list">
-          <li>Authentication and login flow vulnerabilities</li>
-          <li>Password security and recovery flaws</li>
-          <li>Quiz scoring and answer counting logic bugs</li>
-        </ul>
-      </div>
-
-      <div class="researcher-card">
-        <h3 class="researcher-name">Preetish Priyadarshini</h3>
-        <ul class="bug-list">
-          <li>Multiple core application code and logic vulnerabilities</li>
-        </ul>
-      </div>
-    </section>
-
     <footer>
-      <p>Note: We currently offer public recognition only and do not run a paid cash bounty program.</p>
-      <p style="font-size: 0.75rem; margin-top: 1rem; color: #94a3b8;">© 2020–<script>document.write(new Date().getFullYear())</script> ZINGQUARK INDIA TECHNOLOGIES PVT LTD</p>
+      <p>Bounty terms: Exactly one ₹10 Amazon Gift Card (Amazon GC) strictly for verified VERY VERY VERY VERY critical vulnerabilities.</p>
+      <p>© 2020–<script>document.write(new Date().getFullYear())</script> ZINGQUARK INDIA TECHNOLOGIES PVT LTD. All rights reserved.</p>
     </footer>
   </div>
 

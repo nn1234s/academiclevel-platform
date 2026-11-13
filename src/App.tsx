@@ -344,7 +344,7 @@ export const App: React.FC = () => {
                     }`}
                   >
                     <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-                    <span>Hall of Fame</span>
+                    <span>Bug Bounty</span>
                   </button>
                   <button
                     onClick={() => navigateTo('INNOVATIVE_EDTECH')}
@@ -529,7 +529,7 @@ export const App: React.FC = () => {
                   className="w-full text-left p-2.5 rounded-xl text-blue-400 font-semibold hover:bg-slate-800 flex items-center space-x-2"
                 >
                   <ShieldCheck className="w-4 h-4 text-blue-400" />
-                  <span>Security Hall of Fame</span>
+                  <span>Security &amp; Bug Bounty</span>
                 </button>
                 <button
                   onClick={() => navigateTo('INNOVATIVE_EDTECH')}
@@ -877,7 +877,7 @@ export const App: React.FC = () => {
                 className="hover:text-blue-300 text-blue-400 font-semibold flex items-center gap-1 transition-colors"
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Security Hall of Fame</span>
+                <span>Security &amp; Bug Bounty</span>
               </button>
             </div>
 
