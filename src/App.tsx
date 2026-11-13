@@ -19,6 +19,7 @@ import { LegalPages } from './modules/public/LegalPages';
 import { CertificateVerificationView } from './modules/public/CertificateVerificationView';
 import { HallOfFamePage } from './modules/public/HallOfFamePage';
 import { InnovativeEdtechPage } from './modules/public/InnovativeEdtechPage';
+import { NotFoundPika } from './modules/public/NotFoundPika';
 
 // Student Modules
 import { StudentDashboard } from './modules/student/StudentDashboard';
@@ -792,26 +793,11 @@ export const App: React.FC = () => {
 
           {/* 404 Fallback View */}
           {currentRoute === 'NOT_FOUND' && (
-            <div className="max-w-xl mx-auto my-12 p-8 sm:p-12 text-center bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl text-slate-100">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-                <Compass className="w-8 h-8" />
-              </div>
-              <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-400 uppercase bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">
-                404 — Node Not Found
-              </span>
-              <h2 className="text-2xl font-extrabold text-white mt-3">Page or Curriculum Node Not Found</h2>
-              <p className="text-xs text-slate-400 mt-2 max-w-sm mx-auto">
-                The requested URL path was not found or requires student authentication.
-              </p>
-              <div className="mt-6 flex items-center justify-center gap-3">
-                <button
-                  onClick={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
-                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all"
-                >
-                  {isAuthenticated ? 'Return to Dashboard' : 'Back to Home'}
-                </button>
-              </div>
-            </div>
+            <NotFoundPika
+              onNavigateHome={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
+              onNavigateCourses={() => navigateTo(isAuthenticated ? 'COURSES' : 'PUBLIC_COURSES')}
+              isAuthenticated={isAuthenticated}
+            />
           )}
 
           {/* Direct Checkout View */}
