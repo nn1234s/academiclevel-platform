@@ -33,9 +33,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Check existing session after syncing with server database
-    StorageRLSLayer.syncWithServer().then(() => {
+    StorageRLSLayer.syncWithServer().then(async () => {
       const session = StorageRLSLayer.getCurrentSession();
-      if (session) {
+      if (session && session.learnerId) {
+        try {
+          const studentData = await ApiClient.getStudent(session.learnerId);
+          if (studentData.success && studentData.activeSub) {
+            StorageRLSLayer.saveSubscription(studentData.activeSub);
+          }
+        } catch {}
         const learner = StorageRLSLayer.getLearnerById(session.learnerId, session.learnerId);
         if (learner) {
           setCurrentLearner(learner);
@@ -49,6 +55,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const res = await ApiClient.getStudent(currentLearner.id);
         if (res.success && res.learner) {
+          if (res.activeSub) {
+            StorageRLSLayer.saveSubscription(res.activeSub);
+          }
           StorageRLSLayer.saveLearner(res.learner, res.learner.id);
           setCurrentLearner({ ...res.learner });
           return;
@@ -191,6 +200,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (res.token && typeof window !== 'undefined') {
           try { localStorage.setItem('al_student_token', res.token); } catch {}
         }
+        try {
+          const studentData = await ApiClient.getStudent(res.learner.id);
+          if (studentData.success && studentData.activeSub) {
+            StorageRLSLayer.saveSubscription(studentData.activeSub);
+          }
+        } catch {}
         StorageRLSLayer.saveLearner(res.learner, res.learner.id);
         StorageRLSLayer.setSession({
           learnerId: res.learner.id,

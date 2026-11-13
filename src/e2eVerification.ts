@@ -129,7 +129,7 @@ async function runVerificationSuite() {
 
   // Super-Admin One-Tick Approval
   if (payRes1.subscription) {
-    const approveRes = PaymentService.approvePaymentAdmin(SUPER_ADMIN_EMAIL, payRes1.subscription.id);
+    const approveRes = await PaymentService.approvePaymentAdmin(SUPER_ADMIN_EMAIL, payRes1.subscription.id);
     assert(approveRes.success === true, 'Super-Admin successfully approved payment');
     const updatedSub = StorageRLSLayer.getSubscriptionsForLearner(studentA.id, studentA.id)[0];
     assert(updatedSub.status === 'ACTIVE', 'Subscription status atomically transitioned to ACTIVE');

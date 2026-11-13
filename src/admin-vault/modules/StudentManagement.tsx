@@ -107,12 +107,12 @@ export const StudentManagement: React.FC = () => {
   };
 
   // One-Click Quick Grant
-  const handleQuickGrant = (learner: Learner, tier: 'LITE' | 'PLUS', days: number) => {
+  const handleQuickGrant = async (learner: Learner, tier: 'LITE' | 'PLUS', days: number) => {
     try {
-      const res = PaymentService.grantPremiumDirect(SUPER_ADMIN_EMAIL, learner.id, tier, days, `Quick grant: ${days} days`);
+      const res = await PaymentService.grantPremiumDirect(SUPER_ADMIN_EMAIL, learner.id, tier, days, `Quick grant: ${days} days`);
       if (res.success) {
         showNotification(`🎉 Granted ${tier} Plan (${days} days) to ${learner.fullName}!`, 'success');
-        refreshList();
+        await refreshList();
         setGrantingForLearner(null);
       } else {
         showNotification(res.error || 'Failed to grant premium.', 'error');
@@ -123,15 +123,15 @@ export const StudentManagement: React.FC = () => {
   };
 
   // One-Click Quick Ungrant / Revoke
-  const handleQuickUngrant = (learner: Learner) => {
+  const handleQuickUngrant = async (learner: Learner) => {
     if (!window.confirm(`Are you sure you want to revoke/ungrant premium for ${learner.fullName}? They will be immediately returned to the Free Tier.`)) {
       return;
     }
     try {
-      const res = PaymentService.revokePremiumDirect(SUPER_ADMIN_EMAIL, learner.id, 'Super-Admin manual ungrant');
+      const res = await PaymentService.revokePremiumDirect(SUPER_ADMIN_EMAIL, learner.id, 'Super-Admin manual ungrant');
       if (res.success) {
         showNotification(`Revoked premium for ${learner.fullName}. Account is now on Free Tier.`, 'success');
-        refreshList();
+        await refreshList();
       } else {
         showNotification(res.error || 'Failed to revoke premium.', 'error');
       }

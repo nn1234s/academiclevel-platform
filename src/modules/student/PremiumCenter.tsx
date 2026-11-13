@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Learner, Subscription } from '../../core/types';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { PLAN_PRICING, PaymentService } from '../../services/paymentService';
+import { ApiClient } from '../../core/api/apiClient';
 import { UPIQRCheckout } from './UPIQRCheckout';
 import {
   Sparkles,
@@ -28,6 +29,18 @@ export const PremiumCenter: React.FC<PremiumCenterProps> = ({
 }) => {
   const [selectedTier, setSelectedTier] = useState<'LITE' | 'PLUS' | null>(null);
   const [submissionSuccessUtr, setSubmissionSuccessUtr] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (learner?.id) {
+      ApiClient.getStudent(learner.id).then(res => {
+        if (res.success) {
+          if (res.activeSub) StorageRLSLayer.saveSubscription(res.activeSub);
+          if (res.pendingSub) StorageRLSLayer.saveSubscription(res.pendingSub);
+          onRefreshLearner();
+        }
+      }).catch(() => {});
+    }
+  }, [learner?.id]);
 
   const subscriptions = StorageRLSLayer.getSubscriptionsForLearner(learner.id, learner.id);
   const activeSub = subscriptions.find(
