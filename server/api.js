@@ -2915,7 +2915,11 @@ apiRouter.post('/admin/gifts/:id/dispatch', adminAuth, (req, res) => {
     if (!reqItem) return res.status(404).json({ success: false, error: 'Request not found' });
 
     const code = voucherCode ? String(voucherCode).trim() : `GC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    const newAddress = `${reqItem.shippingAddress} | Voucher Code: ${code}`;
+    let baseAddress = reqItem.shippingAddress || '';
+    if (baseAddress.includes(' | Voucher Code:')) {
+      baseAddress = baseAddress.split(' | Voucher Code:')[0].trim();
+    }
+    const newAddress = `${baseAddress} | Voucher Code: ${code}`;
 
     db.prepare(`
       UPDATE gift_requests
@@ -2923,7 +2927,10 @@ apiRouter.post('/admin/gifts/:id/dispatch', adminAuth, (req, res) => {
       WHERE id = ?
     `).run(code, newAddress, reqItem.id);
 
-    res.json({ success: true, message: `Dispatched voucher code ${code}.` });
+    exportDbToJsonStore();
+    const updated = db.prepare('SELECT * FROM gift_requests WHERE id = ?').get(reqItem.id);
+
+    res.json({ success: true, message: `Dispatched voucher code ${code}.`, gift: updated });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

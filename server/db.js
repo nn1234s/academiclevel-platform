@@ -653,8 +653,8 @@ export function exportDbToJsonStore() {
     const validLearnerIds = new Set(learners.map(l => l.id));
     const subscriptions = db.prepare('SELECT * FROM subscriptions').all().filter(s => validLearnerIds.has(s.learnerId));
     const coin_ledger = db.prepare('SELECT * FROM coin_ledger').all().filter(c => validLearnerIds.has(c.learnerId));
-    const acodes = db.prepare('SELECT * FROM acodes').all();
-    const gift_requests = db.prepare('SELECT * FROM gift_requests').all();
+    const acodes = db.prepare('SELECT * FROM acodes').all().filter(a => !a.code.includes('TEST') && (!a.createdBy || validLearnerIds.has(a.createdBy) || a.createdBy === 'SYSTEM_SCHOLARSHIP'));
+    const gift_requests = db.prepare('SELECT * FROM gift_requests').all().filter(g => validLearnerIds.has(g.learnerId));
     const security_audit_logs = db.prepare('SELECT * FROM security_audit_logs').all();
 
     const data = {

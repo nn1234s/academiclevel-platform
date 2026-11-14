@@ -27,7 +27,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": "2026-11-09T13:30:06.834Z",
       "createdAt": "2026-11-09T13:29:42.565Z",
-      "updatedAt": "2026-11-14T07:23:39.437Z",
+      "updatedAt": "2026-11-14T08:16:16.722Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -61,7 +61,7 @@
       "avatarFrame": "Emerald",
       "lastSpinTimestampUtc": "2026-11-09T13:57:04.753Z",
       "createdAt": "2026-11-09T13:46:57.966Z",
-      "updatedAt": "2026-11-14T07:23:39.438Z",
+      "updatedAt": "2026-11-14T08:16:16.722Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -95,7 +95,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-09T13:55:04.826Z",
-      "updatedAt": "2026-11-14T07:23:39.438Z",
+      "updatedAt": "2026-11-14T08:16:16.722Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -129,7 +129,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13 05:20:09",
-      "updatedAt": "2026-11-14T07:23:39.439Z",
+      "updatedAt": "2026-11-14T08:16:16.723Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -163,7 +163,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13T06:42:32.181Z",
-      "updatedAt": "2026-11-14T07:23:39.439Z",
+      "updatedAt": "2026-11-14T08:16:16.730Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -469,622 +469,8 @@
       "signatureHash": "SIG_000022978f94"
     }
   ],
-  "al_prod_acodes_v1": [
-    {
-      "code": "AL-SCHOLAR-2026",
-      "planTier": "PLUS",
-      "durationDays": 180,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "naitiknanda1235@gmail.com",
-      "expiresAt": "2027-12-31T23:59:59.000Z",
-      "createdAt": "2026-11-09T14:14:47.193Z"
-    },
-    {
-      "code": "AL-CBSE-TOPPER",
-      "planTier": "LITE",
-      "durationDays": 60,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "naitiknanda1235@gmail.com",
-      "expiresAt": "2027-12-31T23:59:59.000Z",
-      "createdAt": "2026-11-09T14:14:47.198Z"
-    },
-    {
-      "code": "AL-TEST-REDEEM-1794317625027",
-      "planTier": "PLUS",
-      "durationDays": 90,
-      "isRedeemed": 1,
-      "redeemedBy": "lrn_audit_test_1794317625008",
-      "createdBy": "admin@academiclevel.in",
-      "expiresAt": "2027-12-31T23:59:59.000Z",
-      "createdAt": "2026-11-10T13:33:45.027Z"
-    },
-    {
-      "code": "AL-FRND-HJAQ-7728",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639635337",
-      "expiresAt": "2027-02-12T07:00:35.340Z",
-      "createdAt": "2026-11-14T07:00:35.340Z"
-    },
-    {
-      "code": "AL-FRND-560C-6702",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639635337",
-      "expiresAt": "2027-02-12T07:00:35.340Z",
-      "createdAt": "2026-11-14T07:00:35.340Z"
-    },
-    {
-      "code": "AL-FRND-2SWF-9759",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639635337",
-      "expiresAt": "2027-02-12T07:00:35.340Z",
-      "createdAt": "2026-11-14T07:00:35.340Z"
-    },
-    {
-      "code": "AL-FRND-AW9C-5908",
-      "planTier": "PLUS",
-      "durationDays": 14,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639635337",
-      "expiresAt": "2027-02-12T07:00:35.344Z",
-      "createdAt": "2026-11-14T07:00:35.344Z"
-    },
-    {
-      "code": "AL-FRND-JTV3-7893",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639674855",
-      "expiresAt": "2027-02-12T07:01:14.858Z",
-      "createdAt": "2026-11-14T07:01:14.858Z"
-    },
-    {
-      "code": "AL-FRND-7X83-5260",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639674855",
-      "expiresAt": "2027-02-12T07:01:14.858Z",
-      "createdAt": "2026-11-14T07:01:14.858Z"
-    },
-    {
-      "code": "AL-FRND-A6JS-7329",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639674855",
-      "expiresAt": "2027-02-12T07:01:14.858Z",
-      "createdAt": "2026-11-14T07:01:14.858Z"
-    },
-    {
-      "code": "AL-FRND-7S6I-3148",
-      "planTier": "PLUS",
-      "durationDays": 14,
-      "isRedeemed": 1,
-      "redeemedBy": "test_friend_1794639674855",
-      "createdBy": "test_student_1794639674855",
-      "expiresAt": "2027-02-12T07:01:14.864Z",
-      "createdAt": "2026-11-14T07:01:14.864Z"
-    },
-    {
-      "code": "AL-FRND-N7RN-3524",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639696589",
-      "expiresAt": "2027-02-12T07:01:36.590Z",
-      "createdAt": "2026-11-14T07:01:36.590Z"
-    },
-    {
-      "code": "AL-FRND-IZZV-6951",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639696589",
-      "expiresAt": "2027-02-12T07:01:36.590Z",
-      "createdAt": "2026-11-14T07:01:36.590Z"
-    },
-    {
-      "code": "AL-FRND-GS8L-5838",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639696589",
-      "expiresAt": "2027-02-12T07:01:36.590Z",
-      "createdAt": "2026-11-14T07:01:36.590Z"
-    },
-    {
-      "code": "AL-FRND-UE47-9009",
-      "planTier": "PLUS",
-      "durationDays": 14,
-      "isRedeemed": 1,
-      "redeemedBy": "test_friend_1794639696589",
-      "createdBy": "test_student_1794639696589",
-      "expiresAt": "2027-02-12T07:01:36.597Z",
-      "createdAt": "2026-11-14T07:01:36.597Z"
-    },
-    {
-      "code": "AL-FRND-MX0Q-9223",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639838405",
-      "expiresAt": "2027-02-12T07:03:58.408Z",
-      "createdAt": "2026-11-14T07:03:58.408Z"
-    },
-    {
-      "code": "AL-FRND-4DKP-9636",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639838405",
-      "expiresAt": "2027-02-12T07:03:58.408Z",
-      "createdAt": "2026-11-14T07:03:58.408Z"
-    },
-    {
-      "code": "AL-FRND-A51F-8519",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639838405",
-      "expiresAt": "2027-02-12T07:03:58.408Z",
-      "createdAt": "2026-11-14T07:03:58.408Z"
-    },
-    {
-      "code": "AL-FRND-T6NB-3492",
-      "planTier": "PLUS",
-      "durationDays": 14,
-      "isRedeemed": 1,
-      "redeemedBy": "test_friend_1794639838405",
-      "createdBy": "test_student_1794639838405",
-      "expiresAt": "2027-02-12T07:03:58.413Z",
-      "createdAt": "2026-11-14T07:03:58.413Z"
-    },
-    {
-      "code": "AL-SCH-TEST-1705",
-      "planTier": "PLUS",
-      "durationDays": 60,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_sch_mwg281qw_wj0u",
-      "expiresAt": "2026-11-24T07:03:58.424Z",
-      "createdAt": "2026-11-14T07:03:58.424Z"
-    },
-    {
-      "code": "AL-FRND-XGZJ-8280",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639875073",
-      "expiresAt": "2027-02-12T07:04:35.075Z",
-      "createdAt": "2026-11-14T07:04:35.075Z"
-    },
-    {
-      "code": "AL-FRND-48XS-4081",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639875073",
-      "expiresAt": "2027-02-12T07:04:35.075Z",
-      "createdAt": "2026-11-14T07:04:35.075Z"
-    },
-    {
-      "code": "AL-FRND-N1TB-4053",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639875073",
-      "expiresAt": "2027-02-12T07:04:35.075Z",
-      "createdAt": "2026-11-14T07:04:35.075Z"
-    },
-    {
-      "code": "AL-FRND-NB06-2144",
-      "planTier": "PLUS",
-      "durationDays": 14,
-      "isRedeemed": 1,
-      "redeemedBy": "test_friend_1794639875073",
-      "createdBy": "test_student_1794639875073",
-      "expiresAt": "2027-02-12T07:04:35.083Z",
-      "createdAt": "2026-11-14T07:04:35.083Z"
-    },
-    {
-      "code": "AL-SCH-TEST-9698",
-      "planTier": "PLUS",
-      "durationDays": 60,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_sch_mwg28u1o_ld3r",
-      "expiresAt": "2026-11-24T07:04:35.100Z",
-      "createdAt": "2026-11-14T07:04:35.100Z"
-    },
-    {
-      "code": "AL-WIN1-6ALR-8611",
-      "planTier": "PLUS",
-      "durationDays": 180,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_FIRST_AWARD",
-      "expiresAt": "2027-05-13T07:04:35.234Z",
-      "createdAt": "2026-11-14T07:04:35.234Z"
-    },
-    {
-      "code": "AL-WIN2-MN2I-4508",
-      "planTier": "LITE",
-      "durationDays": 60,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_SECOND_AWARD",
-      "expiresAt": "2027-05-13T07:04:35.234Z",
-      "createdAt": "2026-11-14T07:04:35.234Z"
-    },
-    {
-      "code": "AL-WIN3-O6CP-7966",
-      "planTier": "LITE",
-      "durationDays": 30,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_THIRD_AWARD",
-      "expiresAt": "2027-05-13T07:04:35.234Z",
-      "createdAt": "2026-11-14T07:04:35.234Z"
-    },
-    {
-      "code": "AL-FRND-48J7-7938",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639894108",
-      "expiresAt": "2027-02-12T07:04:54.110Z",
-      "createdAt": "2026-11-14T07:04:54.110Z"
-    },
-    {
-      "code": "AL-FRND-HLA2-3584",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639894108",
-      "expiresAt": "2027-02-12T07:04:54.110Z",
-      "createdAt": "2026-11-14T07:04:54.110Z"
-    },
-    {
-      "code": "AL-FRND-LGWB-4206",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794639894108",
-      "expiresAt": "2027-02-12T07:04:54.110Z",
-      "createdAt": "2026-11-14T07:04:54.110Z"
-    },
-    {
-      "code": "AL-FRND-XJJT-4789",
-      "planTier": "PLUS",
-      "durationDays": 14,
-      "isRedeemed": 1,
-      "redeemedBy": "test_friend_1794639894108",
-      "createdBy": "test_student_1794639894108",
-      "expiresAt": "2027-02-12T07:04:54.119Z",
-      "createdAt": "2026-11-14T07:04:54.119Z"
-    },
-    {
-      "code": "AL-SCH-TEST-4252",
-      "planTier": "PLUS",
-      "durationDays": 60,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_sch_mwg298qg_2j05",
-      "expiresAt": "2026-11-24T07:04:54.136Z",
-      "createdAt": "2026-11-14T07:04:54.136Z"
-    },
-    {
-      "code": "AL-WIN1-74FF-3261",
-      "planTier": "PLUS",
-      "durationDays": 180,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_FIRST_AWARD",
-      "expiresAt": "2027-05-13T07:04:54.264Z",
-      "createdAt": "2026-11-14T07:04:54.264Z"
-    },
-    {
-      "code": "AL-WIN2-11XG-3082",
-      "planTier": "LITE",
-      "durationDays": 60,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_SECOND_AWARD",
-      "expiresAt": "2027-05-13T07:04:54.264Z",
-      "createdAt": "2026-11-14T07:04:54.264Z"
-    },
-    {
-      "code": "AL-WIN3-9A6U-7467",
-      "planTier": "LITE",
-      "durationDays": 30,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_THIRD_AWARD",
-      "expiresAt": "2027-05-13T07:04:54.264Z",
-      "createdAt": "2026-11-14T07:04:54.264Z"
-    },
-    {
-      "code": "AL-FRND-3A3X-5543",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794640186700",
-      "expiresAt": "2027-02-12T07:09:46.703Z",
-      "createdAt": "2026-11-14T07:09:46.703Z"
-    },
-    {
-      "code": "AL-FRND-VDXQ-6753",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794640186700",
-      "expiresAt": "2027-02-12T07:09:46.703Z",
-      "createdAt": "2026-11-14T07:09:46.703Z"
-    },
-    {
-      "code": "AL-FRND-AH4J-9297",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794640186700",
-      "expiresAt": "2027-02-12T07:09:46.703Z",
-      "createdAt": "2026-11-14T07:09:46.703Z"
-    },
-    {
-      "code": "AL-FRND-EZJS-8976",
-      "planTier": "PLUS",
-      "durationDays": 14,
-      "isRedeemed": 1,
-      "redeemedBy": "test_friend_1794640186700",
-      "createdBy": "test_student_1794640186700",
-      "expiresAt": "2027-02-12T07:09:46.710Z",
-      "createdAt": "2026-11-14T07:09:46.710Z"
-    },
-    {
-      "code": "AL-SCH-TEST-2601",
-      "planTier": "PLUS",
-      "durationDays": 60,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_sch_mwg2fihx_nrs3",
-      "expiresAt": "2026-11-24T07:09:46.724Z",
-      "createdAt": "2026-11-14T07:09:46.724Z"
-    },
-    {
-      "code": "AL-WIN1-U5NH-1222",
-      "planTier": "PLUS",
-      "durationDays": 180,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_FIRST_AWARD",
-      "expiresAt": "2027-05-13T07:09:46.868Z",
-      "createdAt": "2026-11-14T07:09:46.868Z"
-    },
-    {
-      "code": "AL-WIN2-5FM1-2922",
-      "planTier": "LITE",
-      "durationDays": 60,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_SECOND_AWARD",
-      "expiresAt": "2027-05-13T07:09:46.868Z",
-      "createdAt": "2026-11-14T07:09:46.868Z"
-    },
-    {
-      "code": "AL-WIN3-IYOE-2653",
-      "planTier": "LITE",
-      "durationDays": 30,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_THIRD_AWARD",
-      "expiresAt": "2027-05-13T07:09:46.868Z",
-      "createdAt": "2026-11-14T07:09:46.868Z"
-    },
-    {
-      "code": "AL-FRND-V1D0-1802",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794640262241",
-      "expiresAt": "2027-02-12T07:11:02.243Z",
-      "createdAt": "2026-11-14T07:11:02.243Z"
-    },
-    {
-      "code": "AL-FRND-H534-8600",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794640262241",
-      "expiresAt": "2027-02-12T07:11:02.243Z",
-      "createdAt": "2026-11-14T07:11:02.243Z"
-    },
-    {
-      "code": "AL-FRND-I1M7-2284",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794640262241",
-      "expiresAt": "2027-02-12T07:11:02.243Z",
-      "createdAt": "2026-11-14T07:11:02.243Z"
-    },
-    {
-      "code": "AL-FRND-OKBG-5255",
-      "planTier": "PLUS",
-      "durationDays": 14,
-      "isRedeemed": 1,
-      "redeemedBy": "test_friend_1794640262241",
-      "createdBy": "test_student_1794640262241",
-      "expiresAt": "2027-02-12T07:11:02.249Z",
-      "createdAt": "2026-11-14T07:11:02.249Z"
-    },
-    {
-      "code": "AL-SCH-TEST-6616",
-      "planTier": "PLUS",
-      "durationDays": 60,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_sch_mwg2h4sc_h9ha",
-      "expiresAt": "2026-11-24T07:11:02.268Z",
-      "createdAt": "2026-11-14T07:11:02.268Z"
-    },
-    {
-      "code": "AL-WIN1-8BMR-4125",
-      "planTier": "PLUS",
-      "durationDays": 180,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_FIRST_AWARD",
-      "expiresAt": "2027-05-13T07:11:02.396Z",
-      "createdAt": "2026-11-14T07:11:02.396Z"
-    },
-    {
-      "code": "AL-WIN2-NFCE-8753",
-      "planTier": "LITE",
-      "durationDays": 60,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_SECOND_AWARD",
-      "expiresAt": "2027-05-13T07:11:02.396Z",
-      "createdAt": "2026-11-14T07:11:02.396Z"
-    },
-    {
-      "code": "AL-WIN3-UD4U-8499",
-      "planTier": "LITE",
-      "durationDays": 30,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_THIRD_AWARD",
-      "expiresAt": "2027-05-13T07:11:02.396Z",
-      "createdAt": "2026-11-14T07:11:02.396Z"
-    },
-    {
-      "code": "AL-FRND-HTXI-6087",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794641019457",
-      "expiresAt": "2027-02-12T07:23:39.462Z",
-      "createdAt": "2026-11-14T07:23:39.462Z"
-    },
-    {
-      "code": "AL-FRND-80XF-7939",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794641019457",
-      "expiresAt": "2027-02-12T07:23:39.462Z",
-      "createdAt": "2026-11-14T07:23:39.462Z"
-    },
-    {
-      "code": "AL-FRND-UP4M-5279",
-      "planTier": "LITE",
-      "durationDays": 7,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "test_student_1794641019457",
-      "expiresAt": "2027-02-12T07:23:39.462Z",
-      "createdAt": "2026-11-14T07:23:39.462Z"
-    },
-    {
-      "code": "AL-FRND-YTAO-1861",
-      "planTier": "PLUS",
-      "durationDays": 14,
-      "isRedeemed": 1,
-      "redeemedBy": "test_friend_1794641019457",
-      "createdBy": "test_student_1794641019457",
-      "expiresAt": "2027-02-12T07:23:39.470Z",
-      "createdAt": "2026-11-14T07:23:39.470Z"
-    },
-    {
-      "code": "AL-SCH-TEST-9404",
-      "planTier": "PLUS",
-      "durationDays": 60,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_sch_mwg2xd29_1bo4",
-      "expiresAt": "2026-11-24T07:23:39.489Z",
-      "createdAt": "2026-11-14T07:23:39.489Z"
-    },
-    {
-      "code": "AL-WIN1-YAWP-4946",
-      "planTier": "PLUS",
-      "durationDays": 180,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_FIRST_AWARD",
-      "expiresAt": "2027-05-13T07:23:39.646Z",
-      "createdAt": "2026-11-14T07:23:39.646Z"
-    },
-    {
-      "code": "AL-WIN2-TUHB-1062",
-      "planTier": "LITE",
-      "durationDays": 60,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_SECOND_AWARD",
-      "expiresAt": "2027-05-13T07:23:39.646Z",
-      "createdAt": "2026-11-14T07:23:39.646Z"
-    },
-    {
-      "code": "AL-WIN3-T6O5-4559",
-      "planTier": "LITE",
-      "durationDays": 30,
-      "isRedeemed": 0,
-      "redeemedBy": null,
-      "createdBy": "SCHOLARSHIP_THIRD_AWARD",
-      "expiresAt": "2027-05-13T07:23:39.646Z",
-      "createdAt": "2026-11-14T07:23:39.646Z"
-    }
-  ],
+  "al_prod_acodes_v1": [],
   "al_prod_gift_requests_v1": [
-    {
-      "id": "gc_req_mw9clbnh_pko7",
-      "learnerId": "lrn_mw9cjlfa_kvf2",
-      "learnerName": "Ananya Sharma",
-      "itemTitle": "Level 1: ₹20 Amazon Pay Gift Card",
-      "coinsCost": 200000,
-      "shippingAddress": "Email Request to academiclevels@gmail.com | Delivery: ananya.sharma@example.com",
-      "contactPhone": "9876543210",
-      "status": "PENDING_APPROVAL",
-      "voucherCode": null,
-      "requestedAt": "2026-11-09T14:19:50.717Z",
-      "updatedAt": "2026-11-09T14:19:50.717Z"
-    },
     {
       "id": "gc_req_mw9c12pk_tljq",
       "learnerId": "lrn_mw9bph4q_xacr",
@@ -1413,6 +799,51 @@
     {
       "id": "admin_cfg_1794640286334",
       "timestampUtc": "2026-11-14T07:11:26.333Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_ads",
+      "severity": "INFO",
+      "details": "Super-Admin updated ADS settings."
+    },
+    {
+      "id": "admin_del_1794644161787_59zf",
+      "timestampUtc": "2026-11-14T08:16:01.787Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "DELETE_LEARNER",
+      "targetId": "lrn_test_deletion_1794644161781",
+      "severity": "WARNING",
+      "details": "Super-Admin deleted learner Temporary Student (delete_me_1794644161781@temp.test, ID: lrn_test_deletion_1794644161781) and purged all associated data."
+    },
+    {
+      "id": "admin_cfg_1794644161800",
+      "timestampUtc": "2026-11-14T08:16:01.800Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_pricing",
+      "severity": "INFO",
+      "details": "Super-Admin updated PRICING settings."
+    },
+    {
+      "id": "admin_cfg_1794644161822",
+      "timestampUtc": "2026-11-14T08:16:01.822Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_home",
+      "severity": "INFO",
+      "details": "Super-Admin updated HOME settings."
+    },
+    {
+      "id": "admin_cfg_1794644161839",
+      "timestampUtc": "2026-11-14T08:16:01.838Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_legal",
+      "severity": "INFO",
+      "details": "Super-Admin updated LEGAL settings."
+    },
+    {
+      "id": "admin_cfg_1794644161852",
+      "timestampUtc": "2026-11-14T08:16:01.851Z",
       "actorEmail": "naitiknanda1235@gmail.com",
       "actionType": "UPDATE_SYSTEM_CONFIG",
       "targetId": "cfg_ads",
