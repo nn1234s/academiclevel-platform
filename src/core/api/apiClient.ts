@@ -408,6 +408,31 @@ export class ApiClient {
     });
   }
 
+  public static async adminDeleteLearner(adminEmail: string, learnerId: string): Promise<{ success: boolean; message: string }> {
+    return this.request(`/admin/learners/${learnerId}`, {
+      method: 'DELETE',
+      headers: this.adminHeaders(adminEmail)
+    });
+  }
+
+  public static async getPublicConfig(): Promise<{ success: boolean; config: any }> {
+    return this.request('/config/public');
+  }
+
+  public static async adminGetSettings(adminEmail: string, group: string): Promise<{ success: boolean; group: string; data: any }> {
+    return this.request(`/admin/settings/${group}`, {
+      headers: this.adminHeaders(adminEmail)
+    });
+  }
+
+  public static async adminUpdateSettings(adminEmail: string, group: string, data: any): Promise<{ success: boolean; message: string; data: any }> {
+    return this.request(`/admin/settings/${group}`, {
+      method: 'POST',
+      headers: this.adminHeaders(adminEmail),
+      body: JSON.stringify(data)
+    });
+  }
+
   public static async adminGetPaymentsQueue(adminEmail: string): Promise<{ success: boolean; subscriptions: Subscription[] }> {
     return this.request('/admin/payments/queue', {
       headers: this.adminHeaders(adminEmail)

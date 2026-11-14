@@ -2399,13 +2399,13 @@ apiRouter.post('/auth/admin-verify', (req, res) => {
 });
 
 function adminAuth(req, res, next) {
-  const adminToken = req.headers['x-admin-token'] || req.query.adminToken;
-  const adminEmail = req.headers['x-admin-email'] || req.query.adminEmail;
+  const adminToken = req.headers?.['x-admin-token'] || req.query?.adminToken;
+  const adminEmail = req.headers?.['x-admin-email'] || req.query?.adminEmail;
   const adminPasskey =
-    req.headers['x-admin-passkey'] ||
-    req.headers['x-admin-key'] ||
-    req.query.passkey ||
-    req.query.adminPasskey ||
+    req.headers?.['x-admin-passkey'] ||
+    req.headers?.['x-admin-key'] ||
+    req.query?.passkey ||
+    req.query?.adminPasskey ||
     req.body?.adminPasskey;
 
   const hasValidToken = adminToken && isValidAdminSession(String(adminToken).trim());
@@ -2638,6 +2638,51 @@ apiRouter.post('/admin/learners/:id/toggle-suspend', adminAuth, (req, res) => {
     const newActive = learner.isActive ? 0 : 1;
     db.prepare('UPDATE learners SET isActive = ?, updatedAt = datetime("now") WHERE id = ?').run(newActive, learner.id);
     res.json({ success: true, isActive: newActive === 1 });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Admin Permanent Delete Learner
+apiRouter.delete('/admin/learners/:id', adminAuth, (req, res) => {
+  try {
+    const learnerId = req.params.id;
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
+
+    // Cascade deletion of all learner records across all tables
+    db.prepare('DELETE FROM sessions WHERE learnerId = ?').run(learnerId);
+    db.prepare('DELETE FROM subscriptions WHERE learnerId = ?').run(learnerId);
+    db.prepare('DELETE FROM course_progress WHERE learnerId = ?').run(learnerId);
+    try { db.prepare('DELETE FROM level_progress WHERE learnerId = ?').run(learnerId); } catch {}
+    db.prepare('DELETE FROM quiz_attempts WHERE learnerId = ?').run(learnerId);
+    db.prepare('DELETE FROM certificates WHERE learnerId = ?').run(learnerId);
+    db.prepare('DELETE FROM gift_requests WHERE learnerId = ?').run(learnerId);
+    db.prepare('DELETE FROM coin_ledger WHERE learnerId = ?').run(learnerId);
+    db.prepare('DELETE FROM scholarship_claims WHERE learnerId = ?').run(learnerId);
+    try { db.prepare('DELETE FROM challenge_completions WHERE learnerId = ?').run(learnerId); } catch {}
+    try { db.prepare('DELETE FROM friendships WHERE requesterId = ? OR receiverId = ?').run(learnerId, learnerId); } catch {}
+    try { db.prepare('DELETE FROM student_messages WHERE senderId = ? OR receiverId = ?').run(learnerId, learnerId); } catch {}
+    db.prepare('UPDATE learners SET referredBy = NULL WHERE referredBy = ?').run(learnerId);
+    db.prepare('DELETE FROM learners WHERE id = ?').run(learnerId);
+
+    // Record immutable security audit log
+    db.prepare(`
+      INSERT INTO security_audit_logs (id, timestampUtc, actorEmail, actionType, targetId, severity, details)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      'admin_del_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      new Date().toISOString(),
+      SUPER_ADMIN_EMAIL,
+      'DELETE_LEARNER',
+      learnerId,
+      'WARNING',
+      `Super-Admin deleted learner ${learner.fullName} (${learner.email}, ID: ${learnerId}) and purged all associated data.`
+    );
+
+    exportDbToJsonStore();
+
+    res.json({ success: true, message: `Successfully deleted learner ${learner.fullName} and associated data.` });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -3763,6 +3808,141 @@ apiRouter.post('/storage', adminAuth, (req, res) => {
     }
 
     res.json({ success: true, message: 'Server storage state synchronized successfully.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// Centralized System Configuration & CMS Endpoints
+// ==========================================
+const DEFAULT_CONFIG = {
+  pricing: {
+    litePriceInr: 49,
+    liteDurationDays: 60,
+    plusPriceInr: 129,
+    plusDurationDays: 180,
+    upiVpa: 'theattirebbsr@okicici',
+    merchantName: '17 Pratyusha Nanda',
+    discountBadge: 'Special Launch Offer (95% Off)',
+    liteFeatures: [
+      'Unlimited Quizzes & Adaptive Assessments',
+      'Full Access to All 4 Progression Levels',
+      'Nova AI Socratic Tutor 24/7',
+      'Level Mastery Certificates',
+      'Max 1 Class Change during active cycle'
+    ],
+    plusFeatures: [
+      'Everything in Lite, Extended to 180 Days',
+      'Olympiad & Competitive Reasoning Track',
+      'Annual Master Certificate Eligibility',
+      'Offline Question Bank Full Synchronization',
+      'Bonus 40-Coin Referral Jackpot eligibility',
+      'Max 1 Class Change during active cycle'
+    ]
+  },
+  home: {
+    heroTitle: 'Master Your School Curriculum with Adaptive AI Quizzes',
+    heroSubtitle: 'CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant Socratic guidance, verifiable certificates, and an earnable Study Coin economy.',
+    announcementActive: true,
+    announcementText: '🚀 12,000 Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
+    statsStudents: '10,000+',
+    statsQuizzes: '500,000+',
+    statsPassRate: '99.4%',
+    bannerCtaText: 'Start Free Practice Now'
+  },
+  legal: {
+    contactEmail: 'academiclevels@gmail.com',
+    lastUpdatedDate: 'November 2026',
+    privacyPolicyHeading: 'AcademicLevel Privacy & Data Protection Policy',
+    privacySummary: 'We collect only what is strictly necessary for academic assessment, certificate generation, and parent reporting. Learner data is never sold or used for third-party ad tracking.',
+    termsHeading: 'AcademicLevel Terms of Service & Learner Agreement',
+    termsSummary: 'Subscriptions grant non-transferable access for the specified duration. Study Coins are gamified reward tokens redeemable for verified gift cards and platform cosmetics according to published rules.',
+    refundPolicySummary: 'Subscriptions can be cancelled within 48 hours if no quizzes or certificate entitlements have been generated. Contact academiclevels@gmail.com with your transaction UTR.'
+  },
+  ads: {
+    mainHeading: 'Score 95%+ in School Exams Without Expensive Tuitions',
+    subHeading: 'CBSE & ICSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Socratic Nova AI Tutor & Real Study Coin Rewards.',
+    offerPriceInr: 49,
+    originalPriceInr: 999,
+    discountPercent: 95,
+    guaranteeDays: 60,
+    timerHours: 48,
+    ctaText: 'Claim 60-Day Unlimited Pass for ₹49',
+    urgentNotice: '⚡ FLASH OFFER: Only 17 spots remaining at ₹49 for today\'s cohort.'
+  }
+};
+
+function getStoredConfigGroup(groupKey) {
+  try {
+    const row = db.prepare('SELECT value FROM system_settings WHERE key = ?').get(`cfg_${groupKey.toLowerCase()}`);
+    if (row && row.value) {
+      const parsed = JSON.parse(row.value);
+      return { ...DEFAULT_CONFIG[groupKey.toLowerCase()], ...parsed };
+    }
+  } catch {}
+  return DEFAULT_CONFIG[groupKey.toLowerCase()] || {};
+}
+
+// Public endpoint for clients to read current live config
+apiRouter.get('/config/public', (req, res) => {
+  try {
+    const config = {
+      pricing: getStoredConfigGroup('pricing'),
+      home: getStoredConfigGroup('home'),
+      legal: getStoredConfigGroup('legal'),
+      ads: getStoredConfigGroup('ads')
+    };
+    res.json({ success: true, config });
+  } catch (err) {
+    res.json({ success: true, config: DEFAULT_CONFIG });
+  }
+});
+
+// Admin endpoint to read specific group
+apiRouter.get('/admin/settings/:group', adminAuth, (req, res) => {
+  try {
+    const group = String(req.params.group).toLowerCase();
+    const data = getStoredConfigGroup(group);
+    res.json({ success: true, group, data });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Admin endpoint to update specific group
+apiRouter.post('/admin/settings/:group', adminAuth, (req, res) => {
+  try {
+    const group = String(req.params.group).toLowerCase();
+    const payload = req.body || {};
+    const key = `cfg_${group}`;
+    const now = new Date().toISOString();
+
+    const current = getStoredConfigGroup(group);
+    const updated = { ...current, ...payload };
+
+    db.prepare(`
+      INSERT INTO system_settings (key, value, updatedAt)
+      VALUES (?, ?, ?)
+      ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
+    `).run(key, JSON.stringify(updated), now);
+
+    db.prepare(`
+      INSERT INTO security_audit_logs (id, timestampUtc, actorEmail, actionType, targetId, severity, details)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      'admin_cfg_' + Date.now(),
+      now,
+      SUPER_ADMIN_EMAIL,
+      'UPDATE_SYSTEM_CONFIG',
+      key,
+      'INFO',
+      `Super-Admin updated ${group.toUpperCase()} settings.`
+    );
+
+    exportDbToJsonStore();
+
+    res.json({ success: true, group, data: updated, message: `${group.toUpperCase()} settings saved and published successfully.` });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

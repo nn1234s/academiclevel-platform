@@ -2,6 +2,7 @@ import { Subscription, PlanTier } from '../core/types';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../core/storage/StorageRLSLayer';
 import { UTRValidator } from '../core/security/utrValidator';
 import { ApiClient } from '../core/api/apiClient';
+import { SiteConfigService } from './siteConfigService';
 import QRCode from 'qrcode';
 
 export interface PlanPricing {
@@ -45,6 +46,33 @@ export const PLAN_PRICING: Record<'LITE' | 'PLUS', PlanPricing> = {
   }
 };
 
+export function getDynamicPlanPricing(tier: 'LITE' | 'PLUS'): PlanPricing {
+  try {
+    const cfg = SiteConfigService.getPricing();
+    if (tier === 'LITE') {
+      return {
+        tier: 'LITE',
+        name: 'AcademicLevel Lite',
+        priceInr: cfg.litePriceInr || 49,
+        durationDays: cfg.liteDurationDays || 60,
+        description: `${cfg.liteDurationDays || 60} days of unlimited access across your chosen Board and Class.`,
+        features: cfg.liteFeatures && cfg.liteFeatures.length > 0 ? cfg.liteFeatures : PLAN_PRICING.LITE.features
+      };
+    } else {
+      return {
+        tier: 'PLUS',
+        name: 'AcademicLevel Plus',
+        priceInr: cfg.plusPriceInr || 129,
+        durationDays: cfg.plusDurationDays || 180,
+        description: `${cfg.plusDurationDays || 180} days complete mastery with Olympiad prep & priority support.`,
+        features: cfg.plusFeatures && cfg.plusFeatures.length > 0 ? cfg.plusFeatures : PLAN_PRICING.PLUS.features
+      };
+    }
+  } catch {
+    return PLAN_PRICING[tier];
+  }
+}
+
 export class PaymentService {
   public static OFFICIAL_UPI_VPA = 'theattirebbsr@okicici';
   public static OFFICIAL_MERCHANT_NAME = '17 Pratyusha Nanda';
@@ -60,9 +88,12 @@ export class PaymentService {
    * Generates a standard NPCI UPI URI string.
    */
   public static generateUpiPaymentString(tier: 'LITE' | 'PLUS', learnerId: string): string {
-    const plan = PLAN_PRICING[tier];
+    const plan = getDynamicPlanPricing(tier);
+    const cfg = SiteConfigService.getPricing();
+    const vpa = cfg.upiVpa || this.OFFICIAL_UPI_VPA;
+    const merchant = cfg.merchantName || this.OFFICIAL_MERCHANT_NAME;
     const txnNote = encodeURIComponent(`AL-${tier}-${learnerId.substring(0, 8)}`);
-    return `upi://pay?pa=${this.OFFICIAL_UPI_VPA}&pn=${encodeURIComponent(this.OFFICIAL_MERCHANT_NAME)}&am=${plan.priceInr.toFixed(2)}&cu=INR&tn=${txnNote}`;
+    return `upi://pay?pa=${vpa}&pn=${encodeURIComponent(merchant)}&am=${plan.priceInr.toFixed(2)}&cu=INR&tn=${txnNote}`;
   }
 
   /**
@@ -142,7 +173,7 @@ export class PaymentService {
       }
     }
 
-    const plan = PLAN_PRICING[tier];
+    const plan = getDynamicPlanPricing(tier);
     const subId = 'sub_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
 
     const subscription: Subscription = serverSub || {

@@ -400,6 +400,56 @@ class StorageRLSLayerClass {
     this.writeRaw(STORAGE_KEYS.LEARNERS, clean);
   }
 
+  public deleteLearnerAdmin(learnerId: string, adminEmail: string): boolean {
+    if (!this.isAdminAuthorized(adminEmail)) {
+      this.recordSecurityViolation(adminEmail, 'UNAUTHORIZED_LEARNER_DELETE', learnerId);
+      throw new Error('Access denied: 403 Forbidden.');
+    }
+    const all = this.readRaw<Learner[]>(STORAGE_KEYS.LEARNERS, []);
+    const target = all.find(l => l.id === learnerId);
+    if (!target) return false;
+
+    // Purge learner
+    this.writeRaw(STORAGE_KEYS.LEARNERS, all.filter(l => l.id !== learnerId));
+
+    // Cascade purge child tables
+    const subs = this.readRaw<Subscription[]>(STORAGE_KEYS.SUBSCRIPTIONS, []);
+    this.writeRaw(STORAGE_KEYS.SUBSCRIPTIONS, subs.filter(s => s.learnerId !== learnerId));
+
+    const progress = this.readRaw<LevelProgress[]>(STORAGE_KEYS.COURSE_PROGRESS, []);
+    this.writeRaw(STORAGE_KEYS.COURSE_PROGRESS, progress.filter(p => p.learnerId !== learnerId));
+
+    const attempts = this.readRaw<QuizAttempt[]>(STORAGE_KEYS.QUIZ_ATTEMPTS, []);
+    this.writeRaw(STORAGE_KEYS.QUIZ_ATTEMPTS, attempts.filter(a => a.learnerId !== learnerId));
+
+    const certs = this.readRaw<Certificate[]>(STORAGE_KEYS.CERTIFICATES, []);
+    this.writeRaw(STORAGE_KEYS.CERTIFICATES, certs.filter(c => c.learnerId !== learnerId));
+
+    const gifts = this.readRaw<GiftRequest[]>(STORAGE_KEYS.GIFT_REQUESTS, []);
+    this.writeRaw(STORAGE_KEYS.GIFT_REQUESTS, gifts.filter(g => g.learnerId !== learnerId));
+
+    const ledger = this.readRaw<CoinLedgerEntry[]>(STORAGE_KEYS.COIN_LEDGER, []);
+    this.writeRaw(STORAGE_KEYS.COIN_LEDGER, ledger.filter(e => e.learnerId !== learnerId));
+
+    const claims = this.readRaw<ScholarshipClaim[]>(STORAGE_KEYS.SCHOLARSHIP_CLAIMS, []);
+    this.writeRaw(STORAGE_KEYS.SCHOLARSHIP_CLAIMS, claims.filter(c => c.learnerId !== learnerId));
+
+    // Audit log
+    const auditLogs = this.readRaw<AuditLogEntry[]>(STORAGE_KEYS.AUDIT_LOGS, []);
+    auditLogs.unshift({
+      id: 'log_del_' + Date.now(),
+      timestampUtc: new Date().toISOString(),
+      actorEmail: adminEmail,
+      actionType: 'DELETE_LEARNER',
+      targetId: learnerId,
+      severity: 'WARNING',
+      details: `Admin deleted learner ${target.fullName} (${target.email}, ID: ${learnerId}).`
+    });
+    this.writeRaw(STORAGE_KEYS.AUDIT_LOGS, auditLogs);
+
+    return true;
+  }
+
   // ==========================================
   // Subscriptions & Payments
   // ==========================================

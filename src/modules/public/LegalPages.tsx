@@ -1,11 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Mail, ExternalLink, AlertCircle } from 'lucide-react';
+import { SiteConfigService } from '../../services/siteConfigService';
 
 interface LegalPageProps {
   pageType: 'PRIVACY' | 'TERMS' | 'SAFETY' | 'POLICIES';
 }
 
 export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
+  const [legalConfig, setLegalConfig] = useState(() => SiteConfigService.getLegal());
+
+  useEffect(() => {
+    return SiteConfigService.subscribe(() => {
+      setLegalConfig(SiteConfigService.getLegal());
+    });
+  }, []);
   useEffect(() => {
     if (pageType === 'TERMS') {
       document.getElementById('terms')?.scrollIntoView({ behavior: 'smooth' });
@@ -83,18 +91,23 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
         {/* Content Card */}
         <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-10 text-sm leading-relaxed text-slate-700">
           <div className="inline-block px-3 py-1 rounded-md bg-slate-100 text-slate-600 text-xs font-semibold">
-            Privacy Policy · Effective date: 6 November 2026
+            Privacy Policy · Effective date: {legalConfig.lastUpdatedDate || 'November 2026'}
           </div>
 
           {/* 1. Privacy Policy */}
           <section id="privacy" className="space-y-4 pt-2">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3">
-              1. Privacy Policy
+              1. {legalConfig.privacyPolicyHeading || 'Privacy Policy'}
             </h2>
+            {legalConfig.privacySummary && (
+              <div className="p-4 bg-indigo-50/70 border border-indigo-200/80 rounded-xl text-xs sm:text-sm text-indigo-950 font-medium leading-relaxed">
+                <strong>Executive Summary:</strong> {legalConfig.privacySummary}
+              </div>
+            )}
             <p>
               AcademicLevel (&quot;AcademicLevel&quot;, &quot;we&quot;, &quot;us&quot;) provides online learning, quizzes, courses, an AI study assistant called Nova, learner profiles, learning points and optional paid plans. Contact:{' '}
-              <a href="mailto:academiclevels@gmail.com" className="text-indigo-600 hover:underline font-medium">
-                academiclevels@gmail.com
+              <a href={`mailto:${legalConfig.contactEmail || 'academiclevels@gmail.com'}`} className="text-indigo-600 hover:underline font-medium">
+                {legalConfig.contactEmail || 'academiclevels@gmail.com'}
               </a>.
             </p>
 
@@ -218,8 +231,13 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
           {/* 6. Payments & ACodes */}
           <section id="payments" className="space-y-4 pt-6 border-t border-slate-100">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3">
-              6. Premium Plans, Payments &amp; ACodes
+              6. {legalConfig.termsHeading || 'Premium Plans, Payments & ACodes'}
             </h2>
+            {legalConfig.termsSummary && (
+              <div className="p-4 bg-amber-50/70 border border-amber-200/80 rounded-xl text-xs sm:text-sm text-amber-950 font-medium leading-relaxed">
+                <strong>Terms Summary:</strong> {legalConfig.termsSummary}
+              </div>
+            )}
             <ul className="list-disc pl-5 space-y-2">
               <li>AcademicLevel Lite is listed at ₹49 for 2 months (60 days); AcademicLevel Plus is listed at ₹129 for 6 months (180 days). The price and plan shown at checkout should be checked before paying.</li>
               <li>Payments are made through the displayed UPI QR/ID outside the app. A parent or guardian must supervise purchases by a child.</li>
@@ -227,8 +245,8 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
               <li>ACodes are intended for one learner and one redemption. Treat a code like a voucher; do not publish it or share it with strangers. ACode creation in the app is not proof that payment was received.</li>
               <li>
                 Keep your payment receipt. For an incorrect activation, duplicate payment or payment dispute, contact{' '}
-                <a href="mailto:academiclevels@gmail.com" className="text-indigo-600 hover:underline font-medium">
-                  academiclevels@gmail.com
+                <a href={`mailto:${legalConfig.contactEmail || 'academiclevels@gmail.com'}`} className="text-indigo-600 hover:underline font-medium">
+                  {legalConfig.contactEmail || 'academiclevels@gmail.com'}
                 </a>{' '}
                 with the plan, date and transaction reference. Never email a UPI PIN, OTP or password.
               </li>
@@ -250,6 +268,11 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3">
               8. Refunds, Cancellations &amp; Complaints
             </h2>
+            {legalConfig.refundPolicySummary && (
+              <div className="p-4 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-xs sm:text-sm text-emerald-950 font-medium leading-relaxed">
+                <strong>Refund Policy Terms:</strong> {legalConfig.refundPolicySummary}
+              </div>
+            )}
             <ul className="list-disc pl-5 space-y-2">
               <li>
                 For payment errors, accidental purchases, duplicate transactions, access problems, cancellation requests or reward fulfilment concerns, email{' '}
