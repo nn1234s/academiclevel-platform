@@ -22,10 +22,10 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
   const [utrNumber, setUtrNumber] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [copiedVpa, setCopiedVpa] = useState<boolean>(false);
   const [isSubmittedSuccess, setIsSubmittedSuccess] = useState<boolean>(false);
+  const [showPostPaymentNotice, setShowPostPaymentNotice] = useState<boolean>(false);
+  const utrInputRef = React.useRef<HTMLInputElement>(null);
 
-  const officialVpa = PaymentService.OFFICIAL_UPI_VPA;
   const officialPayeeName = PaymentService.OFFICIAL_MERCHANT_NAME;
   const officialQrImage = PaymentService.getOfficialQrImageUrl(planTier);
   const upiUri = PaymentService.generateUpiPaymentString(planTier, learnerId);
@@ -40,28 +40,52 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
     };
   }, [planTier, learnerId]);
 
-  const copyVpa = () => {
-    navigator.clipboard?.writeText(officialVpa);
-    setCopiedVpa(true);
-    setTimeout(() => setCopiedVpa(false), 2000);
+  const handleUpiAppTap = () => {
+    try {
+      sessionStorage.setItem('al_checkout_tapped_upi', 'true');
+      sessionStorage.setItem('al_checkout_tapped_time', Date.now().toString());
+    } catch {}
   };
+
+  useEffect(() => {
+    const handleReturn = () => {
+      if (document.visibilityState === 'visible') {
+        try {
+          const tapped = sessionStorage.getItem('al_checkout_tapped_upi') === 'true';
+          const tappedTime = Number(sessionStorage.getItem('al_checkout_tapped_time') || 0);
+          if (tapped && !isSubmittedSuccess && Date.now() - tappedTime < 20 * 60 * 1000) {
+            setShowPostPaymentNotice(true);
+            sessionStorage.removeItem('al_checkout_tapped_upi');
+            setTimeout(() => {
+              utrInputRef.current?.focus();
+            }, 300);
+          }
+        } catch {}
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleReturn);
+    window.addEventListener('focus', handleReturn);
+    return () => {
+      document.removeEventListener('visibilitychange', handleReturn);
+      window.removeEventListener('focus', handleReturn);
+    };
+  }, [isSubmittedSuccess]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
-    if (!payerUpiId || !payerUpiId.includes('@')) {
-      setErrorMessage('Please enter your valid Payer UPI ID (e.g. yourname@okhdfcbank or 9876543210@paytm).');
+    const cleanUtr = utrNumber.trim();
+    if (!cleanUtr) {
+      setErrorMessage('Please enter the 12-digit bank Transaction ID (UTR) from your UPI payment receipt.');
       return;
     }
 
-    // Optional UTR format check (only if student provided one)
-    if (utrNumber.trim()) {
-      const valResult = UTRValidator.validateFormat(utrNumber);
-      if (!valResult.isValid) {
-        setErrorMessage(valResult.message);
-        return;
-      }
+    const valResult = UTRValidator.validateFormat(cleanUtr);
+    if (!valResult.isValid) {
+      setErrorMessage(valResult.message);
+      return;
     }
 
     setIsSubmitting(true);
@@ -69,8 +93,8 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
       const result = await PaymentService.submitUpiPayment(
         learnerId,
         planTier,
-        payerUpiId,
-        utrNumber.trim() || undefined
+        payerUpiId.trim() || undefined,
+        cleanUtr
       );
 
       if (!result.success) {
@@ -115,12 +139,8 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             <span className="text-emerald-400 font-bold">₹{plan.priceInr}.00</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-400">Payer UPI ID:</span>
-            <span className="text-indigo-300">{payerUpiId}</span>
-          </div>
-          <div className="flex justify-between">
             <span className="text-slate-400">Bank UTR Reference:</span>
-            <span className="text-amber-300 font-bold tracking-wider">{utrNumber || 'N/A (Identified via UPI ID)'}</span>
+            <span className="text-amber-300 font-bold tracking-wider">{utrNumber || 'Under Audit Desk Match'}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-slate-400">Current Status:</span>
@@ -173,6 +193,7 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             />
             <a
               href={upiUri}
+              onClick={handleUpiAppTap}
               className="w-full mt-2 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow flex items-center justify-center space-x-1.5 transition-all"
             >
               <Zap className="w-3.5 h-3.5 fill-white" />
@@ -180,22 +201,11 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             </a>
           </div>
 
-          {/* Quick Copy Section */}
+          {/* Payee Verification Badge (UPI ID hidden for clean presentation) */}
           <div className="mt-3 text-center w-full px-1">
-            <div className="flex items-center justify-between bg-slate-100 hover:bg-slate-200/70 transition-colors px-3 py-2 rounded-xl text-xs font-mono text-slate-800 font-semibold border border-slate-200">
-              <div className="text-left overflow-hidden mr-2">
-                <span className="text-[9px] uppercase tracking-wider text-slate-500 block font-sans font-semibold">Payee UPI ID</span>
-                <span className="truncate block text-[11px] font-bold">{officialVpa}</span>
-              </div>
-              <button
-                type="button"
-                onClick={copyVpa}
-                className="flex items-center gap-1 bg-white hover:bg-indigo-50 text-indigo-600 px-2.5 py-1.5 rounded-lg border border-slate-300 hover:border-indigo-300 text-[10px] font-sans font-bold shadow-sm transition-all flex-shrink-0"
-                title="Copy UPI ID"
-              >
-                {copiedVpa ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedVpa ? 'Copied!' : 'Copy'}</span>
-              </button>
+            <div className="flex items-center justify-center space-x-1.5 bg-slate-100 px-3 py-2 rounded-xl text-xs text-slate-800 font-semibold border border-slate-200">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>Verified Payee: <strong className="text-slate-900">{officialPayeeName}</strong></span>
             </div>
             <p className="text-[10px] text-slate-500 mt-2">
               Pay ₹{plan.priceInr} directly from GPay, PhonePe, Paytm, BHIM, or any UPI app.
@@ -212,9 +222,19 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             </span>
             <h2 className="text-xl font-bold text-white">Audited UPI Verification</h2>
             <p className="text-xs text-slate-400 mt-1">
-              After completing the UPI payment of <strong className="text-white">₹{plan.priceInr}</strong>, submit your Payer UPI ID and 12-digit bank UTR reference. Manual verification takes approximately one hour.
+              After completing the UPI payment of <strong className="text-white">₹{plan.priceInr}</strong>, submit your 12-digit bank UTR reference below. Verification takes approximately one hour.
             </p>
           </div>
+
+          {showPostPaymentNotice && (
+            <div className="mb-4 p-3 bg-emerald-950/40 border border-emerald-800 rounded-xl text-xs text-emerald-300 flex items-start space-x-2 animate-in fade-in">
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-emerald-400" />
+              <div>
+                <strong className="block font-bold">Welcome Back! 🎉</strong>
+                <span>Enter the 12-digit UTR reference from your payment receipt below to complete activation.</span>
+              </div>
+            </div>
+          )}
 
           {errorMessage && (
             <div className="mb-4 p-3 bg-red-950/40 border border-red-800/80 rounded-xl text-xs text-red-300 flex items-start space-x-2">
@@ -225,41 +245,29 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Your Payer UPI ID <span className="text-red-400">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. rahul@oksbi or 9876543210@paytm"
-                value={payerUpiId}
-                onChange={e => setPayerUpiId(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-xs font-semibold text-slate-300">
-                  12-Digit Bank UTR / Reference No.
+                  12-Digit Bank Transaction ID (UTR) <span className="text-red-400">*</span>
                 </label>
-                <span className="text-[10px] font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
-                  Optional
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${utrNumber.length === 12 ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-amber-400 bg-amber-500/10 border-amber-500/20'}`}>
+                  {utrNumber.length}/12 Digits
                 </span>
               </div>
               <input
+                ref={utrInputRef}
                 type="text"
+                required
                 maxLength={12}
-                placeholder="e.g. 431289567812 (optional if UPI ID provided)"
+                placeholder="e.g. 431289567812 (12 digits from receipt)"
                 value={utrNumber}
                 onChange={e => {
-                  const cleaned = e.target.value.replace(/[^0-9]/g, '');
+                  const cleaned = e.target.value.replace(/[^0-9]/g, '').slice(0, 12);
                   setUtrNumber(cleaned);
                 }}
-                className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 font-mono tracking-widest focus:outline-none"
+                className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 font-mono tracking-widest focus:outline-none"
               />
               <p className="text-[10px] text-slate-500 mt-1">
-                Optional: If visible in your UPI app under &quot;Bank Reference No.&quot; or &quot;UPI Ref ID&quot;.
+                Check your UPI app receipt for <strong>UPI Ref No.</strong>, <strong>UTR</strong>, or <strong>Transaction ID</strong> (12 digits).
               </p>
             </div>
 

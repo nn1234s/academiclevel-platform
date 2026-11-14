@@ -155,13 +155,14 @@ export class PaymentService {
   public static async submitUpiPayment(
     learnerId: string,
     tier: 'LITE' | 'PLUS',
-    payerUpiId: string,
+    payerUpiId?: string,
     utrReference?: string
   ): Promise<{ success: boolean; subscription?: Subscription; error?: string }> {
-    // 1. Validate UPI ID format (Primary Required Field)
-    if (!payerUpiId || !payerUpiId.includes('@')) {
-      return { success: false, error: 'Please enter a valid Payer UPI ID (e.g. name@okhdfcbank or 9876543210@paytm).' };
-    }
+    // 1. Resolve Payer identifier (falls back cleanly to mobile/user ID if UPI ID is omitted)
+    const rawPayer = (payerUpiId || '').trim();
+    const resolvedPayerUpi = rawPayer.length > 0
+      ? (rawPayer.includes('@') ? rawPayer : `${rawPayer.replace(/[^a-zA-Z0-9._-]/g, '')}@upi`)
+      : `scholar_${learnerId.replace(/[^a-zA-Z0-9]/g, '')}@upi`;
 
     const cleanUtr = utrReference?.trim();
     let finalUtr = cleanUtr;
@@ -193,7 +194,7 @@ export class PaymentService {
     // Call real SQLite backend endpoint POST /api/payments/submit
     let serverSub: Subscription | undefined;
     try {
-      const res = await ApiClient.submitPayment(learnerId, tier, payerUpiId.trim(), finalUtr);
+      const res = await ApiClient.submitPayment(learnerId, tier, resolvedPayerUpi, finalUtr);
       if (res.success && res.subscription) {
         serverSub = res.subscription;
       }
@@ -214,7 +215,7 @@ export class PaymentService {
       status: 'PENDING_VERIFICATION',
       paymentMethod: 'UPI_QR',
       utrReference: finalUtr,
-      payerUpiId: payerUpiId.trim(),
+      payerUpiId: resolvedPayerUpi,
       amountInr: plan.priceInr,
       durationDays: plan.durationDays,
       createdAt: new Date().toISOString(),
