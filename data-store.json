@@ -27,7 +27,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": "2026-11-09T13:30:06.834Z",
       "createdAt": "2026-11-09T13:29:42.565Z",
-      "updatedAt": "2026-11-14T09:19:34.739Z",
+      "updatedAt": "2026-11-14T11:01:20.922Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -61,7 +61,7 @@
       "avatarFrame": "Emerald",
       "lastSpinTimestampUtc": "2026-11-09T13:57:04.753Z",
       "createdAt": "2026-11-09T13:46:57.966Z",
-      "updatedAt": "2026-11-14T09:19:34.739Z",
+      "updatedAt": "2026-11-14T11:01:20.932Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -95,7 +95,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-09T13:55:04.826Z",
-      "updatedAt": "2026-11-14T09:19:34.739Z",
+      "updatedAt": "2026-11-14T11:01:20.932Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -129,7 +129,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13 05:20:09",
-      "updatedAt": "2026-11-14T09:19:34.743Z",
+      "updatedAt": "2026-11-14T11:01:20.933Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -163,7 +163,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13T06:42:32.181Z",
-      "updatedAt": "2026-11-14T09:19:34.743Z",
+      "updatedAt": "2026-11-14T11:01:20.933Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -984,6 +984,145 @@
       "targetId": "cfg_ads",
       "severity": "INFO",
       "details": "Super-Admin updated ADS settings."
+    },
+    {
+      "id": "admin_del_1794653840890_1n37",
+      "timestampUtc": "2026-11-14T10:57:20.890Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "DELETE_LEARNER",
+      "targetId": "lrn_test_deletion_1794653840886",
+      "severity": "WARNING",
+      "details": "Super-Admin deleted learner Temporary Student (delete_me_1794653840886@temp.test, ID: lrn_test_deletion_1794653840886) and purged all associated data."
+    },
+    {
+      "id": "admin_cfg_1794653840903",
+      "timestampUtc": "2026-11-14T10:57:20.898Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_pricing",
+      "severity": "INFO",
+      "details": "Super-Admin updated PRICING settings."
+    },
+    {
+      "id": "admin_cfg_1794653840909",
+      "timestampUtc": "2026-11-14T10:57:20.908Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_home",
+      "severity": "INFO",
+      "details": "Super-Admin updated HOME settings."
+    },
+    {
+      "id": "admin_cfg_1794653840914",
+      "timestampUtc": "2026-11-14T10:57:20.913Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_legal",
+      "severity": "INFO",
+      "details": "Super-Admin updated LEGAL settings."
+    },
+    {
+      "id": "admin_cfg_1794653840924",
+      "timestampUtc": "2026-11-14T10:57:20.923Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_ads",
+      "severity": "INFO",
+      "details": "Super-Admin updated ADS settings."
+    },
+    {
+      "id": "admin_del_1794653995066_iiwx",
+      "timestampUtc": "2026-11-14T10:59:55.066Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "DELETE_LEARNER",
+      "targetId": "lrn_test_deletion_1794653995060",
+      "severity": "WARNING",
+      "details": "Super-Admin deleted learner Temporary Student (delete_me_1794653995060@temp.test, ID: lrn_test_deletion_1794653995060) and purged all associated data."
+    },
+    {
+      "id": "admin_cfg_1794653995075",
+      "timestampUtc": "2026-11-14T10:59:55.074Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_pricing",
+      "severity": "INFO",
+      "details": "Super-Admin updated PRICING settings."
+    },
+    {
+      "id": "admin_del_1794654014178_td5r",
+      "timestampUtc": "2026-11-14T11:00:14.178Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "DELETE_LEARNER",
+      "targetId": "lrn_test_deletion_1794654014166",
+      "severity": "WARNING",
+      "details": "Super-Admin deleted learner Temporary Student (delete_me_1794654014166@temp.test, ID: lrn_test_deletion_1794654014166) and purged all associated data."
+    },
+    {
+      "id": "admin_del_1794654071692_wux0",
+      "timestampUtc": "2026-11-14T11:01:11.692Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "DELETE_LEARNER",
+      "targetId": "lrn_test_deletion_1794654071688",
+      "severity": "WARNING",
+      "details": "Super-Admin deleted learner Temporary Student (delete_me_1794654071688@temp.test, ID: lrn_test_deletion_1794654071688) and purged all associated data."
+    },
+    {
+      "id": "admin_cfg_1794654071703",
+      "timestampUtc": "2026-11-14T11:01:11.702Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_pricing",
+      "severity": "INFO",
+      "details": "Super-Admin updated PRICING settings."
+    },
+    {
+      "id": "admin_cfg_1794654071713",
+      "timestampUtc": "2026-11-14T11:01:11.713Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_home",
+      "severity": "INFO",
+      "details": "Super-Admin updated HOME settings."
+    },
+    {
+      "id": "admin_cfg_1794654071719",
+      "timestampUtc": "2026-11-14T11:01:11.719Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_legal",
+      "severity": "INFO",
+      "details": "Super-Admin updated LEGAL settings."
+    },
+    {
+      "id": "admin_cfg_1794654071731",
+      "timestampUtc": "2026-11-14T11:01:11.731Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_ads",
+      "severity": "INFO",
+      "details": "Super-Admin updated ADS settings."
+    }
+  ],
+  "al_prod_system_settings_v1": [
+    {
+      "key": "cfg_pricing",
+      "value": "{\"litePriceInr\":49,\"liteDurationDays\":60,\"plusPriceInr\":129,\"plusDurationDays\":180,\"upiVpa\":\"theattirebbsr@okicici\",\"merchantName\":\"17 Pratyusha Nanda\",\"discountBadge\":\"Special Launch Offer (95% Off)\"}",
+      "updatedAt": "2026-11-14T11:01:11.737Z"
+    },
+    {
+      "key": "cfg_home",
+      "value": "{\"heroTitle\":\"Master All Classes 1 to 12 With India Top Adaptive AI\",\"heroSubtitle\":\"Personalized Socratic Quizzes, CBSE/ICSE curriculum mastery, and real digital gift cards.\",\"announcementActive\":true,\"announcementText\":\"🔥 New AI Olympiad Track Live across all grades!\",\"statsStudents\":\"25,000+\",\"statsQuizzes\":\"750,000+\",\"statsPassRate\":\"99.8%\",\"bannerCtaText\":\"Claim Your Scholarship Now\",\"updatedAt\":\"2026-11-14T11:01:20.960Z\"}",
+      "updatedAt": "2026-11-14T11:01:20.960Z"
+    },
+    {
+      "key": "cfg_legal",
+      "value": "{\"contactEmail\":\"academiclevels@gmail.com\",\"lastUpdatedDate\":\"November 2026\",\"privacyPolicyHeading\":\"AcademicLevel Privacy & Data Protection Policy\",\"privacySummary\":\"We collect only what is strictly necessary for academic assessment, certificate generation, and parent reporting. Learner data is never sold or used for third-party ad tracking.\",\"termsHeading\":\"AcademicLevel Terms of Service & Learner Agreement\",\"termsSummary\":\"Subscriptions grant non-transferable access for the specified duration. Study Coins are gamified reward tokens redeemable for verified gift cards and platform cosmetics according to published rules.\",\"refundPolicySummary\":\"Subscriptions can be cancelled within 48 hours if no quizzes or certificate entitlements have been generated. Contact academiclevels@gmail.com with your transaction UTR.\"}",
+      "updatedAt": "2026-11-14T11:01:11.737Z"
+    },
+    {
+      "key": "cfg_ads",
+      "value": "{\"mainHeading\":\"Score 95%+ in School Exams Without Expensive Tuitions\",\"subHeading\":\"CBSE & ICSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Socratic Nova AI Tutor & Real Study Coin Rewards.\",\"offerPriceInr\":49,\"originalPriceInr\":999,\"discountPercent\":95,\"guaranteeDays\":60,\"timerHours\":48,\"ctaText\":\"Claim 60-Day Unlimited Pass for ₹49\",\"urgentNotice\":\"⚡ FLASH OFFER: Only 17 spots remaining at ₹49 for today's cohort.\"}",
+      "updatedAt": "2026-11-14T11:01:11.737Z"
     }
   ]
 }

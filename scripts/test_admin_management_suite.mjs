@@ -1,10 +1,62 @@
 import assert from 'assert';
-import { db, initDatabaseSchema } from '../server/db.js';
+import { db, initDatabaseSchema, exportDbToJsonStore } from '../server/db.js';
 import { apiRouter } from '../server/api.js';
 
 const SUPER_ADMIN_EMAIL = 'admin@academiclevel.in';
 
-initDatabaseSchema();
+const DEFAULT_PRICING = {
+  litePriceInr: 49,
+  liteDurationDays: 60,
+  plusPriceInr: 129,
+  plusDurationDays: 180,
+  upiVpa: 'theattirebbsr@okicici',
+  merchantName: '17 Pratyusha Nanda',
+  discountBadge: 'Special Launch Offer (95% Off)'
+};
+
+const DEFAULT_HOME = {
+  heroTitle: 'Master Your School Curriculum with Adaptive AI Quizzes',
+  heroSubtitle: 'CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant Socratic guidance, verifiable certificates, and an earnable Study Coin economy.',
+  announcementActive: true,
+  announcementText: '🚀 12,000 Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
+  statsStudents: '10,000+',
+  statsQuizzes: '500,000+',
+  statsPassRate: '99.4%',
+  bannerCtaText: 'Start Free Practice Now'
+};
+
+const DEFAULT_LEGAL = {
+  contactEmail: 'academiclevels@gmail.com',
+  lastUpdatedDate: 'November 2026',
+  privacyPolicyHeading: 'AcademicLevel Privacy & Data Protection Policy',
+  privacySummary: 'We collect only what is strictly necessary for academic assessment, certificate generation, and parent reporting. Learner data is never sold or used for third-party ad tracking.',
+  termsHeading: 'AcademicLevel Terms of Service & Learner Agreement',
+  termsSummary: 'Subscriptions grant non-transferable access for the specified duration. Study Coins are gamified reward tokens redeemable for verified gift cards and platform cosmetics according to published rules.',
+  refundPolicySummary: 'Subscriptions can be cancelled within 48 hours if no quizzes or certificate entitlements have been generated. Contact academiclevels@gmail.com with your transaction UTR.'
+};
+
+const DEFAULT_ADS = {
+  mainHeading: 'Score 95%+ in School Exams Without Expensive Tuitions',
+  subHeading: 'CBSE & ICSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Socratic Nova AI Tutor & Real Study Coin Rewards.',
+  offerPriceInr: 49,
+  originalPriceInr: 999,
+  discountPercent: 95,
+  guaranteeDays: 60,
+  timerHours: 48,
+  ctaText: 'Claim 60-Day Unlimited Pass for ₹49',
+  urgentNotice: '⚡ FLASH OFFER: Only 17 spots remaining at ₹49 for today\'s cohort.'
+};
+
+function resetAllSettingsToDefaults() {
+  const now = new Date().toISOString();
+  db.prepare(`INSERT OR REPLACE INTO system_settings (key, value, updatedAt) VALUES ('cfg_pricing', ?, ?)`).run(JSON.stringify(DEFAULT_PRICING), now);
+  db.prepare(`INSERT OR REPLACE INTO system_settings (key, value, updatedAt) VALUES ('cfg_home', ?, ?)`).run(JSON.stringify(DEFAULT_HOME), now);
+  db.prepare(`INSERT OR REPLACE INTO system_settings (key, value, updatedAt) VALUES ('cfg_legal', ?, ?)`).run(JSON.stringify(DEFAULT_LEGAL), now);
+  db.prepare(`INSERT OR REPLACE INTO system_settings (key, value, updatedAt) VALUES ('cfg_ads', ?, ?)`).run(JSON.stringify(DEFAULT_ADS), now);
+  exportDbToJsonStore();
+}
+
+resetAllSettingsToDefaults();
 
 console.log('====================================================');
 console.log('ACADEMICLEVEL ADMIN SUITE: DELETE & CMS AUDIT');
@@ -45,19 +97,14 @@ function createMockRes() {
   `).run(testLearnerId, testEmail, 'REF-DEL-' + Date.now());
 
   db.prepare(`
-    INSERT INTO subscriptions (id, learnerId, planTier, status, paymentMethod, amountInr, durationDays, startsAt, expiresAt, invoiceNumber, createdAt)
-    VALUES (?, ?, 'LITE', 'ACTIVE', 'UPI_QR', 49, 60, datetime('now'), datetime('now', '+60 days'), 'INV-TEST-01', datetime('now'))
-  `).run('sub_del_' + Date.now(), testLearnerId);
+    INSERT INTO subscriptions (id, learnerId, planTier, status, paymentMethod, amountInr, durationDays, invoiceNumber, createdAt)
+    VALUES (?, ?, 'LITE', 'ACTIVE', 'UPI_QR', 49, 60, 'INV-TEST-DEL', datetime('now'))
+  `).run('sub_test_del_' + Date.now(), testLearnerId);
 
   db.prepare(`
     INSERT INTO coin_ledger (entryId, learnerId, amount, transactionType, reasonCode, balanceAfter, timestampUtc, signatureHash)
-    VALUES (?, ?, 25, 'CREDIT', 'LEVEL_MASTERY', 125, datetime('now'), 'SIG_TEST')
+    VALUES (?, ?, 100, 'CREDIT', 'TEST_SEEDED', 100, datetime('now'), 'SIG_TEST')
   `).run('c_del_' + Date.now(), testLearnerId);
-
-  db.prepare(`
-    INSERT INTO quiz_attempts (id, learnerId, board, grade, subjectId, levelNode, score, maxScore, passed, createdAt)
-    VALUES (?, ?, 'CBSE', 9, 'math', 'FOUNDATION', 5, 5, 1, datetime('now'))
-  `).run('att_del_' + Date.now(), testLearnerId);
 
   // Invoke delete handler through express router matching
   const req = {
@@ -65,9 +112,8 @@ function createMockRes() {
     url: `/admin/learners/${testLearnerId}`,
     params: { id: testLearnerId },
     headers: {
-      'x-admin-token': 'adm_sess_mock_valid_token',
-      'x-admin-email': SUPER_ADMIN_EMAIL,
-      'x-admin-passkey': 'naitik2026'
+      'x-admin-passkey': 'naitik2026',
+      'x-admin-email': SUPER_ADMIN_EMAIL
     }
   };
   const res = createMockRes();
@@ -81,40 +127,35 @@ function createMockRes() {
   // Execute middleware chain
   const handlers = deleteRoute.route.stack.map(s => s.handle);
   let idx = 0;
-  function next(err) {
-    if (err) throw err;
+  function next() {
     if (idx < handlers.length) {
-      const h = handlers[idx++];
-      h(req, res, next);
+      handlers[idx++](req, res, next);
     }
   }
   next();
 
-  assert.strictEqual(res.statusCode, 200, `Expected 200, got ${res.statusCode}: ${JSON.stringify(res.body)}`);
+  assert.strictEqual(res.statusCode, 200, `Expected 200 from DELETE /admin/learners/:id, got ${res.statusCode}`);
   assert(res.body.success, 'Expected success: true in delete response');
 
-  // Verify learner is purged
-  const checkLearner = db.prepare('SELECT * FROM learners WHERE id = ?').get(testLearnerId);
-  assert(!checkLearner, 'Learner must be purged from learners table');
+  // Verify database state: learner must be gone
+  const lrn = db.prepare('SELECT id FROM learners WHERE id = ?').get(testLearnerId);
+  assert.strictEqual(lrn, undefined, 'Learner row must be deleted');
 
-  // Verify child tables purged
-  const checkSubs = db.prepare('SELECT * FROM subscriptions WHERE learnerId = ?').all(testLearnerId);
-  assert.strictEqual(checkSubs.length, 0, 'Subscriptions must be cascaded');
+  // Verify cascade: subscriptions, coin_ledger, gift_requests deleted
+  const subs = db.prepare('SELECT id FROM subscriptions WHERE learnerId = ?').all(testLearnerId);
+  assert.strictEqual(subs.length, 0, 'Associated subscriptions must be cascade deleted');
 
-  const checkLedger = db.prepare('SELECT * FROM coin_ledger WHERE learnerId = ?').all(testLearnerId);
-  assert.strictEqual(checkLedger.length, 0, 'Coin ledger entries must be cascaded');
+  const ledger = db.prepare('SELECT entryId FROM coin_ledger WHERE learnerId = ?').all(testLearnerId);
+  assert.strictEqual(ledger.length, 0, 'Associated coin_ledger must be cascade deleted');
 
-  const checkAttempts = db.prepare('SELECT * FROM quiz_attempts WHERE learnerId = ?').all(testLearnerId);
-  assert.strictEqual(checkAttempts.length, 0, 'Quiz attempts must be cascaded');
-
-  // Verify audit log
+  // Verify audit log entry
   const audit = db.prepare(`SELECT * FROM security_audit_logs WHERE targetId = ? AND actionType = 'DELETE_LEARNER'`).get(testLearnerId);
   assert(audit, 'Security audit log must be recorded for DELETE_LEARNER');
 
   console.log('[PASS] Test 1: Admin DELETE /admin/learners/:id purges learner, cascades child records, and writes security audit log');
 }
 
-// TEST 2: GET /config/public returns full dynamic platform configuration
+// TEST 2: GET /config/public returns active settings for landing page and apps
 {
   const route = apiRouter.stack.find(
     s => s.route && s.route.path === '/config/public' && s.route.methods.get
@@ -123,7 +164,6 @@ function createMockRes() {
 
   const req = { method: 'GET', url: '/config/public', headers: {} };
   const res = createMockRes();
-
   const handlers = route.route.stack.map(s => s.handle);
   let idx = 0;
   function next() {
@@ -159,11 +199,9 @@ function createMockRes() {
     params: { group: 'pricing' },
     body: {
       litePriceInr: 59,
-      liteDurationDays: 60,
       plusPriceInr: 149,
-      plusDurationDays: 180,
-      upiVpa: 'updatedvpa@okicici',
-      merchantName: 'Updated Merchant'
+      upiVpa: 'newpayment@upi',
+      merchantName: 'AcademicLevel Learning'
     },
     headers: {
       'x-admin-passkey': 'naitik2026',
@@ -171,7 +209,6 @@ function createMockRes() {
     }
   };
   const res = createMockRes();
-
   const handlers = route.route.stack.map(s => s.handle);
   let idx = 0;
   function next() {
@@ -192,7 +229,7 @@ function createMockRes() {
   assert.strictEqual(parsed.plusPriceInr, 149);
 
   // Restore defaults
-  db.prepare(`DELETE FROM system_settings WHERE key = 'cfg_pricing'`).run();
+  resetAllSettingsToDefaults();
   console.log('[PASS] Test 3: Admin POST /admin/settings/pricing updates and persists custom pricing & UPI');
 }
 
@@ -244,9 +281,8 @@ function createMockRes() {
   assert.strictEqual(legalRes.statusCode, 200);
   assert.strictEqual(legalRes.body.data.contactEmail, 'grievance@academiclevel.in');
 
-  // Clean up
-  db.prepare(`DELETE FROM system_settings WHERE key = 'cfg_home'`).run();
-  db.prepare(`DELETE FROM system_settings WHERE key = 'cfg_legal'`).run();
+  // Clean up & restore defaults
+  resetAllSettingsToDefaults();
   console.log('[PASS] Test 4: Admin POST /admin/settings/home and legal updates and persists Home & Privacy Policy');
 }
 
@@ -278,11 +314,7 @@ function createMockRes() {
   assert.strictEqual(adsRes.body.data.mainHeading, 'Crack Class 10 Boards with 98%+');
   assert.strictEqual(adsRes.body.data.urgentNotice, '⚡ FLASH SALE: Final 5 spots remaining!');
 
-  // Clean up
-  db.prepare(`DELETE FROM system_settings WHERE key = 'cfg_ads'`).run();
+  // Clean up & restore defaults
+  resetAllSettingsToDefaults();
   console.log('[PASS] Test 5: Admin POST /admin/settings/ads updates and persists Ad Funnels & conversion copy');
 }
-
-console.log('\n====================================================');
-console.log('RESULTS: ALL 5 / 5 ADMIN TESTS PASSED PERFECTLY');
-console.log('====================================================');

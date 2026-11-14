@@ -445,7 +445,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 </div>
 
                 <p className="text-[10px] text-slate-400 text-center">
-                  Need more coins? Ace your quizzes (5 quizzes = 1 Level mastery) or spin the daily wheel to earn coins!
+                  Need more coins? Ace your quizzes (≥ 70% score for Level mastery) or spin the daily wheel to earn coins!
                 </p>
               </>
             )}

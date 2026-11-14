@@ -636,7 +636,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <div className="flex justify-between items-center text-xs mb-2">
               <div>
                 <span className="text-slate-400 block">Course Levels Mastered</span>
-                <span className="text-[10px] text-slate-500 font-mono">5 quizzes = 1 level</span>
+                <span className="text-[10px] text-slate-500 font-mono">≥ 70% score to master</span>
               </div>
               <span className="font-mono font-bold text-white">
                 {quota.levelsCompleted} / {quota.hasActiveSubscription ? '∞ (All Levels Unlocked)' : quota.maxLevels}
