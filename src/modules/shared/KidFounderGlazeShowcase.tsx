@@ -16,37 +16,103 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
 
   const certificates = [
     {
-      id: 'iit-bombay',
+      id: 'cert-iit-bombay',
       title: 'IIT Bombay Mood Indigo Coding Project',
       badge: '🏛️ IIT Bombay Certified',
-      subtitle: 'Young Animator & Software Builder — STEM.org Accredited',
-      desc: 'Officially certified in competitive coding and interactive application architecture under the prestigious IIT Bombay Mood Indigo National Coding Project.',
-      image: '/founder-certs/iit-bombay-cert.jpg',
-      tags: ['IIT Bombay', 'Mood Indigo', 'STEM.org Accredited', 'Google / Amazon Alumni Evaluated'],
+      subtitle: 'Young Animator • Playlab Module • STEM.org',
+      desc: 'Certified in competitive coding and interactive software architecture under the prestigious IIT Bombay Mood Indigo National Project.',
+      image: '/founder-certs/cert-9-iit-bombay.jpg',
+      tags: ['IIT Bombay', 'Mood Indigo', 'STEM.org Accredited'],
       accent: 'from-amber-500/20 via-orange-500/10 to-amber-500/5',
       borderAccent: 'border-amber-500/60'
     },
     {
-      id: 'python-dsa',
-      title: 'Python, Algorithms & Game Dev Specialization',
-      badge: '🐍 4x Python & Web Credentials',
-      subtitle: 'Python Developer • Intermediate DSA • Pygame Engine • Web Dev',
-      desc: 'Formally mastered Object-Oriented Programming, Data Structures, Time Complexity, Recursion, Bit Manipulation, and GUI Game Engines with Tkinter & Pygame.',
-      image: '/founder-certs/coding-certs-python.jpg',
-      tags: ['Python Developer', 'DSA & Algorithms', 'Pygame Space Invaders', 'Junior Web Dev'],
+      id: 'cert-python-dev',
+      title: 'Python Developer Specialization',
+      badge: '🐍 Python Specialist',
+      subtitle: 'OOP • Data Structures • Tkinter GUI • Git',
+      desc: 'Mastered Object-Oriented Programming, data structures, and file handling with GUI applications using Tkinter and VS Code.',
+      image: '/founder-certs/cert-1-python-dev.jpg',
+      tags: ['OOP Architecture', 'Tkinter GUI', 'File I/O'],
       accent: 'from-indigo-500/20 via-blue-500/10 to-indigo-500/5',
       borderAccent: 'border-indigo-500/60'
     },
     {
-      id: 'apps-logic',
-      title: 'App Architecture & Algorithmic Logic Suite',
-      badge: '📱 4x App & Animation Credentials',
-      subtitle: 'App Lab Developer • Game Lab Developer • Junior Animator • Rising Star',
-      desc: 'Engineered event-driven UI systems, database integration, block-to-text algorithm pipelines, and STEM logic architecture across 100+ projects.',
-      image: '/founder-certs/coding-certs-apps.jpg',
-      tags: ['App Lab Database', 'Game Lab Physics', 'Play Lab Animation', 'STEM Logic Star'],
+      id: 'cert-python-dsa',
+      title: 'Intermediate Python Programmer',
+      badge: '⚡ Algorithms & DSA',
+      subtitle: 'Time Complexity • Recursion • Bit Manipulation',
+      desc: 'Formally awarded title for solving complex algorithmic challenges, recursion trees, and optimized array algorithms.',
+      image: '/founder-certs/cert-2-python-dsa.jpg',
+      tags: ['Time Complexity', 'Recursion', 'Array Algorithms'],
+      accent: 'from-blue-500/20 via-cyan-500/10 to-blue-500/5',
+      borderAccent: 'border-blue-500/60'
+    },
+    {
+      id: 'cert-python-game',
+      title: 'Python Game Developer',
+      badge: '🎮 Game Engine Architect',
+      subtitle: 'Pygame Library • Space Invaders • Physics',
+      desc: 'Built full 2D arcade games including Space Invaders and interactive GUI engines using Pygame and object-oriented physics.',
+      image: '/founder-certs/cert-3-python-game.jpg',
+      tags: ['Pygame Engine', 'Space Invaders', 'Game Physics'],
+      accent: 'from-purple-500/20 via-pink-500/10 to-purple-500/5',
+      borderAccent: 'border-purple-500/60'
+    },
+    {
+      id: 'cert-junior-web',
+      title: 'Junior Web Developer',
+      badge: '🌐 Web Applications',
+      subtitle: 'HTML5 • CSS Styling • Responsive Web UI',
+      desc: 'Engineered responsive multi-page web layouts, semantic document structures, and modern styling architectures.',
+      image: '/founder-certs/cert-4-junior-web.jpg',
+      tags: ['HTML5 Semantic', 'CSS3 Layouts', 'Responsive UI'],
       accent: 'from-emerald-500/20 via-teal-500/10 to-emerald-500/5',
       borderAccent: 'border-emerald-500/60'
+    },
+    {
+      id: 'cert-app-lab',
+      title: 'Junior App Lab Developer',
+      badge: '📱 Mobile App Engineer',
+      subtitle: 'Code.org App Lab • Databases • Event Driven',
+      desc: 'Designed interactive mobile user interfaces, database tables, and real-time event-driven application state logic.',
+      image: '/founder-certs/cert-6-app-lab.jpg',
+      tags: ['App Lab Engine', 'Database Integration', 'Event Driven'],
+      accent: 'from-teal-500/20 via-cyan-500/10 to-teal-500/5',
+      borderAccent: 'border-teal-500/60'
+    },
+    {
+      id: 'cert-game-lab',
+      title: 'Junior Game Lab Developer',
+      badge: '🕹️ 2D Game Systems',
+      subtitle: 'Code.org Game Lab • Animation • Collision',
+      desc: 'Programmed sprite animations, velocity systems, collision physics, and scoring loops for arcade shooter games.',
+      image: '/founder-certs/cert-5-game-lab.jpg',
+      tags: ['Game Lab Sprites', 'Collision Detection', 'Physics'],
+      accent: 'from-rose-500/20 via-red-500/10 to-rose-500/5',
+      borderAccent: 'border-rose-500/60'
+    },
+    {
+      id: 'cert-animator',
+      title: 'Junior Animator & Logic Builder',
+      badge: '🎬 Visual Programming',
+      subtitle: 'Play Lab • Minecraft Logic • Functions & Loops',
+      desc: 'Mastered visual programming, nested loops, conditional branches, variables, and game logic across 50+ projects.',
+      image: '/founder-certs/cert-7-animator.jpg',
+      tags: ['Visual Logic', 'Nested Loops', 'Functions'],
+      accent: 'from-violet-500/20 via-purple-500/10 to-violet-500/5',
+      borderAccent: 'border-violet-500/60'
+    },
+    {
+      id: 'cert-rising-star',
+      title: 'Rising Coding Star',
+      badge: '⭐ STEM.org Logic Star',
+      subtitle: 'STEM.org Accredited • Algorithmic Thinking',
+      desc: 'Accredited by STEM.org for rapid algorithmic problem solving, logic building, and creative computational design.',
+      image: '/founder-certs/cert-8-rising-star.jpg',
+      tags: ['STEM.org Accredited', 'Logic Building', 'Computational Thinking'],
+      accent: 'from-amber-500/20 via-yellow-500/10 to-amber-500/5',
+      borderAccent: 'border-amber-500/60'
     }
   ];
 
@@ -77,7 +143,7 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
           <span className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider border ${
             isDark ? 'bg-emerald-950/80 border-emerald-700/80 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'
           }`}>
-            ⭐ 8x Coding &amp; Software Credentials
+            ⭐ 9x Certified Engineering Boxes
           </span>
         </div>
 
@@ -94,7 +160,7 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
           isDark ? 'text-slate-300' : 'text-slate-700'
         }`}>
           Most education platforms are created by corporate executives who never sat in your child’s classroom.
-          <strong> AcademicLevel is completely different:</strong> it was coded, designed, and architected by a <strong>10-year-old Grade 5 student prodigy</strong> with 8+ formal software engineering certifications in Python, Data Structures &amp; Algorithms, Game Engines, and Full-Stack Development — verified by <strong>IIT Bombay Mood Indigo</strong> and <strong>STEM.org</strong>.
+          <strong> AcademicLevel is completely different:</strong> it was coded, designed, and architected by a <strong>Grade 5 student prodigy</strong> with 9 formal software engineering certifications in Python, Data Structures &amp; Algorithms, Game Engines, and Full-Stack Development — verified by <strong>IIT Bombay Mood Indigo</strong> and <strong>STEM.org</strong>.
         </p>
 
         <div className={`p-4 rounded-2xl border text-xs italic max-w-2xl mx-auto ${
@@ -104,19 +170,19 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
         </div>
       </div>
 
-      {/* 3 Featured Credentials Cards Grid */}
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+      {/* 9 Individual Certificate Boxes Grid */}
+      <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">
         {certificates.map(cert => (
           <div
             key={cert.id}
             className={`rounded-2xl border transition-all duration-300 flex flex-col justify-between overflow-hidden group hover:scale-[1.02] shadow-xl ${
               isDark
-                ? `bg-slate-950/80 ${cert.borderAccent} hover:border-amber-400`
+                ? `bg-slate-950/90 ${cert.borderAccent} hover:border-amber-400`
                 : `bg-white ${cert.borderAccent} hover:border-amber-500`
             }`}
           >
             <div>
-              {/* Image Preview with Zoom Overlay */}
+              {/* Individual Image Preview with Zoom Overlay */}
               <div
                 onClick={() => setSelectedImage({ src: cert.image, title: cert.title, subtitle: cert.subtitle })}
                 className="relative overflow-hidden cursor-pointer bg-slate-950 aspect-[4/3] flex items-center justify-center border-b border-slate-800/80 group"
@@ -138,18 +204,18 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
               </div>
 
               {/* Card Body */}
-              <div className="p-5 space-y-2.5">
-                <h3 className={`text-base font-extrabold leading-snug ${
+              <div className="p-4 space-y-2">
+                <h3 className={`text-sm sm:text-base font-extrabold leading-snug line-clamp-1 ${
                   isDark ? 'text-white' : 'text-slate-950'
                 }`}>
                   {cert.title}
                 </h3>
 
-                <p className={`text-[11px] font-bold text-amber-400`}>
+                <p className="text-[11px] font-bold text-amber-400 truncate">
                   {cert.subtitle}
                 </p>
 
-                <p className={`text-xs leading-relaxed ${
+                <p className={`text-xs leading-relaxed line-clamp-2 ${
                   isDark ? 'text-slate-400' : 'text-slate-600'
                 }`}>
                   {cert.desc}
@@ -158,7 +224,7 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
             </div>
 
             {/* Tags Footer */}
-            <div className={`p-4 pt-3 border-t text-[10px] flex flex-wrap gap-1.5 ${
+            <div className={`p-3.5 pt-2.5 border-t text-[10px] flex flex-wrap gap-1.5 ${
               isDark ? 'border-slate-800/80 bg-slate-900/50' : 'border-slate-100 bg-slate-50'
             }`}>
               {cert.tags.map(t => (
@@ -176,14 +242,14 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
         ))}
       </div>
 
-      {/* 8-Credential Quick Bar */}
+      {/* 9-Credential Quick Bar */}
       <div className={`mt-10 rounded-2xl p-5 border text-center relative z-10 ${
         isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
       }`}>
         <span className="text-[10px] font-mono font-bold tracking-widest uppercase text-amber-400 block mb-3">
-          🎓 Complete Verification Roster (Grade 5 Coding Credentials)
+          🎓 Complete Verification Roster (9 Certified Credentials)
         </span>
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-[11px] font-bold">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 text-[11px] font-bold">
           <span className="px-3 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
             🏛️ IIT Bombay Mood Indigo Certified
           </span>
@@ -205,6 +271,9 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
           <span className="px-3 py-1 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300">
             🕹️ Junior Game Lab Developer (Physics)
           </span>
+          <span className="px-3 py-1 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-300">
+            🎬 Junior Animator (Visual Programming)
+          </span>
           <span className="px-3 py-1 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-yellow-300">
             ⭐ Rising Coding Star (STEM.org)
           </span>
@@ -219,7 +288,7 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
         >
           <div
             onClick={e => e.stopPropagation()}
-            className="max-w-4xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl relative space-y-4"
+            className="max-w-2xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl relative space-y-4"
           >
             <button
               onClick={() => setSelectedImage(null)}

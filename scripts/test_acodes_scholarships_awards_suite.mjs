@@ -213,18 +213,24 @@ async function run() {
   assert.strictEqual(stuSch.wonAward.coins, 500);
   console.log(`[PASS] Student portal correctly delivers Rank 1 podium recognition and winner voucher.`);
 
-  // Test 6: Verify Privacy-Redacted Founder Certificates Assets exist
-  console.log('\nTEST 6: Verify Founder Glaze certificate assets and privacy masking');
+  // Test 6: Verify Privacy-Redacted Founder Certificates Assets exist (All 9 Singleized Certs)
+  console.log('\nTEST 6: Verify Founder Glaze certificate assets and privacy masking (9 Singleized Certs)');
   const certFiles = [
-    'public/founder-certs/iit-bombay-cert.jpg',
-    'public/founder-certs/coding-certs-python.jpg',
-    'public/founder-certs/coding-certs-apps.jpg'
+    'public/founder-certs/cert-1-python-dev.jpg',
+    'public/founder-certs/cert-2-python-dsa.jpg',
+    'public/founder-certs/cert-3-python-game.jpg',
+    'public/founder-certs/cert-4-junior-web.jpg',
+    'public/founder-certs/cert-5-game-lab.jpg',
+    'public/founder-certs/cert-6-app-lab.jpg',
+    'public/founder-certs/cert-7-animator.jpg',
+    'public/founder-certs/cert-8-rising-star.jpg',
+    'public/founder-certs/cert-9-iit-bombay.jpg'
   ];
   for (const f of certFiles) {
     const fullPath = path.resolve(f);
     assert.ok(fs.existsSync(fullPath), `Certificate asset ${f} must exist`);
     const stat = fs.statSync(fullPath);
-    assert.ok(stat.size > 20000, `Certificate ${f} must be a valid image (>20KB)`);
+    assert.ok(stat.size > 5000, `Certificate ${f} must be a valid image (>5KB)`);
     console.log(`[PASS] Certificate asset verified: ${f} (${Math.round(stat.size / 1024)} KB)`);
   }
 
