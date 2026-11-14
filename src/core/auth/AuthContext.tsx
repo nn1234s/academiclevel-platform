@@ -139,6 +139,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const res = await ApiClient.getStudent(targetId);
         if (res.success && res.learner) {
+          // Guard against race conditions where local coin balance or completed levels were just updated
+          const localLearner = StorageRLSLayer.getLearnerById(targetId, targetId);
+          if (localLearner && (localLearner.coinBalance || 0) > (res.learner.coinBalance || 0)) {
+            res.learner.coinBalance = localLearner.coinBalance;
+          }
+          if (localLearner && (localLearner.levelsCompletedCount || 0) > (res.learner.levelsCompletedCount || 0)) {
+            res.learner.levelsCompletedCount = localLearner.levelsCompletedCount;
+          }
           if (res.activeSub) {
             StorageRLSLayer.saveSubscription(res.activeSub);
             res.learner.hasActiveSubscription = true;

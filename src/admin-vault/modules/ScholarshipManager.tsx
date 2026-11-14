@@ -160,12 +160,14 @@ export const ScholarshipManager: React.FC = () => {
     if (!window.confirm(`Are you sure you want to remove scholarship "${sch.title}"?`)) return;
     try {
       await ApiClient.adminDeleteScholarship(SUPER_ADMIN_EMAIL, sch.id);
-    } catch {
-      // Offline
+      StorageRLSLayer.deleteScholarship(sch.id);
+      setNotice({ type: 'success', text: `Scholarship "${sch.title}" deleted successfully.` });
+      await fetchScholarships();
+    } catch (err: any) {
+      StorageRLSLayer.deleteScholarship(sch.id);
+      setNotice({ type: 'success', text: `Scholarship "${sch.title}" deleted.` });
+      await fetchScholarships();
     }
-    StorageRLSLayer.deleteScholarship(sch.id);
-    setNotice({ type: 'success', text: `Scholarship "${sch.title}" deleted.` });
-    fetchScholarships();
     setTimeout(() => setNotice(null), 3000);
   };
 

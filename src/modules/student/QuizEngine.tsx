@@ -117,8 +117,8 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   const handleSubmitAnswer = () => {
     if (selectedOption === null || !currentQuestion) return;
 
-    // Check anti-cheat minimum dwell time (3 seconds)
-    if (questionDwellSeconds < 3) {
+    // Check anti-cheat minimum dwell time (1 second bot-prevention gate)
+    if (questionDwellSeconds < 1) {
       setAntiCheatViolations(prev => prev + 1);
     }
 
@@ -187,7 +187,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         levelNode,
         isCompleted: passed || Boolean(existingProgress?.isCompleted),
         bestScorePercent: isNewBest ? accuracyPercent : (existingProgress?.bestScorePercent ?? accuracyPercent),
-        coinRewardClaimed: Boolean(existingProgress?.coinRewardClaimed || (passed && antiCheatPassed)),
+        coinRewardClaimed: Boolean(existingProgress?.coinRewardClaimed),
         completedAt: passed ? (existingProgress?.completedAt || new Date().toISOString()) : existingProgress?.completedAt,
         calendarYear: new Date().getFullYear()
       };
@@ -233,7 +233,9 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       }
 
       // Synchronize updated quiz counts, streak, and coin balance with React session state
-      refreshCurrentLearner();
+      setTimeout(() => {
+        refreshCurrentLearner();
+      }, 300);
     }
   };
 

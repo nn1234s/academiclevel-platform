@@ -56,7 +56,7 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
     const enriched = all.map(s => {
       const isClaimed = claimedIds.has(s.id);
       const isExpired = new Date(s.endDate).getTime() < Date.now();
-      const progress = Math.min(s.targetQuizCount, learner.quizzesCompletedCount || 0);
+      const progress = Math.min(s.targetQuizCount, Math.max(learner.quizzesCompletedCount || 0, learner.levelsCompletedCount || 0));
       const canClaim = !isClaimed && !isExpired && progress >= s.targetQuizCount;
       return {
         ...s,
@@ -74,7 +74,7 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
 
   useEffect(() => {
     fetchScholarships();
-  }, [learner.id, learner.quizzesCompletedCount]);
+  }, [learner.id, learner.quizzesCompletedCount, learner.levelsCompletedCount]);
 
   const handleClaimReward = async (sch: any) => {
     setClaimingId(sch.id);

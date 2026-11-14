@@ -146,27 +146,26 @@ export class QuotaService {
   }
 
   /**
-   * Records completion of a quiz and updates learner quiz and level quota counters.
-   * 10 quizzes doesn't mean 10 levels. It means 2 (5 quizzes = 1 level).
+   * Records completion of a quiz and increments learner quiz count.
    */
   public static recordQuizCompletion(learnerId: string): void {
     const learner = StorageRLSLayer.getLearnerById(learnerId, learnerId);
     if (!learner) return;
 
     learner.quizzesCompletedCount = (learner.quizzesCompletedCount || 0) + 1;
-    learner.levelsCompletedCount = Math.floor(learner.quizzesCompletedCount / 5);
     StorageRLSLayer.saveLearner(learner, learnerId);
   }
 
   /**
-   * Records completion of a course level node and syncs level counter.
-   * 10 quizzes doesn't mean 10 levels. It means 2 (5 quizzes = 1 level).
+   * Records completion of a course level node and syncs level counter accurately.
    */
   public static recordLevelCompletion(learnerId: string): void {
     const learner = StorageRLSLayer.getLearnerById(learnerId, learnerId);
     if (!learner) return;
 
-    learner.levelsCompletedCount = Math.floor((learner.quizzesCompletedCount || 0) / 5);
+    const progressList = StorageRLSLayer.getProgressForLearner(learnerId, learnerId);
+    const completedLevels = progressList.filter(p => p.isCompleted).length;
+    learner.levelsCompletedCount = Math.max(completedLevels, (learner.levelsCompletedCount || 0) + 1);
     StorageRLSLayer.saveLearner(learner, learnerId);
   }
 }

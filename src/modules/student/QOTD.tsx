@@ -109,7 +109,9 @@ export const QOTD: React.FC<QOTDProps> = ({ learner, onRefreshLearner }) => {
         date: new Date().toISOString().split('T')[0]
       });
       setRewardClaimed(true);
-      onRefreshLearner();
+      setTimeout(() => {
+        onRefreshLearner();
+      }, 300);
     }
   };
 

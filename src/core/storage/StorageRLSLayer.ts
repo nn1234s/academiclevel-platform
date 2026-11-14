@@ -646,30 +646,7 @@ class StorageRLSLayerClass {
   // Worldwide Scholarships & Sprints
   // ==========================================
   public getAllScholarships(): Scholarship[] {
-    const list = this.readRaw<Scholarship[]>(STORAGE_KEYS.SCHOLARSHIPS, []);
-    if (list.length === 0) {
-      const now = new Date();
-      const defaultSch: Scholarship = {
-        id: 'sch_inaugural_sprint_001',
-        title: '🌟 All-India 7-Day Scholar Sprint (10 Quizzes = 250 Coins)',
-        description: 'Complete 10 curriculum quizzes across any subject this week to earn a 250 Coins Scholarship reward and the official Scholar Sprint Laureate badge!',
-        targetQuizCount: 10,
-        rewardCoins: 250,
-        durationDays: 7,
-        badgeTitle: '🏆 Scholar Sprint Laureate',
-        maxRecipients: 0,
-        claimedCount: 0,
-        isActive: true,
-        startDate: now.toISOString(),
-        endDate: new Date(now.getTime() + 7 * 86400000).toISOString(),
-        createdBy: SUPER_ADMIN_EMAIL,
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString()
-      };
-      this.writeRaw(STORAGE_KEYS.SCHOLARSHIPS, [defaultSch]);
-      return [defaultSch];
-    }
-    return list;
+    return this.readRaw<Scholarship[]>(STORAGE_KEYS.SCHOLARSHIPS, []);
   }
 
   public saveScholarship(sch: Scholarship): void {
