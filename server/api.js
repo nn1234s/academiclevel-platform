@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { db, initDatabaseSchema, exportDbToJsonStore } from './db.js';
-import { replicateUpsertAsync } from './tursoClient.js';
+import { replicateUpsertAsync, executeTurso } from './tursoClient.js';
 
 // Safe non-blocking Turso replication helper
 export function safeReplicateAsync(table, record) {
@@ -14,6 +14,19 @@ export function safeReplicateAsync(table, record) {
     }
   } catch (err) {
     console.warn(`[Turso Replication Non-fatal: ${table}]`, err?.message);
+  }
+}
+
+// Safe non-blocking Turso SQL execution helper
+export function safeExecuteTursoAsync(sql, args = []) {
+  try {
+    if (typeof executeTurso === 'function') {
+      executeTurso(sql, args).catch(err => {
+        console.warn('[Turso Execute Non-fatal]', err?.message);
+      });
+    }
+  } catch (err) {
+    console.warn('[Turso Execute Error]', err?.message);
   }
 }
 
@@ -1139,11 +1152,36 @@ apiRouter.post('/coins/transact', (req, res) => {
     const sessionToken = req.headers['x-session-token'] || req.headers['authorization']?.replace(/^Bearer\s+/i, '');
     const isAuthorizedStudent = isValidLearnerSession(sessionToken, learnerId);
 
-    if (numAmount > 0 && !isAdmin) {
+    const ALLOWED_STUDENT_CREDIT_REASONS = [
+      'QOTD_COMPLETION',
+      'LEVEL_COMPLETED_REWARD',
+      'DAILY_SPIN_REWARD',
+      'WEEKLY_CHALLENGE_REWARD',
+      'QUIZ_PERFECT_SCORE',
+      'STREAK_MILESTONE',
+      'SCHOLARSHIP_AWARD'
+    ];
+
+    const isAllowedStudentCredit = (isAuthorizedStudent || Boolean(learner)) && ALLOWED_STUDENT_CREDIT_REASONS.includes(reasonCode);
+
+    if (numAmount > 0 && !isAdmin && !isAllowedStudentCredit) {
       return res.status(403).json({
         success: false,
-        error: 'Unauthorized coin credit: Direct coin minting requires admin authorization. Coins can only be earned through verified quiz completions, daily spins, or official bonuses.'
+        error: 'Unauthorized coin credit: Direct coin minting requires admin authorization or verified student activity.'
       });
+    }
+
+    // Safety bounds on student coin awards
+    if (numAmount > 0 && !isAdmin) {
+      if (reasonCode === 'LEVEL_COMPLETED_REWARD' && numAmount > 25) {
+        return res.status(400).json({ success: false, error: 'Exceeded maximum level completion reward of 25 coins.' });
+      }
+      if (reasonCode === 'QOTD_COMPLETION' && numAmount > 5) {
+        return res.status(400).json({ success: false, error: 'Exceeded maximum QOTD reward of 5 coins.' });
+      }
+      if (reasonCode === 'DAILY_SPIN_REWARD' && numAmount > 50) {
+        return res.status(400).json({ success: false, error: 'Exceeded maximum daily spin reward of 50 coins.' });
+      }
     }
 
     if (numAmount < 0 && !isAdmin && !isAuthorizedStudent) {
@@ -1179,6 +1217,13 @@ apiRouter.post('/coins/transact', (req, res) => {
       now,
       'SIG_' + crypto.randomBytes(6).toString('hex')
     );
+
+    // Replicate updated learner balance and coin ledger entry to Turso Cloud
+    const updatedLearner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    safeReplicateAsync('learners', updatedLearner);
+    const ledgerEntry = db.prepare('SELECT * FROM coin_ledger WHERE entryId = ?').get(entryId);
+    safeReplicateAsync('coin_ledger', ledgerEntry);
+    exportDbToJsonStore();
 
     res.json({ success: true, newBalance, entryId });
   } catch (err) {
@@ -1298,7 +1343,7 @@ apiRouter.get('/scholarships', (req, res) => {
           WHERE learnerId = ? AND createdAt >= ? AND passed = 1
         `).get(learnerId, sch.startDate)?.count || 0;
 
-        completedQuizzesInWindow = Math.min(sch.targetQuizCount, Math.max(attemptCount, learner?.quizzesCompletedCount || 0));
+        completedQuizzesInWindow = Math.min(sch.targetQuizCount, Math.max(attemptCount, learner?.quizzesCompletedCount || 0, learner?.levelsCompletedCount || 0));
       }
 
       const isExpired = new Date(sch.endDate).getTime() < Date.now();
@@ -1346,17 +1391,17 @@ apiRouter.post('/scholarships/:id/claim', (req, res) => {
       return res.status(400).json({ success: false, error: 'You have already claimed this scholarship reward.' });
     }
 
-    // Check quiz requirement
+    // Check quiz or level requirement
     const attemptCount = db.prepare(`
       SELECT count(*) as count FROM quiz_attempts 
       WHERE learnerId = ? AND createdAt >= ? AND passed = 1
     `).get(learnerId, sch.startDate)?.count || 0;
-    const progressCount = Math.max(attemptCount, learner.quizzesCompletedCount || 0);
+    const progressCount = Math.max(attemptCount, learner.quizzesCompletedCount || 0, learner.levelsCompletedCount || 0);
 
     if (progressCount < sch.targetQuizCount) {
       return res.status(400).json({
         success: false,
-        error: `Academic requirement not met: You have completed ${progressCount} of ${sch.targetQuizCount} required quizzes.`
+        error: `Academic requirement not met: You have completed ${progressCount} of ${sch.targetQuizCount} required milestones.`
       });
     }
 
@@ -1393,6 +1438,15 @@ apiRouter.post('/scholarships/:id/claim', (req, res) => {
 
     // Increment scholarship claimedCount
     db.prepare('UPDATE scholarships SET claimedCount = claimedCount + 1, updatedAt = ? WHERE id = ?').run(now, sch.id);
+
+    // Replicate updated learner and claim to Turso Cloud
+    const updatedLearner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learner.id);
+    safeReplicateAsync('learners', updatedLearner);
+    const createdClaim = db.prepare('SELECT * FROM scholarship_claims WHERE id = ?').get(claimId);
+    safeReplicateAsync('scholarship_claims', createdClaim);
+    const updatedSch = db.prepare('SELECT * FROM scholarships WHERE id = ?').get(sch.id);
+    safeReplicateAsync('scholarships', updatedSch);
+    exportDbToJsonStore();
 
     // Audit log
     try {
@@ -1472,14 +1526,19 @@ apiRouter.post('/quizzes/attempt', (req, res) => {
       now
     );
 
-    // Increment quizzes completed count and calculate levels completed: 5 quizzes = 1 level (10 quizzes = 2 levels)
+    // Increment quizzes completed count
     const newQuizCount = (learner.quizzesCompletedCount || 0) + 1;
-    const newLevelCount = Math.floor(newQuizCount / 5);
     db.prepare(`
       UPDATE learners
-      SET quizzesCompletedCount = ?, levelsCompletedCount = ?, updatedAt = ?
+      SET quizzesCompletedCount = ?, updatedAt = ?
       WHERE id = ?
-    `).run(newQuizCount, newLevelCount, now, learnerId);
+    `).run(newQuizCount, now, learnerId);
+
+    const updatedLearner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    safeReplicateAsync('learners', updatedLearner);
+    const attemptRecord = db.prepare('SELECT * FROM quiz_attempts WHERE id = ?').get(attemptId);
+    safeReplicateAsync('quiz_attempts', attemptRecord);
+    exportDbToJsonStore();
 
     // Referral qualification check on referee's first quiz
     let referralBonusAwarded = false;
@@ -1706,16 +1765,26 @@ apiRouter.post('/progress/level', (req, res) => {
       );
     }
 
-    if (newlyCompleted) {
-      // 10 quizzes doesn't mean 10 levels. It means 2 levels (5 quizzes = 1 level).
-      const currentQuizCount = Number(learner.quizzesCompletedCount || 0);
-      const calculatedLevels = Math.floor(currentQuizCount / 5);
-      db.prepare(`
-        UPDATE learners
-        SET levelsCompletedCount = ?, updatedAt = ?
-        WHERE id = ?
-      `).run(calculatedLevels, now, learnerId);
-    }
+    // Recalculate accurate completed course levels count
+    const distinctLevelsCount = db.prepare(`
+      SELECT count(*) as count FROM course_progress 
+      WHERE learnerId = ? AND (isCompleted = 1 OR passed = 1)
+    `).get(learnerId)?.count || 0;
+
+    const currentLevelsCount = Number(learner.levelsCompletedCount || 0);
+    const calculatedLevels = Math.max(distinctLevelsCount, newlyCompleted ? currentLevelsCount + 1 : currentLevelsCount);
+
+    db.prepare(`
+      UPDATE learners
+      SET levelsCompletedCount = ?, updatedAt = ?
+      WHERE id = ?
+    `).run(calculatedLevels, now, learnerId);
+
+    const updatedLearner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    safeReplicateAsync('learners', updatedLearner);
+    const progressRecord = db.prepare('SELECT * FROM course_progress WHERE id = ?').get(progressId);
+    safeReplicateAsync('course_progress', progressRecord);
+    exportDbToJsonStore();
 
     res.json({ success: true, progressId, newlyCompleted });
   } catch (err) {
@@ -2756,6 +2825,8 @@ apiRouter.post('/admin/scholarships', adminAuth, (req, res) => {
     );
 
     const created = db.prepare('SELECT * FROM scholarships WHERE id = ?').get(schId);
+    safeReplicateAsync('scholarships', created);
+    exportDbToJsonStore();
     res.json({ success: true, scholarship: created, message: 'Worldwide scholarship published successfully!' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -2771,6 +2842,10 @@ apiRouter.patch('/admin/scholarships/:id/toggle', adminAuth, (req, res) => {
     const now = new Date().toISOString();
     db.prepare('UPDATE scholarships SET isActive = ?, updatedAt = ? WHERE id = ?').run(newStatus, now, sch.id);
 
+    const updated = db.prepare('SELECT * FROM scholarships WHERE id = ?').get(sch.id);
+    safeReplicateAsync('scholarships', updated);
+    exportDbToJsonStore();
+
     res.json({
       success: true,
       isActive: newStatus === 1,
@@ -2785,6 +2860,12 @@ apiRouter.delete('/admin/scholarships/:id', adminAuth, (req, res) => {
   try {
     db.prepare('DELETE FROM scholarship_claims WHERE scholarshipId = ?').run(req.params.id);
     db.prepare('DELETE FROM scholarships WHERE id = ?').run(req.params.id);
+
+    // Cascading deletion across Turso Cloud database
+    safeExecuteTursoAsync('DELETE FROM scholarship_claims WHERE scholarshipId = ?', [req.params.id]);
+    safeExecuteTursoAsync('DELETE FROM scholarships WHERE id = ?', [req.params.id]);
+
+    exportDbToJsonStore();
     res.json({ success: true, message: 'Scholarship challenge deleted.' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

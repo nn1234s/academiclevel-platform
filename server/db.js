@@ -327,38 +327,9 @@ export function initDatabaseSchema() {
   addColumnSafe('learners', 'lastAiMessageDateUtc TEXT');
   addColumnSafe('learners', 'bonusAiMessages INTEGER DEFAULT 0');
 
-  // Seed inaugural worldwide scholarship if empty
+  // ACodes and scholarships are managed via admin portal and persisted in database.
+  // Never re-seed deleted inaugural scholarships.
   const defaultAdminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
-  const countScholarships = db.prepare('SELECT count(*) as cnt FROM scholarships').get().cnt;
-  if (countScholarships === 0) {
-    const now = new Date();
-    const endDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    db.prepare(`
-      INSERT INTO scholarships (
-        id, title, description, targetQuizCount, rewardCoins, durationDays,
-        targetGrade, targetBoard, badgeTitle, maxRecipients, claimedCount,
-        isActive, startDate, endDate, createdBy, createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      'sch_inaugural_sprint_001',
-      '🌟 All-India 7-Day Scholar Sprint (10 Quizzes = 250 Coins)',
-      'Complete 10 curriculum quizzes across any subject this week to earn a 250 Coins Scholarship reward and the official Scholar Sprint Laureate badge!',
-      10,
-      250,
-      7,
-      null,
-      null,
-      '🏆 Scholar Sprint Laureate',
-      0,
-      0,
-      1,
-      now.toISOString(),
-      endDate.toISOString(),
-      defaultAdminEmail || 'admin@academiclevel.in',
-      now.toISOString(),
-      now.toISOString()
-    );
-  }
 
   // Seed default ACodes if empty
   const countACodes = db.prepare('SELECT count(*) as cnt FROM acodes').get().cnt;
