@@ -85,7 +85,7 @@ export class HybridQuizService {
     }
 
     try {
-      // 1. Try server backend endpoint first with a 4-second race guard
+      // 1. Try server backend endpoint first with an extended race guard accommodating natural Google Gemini latencies (7-12s)
       const serverFetchPromise = fetch('/api/ai/generate-quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -96,7 +96,7 @@ export class HybridQuizService {
       });
 
       const timeoutPromise = new Promise<{ timeout: true }>((resolve) =>
-        setTimeout(() => resolve({ timeout: true }), 4200)
+        setTimeout(() => resolve({ timeout: true }), 22000)
       );
 
       const raceResult = await Promise.race([serverFetchPromise, timeoutPromise]);
@@ -175,7 +175,7 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
       const { version, model } = candidate;
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 4500);
+        const timeout = setTimeout(() => controller.abort(), 20000);
 
         const res = await fetch(
           `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`,

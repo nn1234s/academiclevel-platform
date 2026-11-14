@@ -27,7 +27,7 @@ export interface StudentAiQuota {
 }
 
 export class NovaAiService {
-  private static AI_TIMEOUT_MS = 4500;
+  private static AI_TIMEOUT_MS = 20000;
   private static CLIENT_CANDIDATES: { version: string; model: string }[] = [
     { version: 'v1beta', model: 'gemini-3.5-flash-lite' },
     { version: 'v1beta', model: 'gemini-3.1-flash-lite' },
@@ -256,7 +256,7 @@ Provide an age-appropriate Socratic breakdown under 120 words.`;
       const { version, model } = candidate;
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 3500);
+        const timeout = setTimeout(() => controller.abort(), 18000);
 
         const res = await fetch(
           `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`,
@@ -299,7 +299,7 @@ Guide them Socratically in under 120 words.`;
       const { version, model } = candidate;
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 3500);
+        const timeout = setTimeout(() => controller.abort(), 18000);
 
         const res = await fetch(
           `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`,

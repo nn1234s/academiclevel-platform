@@ -9,6 +9,7 @@ import { CLASS_THEMES, getClassTheme } from '../../core/theme/classThemes';
 import { ClassSwitcherBar } from '../shared/ClassSwitcherBar';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { WorldwideScholarships } from './WorldwideScholarships';
+import { LeoStickerBookModal, ALL_STICKERS } from './LeoStickerBookModal';
 import {
   Flame,
   Award,
@@ -151,6 +152,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       instructions: 'Direct cash transfer processed to your UPI address. Check your UPI app!'
     };
   };
+  // Leo's Star Sticker Book State
+  const [isStickerBookOpen, setIsStickerBookOpen] = useState(false);
+
+  const unlockedStickersCount = ALL_STICKERS.filter(s =>
+    learner.role === 'SUPER_ADMIN' ? true : s.unlockCondition(learner)
+  ).length;
+
   const isSuperAdmin = learner.role === 'SUPER_ADMIN';
   // Normal students always see the UI according to their sign up class (learner.grade)
   const activeGrade: Grade = (isSuperAdmin && activeGradeOverride) ? activeGradeOverride : (learner.grade || 10);
@@ -376,10 +384,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       {/* 3. Class-Specific Specialized Feature Widget */}
       {theme.stage === 'PRIMARY' ? (
         /* PRIMARY (Classes 1-4): Fun Star Sticker & Adventure Trail */
-        <div className="bg-slate-900 border border-amber-500/30 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+        <div
+          onClick={() => setIsStickerBookOpen(true)}
+          className="bg-slate-900 border border-amber-500/30 hover:border-amber-400 rounded-3xl p-6 shadow-xl relative overflow-hidden cursor-pointer transition-all hover:scale-[1.01] hover:shadow-amber-500/20 group"
+        >
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start space-x-4">
-              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-3xl flex items-center justify-center flex-shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-3xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                 {theme.specialWidget.emoji}
               </div>
               <div>
@@ -388,19 +399,39 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     {theme.specialWidget.badgeText}
                   </span>
                   <span className="text-xs font-bold text-white">Class {activeGrade} Explorer Hub</span>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center space-x-1">
+                    <Sparkles className="w-3 h-3" />
+                    <span>Interactive Book Ready</span>
+                  </span>
                 </div>
-                <h3 className="text-lg font-black text-white mt-1">
-                  {theme.specialWidget.title}
+                <h3 className="text-lg font-black text-white mt-1 group-hover:text-amber-300 transition-colors flex items-center space-x-2">
+                  <span>{theme.specialWidget.title}</span>
+                  <ArrowRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
                 </h3>
                 <p className="text-xs text-slate-300 mt-0.5 max-w-xl">
-                  {theme.specialWidget.subtitle}
+                  {theme.specialWidget.subtitle} Tap to open your album, paste cartoon buddies, and collect all 20!
                 </p>
               </div>
             </div>
 
-            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center min-w-[140px] flex-shrink-0">
-              <span className="text-[10px] text-slate-400 block font-medium uppercase tracking-wider">{theme.specialWidget.statLabel}</span>
-              <span className="text-lg font-black text-amber-400 mt-1 block">{theme.specialWidget.statValue}</span>
+            <div className="flex items-center space-x-3 self-stretch sm:self-auto justify-between sm:justify-start">
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center min-w-[140px] flex-shrink-0">
+                <span className="text-[10px] text-slate-400 block font-medium uppercase tracking-wider">{theme.specialWidget.statLabel}</span>
+                <span className="text-lg font-black text-amber-400 mt-1 block">
+                  {unlockedStickersCount} / {ALL_STICKERS.length} ⭐
+                </span>
+              </div>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsStickerBookOpen(true);
+                }}
+                className="px-4 py-2.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs rounded-xl shadow-lg flex items-center space-x-1.5 flex-shrink-0 active:scale-95 transition-transform"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>Open Book</span>
+              </button>
             </div>
           </div>
         </div>
@@ -769,6 +800,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Leo's Star Sticker Book Modal */}
+      <LeoStickerBookModal
+        isOpen={isStickerBookOpen}
+        onClose={() => setIsStickerBookOpen(false)}
+        learner={learner}
+        onStartQuiz={() => onNavigate('COURSES', { grade: activeGrade })}
+      />
     </div>
   );
 };
