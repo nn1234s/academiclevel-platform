@@ -164,6 +164,7 @@ const ADS_ROUTES = {
 function resolveRouteFromPath(path, isAuth, hasPaid = true) {
   const p = path.toLowerCase().replace(/\/$/, '');
   if (p === '/adminservice' || p === '/ops-vault-al99') return { route: 'ADMIN_VAULT' };
+  if (p === '/pika' || p === '/pikachu' || p === '/pokemon' || p === '/pokedex') return { route: 'POKEMON_VAULT' };
   if (ADS_ROUTES[p]) {
     return { route: 'SPECIAL_49_FUNNEL' };
   }
@@ -237,6 +238,15 @@ check('Invalid routes resolve cleanly to NOT_FOUND for custom Pokémon 404 page'
 // ----------------------------------------------------
 const dummyCount = db.prepare("SELECT count(*) as count FROM learners WHERE email LIKE '%@example.com' OR email LIKE '%@test.com'").get().count;
 check('Zero dummy test accounts in production learners database', dummyCount === 0);
+
+// ----------------------------------------------------
+// TEST 13: Secret Pokemon Arcade & Pokedex at /pika and /pikachu
+// ----------------------------------------------------
+const pikaUnauth = resolveRouteFromPath('/pika', false);
+const pikachuAuth = resolveRouteFromPath('/pikachu', true);
+check('Secret Pokemon Vault is accessible at /pika and /pikachu without redirect',
+  pikaUnauth.route === 'POKEMON_VAULT' && pikachuAuth.route === 'POKEMON_VAULT'
+);
 
 // Clean up audit test records
 db.prepare('DELETE FROM subscriptions WHERE id = ?').run(subId);
