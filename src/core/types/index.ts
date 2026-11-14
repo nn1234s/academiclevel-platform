@@ -84,6 +84,7 @@ export type CoinReasonCode =
   | 'REFERRAL_SIGNUP_QUALIFIED' // +40 to referrer
   | 'DAILY_SPIN_WHEEL' // +2, +3, +5, +40
   | 'QOTD_COMPLETION' // +1
+  | 'POKEMON_GUESS_REWARD' // +1
   | 'MALL_PURCHASE' // -X
   | 'GIFT_STORE_REDEMPTION' // -X
   | 'ADMIN_ADJUSTMENT'; // +/-X

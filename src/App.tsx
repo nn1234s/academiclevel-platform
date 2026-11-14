@@ -381,15 +381,32 @@ export const App: React.FC = () => {
   // Secret Pokemon & Pokedex Arcade (/pika, /pikachu, /pokemon, /pokedex)
   if (currentRoute === 'POKEMON_VAULT') {
     return (
-      <PokemonVaultHub
-        onBackToApp={() => {
-          if (isAuthenticated) {
-            navigateTo('DASHBOARD');
-          } else {
-            navigateTo('HOME');
-          }
-        }}
-      />
+      <>
+        <PokemonVaultHub
+          learner={currentLearner}
+          onRefreshLearner={() => refreshCurrentLearner()}
+          onOpenAuth={mode => {
+            setAuthModalMode(mode);
+            setAuthModalOpen(true);
+          }}
+          onBackToApp={() => {
+            if (isAuthenticated) {
+              navigateTo('DASHBOARD');
+            } else {
+              navigateTo('HOME');
+            }
+          }}
+        />
+        <AuthModal
+          isOpen={authModalOpen}
+          onClose={() => setAuthModalOpen(false)}
+          onSuccess={() => {
+            refreshCurrentLearner();
+            setAuthModalOpen(false);
+          }}
+          initialMode={authModalMode}
+        />
+      </>
     );
   }
 
