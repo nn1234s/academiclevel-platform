@@ -63,7 +63,7 @@ const DEFAULT_CONFIG: SiteConfig = {
     plusPriceInr: 129,
     plusDurationDays: 180,
     upiVpa: 'theattirebbsr@okicici',
-    merchantName: '17 Pratyusha Nanda',
+    merchantName: 'Academic Level',
     discountBadge: 'Special Launch Offer (95% Off)',
     liteFeatures: [
       'Unlimited Quizzes & Adaptive Assessments',
