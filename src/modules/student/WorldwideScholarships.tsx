@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Learner, Grade } from '../../core/types';
 import { ApiClient } from '../../core/api/apiClient';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import confetti from 'canvas-confetti';
 import {
   Award,
@@ -212,8 +213,8 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
                     <span>{sch.durationDays} Days Sprint</span>
                   </span>
 
-                  <span className="px-2.5 py-1 rounded-full text-xs font-black tracking-wide flex items-center space-x-1 bg-amber-500/20 border border-amber-500/50 text-amber-300">
-                    <Sparkles className="w-3.5 h-3.5" />
+                  <span className="px-2.5 py-1 rounded-full text-xs font-black tracking-wide flex items-center space-x-1.5 bg-amber-500/20 border border-amber-500/50 text-amber-300">
+                    <StudyCoinIcon className="w-3.5 h-3.5" glow />
                     <span>+{sch.rewardCoins} Coins</span>
                   </span>
                 </div>
@@ -267,7 +268,10 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
                 {isClaimed ? (
                   <div className="w-full py-2.5 px-4 rounded-xl bg-emerald-950/50 border border-emerald-800/80 text-emerald-300 text-xs font-bold flex items-center justify-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>Scholarship Claimed (+{sch.rewardCoins} Coins Credited)</span>
+                    <span className="flex items-center gap-1.5">
+                      <StudyCoinIcon className="w-3.5 h-3.5" />
+                      Scholarship Claimed (+{sch.rewardCoins} Coins Credited)
+                    </span>
                   </div>
                 ) : canClaim ? (
                   <button
@@ -276,10 +280,11 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
                     className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center space-x-2 shadow-xl shadow-amber-950 animate-pulse transition-all"
                   >
                     <Trophy className="w-4 h-4 text-slate-950" />
-                    <span>
+                    <span className="flex items-center gap-1.5">
+                      <StudyCoinIcon className="w-4 h-4" />
                       {claimingId === sch.id
                         ? 'Claiming Scholarship...'
-                        : `🎉 Claim ${sch.rewardCoins} Coins Scholarship!`}
+                        : `Claim ${sch.rewardCoins} Coins Scholarship!`}
                     </span>
                   </button>
                 ) : (
@@ -326,8 +331,8 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
             </p>
 
             <div className="bg-slate-950 p-4 rounded-2xl border border-amber-500/30 mb-6">
-              <div className="flex items-center justify-center space-x-2 text-2xl font-black text-amber-300">
-                <Sparkles className="w-6 h-6 text-amber-400" />
+              <div className="flex items-center justify-center space-x-2.5 text-2xl font-black text-amber-300">
+                <StudyCoinIcon className="w-8 h-8" glow animate />
                 <span>+{celebration.coins} Study Coins</span>
               </div>
               {celebration.badge && (

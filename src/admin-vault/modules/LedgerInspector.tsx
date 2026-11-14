@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
 import { CoinLedgerEntry } from '../../core/types';
+import { StudyCoinIcon } from '../../modules/shared/StudyCoinIcon';
 import { Sparkles, ShieldCheck, Search, Filter } from 'lucide-react';
 
 export const LedgerInspector: React.FC = () => {
@@ -21,7 +22,7 @@ export const LedgerInspector: React.FC = () => {
     <div className="space-y-6 text-slate-100">
       <div>
         <h2 className="text-xl font-bold text-white flex items-center space-x-2">
-          <Sparkles className="w-5 h-5 text-amber-400" />
+          <StudyCoinIcon className="w-6 h-6" glow />
           <span>Study Coin & Reward Ledger Inspector</span>
         </h2>
         <p className="text-xs text-slate-400 mt-0.5">
@@ -33,11 +34,17 @@ export const LedgerInspector: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
           <span className="text-xs text-slate-400">Total Coins Minted</span>
-          <p className="text-2xl font-black text-emerald-400 mt-1">+{credits}</p>
+          <p className="text-2xl font-black text-emerald-400 mt-1 flex items-center justify-center gap-1.5">
+            <StudyCoinIcon className="w-5 h-5" glow />
+            <span>+{credits}</span>
+          </p>
         </div>
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
           <span className="text-xs text-slate-400">Total Coins Spent / Burned</span>
-          <p className="text-2xl font-black text-rose-400 mt-1">-{debits}</p>
+          <p className="text-2xl font-black text-rose-400 mt-1 flex items-center justify-center gap-1.5">
+            <StudyCoinIcon className="w-5 h-5" />
+            <span>-{debits}</span>
+          </p>
         </div>
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
           <span className="text-xs text-slate-400">Total Ledger Entries</span>

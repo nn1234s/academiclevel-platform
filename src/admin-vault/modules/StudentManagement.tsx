@@ -4,6 +4,7 @@ import { Learner, Board, Grade, Subscription } from '../../core/types';
 import { PaymentService } from '../../services/paymentService';
 import { QuotaService } from '../../services/quotaService';
 import { CoinLedgerService } from '../../services/coinLedgerService';
+import { StudyCoinIcon } from '../../modules/shared/StudyCoinIcon';
 import {
   Search,
   Zap,
@@ -537,7 +538,7 @@ export const StudentManagement: React.FC = () => {
                       {/* Economy & Quota */}
                       <td className="p-4">
                         <div className="flex items-center space-x-1 text-amber-400 font-mono font-bold text-xs">
-                          <Coins className="w-3.5 h-3.5 text-amber-400" />
+                          <StudyCoinIcon className="w-4 h-4" glow />
                           <span>{learner.coinBalance.toLocaleString()} Coins</span>
                         </div>
                         <p className="text-[10px] text-emerald-400 font-mono mt-0.5">
@@ -824,7 +825,7 @@ export const StudentManagement: React.FC = () => {
             <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold text-white flex items-center space-x-1.5">
-                  <Coins className="w-4 h-4 text-amber-400" />
+                  <StudyCoinIcon className="w-4 h-4" glow />
                   <span>Study Coins Balance & Ledger Adjustment</span>
                 </h4>
                 <span className="text-xs font-mono font-bold text-amber-400">

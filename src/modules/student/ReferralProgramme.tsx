@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Learner } from '../../core/types';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { Users, Copy, Check, Sparkles, Award, ShieldAlert, CheckCircle2, Clock } from 'lucide-react';
 
 interface ReferralProgrammeProps {
@@ -37,8 +38,8 @@ export const ReferralProgramme: React.FC<ReferralProgrammeProps> = ({ learner })
       {/* Hero Banner */}
       <div className="bg-gradient-to-r from-indigo-950 via-slate-900 to-slate-900 border border-indigo-900/50 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
         <div className="max-w-xl">
-          <span className="inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+          <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-3">
+            <StudyCoinIcon className="w-3.5 h-3.5" glow />
             <span>+40 Coins Per Qualified Scholar</span>
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
@@ -46,7 +47,7 @@ export const ReferralProgramme: React.FC<ReferralProgrammeProps> = ({ learner })
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
             Share your unique invite code with friends from CBSE, ICSE, or Cambridge IGCSE.
-            When they join and complete their <strong className="text-white">first full quiz</strong>, you receive an instant <strong className="text-amber-400">+40 Study Coins</strong> and unlock the Rare 40-Coin Spin Wheel Jackpot!
+            When they join and complete their <strong className="text-white">first full quiz</strong>, you receive an instant <strong className="text-amber-400 inline-flex items-center gap-1"><StudyCoinIcon className="w-4 h-4" /> +40 Study Coins</strong> and unlock the Rare 40-Coin Spin Wheel Jackpot!
           </p>
         </div>
 
@@ -91,7 +92,10 @@ export const ReferralProgramme: React.FC<ReferralProgrammeProps> = ({ learner })
 
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
           <span className="text-xs text-slate-400">Referral Coins Earned</span>
-          <p className="text-2xl font-black text-amber-400 mt-1">+{totalCoinsEarned}</p>
+          <p className="text-2xl font-black text-amber-400 mt-1 flex items-center justify-center gap-1.5">
+            <StudyCoinIcon className="w-6 h-6" glow />
+            <span>+{totalCoinsEarned}</span>
+          </p>
           <span className="text-[10px] text-slate-500">Append-Only Ledger</span>
         </div>
       </div>
@@ -122,6 +126,7 @@ export const ReferralProgramme: React.FC<ReferralProgrammeProps> = ({ learner })
                   {ref.referralQualified ? (
                     <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                       <CheckCircle2 className="w-3.5 h-3.5" />
+                      <StudyCoinIcon className="w-3.5 h-3.5" />
                       <span>Qualified (+40 Coins)</span>
                     </span>
                   ) : (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Learner, Board, Grade } from '../../core/types';
 import { CoinLedgerService } from '../../services/coinLedgerService';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { Compass, Sparkles, CheckCircle2, XCircle, ArrowRight, Flame, Award, Loader2 } from 'lucide-react';
 
 interface QOTDProps {
@@ -176,8 +177,8 @@ export const QOTD: React.FC<QOTDProps> = ({ learner, onRefreshLearner }) => {
           <p className="font-bold text-indigo-400">Official Solution:</p>
           <p>{question.explanation}</p>
           {rewardClaimed && (
-            <div className="pt-2 text-emerald-400 font-bold flex items-center space-x-1">
-              <Sparkles className="w-4 h-4" />
+            <div className="pt-2 text-emerald-400 font-bold flex items-center space-x-1.5">
+              <StudyCoinIcon className="w-4 h-4" glow />
               <span>+1 Study Coin credited for completing today&apos;s question!</span>
             </div>
           )}

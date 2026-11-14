@@ -9,6 +9,7 @@ import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { ApiClient } from '../../core/api/apiClient';
 import { useAuth } from '../../core/auth/AuthContext';
 import { getClassTheme } from '../../core/theme/classThemes';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import confetti from 'canvas-confetti';
 import {
   Clock,
@@ -303,9 +304,12 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         {/* Reward Status Banner */}
         {rewardResult?.awarded && (
           <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center space-x-3 text-amber-300">
-            <Sparkles className="w-5 h-5 flex-shrink-0 text-amber-400 animate-spin-slow" />
+            <StudyCoinIcon className="w-8 h-8 flex-shrink-0" glow animate />
             <div className="text-xs text-left">
-              <p className="font-bold">+25 Study Coins Credited to Ledger!</p>
+              <p className="font-bold flex items-center gap-1.5">
+                <StudyCoinIcon className="w-4 h-4" />
+                <span>+25 Study Coins Credited to Ledger!</span>
+              </p>
               <p className="text-amber-400/80">Level certificate generated and secured in your Certificate Vault.</p>
             </div>
           </div>
