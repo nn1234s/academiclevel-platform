@@ -54,6 +54,9 @@ export interface Learner {
   dailyAiMessagesUsed?: number;
   lastAiMessageDateUtc?: string;
   bonusAiMessages?: number;
+
+  // Metadata
+  metadataJson?: string;
 }
 
 export interface Subscription {

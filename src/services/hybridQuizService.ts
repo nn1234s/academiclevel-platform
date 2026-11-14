@@ -11,13 +11,26 @@ export interface HybridQuizResult {
 
 export interface AiConfig {
   hasApiKey: boolean;
+  keyCount?: number;
   maskedApiKey?: string | null;
+  apiKeys?: { slot: number; masked: string; length: number }[];
   preferLiveAi: boolean;
   model: string;
+  modelChain?: string[];
+}
+
+export interface KeyTestResult {
+  slot: number;
+  masked: string;
+  ok: boolean;
+  latencyMs: number;
+  model?: string;
+  error?: string;
 }
 
 export class HybridQuizService {
   private static LOCAL_KEY_STORAGE = 'al_gemini_api_key';
+  private static LOCAL_KEYS_POOL_STORAGE = 'al_gemini_api_keys_pool';
   private static PREFER_LIVE_KEY = 'al_prefer_live_ai';
   private static CLIENT_CANDIDATES: { version: string; model: string }[] = [
     { version: 'v1beta', model: 'gemini-2.0-flash' },
@@ -39,12 +52,36 @@ export class HybridQuizService {
     );
   }
 
+  public static getClientStoredKeysPool(): string[] {
+    if (typeof window === 'undefined') return [];
+    try {
+      const raw = localStorage.getItem(this.LOCAL_KEYS_POOL_STORAGE);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean);
+      }
+    } catch {}
+    const single = this.getClientStoredKey();
+    return single ? [single] : [];
+  }
+
   public static setClientStoredKey(key: string): void {
     if (typeof window === 'undefined') return;
     if (key.trim()) {
       localStorage.setItem(this.LOCAL_KEY_STORAGE, key.trim());
     } else {
       localStorage.removeItem(this.LOCAL_KEY_STORAGE);
+    }
+  }
+
+  public static setClientStoredKeysPool(keys: string[]): void {
+    if (typeof window === 'undefined') return;
+    const clean = keys.map(k => String(k || '').trim()).filter(Boolean).slice(0, 5);
+    localStorage.setItem(this.LOCAL_KEYS_POOL_STORAGE, JSON.stringify(clean));
+    if (clean[0]) {
+      this.setClientStoredKey(clean[0]);
+    } else {
+      this.setClientStoredKey('');
     }
   }
 
@@ -233,9 +270,12 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
         const clientKey = this.getClientStoredKey();
         return {
           hasApiKey: data.hasApiKey || !!clientKey,
+          keyCount: data.keyCount || (clientKey ? 1 : 0),
           maskedApiKey: data.maskedApiKey || (clientKey ? `${clientKey.substring(0, 4)}...${clientKey.substring(clientKey.length - 4)}` : null),
+          apiKeys: data.apiKeys || (clientKey ? [{ slot: 1, masked: `${clientKey.substring(0, 4)}...${clientKey.substring(clientKey.length - 4)}`, length: clientKey.length }] : []),
           preferLiveAi: data.preferLiveAi && this.getPreferLiveAi(),
-          model: data.model || 'gemini-3.5-flash-lite'
+          model: data.model || 'gemini-3.5-flash-lite',
+          modelChain: data.modelChain
         };
       }
     } catch {
@@ -243,9 +283,12 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
     }
 
     const clientKey = this.getClientStoredKey();
+    const pool = this.getClientStoredKeysPool();
     return {
-      hasApiKey: !!clientKey,
+      hasApiKey: !!clientKey || pool.length > 0,
+      keyCount: pool.length || (clientKey ? 1 : 0),
       maskedApiKey: clientKey ? `${clientKey.substring(0, 4)}...${clientKey.substring(clientKey.length - 4)}` : null,
+      apiKeys: pool.map((k, idx) => ({ slot: idx + 1, masked: `${k.substring(0, 4)}...${k.substring(k.length - 4)}`, length: k.length })),
       preferLiveAi: this.getPreferLiveAi(),
       model: 'gemini-3.5-flash-lite'
     };
@@ -255,10 +298,19 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
    * Save config to server and sync client
    */
   public static async saveConfig(
-    geminiApiKey: string,
+    geminiApiKeyOrKeys: string | string[],
     preferLiveAi: boolean
   ): Promise<{ success: boolean; message: string }> {
-    this.setClientStoredKey(geminiApiKey);
+    let keyList: string[] = [];
+    if (Array.isArray(geminiApiKeyOrKeys)) {
+      keyList = geminiApiKeyOrKeys.map(k => String(k || '').trim()).filter(Boolean).slice(0, 5);
+      this.setClientStoredKeysPool(keyList);
+    } else {
+      const single = String(geminiApiKeyOrKeys || '').trim();
+      keyList = single ? [single] : [];
+      this.setClientStoredKey(single);
+      this.setClientStoredKeysPool(keyList);
+    }
     this.setPreferLiveAi(preferLiveAi);
 
     const token = typeof window !== 'undefined'
@@ -272,7 +324,11 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
           'Content-Type': 'application/json',
           ...(token ? { 'x-admin-token': token } : {})
         },
-        body: JSON.stringify({ geminiApiKey, preferLiveAi })
+        body: JSON.stringify({
+          geminiApiKey: keyList[0] || '',
+          geminiApiKeys: keyList,
+          preferLiveAi
+        })
       });
       if (res.ok) {
         const data = await res.json();
@@ -289,8 +345,19 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
    * Ping Gemini API to test connection
    */
   public static async testConnection(
-    customApiKey?: string
-  ): Promise<{ success: boolean; latencyMs?: number; message?: string; error?: string }> {
+    customApiKey?: string,
+    testAll = false,
+    keysToTest?: string[]
+  ): Promise<{
+    success: boolean;
+    latencyMs?: number;
+    message?: string;
+    error?: string;
+    testAll?: boolean;
+    workingCount?: number;
+    totalTested?: number;
+    results?: KeyTestResult[];
+  }> {
     const key = customApiKey || this.getClientStoredKey();
     const token = typeof window !== 'undefined'
       ? (sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token') || '')
@@ -303,7 +370,11 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
           'Content-Type': 'application/json',
           ...(token ? { 'x-admin-token': token } : {})
         },
-        body: JSON.stringify({ customApiKey: key })
+        body: JSON.stringify({
+          customApiKey: testAll ? undefined : key,
+          testAll,
+          keysToTest
+        })
       });
       if (res.ok) {
         return await res.json();

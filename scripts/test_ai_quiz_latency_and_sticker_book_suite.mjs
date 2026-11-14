@@ -42,7 +42,7 @@ const serverApiContent = fs.readFileSync(path.resolve('server/api.js'), 'utf8');
 assert(!serverApiContent.includes('maxOutputTokens: 2500'), 'Must NOT limit maxOutputTokens to 2500');
 assert(!serverApiContent.includes('maxOutputTokens: 8192'), 'Must NOT allow 8192 tokens to prevent financial loss');
 assert(serverApiContent.includes('maxOutputTokens: 2430'), 'Must strictly set maxOutputTokens to 2430');
-assert(serverApiContent.includes('callGeminiApiWithFallback(apiKey, bodyPayload, 20000)'), 'Quiz generation must allow 20,000ms timeout for Google latency');
+assert(serverApiContent.includes('callGeminiApiWithMultiKeyFallback(bodyPayload, 20000)') || serverApiContent.includes('callGeminiApiWithFallback(apiKey, bodyPayload, 20000)'), 'Quiz generation must allow 20,000ms timeout for Google latency');
 console.log('✓ TEST 3 PASSED: Server API enforces strict maxOutputTokens: 2430 and 20,000ms timeout\n');
 
 // 4. Verify HybridQuizService and NovaAiService timeouts
