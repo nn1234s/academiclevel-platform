@@ -332,12 +332,17 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const officialVpa = PaymentService.OFFICIAL_UPI_VPA;
   const officialPayeeName = PaymentService.OFFICIAL_MERCHANT_NAME;
   const officialQrImage = PaymentService.getOfficialQrImageUrl('LITE');
+  const offerAmount = Number(adsConfig.offerPriceInr || 49);
+  const upiUri = PaymentService.buildStandardUpiUri({
+    amount: offerAmount,
+    note: `Order_AL_49_${(currentLearner?.id || 'guest').slice(-6)}`
+  });
 
   useEffect(() => {
-    PaymentService.generateQrDataUrl('LITE', currentLearner?.id || 'scholar_lite_49').then(url => {
+    PaymentService.generateQrDataUrl(offerAmount, `Order_AL_49_${(currentLearner?.id || 'guest').slice(-6)}`).then(url => {
       if (url) setQrDataUrl(url);
     });
-  }, [currentLearner?.id]);
+  }, [offerAmount, currentLearner?.id]);
 
   // Pre-fill payer details if student is already logged in
   useEffect(() => {
@@ -858,24 +863,28 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   ₹49 Concept Booster (60 Days)
                 </div>
 
-                {/* QR Code Container */}
+                {/* Dynamic QR Code Container */}
                 <div className="p-3 bg-white rounded-2xl shadow-xl border-2 border-orange-400 mb-3 relative group">
                   <img
-                    src={officialQrImage}
-                    alt="Official ₹49 UPI QR Code"
-                    className="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-xl"
-                    onError={(e) => {
-                      if (qrDataUrl) {
-                        (e.target as HTMLImageElement).src = qrDataUrl;
-                      }
-                    }}
+                    src={qrDataUrl || officialQrImage}
+                    alt="Official Dynamic ₹49 UPI QR Code"
+                    className="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-xl select-none"
                   />
                   <div className="absolute inset-x-3 bottom-4 text-center">
-                    <span className="bg-black/80 backdrop-blur-sm text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded-full shadow">
-                      Amount: ₹49 Fixed
+                    <span className="bg-black/80 backdrop-blur-sm text-white text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full shadow">
+                      Dynamic UPI QR • ₹{offerAmount}.00 Fixed
                     </span>
                   </div>
                 </div>
+
+                {/* Instant Mobile Deep Link */}
+                <a
+                  href={upiUri}
+                  className="w-full mb-3 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center justify-center space-x-1.5 transition-all hover:scale-[1.01]"
+                >
+                  <Zap className="w-3.5 h-3.5 fill-white" />
+                  <span>Tap to Pay via UPI App (₹{offerAmount})</span>
+                </a>
 
                 {/* Official VPA Card with Copy */}
                 <div className="w-full bg-white p-3 rounded-xl border border-orange-200 shadow-sm text-left">
@@ -1607,18 +1616,22 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 </div>
               ) : (
                 <div className="space-y-4 text-xs">
-                  {/* QR Image & VPA Display */}
+                  {/* Dynamic QR Image & VPA Display */}
                   <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 flex flex-col items-center text-center">
                     <div className="p-2 bg-white rounded-xl shadow-md border border-orange-300 mb-2">
                       <img
-                        src={officialQrImage}
-                        alt="Official ₹49 UPI QR Code"
-                        className="w-36 h-36 object-contain rounded-lg"
-                        onError={(e) => {
-                          if (qrDataUrl) (e.target as HTMLImageElement).src = qrDataUrl;
-                        }}
+                        src={qrDataUrl || officialQrImage}
+                        alt="Official Dynamic ₹49 UPI QR Code"
+                        className="w-36 h-36 object-contain rounded-lg select-none"
                       />
                     </div>
+                    <a
+                      href={upiUri}
+                      className="w-full mb-2 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] rounded-xl shadow flex items-center justify-center space-x-1 transition-all"
+                    >
+                      <Zap className="w-3.5 h-3.5 fill-white" />
+                      <span>Tap to Pay with UPI App (₹{offerAmount})</span>
+                    </a>
                     <div className="w-full bg-white px-3 py-1.5 rounded-lg border border-orange-200 flex items-center justify-between text-xs">
                       <span className="font-mono font-bold text-slate-800 select-all">{officialVpa}</span>
                       <button
@@ -1631,7 +1644,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       </button>
                     </div>
                     <span className="text-[10px] text-slate-500 mt-1">
-                      Payee: <strong>{officialPayeeName}</strong> • Fixed: <strong>₹49</strong>
+                      Payee: <strong>{officialPayeeName}</strong> • Fixed: <strong>₹{offerAmount}.00</strong>
                     </span>
                   </div>
 

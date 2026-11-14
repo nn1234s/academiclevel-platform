@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlanPricing, PLAN_PRICING, PaymentService } from '../../services/paymentService';
 import { UTRValidator } from '../../core/security/utrValidator';
-import { CheckCircle2, QrCode, ShieldCheck, AlertCircle, Copy, Check, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, QrCode, ShieldCheck, AlertCircle, Copy, Check, ArrowLeft, Zap } from 'lucide-react';
 
 interface UPIQRCheckoutProps {
   planTier: 'LITE' | 'PLUS';
@@ -28,6 +28,7 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
   const officialVpa = PaymentService.OFFICIAL_UPI_VPA;
   const officialPayeeName = PaymentService.OFFICIAL_MERCHANT_NAME;
   const officialQrImage = PaymentService.getOfficialQrImageUrl(planTier);
+  const upiUri = PaymentService.generateUpiPaymentString(planTier, learnerId);
 
   useEffect(() => {
     let isMounted = true;
@@ -163,18 +164,20 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             </span>
           </div>
 
-          {/* Authentic Google Pay QR Image */}
-          <div className="w-full rounded-2xl overflow-hidden border border-slate-100 shadow-sm bg-slate-50 relative">
+          {/* Dynamic Google Pay UPI QR Image */}
+          <div className="w-full rounded-2xl overflow-hidden border border-slate-100 shadow-sm bg-slate-50 relative p-1 bg-white flex flex-col items-center">
             <img
-              src={officialQrImage}
-              alt={`Google Pay UPI QR - ₹${plan.priceInr} (${officialPayeeName})`}
+              src={qrDataUrl || officialQrImage}
+              alt={`Dynamic UPI QR - ₹${plan.priceInr} (${officialPayeeName})`}
               className="w-full h-auto object-contain block select-none"
-              onError={(e) => {
-                if (qrDataUrl) {
-                  (e.target as HTMLImageElement).src = qrDataUrl;
-                }
-              }}
             />
+            <a
+              href={upiUri}
+              className="w-full mt-2 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow flex items-center justify-center space-x-1.5 transition-all"
+            >
+              <Zap className="w-3.5 h-3.5 fill-white" />
+              <span>Tap to Pay via UPI App (₹{plan.priceInr})</span>
+            </a>
           </div>
 
           {/* Quick Copy Section */}

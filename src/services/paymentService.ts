@@ -85,33 +85,64 @@ export class PaymentService {
   }
 
   /**
-   * Generates a standard NPCI UPI URI string.
+   * Generates a standard NPCI UPI URI string following the exact specification:
+   * upi://pay?pa=merchant@bank&pn=Merchant%20Name&am=250.00&cu=INR&tn=Order123
    */
-  public static generateUpiPaymentString(tier: 'LITE' | 'PLUS', learnerId: string): string {
-    const plan = getDynamicPlanPricing(tier);
+  public static buildStandardUpiUri(options: {
+    amount: number;
+    vpa?: string;
+    merchantName?: string;
+    note?: string;
+  }): string {
     const cfg = SiteConfigService.getPricing();
-    const vpa = cfg.upiVpa || this.OFFICIAL_UPI_VPA;
-    const merchant = cfg.merchantName || this.OFFICIAL_MERCHANT_NAME;
-    const txnNote = encodeURIComponent(`AL-${tier}-${learnerId.substring(0, 8)}`);
-    return `upi://pay?pa=${vpa}&pn=${encodeURIComponent(merchant)}&am=${plan.priceInr.toFixed(2)}&cu=INR&tn=${txnNote}`;
+    const vpa = (options.vpa || cfg.upiVpa || this.OFFICIAL_UPI_VPA).trim();
+    const merchant = (options.merchantName || cfg.merchantName || this.OFFICIAL_MERCHANT_NAME).trim();
+    const amountStr = Number(options.amount || 49).toFixed(2);
+    const note = (options.note || `Order_AL_${Math.round(options.amount)}`).trim();
+
+    return `upi://pay?pa=${vpa}&pn=${encodeURIComponent(merchant)}&am=${amountStr}&cu=INR&tn=${encodeURIComponent(note)}`;
   }
 
   /**
-   * Generates a data URL for QR code rendering.
+   * Generates a standard NPCI UPI URI string for a plan tier or learner.
    */
-  public static async generateQrDataUrl(tier: 'LITE' | 'PLUS', learnerId: string): Promise<string> {
-    const upiUri = this.generateUpiPaymentString(tier, learnerId);
+  public static generateUpiPaymentString(tier: 'LITE' | 'PLUS', learnerId?: string): string {
+    const plan = getDynamicPlanPricing(tier);
+    const cleanId = (learnerId || '49').replace(/[^a-zA-Z0-9]/g, '').slice(0, 8);
+    return this.buildStandardUpiUri({
+      amount: plan.priceInr,
+      note: `Order_AL_${tier}_${cleanId || 'Pass'}`
+    });
+  }
+
+  /**
+   * Generates a data URL for dynamic QR code rendering using standard UPI true form.
+   */
+  public static async generateQrDataUrl(
+    tierOrAmount: 'LITE' | 'PLUS' | number,
+    learnerIdOrNote?: string
+  ): Promise<string> {
+    let upiUri: string;
+    if (typeof tierOrAmount === 'number') {
+      upiUri = this.buildStandardUpiUri({
+        amount: tierOrAmount,
+        note: learnerIdOrNote || `Order_AL_${Math.round(tierOrAmount)}`
+      });
+    } else {
+      upiUri = this.generateUpiPaymentString(tierOrAmount, learnerIdOrNote);
+    }
+
     try {
       return await QRCode.toDataURL(upiUri, {
-        width: 320,
+        width: 360,
         margin: 2,
+        errorCorrectionLevel: 'M',
         color: {
-          dark: '#1e1b4b',
+          dark: '#0f172a',
           light: '#ffffff'
         }
       });
     } catch {
-      // Fallback placeholder SVG
       return '';
     }
   }
