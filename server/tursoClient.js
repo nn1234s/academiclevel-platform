@@ -159,9 +159,18 @@ export async function pullAllFromTurso(localDb) {
   console.log('[Turso] Checking cloud database for stored learner records...');
 
   // Enforce zero-tolerance purge of dummy test accounts across local and cloud
+  const DUMMY_DELETE_SQL = `
+    DELETE FROM learners WHERE 
+      email LIKE '%@example.com' OR 
+      email LIKE '%@academiclevel.test' OR 
+      email LIKE '%@test.com' OR 
+      email LIKE '%friend%@gmail.com' OR 
+      email = 'user@gmail.com' OR 
+      email LIKE 'audit_%@academiclevel.in'
+  `;
   try {
-    localDb.prepare("DELETE FROM learners WHERE email LIKE '%@example.com' OR email LIKE '%@academiclevel.test' OR email LIKE '%@test.com'").run();
-    await executeTurso("DELETE FROM learners WHERE email LIKE '%@example.com' OR email LIKE '%@academiclevel.test' OR email LIKE '%@test.com'");
+    localDb.prepare(DUMMY_DELETE_SQL).run();
+    await executeTurso(DUMMY_DELETE_SQL);
   } catch {}
 
   const tables = [
@@ -178,7 +187,12 @@ export async function pullAllFromTurso(localDb) {
       if (table === 'learners' && Array.isArray(rows)) {
         rows = rows.filter(r => {
           const em = (r.email || '').toLowerCase();
-          return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
+          return !em.includes('@example.com') && 
+                 !em.includes('@academiclevel.test') && 
+                 !em.includes('@test.com') && 
+                 !em.includes('friend@gmail.com') && 
+                 em !== 'user@gmail.com' && 
+                 !em.startsWith('audit_');
         });
       }
 
@@ -211,8 +225,17 @@ export async function pushAllToTurso(localDb) {
   console.log('[Turso] Pushing local SQLite data to Turso cloud...');
 
   // Ensure cloud database does not receive or keep dummy test accounts
+  const DUMMY_DELETE_SQL = `
+    DELETE FROM learners WHERE 
+      email LIKE '%@example.com' OR 
+      email LIKE '%@academiclevel.test' OR 
+      email LIKE '%@test.com' OR 
+      email LIKE '%friend%@gmail.com' OR 
+      email = 'user@gmail.com' OR 
+      email LIKE 'audit_%@academiclevel.in'
+  `;
   try {
-    await executeTurso("DELETE FROM learners WHERE email LIKE '%@example.com' OR email LIKE '%@academiclevel.test' OR email LIKE '%@test.com'");
+    await executeTurso(DUMMY_DELETE_SQL);
   } catch {}
 
   const tables = [
@@ -230,7 +253,12 @@ export async function pushAllToTurso(localDb) {
       if (table === 'learners') {
         rows = rows.filter(r => {
           const em = (r.email || '').toLowerCase();
-          return !em.includes('@example.com') && !em.includes('@academiclevel.test') && !em.includes('@test.com');
+          return !em.includes('@example.com') && 
+                 !em.includes('@academiclevel.test') && 
+                 !em.includes('@test.com') && 
+                 !em.includes('friend@gmail.com') && 
+                 em !== 'user@gmail.com' && 
+                 !em.startsWith('audit_');
         });
       }
       if (rows.length === 0) continue;
