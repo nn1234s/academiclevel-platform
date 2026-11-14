@@ -803,15 +803,21 @@ apiRouter.get('/students/:id', (req, res) => {
 
     // Reconcile and ensure levelsCompletedCount is accurate across progress and quiz attempts
     try {
-      const distinctLevelsCount = db.prepare(`
-        SELECT count(*) as count FROM course_progress 
-        WHERE learnerId = ? AND (isCompleted = 1 OR passed = 1)
-      `).get(learner.id)?.count || 0;
-      
-      const attemptsCount = db.prepare(`
-        SELECT count(*) as count FROM quiz_attempts 
-        WHERE learnerId = ? AND (isPassed = 1 OR score >= 70)
-      `).get(learner.id)?.count || 0;
+      let distinctLevelsCount = 0;
+      try {
+        distinctLevelsCount = db.prepare(`
+          SELECT count(DISTINCT levelNode) as count FROM course_progress 
+          WHERE learnerId = ? AND (passed = 1 OR accuracy >= 70 OR bestScorePercent >= 70)
+        `).get(learner.id)?.count || 0;
+      } catch {}
+
+      let attemptsCount = 0;
+      try {
+        attemptsCount = db.prepare(`
+          SELECT count(*) as count FROM quiz_attempts 
+          WHERE learnerId = ? AND (passed = 1 OR (maxScore > 0 AND (score * 100.0 / maxScore) >= 70) OR score >= 70)
+        `).get(learner.id)?.count || 0;
+      } catch {}
 
       const reconciledLevels = Math.max(
         Number(learner.levelsCompletedCount || 0),
@@ -1013,12 +1019,14 @@ apiRouter.post('/students/:id/spin', (req, res) => {
 apiRouter.post('/payments/submit', paymentLimiter, (req, res) => {
   try {
     const { learnerId, tier, payerUpiId, utrReference } = req.body;
-    if (!learnerId || !tier || !payerUpiId) {
-      return res.status(400).json({ success: false, error: 'Learner ID, tier, and Payer UPI ID are required.' });
+    if (!learnerId || !tier) {
+      return res.status(400).json({ success: false, error: 'Learner ID and tier are required.' });
     }
 
-    const cleanPayerUpi = String(payerUpiId).trim();
-    const finalPayerUpi = cleanPayerUpi.includes('@') ? cleanPayerUpi : `${cleanPayerUpi.replace(/[^a-zA-Z0-9._-]/g, '')}@upi`;
+    const rawPayer = String(payerUpiId || '').trim();
+    const finalPayerUpi = rawPayer.length > 0
+      ? (rawPayer.includes('@') ? rawPayer : `${rawPayer.replace(/[^a-zA-Z0-9._-]/g, '')}@upi`)
+      : `scholar_${String(learnerId).replace(/[^a-zA-Z0-9]/g, '')}@upi`;
 
     // Resolve learner to canonical ID
     const rawParam = String(learnerId).trim();
@@ -1278,15 +1286,19 @@ apiRouter.post('/gifts/redeem', (req, res) => {
     let totalAttempts = 0;
     try {
       distinctLevelsCount = db.prepare(`
-        SELECT count(*) as count FROM course_progress 
-        WHERE learnerId = ? AND (isCompleted = 1 OR passed = 1)
+        SELECT count(DISTINCT levelNode) as count FROM course_progress 
+        WHERE learnerId = ? AND (passed = 1 OR accuracy >= 70 OR bestScorePercent >= 70)
       `).get(learner.id)?.count || 0;
-      
+    } catch {}
+
+    try {
       attemptsCount = db.prepare(`
         SELECT count(*) as count FROM quiz_attempts 
-        WHERE learnerId = ? AND (isPassed = 1 OR score >= 70)
+        WHERE learnerId = ? AND (passed = 1 OR (maxScore > 0 AND (score * 100.0 / maxScore) >= 70) OR score >= 70)
       `).get(learner.id)?.count || 0;
+    } catch {}
 
+    try {
       totalAttempts = db.prepare(`
         SELECT count(*) as count FROM quiz_attempts 
         WHERE learnerId = ?

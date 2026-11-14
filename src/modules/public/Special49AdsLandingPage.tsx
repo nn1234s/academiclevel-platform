@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { KidFounderGlazeShowcase } from '../shared/KidFounderGlazeShowcase';
 import { SiteConfigService } from '../../services/siteConfigService';
@@ -306,6 +306,39 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const [showUpiCheckout, setShowUpiCheckout] = useState(false);
   const [createdLearnerId, setCreatedLearnerId] = useState<string | null>(null);
   const [showAllReviewsModal, setShowAllReviewsModal] = useState(false);
+  const [showPostPaymentPopup, setShowPostPaymentPopup] = useState(false);
+  const utrInputRef = useRef<HTMLInputElement>(null);
+  const modalUtrInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpiAppTap = () => {
+    try {
+      sessionStorage.setItem('al_tapped_upi_app', 'true');
+      sessionStorage.setItem('al_upi_tapped_time', Date.now().toString());
+    } catch {}
+  };
+
+  useEffect(() => {
+    const handleReturnToTab = () => {
+      if (document.visibilityState === 'visible') {
+        try {
+          const wasTapped = sessionStorage.getItem('al_tapped_upi_app') === 'true';
+          const tappedTime = Number(sessionStorage.getItem('al_upi_tapped_time') || 0);
+          if (wasTapped && !paymentSuccess && Date.now() - tappedTime < 20 * 60 * 1000) {
+            setShowPostPaymentPopup(true);
+            sessionStorage.removeItem('al_tapped_upi_app');
+          }
+        } catch {}
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleReturnToTab);
+    window.addEventListener('focus', handleReturnToTab);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleReturnToTab);
+      window.removeEventListener('focus', handleReturnToTab);
+    };
+  }, [paymentSuccess]);
 
   // Cycle live enrollment ticker
   useEffect(() => {
@@ -376,11 +409,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
     e.preventDefault();
     setErrorMessage('');
 
-    const cleanPayer = payerUpiId.trim();
-    if (!cleanPayer || !cleanPayer.includes('@')) {
-      setErrorMessage('Please enter your valid Payer UPI ID (e.g. 9861439460@paytm or rahul@oksbi).');
-      return;
-    }
+    const cleanPayer = (payerUpiId || emailOrPhone || '').trim();
 
     const cleanUtr = utrNumber.trim();
     if (!cleanUtr) {
@@ -880,34 +909,22 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 {/* Instant Mobile Deep Link */}
                 <a
                   href={upiUri}
+                  onClick={handleUpiAppTap}
                   className="w-full mb-3 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center justify-center space-x-1.5 transition-all hover:scale-[1.01]"
                 >
                   <Zap className="w-3.5 h-3.5 fill-white" />
                   <span>Tap to Pay via UPI App (₹{offerAmount})</span>
                 </a>
 
-                {/* Official VPA Card with Copy */}
-                <div className="w-full bg-white p-3 rounded-xl border border-orange-200 shadow-sm text-left">
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
-                    <span className="font-semibold">Official Merchant UPI ID:</span>
-                    <span className="text-[10px] text-emerald-600 font-bold">Verified Merchant</span>
+                {/* Payee Verification Badge (UPI ID hidden for clean presentation) */}
+                <div className="w-full bg-white/90 backdrop-blur-sm p-3 rounded-xl border border-orange-200 shadow-sm text-center">
+                  <div className="flex items-center justify-center space-x-1.5 text-xs text-slate-800 font-bold">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span>Payee: <strong className="text-slate-900">{officialPayeeName}</strong></span>
                   </div>
-                  <div className="flex items-center justify-between bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200">
-                    <span className="font-mono font-bold text-slate-900 text-xs sm:text-sm select-all">
-                      {officialVpa}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={copyVpa}
-                      className="ml-2 px-2.5 py-1 bg-orange-600 hover:bg-orange-700 text-white rounded font-bold text-[11px] flex items-center space-x-1 cursor-pointer transition-all shadow-sm"
-                    >
-                      <Copy className="w-3 h-3" />
-                      <span>{copiedVpa ? 'COPIED!' : 'COPY'}</span>
-                    </button>
-                  </div>
-                  <div className="text-[10px] text-slate-500 mt-1.5">
-                    Payee Name: <strong className="text-slate-800">{officialPayeeName}</strong>
-                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Scan dynamic QR with any UPI app or tap the button above to pay ₹{offerAmount}
+                  </p>
                 </div>
               </div>
 
@@ -1028,27 +1045,12 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   )}
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">
-                      Your Payer UPI ID / Mobile *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. 9861439460@paytm or rahul@oksbi"
-                      value={payerUpiId}
-                      onChange={e => setPayerUpiId(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 text-xs font-mono"
-                    />
-                    <span className="text-[10px] text-slate-500 mt-0.5 block">
-                      The UPI ID you used to make the payment (used by Admin to match with bank statement).
-                    </span>
-                  </div>
-
-                  <div>
                     <label className="block font-bold text-slate-900 mb-1 text-xs sm:text-sm">
                       12-Digit Bank Transaction ID (UTR) *
                     </label>
                     <input
+                      ref={utrInputRef}
+                      id="onpage-utr-input"
                       type="text"
                       required
                       maxLength={12}
@@ -1627,21 +1629,15 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     </div>
                     <a
                       href={upiUri}
+                      onClick={handleUpiAppTap}
                       className="w-full mb-2 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] rounded-xl shadow flex items-center justify-center space-x-1 transition-all"
                     >
                       <Zap className="w-3.5 h-3.5 fill-white" />
                       <span>Tap to Pay with UPI App (₹{offerAmount})</span>
                     </a>
-                    <div className="w-full bg-white px-3 py-1.5 rounded-lg border border-orange-200 flex items-center justify-between text-xs">
-                      <span className="font-mono font-bold text-slate-800 select-all">{officialVpa}</span>
-                      <button
-                        type="button"
-                        onClick={copyVpa}
-                        className="px-2 py-0.5 bg-orange-600 hover:bg-orange-700 text-white rounded font-bold text-[10px] flex items-center space-x-1"
-                      >
-                        <Copy className="w-3 h-3" />
-                        <span>{copiedVpa ? 'COPIED' : 'COPY'}</span>
-                      </button>
+                    <div className="w-full bg-white/90 px-3 py-1.5 rounded-lg border border-orange-200 flex items-center justify-center space-x-1.5 text-xs font-semibold text-slate-800">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Verified Payee: <strong>{officialPayeeName}</strong></span>
                     </div>
                     <span className="text-[10px] text-slate-500 mt-1">
                       Payee: <strong>{officialPayeeName}</strong> • Fixed: <strong>₹{offerAmount}.00</strong>
@@ -1712,18 +1708,6 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     )}
 
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">Your Payer UPI ID *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. 9861439460@paytm or rahul@oksbi"
-                        value={payerUpiId}
-                        onChange={e => setPayerUpiId(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 font-mono"
-                      />
-                    </div>
-
-                    <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="block font-bold text-slate-900">12-Digit Bank Transaction ID (UTR) *</label>
                         <span className={`font-mono font-bold text-[10px] ${utrNumber.length === 12 ? 'text-emerald-600' : 'text-amber-600'}`}>
@@ -1731,6 +1715,8 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                         </span>
                       </div>
                       <input
+                        ref={modalUtrInputRef}
+                        id="modal-utr-input"
                         type="text"
                         required
                         maxLength={12}
@@ -1964,6 +1950,77 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   </p>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL 4: POST-PAYMENT RETURN GUIDANCE POPUP               */}
+      {/* ======================================================== */}
+      {showPostPaymentPopup && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-7 shadow-2xl relative border-2 border-orange-300 text-center space-y-4">
+            <button
+              onClick={() => setShowPostPaymentPopup(false)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100 transition-colors"
+              aria-label="Close dialog"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="w-14 h-14 bg-gradient-to-tr from-emerald-500 to-teal-400 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/30">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="inline-block px-3 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider rounded-full">
+                Welcome Back! 🎉
+              </div>
+              <h3 className="text-xl font-black text-slate-900">
+                Payment Completed in UPI App?
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed max-w-sm mx-auto">
+                To instantly activate your <strong>₹49 Concept Booster (60 Days)</strong> pass, please enter your details and the <strong>12-digit UTR reference</strong> from your UPI payment receipt below, then click submit.
+              </p>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-left text-xs text-amber-900 space-y-1">
+              <div className="font-bold flex items-center space-x-1.5 text-amber-950">
+                <span>💡</span>
+                <span>Where to find the 12-digit UTR?</span>
+              </div>
+              <p className="text-[11px] text-amber-800 leading-snug">
+                Open your GPay, PhonePe, or Paytm receipt. Look for <strong>UPI Ref No.</strong>, <strong>UTR</strong>, or <strong>Transaction ID</strong> (12 numbers).
+              </p>
+            </div>
+
+            <div className="space-y-2 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPostPaymentPopup(false);
+                  const el = document.getElementById('instant-pay-qr');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                  setTimeout(() => {
+                    utrInputRef.current?.focus();
+                  }, 400);
+                }}
+                className="w-full py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-sm rounded-xl shadow-lg shadow-orange-600/30 transition-all hover:scale-[1.01] flex items-center justify-center space-x-2 cursor-pointer"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>ENTER UTR &amp; SUBMIT DETAILS</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowPostPaymentPopup(false)}
+                className="w-full py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+              >
+                I haven&apos;t paid yet • Close
+              </button>
             </div>
           </div>
         </div>
