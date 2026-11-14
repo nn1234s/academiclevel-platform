@@ -312,31 +312,49 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
   const handleUpiAppTap = () => {
     try {
+      const nowStr = Date.now().toString();
       sessionStorage.setItem('al_tapped_upi_app', 'true');
-      sessionStorage.setItem('al_upi_tapped_time', Date.now().toString());
+      sessionStorage.setItem('al_upi_tapped_time', nowStr);
+      localStorage.setItem('al_tapped_upi_app', 'true');
+      localStorage.setItem('al_upi_tapped_time', nowStr);
     } catch {}
   };
 
   useEffect(() => {
+    const checkAndShowReturnPopup = () => {
+      try {
+        const wasTapped = sessionStorage.getItem('al_tapped_upi_app') === 'true' ||
+                          localStorage.getItem('al_tapped_upi_app') === 'true';
+        const tappedTime = Number(
+          sessionStorage.getItem('al_upi_tapped_time') ||
+          localStorage.getItem('al_upi_tapped_time') ||
+          0
+        );
+        if (wasTapped && !paymentSuccess && Date.now() - tappedTime < 20 * 60 * 1000) {
+          setShowPostPaymentPopup(true);
+          sessionStorage.removeItem('al_tapped_upi_app');
+          localStorage.removeItem('al_tapped_upi_app');
+        }
+      } catch {}
+    };
+
     const handleReturnToTab = () => {
       if (document.visibilityState === 'visible') {
-        try {
-          const wasTapped = sessionStorage.getItem('al_tapped_upi_app') === 'true';
-          const tappedTime = Number(sessionStorage.getItem('al_upi_tapped_time') || 0);
-          if (wasTapped && !paymentSuccess && Date.now() - tappedTime < 20 * 60 * 1000) {
-            setShowPostPaymentPopup(true);
-            sessionStorage.removeItem('al_tapped_upi_app');
-          }
-        } catch {}
+        checkAndShowReturnPopup();
       }
     };
 
+    // Check immediately on mount in case WebView reloaded while user was in UPI app
+    checkAndShowReturnPopup();
+
     document.addEventListener('visibilitychange', handleReturnToTab);
-    window.addEventListener('focus', handleReturnToTab);
+    window.addEventListener('focus', checkAndShowReturnPopup);
+    window.addEventListener('pageshow', checkAndShowReturnPopup);
 
     return () => {
       document.removeEventListener('visibilitychange', handleReturnToTab);
-      window.removeEventListener('focus', handleReturnToTab);
+      window.removeEventListener('focus', checkAndShowReturnPopup);
+      window.removeEventListener('pageshow', checkAndShowReturnPopup);
     };
   }, [paymentSuccess]);
 

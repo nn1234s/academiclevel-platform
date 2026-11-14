@@ -42,33 +42,52 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
 
   const handleUpiAppTap = () => {
     try {
+      const nowStr = Date.now().toString();
       sessionStorage.setItem('al_checkout_tapped_upi', 'true');
-      sessionStorage.setItem('al_checkout_tapped_time', Date.now().toString());
+      sessionStorage.setItem('al_checkout_tapped_time', nowStr);
+      localStorage.setItem('al_checkout_tapped_upi', 'true');
+      localStorage.setItem('al_checkout_tapped_time', nowStr);
     } catch {}
   };
 
   useEffect(() => {
+    const checkAndShowNotice = () => {
+      try {
+        const tapped = sessionStorage.getItem('al_checkout_tapped_upi') === 'true' ||
+                       localStorage.getItem('al_checkout_tapped_upi') === 'true';
+        const tappedTime = Number(
+          sessionStorage.getItem('al_checkout_tapped_time') ||
+          localStorage.getItem('al_checkout_tapped_time') ||
+          0
+        );
+        if (tapped && !isSubmittedSuccess && Date.now() - tappedTime < 20 * 60 * 1000) {
+          setShowPostPaymentNotice(true);
+          sessionStorage.removeItem('al_checkout_tapped_upi');
+          localStorage.removeItem('al_checkout_tapped_upi');
+          setTimeout(() => {
+            utrInputRef.current?.focus();
+          }, 300);
+        }
+      } catch {}
+    };
+
     const handleReturn = () => {
       if (document.visibilityState === 'visible') {
-        try {
-          const tapped = sessionStorage.getItem('al_checkout_tapped_upi') === 'true';
-          const tappedTime = Number(sessionStorage.getItem('al_checkout_tapped_time') || 0);
-          if (tapped && !isSubmittedSuccess && Date.now() - tappedTime < 20 * 60 * 1000) {
-            setShowPostPaymentNotice(true);
-            sessionStorage.removeItem('al_checkout_tapped_upi');
-            setTimeout(() => {
-              utrInputRef.current?.focus();
-            }, 300);
-          }
-        } catch {}
+        checkAndShowNotice();
       }
     };
 
+    // Check immediately on mount in case WebView reloaded
+    checkAndShowNotice();
+
     document.addEventListener('visibilitychange', handleReturn);
-    window.addEventListener('focus', handleReturn);
+    window.addEventListener('focus', checkAndShowNotice);
+    window.addEventListener('pageshow', checkAndShowNotice);
+
     return () => {
       document.removeEventListener('visibilitychange', handleReturn);
-      window.removeEventListener('focus', handleReturn);
+      window.removeEventListener('focus', checkAndShowNotice);
+      window.removeEventListener('pageshow', checkAndShowNotice);
     };
   }, [isSubmittedSuccess]);
 
