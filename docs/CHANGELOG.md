@@ -2,6 +2,38 @@
 
 All notable changes, architectural decisions, and security hardening updates are documented in this file.
 
+## [v1.4.0-PROD] - 2026-11-14
+
+### Google Gemini 5-Key Cascading Failover Engine
+- **Server Failover Pool (`server/api.js`)**:
+  - Implemented `getGeminiApiKeys()` to retrieve up to 5 unique Gemini API keys from `system_settings.gemini_api_keys` JSON array, slots `gemini_api_key_1..5`, legacy single key, and environment variables `GEMINI_API_KEY_1..5` / `GEMINI_API_KEY`.
+  - Implemented `callGeminiApiWithMultiKeyFallback(bodyPayload, timeoutMs = 20000)` cascading through Key 1 -> Key 2 -> Key 3 -> Key 4 -> Key 5 in real time. If Key 1 fails (rate limit 429, invalid key, or quota exhausted), the server automatically cascades to the next key before falling back to the curated syllabus bank.
+  - Upgraded `/ai/generate-quiz`, `/ai/explain`, and `/ai/chat` endpoints to leverage the 5-key failover pool.
+  - Updated `POST /admin/ai/config` to accept and persist `geminiApiKeys: string[]`.
+  - Updated `POST /admin/ai/test-connection` with multi-key diagnostic ping testing all keys in the pool with per-slot latency and model status.
+- **Admin Vault Key Management (`src/admin-vault/modules/QuestionBankManager.tsx`)**:
+  - Replaced single key input with a 5-Slot API Key Manager (Slot 1 Primary, Slots 2–5 Failover).
+  - Added visibility toggle (eye/eye-off), paste from clipboard, clear buttons, and per-slot live test indicators.
+  - Added "Save 5 API Keys" and "Test All 5 Keys" actions.
+- **Client Synchronization (`src/services/hybridQuizService.ts`)**:
+  - Added `getClientStoredKeysPool()` and `setClientStoredKeysPool()`.
+  - Enforced `maxOutputTokens: 2430` strictly and relaxed latency guards to 20,000ms–22,000ms.
+
+### 30-Coin Class Practice Worksheets & Revision PDF Center
+- **Dedicated Worksheet Viewer (`src/modules/student/PracticeWorksheetViewer.tsx`)**:
+  - Generates authentic, curriculum-calibrated practice worksheets directly from the 12,000-question SQLite question bank for all classes (Classes 1 to 12) across CBSE, ICSE, and Cambridge IGCSE.
+  - Features subject selector, question count selector (10, 15, 20 questions), and re-roll bank action.
+  - **Academic Header**: School banner, candidate name, student ID, board, class, subject, date, time allowed, max marks.
+  - **Section A**: Objective Multiple Choice Questions with clean bubble circles `(A)  (B)  (C)  (D)` and candidate answer boxes.
+  - **Section B**: Student rough work and calculation scratchpad.
+  - **Section C**: Detachable Answer Key & NCERT Step-by-Step Solutions with print page-break `page-break-before: always;`.
+  - **1-Click Vector Print**: Opens dedicated printable preview window styled with pristine `@media print` CSS for saving as high-resolution PDF or printing.
+  - **Offline Download**: 1-click standalone `.html` worksheet file for offline practice.
+- **Coin Mall Integration (`src/modules/student/CoinMall.tsx`)**:
+  - Replaced legacy text guide with active 30-coin Practice Worksheets card.
+  - On 30-coin purchase: deducts 30 coins via `CoinLedgerService`, persists unlock in student state, and opens `PracticeWorksheetViewer`.
+  - Displays "📄 Open & Print Practice Worksheets" with lifetime access once unlocked.
+
 ## [v1.3.0-PROD] - 2026-11-11
 
 ### 12,000 Question Curriculum Bank (1,000 Questions per Class)

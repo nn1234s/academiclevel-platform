@@ -3232,19 +3232,67 @@ apiRouter.get('/admin/audit-logs', adminAuth, (req, res) => {
 });
 
 // ==========================================
-// Hybrid AI Engine (Google Gemini 1.5 Flash + Fallback)
+// Hybrid AI Engine (Google Gemini 5-Key Failover Pool + Fallback)
 // ==========================================
 
-function getGeminiApiKey() {
-  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim()) {
-    return process.env.GEMINI_API_KEY.trim();
-  }
+function getGeminiApiKeys() {
+  const keys = [];
+
+  // 1. From database system_settings: gemini_api_keys (JSON array)
   try {
-    const row = db.prepare("SELECT value FROM system_settings WHERE key = 'gemini_api_key'").get();
-    return row?.value?.trim() || null;
-  } catch {
-    return null;
+    const row = db.prepare("SELECT value FROM system_settings WHERE key = 'gemini_api_keys'").get();
+    if (row && row.value) {
+      try {
+        const parsed = JSON.parse(row.value);
+        if (Array.isArray(parsed)) {
+          for (const k of parsed) {
+            const trimmed = String(k || '').trim();
+            if (trimmed && !keys.includes(trimmed)) {
+              keys.push(trimmed);
+            }
+          }
+        }
+      } catch {}
+    }
+  } catch {}
+
+  // 2. Individual slots in system_settings: gemini_api_key_1 .. 5
+  try {
+    for (let i = 1; i <= 5; i++) {
+      const row = db.prepare(`SELECT value FROM system_settings WHERE key = 'gemini_api_key_${i}'`).get();
+      const val = row?.value?.trim();
+      if (val && !keys.includes(val)) {
+        keys.push(val);
+      }
+    }
+  } catch {}
+
+  // 3. Fallback to legacy single key in DB
+  try {
+    const single = db.prepare("SELECT value FROM system_settings WHERE key = 'gemini_api_key'").get();
+    const val = single?.value?.trim();
+    if (val && !keys.includes(val)) {
+      keys.push(val);
+    }
+  } catch {}
+
+  // 4. Environment variables: GEMINI_API_KEY_1..5 and GEMINI_API_KEY
+  for (let i = 1; i <= 5; i++) {
+    const envKey = process.env[`GEMINI_API_KEY_${i}`];
+    if (envKey && envKey.trim() && !keys.includes(envKey.trim())) {
+      keys.push(envKey.trim());
+    }
   }
+  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim() && !keys.includes(process.env.GEMINI_API_KEY.trim())) {
+    keys.push(process.env.GEMINI_API_KEY.trim());
+  }
+
+  return keys.slice(0, 5);
+}
+
+function getGeminiApiKey() {
+  const keys = getGeminiApiKeys();
+  return keys[0] || null;
 }
 
 // Multi-Model Dynamic Discovery & Multi-Version Fallback Engine
@@ -3384,6 +3432,49 @@ async function callGeminiApiWithFallback(apiKey, bodyPayload, timeoutMs = 20000)
   return { ok: false, error: lastError, attempts };
 }
 
+// 5-Key Cascading Failover Engine:
+// 1 doesn't work -> try 2nd -> doesn't work -> try 3rd -> try 4th -> try 5th!
+async function callGeminiApiWithMultiKeyFallback(bodyPayload, timeoutMs = 20000) {
+  const keys = getGeminiApiKeys();
+  if (keys.length === 0) {
+    return { ok: false, error: 'No Gemini API keys configured on server. Please add at least 1 key in Admin Vault.' };
+  }
+
+  let lastError = null;
+  const poolAttempts = [];
+
+  for (let i = 0; i < keys.length; i++) {
+    const currentKey = keys[i];
+    const keyLabel = `Key Slot #${i + 1} (${currentKey.substring(0, 4)}...${currentKey.substring(currentKey.length - 4)})`;
+
+    try {
+      const res = await callGeminiApiWithFallback(currentKey, bodyPayload, timeoutMs);
+      if (res.ok) {
+        return {
+          ...res,
+          usedKeySlot: i + 1,
+          totalKeysInPool: keys.length,
+          usedKeyMasked: `${currentKey.substring(0, 4)}...${currentKey.substring(currentKey.length - 4)}`
+        };
+      }
+      const err = res.error || 'Failed';
+      poolAttempts.push(`${keyLabel}: ${err}`);
+      console.warn(`[AI Failover Pool] ⚠️ ${keyLabel} failed (${err}). Cascading to next key in pool...`);
+      lastError = err;
+    } catch (e) {
+      poolAttempts.push(`${keyLabel}: ${e.message}`);
+      console.warn(`[AI Failover Pool] ⚠️ ${keyLabel} exception (${e.message}). Cascading to next key in pool...`);
+      lastError = e.message;
+    }
+  }
+
+  return {
+    ok: false,
+    error: `All ${keys.length} API keys in failover pool failed: ${poolAttempts.join(' | ')}`,
+    poolAttempts
+  };
+}
+
 // Per-Student Daily AI Quota & Coin Recharge Engine
 const DAILY_FREE_AI_MESSAGES = 8; // 8 free messages per day per student
 
@@ -3475,10 +3566,17 @@ function getAiSettings() {
     const row = db.prepare("SELECT value FROM system_settings WHERE key = 'prefer_live_ai'").get();
     if (row && row.value === 'false') preferLiveAi = false;
   } catch {}
-  const apiKey = getGeminiApiKey();
+  const keys = getGeminiApiKeys();
+  const primaryKey = keys[0] || null;
   return {
-    hasApiKey: !!apiKey,
-    maskedApiKey: apiKey ? `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}` : null,
+    hasApiKey: keys.length > 0,
+    keyCount: keys.length,
+    maskedApiKey: primaryKey ? `${primaryKey.substring(0, 4)}...${primaryKey.substring(primaryKey.length - 4)}` : null,
+    apiKeys: keys.map((k, idx) => ({
+      slot: idx + 1,
+      masked: `${k.substring(0, 4)}...${k.substring(k.length - 4)}`,
+      length: k.length
+    })),
     preferLiveAi,
     model: getActiveGeminiModel(),
     modelChain: AI_FALLBACK_MODELS
@@ -3580,16 +3678,61 @@ apiRouter.post('/ai/buy-messages', (req, res) => {
 
 apiRouter.post('/admin/ai/config', adminAuth, (req, res) => {
   try {
-    const { geminiApiKey, preferLiveAi } = req.body;
+    const { geminiApiKey, geminiApiKeys, preferLiveAi } = req.body;
     const now = new Date().toISOString();
 
-    if (geminiApiKey !== undefined) {
+    // 1. Process 5-Key Pool if provided
+    if (geminiApiKeys !== undefined) {
+      let keyList = [];
+      if (Array.isArray(geminiApiKeys)) {
+        keyList = geminiApiKeys.map(k => String(k || '').trim()).filter(Boolean);
+      } else if (typeof geminiApiKeys === 'string') {
+        keyList = geminiApiKeys.split(',').map(k => k.trim()).filter(Boolean);
+      }
+      keyList = keyList.slice(0, 5);
+
+      db.prepare(`
+        INSERT INTO system_settings (key, value, updatedAt)
+        VALUES ('gemini_api_keys', ?, ?)
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
+      `).run(JSON.stringify(keyList), now);
+
+      for (let i = 1; i <= 5; i++) {
+        const val = keyList[i - 1] || '';
+        db.prepare(`
+          INSERT INTO system_settings (key, value, updatedAt)
+          VALUES ('gemini_api_key_${i}', ?, ?)
+          ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
+        `).run(val, now);
+      }
+
+      // Also sync primary key
+      const primary = keyList[0] || '';
+      db.prepare(`
+        INSERT INTO system_settings (key, value, updatedAt)
+        VALUES ('gemini_api_key', ?, ?)
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
+      `).run(primary, now);
+    } else if (geminiApiKey !== undefined) {
       const cleanKey = String(geminiApiKey).trim();
       db.prepare(`
         INSERT INTO system_settings (key, value, updatedAt)
         VALUES ('gemini_api_key', ?, ?)
         ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
       `).run(cleanKey, now);
+
+      // If single key set, ensure it is in slot 1 and gemini_api_keys list
+      db.prepare(`
+        INSERT INTO system_settings (key, value, updatedAt)
+        VALUES ('gemini_api_key_1', ?, ?)
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
+      `).run(cleanKey, now);
+
+      db.prepare(`
+        INSERT INTO system_settings (key, value, updatedAt)
+        VALUES ('gemini_api_keys', ?, ?)
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
+      `).run(JSON.stringify(cleanKey ? [cleanKey] : []), now);
     }
 
     if (preferLiveAi !== undefined) {
@@ -3608,18 +3751,63 @@ apiRouter.post('/admin/ai/config', adminAuth, (req, res) => {
 
 apiRouter.post('/admin/ai/test-connection', adminAuth, async (req, res) => {
   try {
-    const keyToTest = req.body.customApiKey ? String(req.body.customApiKey).trim() : getGeminiApiKey();
-    if (!keyToTest) {
-      return res.status(400).json({ success: false, error: 'No Gemini API key provided to test.' });
-    }
+    const { customApiKey, testAll, keysToTest } = req.body;
+    const poolKeys = getGeminiApiKeys();
 
-    const startTime = Date.now();
     const testPayload = {
       contents: [{ role: 'user', parts: [{ text: 'Respond with a simple JSON object: {"status": "ok", "service": "AcademicLevel Hybrid AI"}' }] }],
       generationConfig: { responseMimeType: 'application/json', maxOutputTokens: 60 }
     };
 
-    const result = await callGeminiApiWithFallback(keyToTest, testPayload, 6000);
+    // If caller wants to test all keys in pool or a specific set of keys
+    if (testAll || Array.isArray(keysToTest)) {
+      const targets = Array.isArray(keysToTest) && keysToTest.length > 0
+        ? keysToTest.map(k => String(k || '').trim()).filter(Boolean)
+        : poolKeys;
+
+      if (targets.length === 0) {
+        return res.status(400).json({ success: false, error: 'No Gemini API keys in pool to test.' });
+      }
+
+      const results = [];
+      for (let i = 0; i < targets.length; i++) {
+        const key = targets[i];
+        const masked = `${key.substring(0, 4)}...${key.substring(key.length - 4)}`;
+        const start = Date.now();
+        const singleRes = await callGeminiApiWithFallback(key, testPayload, 8000);
+        const latencyMs = Date.now() - start;
+        results.push({
+          slot: i + 1,
+          masked,
+          ok: singleRes.ok,
+          latencyMs,
+          model: singleRes.model || null,
+          error: singleRes.ok ? null : singleRes.error
+        });
+      }
+
+      const workingCount = results.filter(r => r.ok).length;
+      const overallSuccess = workingCount > 0;
+      return res.json({
+        success: overallSuccess,
+        testAll: true,
+        totalTested: results.length,
+        workingCount,
+        message: overallSuccess
+          ? `${workingCount}/${results.length} Gemini API keys in pool are operational and ready with cascading failover.`
+          : `All ${results.length} tested keys failed connection test.`,
+        results
+      });
+    }
+
+    // Single key test
+    const keyToTest = customApiKey ? String(customApiKey).trim() : getGeminiApiKey();
+    if (!keyToTest) {
+      return res.status(400).json({ success: false, error: 'No Gemini API key provided to test.' });
+    }
+
+    const startTime = Date.now();
+    const result = await callGeminiApiWithFallback(keyToTest, testPayload, 8000);
     const latencyMs = Date.now() - startTime;
 
     if (!result.ok) {
@@ -3654,7 +3842,6 @@ apiRouter.post('/ai/generate-quiz', async (req, res) => {
       });
     }
 
-    const apiKey = getGeminiApiKey();
     const safeCount = Math.min(Math.max(Number(count) || 5, 1), 10);
 
     const prompt = `You are an expert curriculum assessment creator for Indian education boards (CBSE, ICSE, Cambridge IGCSE) at AcademicLevel.
@@ -3692,9 +3879,10 @@ CRITICAL REQUIREMENTS:
       }
     };
 
-    const result = await callGeminiApiWithFallback(apiKey, bodyPayload, 20000);
+    // 5-Key Cascading Failover: Key 1 -> Key 2 -> Key 3 -> Key 4 -> Key 5
+    const result = await callGeminiApiWithMultiKeyFallback(bodyPayload, 20000);
     if (!result.ok) {
-      console.warn(`[Hybrid AI] Generation fallback triggered: ${result.error}`);
+      console.warn(`[Hybrid AI] Generation failover exhausted, falling back to offline bank: ${result.error}`);
       return res.json({ success: false, fallback: true, error: result.error });
     }
 
@@ -3749,9 +3937,9 @@ CRITICAL REQUIREMENTS:
 apiRouter.post('/ai/explain', async (req, res) => {
   try {
     const { question, chosenIndex, board = 'CBSE', grade = 10 } = req.body;
-    const apiKey = getGeminiApiKey();
+    const keys = getGeminiApiKeys();
 
-    if (!apiKey || !question) {
+    if (keys.length === 0 || !question) {
       return res.json({ success: false, fallback: true });
     }
 
@@ -3779,7 +3967,7 @@ Keep the response direct, engaging, and under 150 words.`;
       generationConfig: { temperature: 0.4, maxOutputTokens: 400 }
     };
 
-    const result = await callGeminiApiWithFallback(apiKey, bodyPayload, 15000);
+    const result = await callGeminiApiWithMultiKeyFallback(bodyPayload, 20000);
     if (!result.ok) return res.json({ success: false, fallback: true });
 
     const explanationText = result.data?.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -3839,9 +4027,9 @@ apiRouter.post('/ai/chat', aiChatLimiter, async (req, res) => {
     }
 
     const { text: cleanQuery, isSuspect } = sanitizeAiQuery(query);
-    const apiKey = getGeminiApiKey();
+    const keys = getGeminiApiKeys();
 
-    if (!apiKey) {
+    if (keys.length === 0) {
       if (resolvedLearnerId) consumeStudentAiMessage(resolvedLearnerId);
       return res.json({
         success: true,
@@ -3891,7 +4079,7 @@ Rules:
       generationConfig: { temperature: 0.5, maxOutputTokens: 350 }
     };
 
-    const result = await callGeminiApiWithFallback(apiKey, bodyPayload, 15000);
+    const result = await callGeminiApiWithMultiKeyFallback(bodyPayload, 20000);
 
     if (!result.ok) {
       if (resolvedLearnerId) consumeStudentAiMessage(resolvedLearnerId);

@@ -3,7 +3,8 @@ import { Learner } from '../../core/types';
 import { CoinLedgerService } from '../../services/coinLedgerService';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
-import { ShoppingBag, ShieldCheck, Flame, BookOpen, Sparkles, Check, AlertCircle, Gift, ArrowRight } from 'lucide-react';
+import { ShoppingBag, ShieldCheck, Flame, BookOpen, Sparkles, Check, AlertCircle, Gift, ArrowRight, FileText, Printer } from 'lucide-react';
+import { PracticeWorksheetViewer } from './PracticeWorksheetViewer';
 
 interface CoinMallProps {
   learner: Learner;
@@ -14,6 +15,12 @@ interface CoinMallProps {
 export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, onNavigateToGiftStore }) => {
   const [purchaseSuccess, setPurchaseSuccess] = useState<string>('');
   const [purchaseError, setPurchaseError] = useState<string>('');
+  const [isWorksheetModalOpen, setIsWorksheetModalOpen] = useState<boolean>(false);
+
+  const isWorksheetUnlocked = typeof window !== 'undefined' && (
+    localStorage.getItem(`al_unlocked_worksheets_${learner.id}`) === 'true' ||
+    (learner.metadataJson && JSON.parse(learner.metadataJson || '{}').unlockedWorksheets)
+  );
 
   const handleBuyStreakFreeze = () => {
     setPurchaseSuccess('');
@@ -183,35 +190,90 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
           </button>
         </div>
 
-        {/* Gold Olympiad Frame */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition-all">
+        {/* Class Practice Worksheets & Revision PDF Center (30 Coins) */}
+        <div className={`border rounded-3xl p-6 flex flex-col justify-between transition-all ${
+          isWorksheetUnlocked
+            ? 'bg-gradient-to-br from-indigo-950/40 via-slate-900 to-emerald-950/30 border-emerald-500/50 shadow-lg shadow-emerald-950/20'
+            : 'bg-slate-900 border-slate-800 hover:border-indigo-500/50'
+        }`}>
           <div>
-            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center mb-4">
-              <BookOpen className="w-6 h-6" />
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center">
+                <FileText className="w-6 h-6" />
+              </div>
+              {isWorksheetUnlocked ? (
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 flex items-center space-x-1">
+                  <Check className="w-3 h-3" />
+                  <span>Unlocked & Ready</span>
+                </span>
+              ) : (
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 border border-amber-500/30 text-amber-300">
+                  30 Coins
+                </span>
+              )}
             </div>
-            <h3 className="font-bold text-white text-base">Olympiad Formula Guide</h3>
-            <p className="text-xs text-slate-400 mt-2">
-              Instant digital download of high-yield formula compendium for {learner.board} Class {learner.grade}.
+
+            <h3 className="font-bold text-white text-base">Class Practice Worksheets & PDF Center</h3>
+            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+              Generate curriculum-calibrated practice worksheets directly from the 12,000-question bank for all classes (Classes 1–12), with rough work workspace and detachable NCERT step-by-step solutions.
             </p>
+
+            <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-mono">
+              <span className="px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 border border-slate-700/60">
+                All Classes (1 to 12)
+              </span>
+              <span className="px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 border border-slate-700/60">
+                1-Click Vector PDF Print
+              </span>
+              <span className="px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 border border-slate-700/60">
+                Offline .HTML
+              </span>
+            </div>
           </div>
 
-          <button
-            onClick={() => {
-              if (learner.coinBalance < 30) {
-                setPurchaseError('Need 30 coins for digital handbook.');
-              } else {
-                CoinLedgerService.appendTransaction(learner.id, -30, 'MALL_PURCHASE', { item: 'FORMULA_GUIDE' });
-                onRefreshLearner();
-                setPurchaseSuccess('Formula Guide unlocked! Check your course resources.');
-              }
-            }}
-            className="mt-6 w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5"
-          >
-            <StudyCoinIcon className="w-4 h-4" />
-            <span>Unlock PDF (30 Coins)</span>
-          </button>
+          {isWorksheetUnlocked ? (
+            <button
+              onClick={() => setIsWorksheetModalOpen(true)}
+              className="mt-6 w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center space-x-1.5"
+            >
+              <Printer className="w-4 h-4" />
+              <span>📄 Open & Print Practice Worksheets</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                if (learner.coinBalance < 30) {
+                  setPurchaseError(`Insufficient coins. You have ${learner.coinBalance} coins, but 30 coins are required for Practice Worksheets.`);
+                } else {
+                  const tx = CoinLedgerService.appendTransaction(learner.id, -30, 'MALL_PURCHASE', {
+                    item: 'PRACTICE_WORKSHEETS_ALL_CLASSES'
+                  });
+                  if (tx.success) {
+                    localStorage.setItem(`al_unlocked_worksheets_${learner.id}`, 'true');
+                    onRefreshLearner();
+                    setPurchaseSuccess('🎉 Practice Worksheets unlocked for all classes! Opening your printable worksheet generator...');
+                    setIsWorksheetModalOpen(true);
+                  } else {
+                    setPurchaseError(tx.error || 'Transaction failed.');
+                  }
+                }
+              }}
+              className="mt-6 w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5"
+            >
+              <StudyCoinIcon className="w-4 h-4" />
+              <span>Unlock Practice Worksheets (30 Coins)</span>
+            </button>
+          )}
         </div>
       </div>
+
+      {/* PRACTICE WORKSHEETS MODAL */}
+      {isWorksheetModalOpen && (
+        <PracticeWorksheetViewer
+          learner={learner}
+          onClose={() => setIsWorksheetModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

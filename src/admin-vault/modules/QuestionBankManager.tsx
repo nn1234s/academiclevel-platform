@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Board, Grade, LevelNode, Question } from '../../core/types';
 import { OfflineBankService } from '../../services/offlineBankService';
-import { HybridQuizService, AiConfig } from '../../services/hybridQuizService';
+import { HybridQuizService, AiConfig, KeyTestResult } from '../../services/hybridQuizService';
 import {
   Database,
   Plus,
@@ -14,7 +14,11 @@ import {
   Zap,
   CheckCircle2,
   AlertTriangle,
-  Play
+  Play,
+  Layers,
+  ShieldCheck,
+  Copy,
+  Trash2
 } from 'lucide-react';
 
 export const QuestionBankManager: React.FC = () => {
@@ -38,25 +42,37 @@ export const QuestionBankManager: React.FC = () => {
   const [hint, setHint] = useState('');
   const [notice, setNotice] = useState('');
 
-  // AI Hybrid State
+  // AI Hybrid State with 5-Key Cascading Failover Pool
   const [aiConfig, setAiConfig] = useState<AiConfig>({
     hasApiKey: false,
+    keyCount: 0,
     preferLiveAi: true,
     model: 'gemini-3.5-flash-lite'
   });
-  const [apiKeyInput, setApiKeyInput] = useState('');
-  const [showKey, setShowKey] = useState(false);
+  const [apiKeysList, setApiKeysList] = useState<string[]>(['', '', '', '', '']);
+  const [showKeys, setShowKeys] = useState<boolean[]>([false, false, false, false, false]);
   const [isTestingAi, setIsTestingAi] = useState(false);
-  const [testResult, setTestResult] = useState<{ success: boolean; latencyMs?: number; message?: string; error?: string } | null>(null);
+  const [poolTestResults, setPoolTestResults] = useState<{
+    success: boolean;
+    message?: string;
+    workingCount?: number;
+    totalTested?: number;
+    results?: KeyTestResult[];
+  } | null>(null);
   const [isGeneratingAiSample, setIsGeneratingAiSample] = useState(false);
   const [aiSampleQuestions, setAiSampleQuestions] = useState<Question[] | null>(null);
 
   useEffect(() => {
     HybridQuizService.getConfig().then(cfg => {
       setAiConfig(cfg);
-      if (cfg.hasApiKey && !apiKeyInput) {
-        setApiKeyInput(HybridQuizService.getClientStoredKey() || '');
+      const storedPool = HybridQuizService.getClientStoredKeysPool();
+      const initialKeys = ['', '', '', '', ''];
+      for (let i = 0; i < 5; i++) {
+        if (storedPool[i]) {
+          initialKeys[i] = storedPool[i];
+        }
       }
+      setApiKeysList(initialKeys);
     });
   }, []);
 
@@ -64,20 +80,60 @@ export const QuestionBankManager: React.FC = () => {
     setQuestions(OfflineBankService.getQuestions(board, grade, subjectId, levelNode));
   };
 
+  const handleKeyChange = (index: number, value: string) => {
+    setApiKeysList(prev => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+  };
+
+  const toggleShowKey = (index: number) => {
+    setShowKeys(prev => {
+      const next = [...prev];
+      next[index] = !next[index];
+      return next;
+    });
+  };
+
+  const handlePasteKey = async (index: number) => {
+    try {
+      const clipText = await navigator.clipboard.readText();
+      if (clipText) {
+        handleKeyChange(index, clipText.trim());
+      }
+    } catch {
+      const entered = window.prompt(`Paste Gemini API Key for Slot #${index + 1}:`);
+      if (entered) handleKeyChange(index, entered.trim());
+    }
+  };
+
+  const handleClearKey = (index: number) => {
+    handleKeyChange(index, '');
+  };
+
   const handleSaveAiConfig = async () => {
-    const res = await HybridQuizService.saveConfig(apiKeyInput, aiConfig.preferLiveAi);
+    const cleanKeys = apiKeysList.map(k => k.trim()).filter(Boolean);
+    const res = await HybridQuizService.saveConfig(cleanKeys, aiConfig.preferLiveAi);
     const updated = await HybridQuizService.getConfig();
     setAiConfig(updated);
-    setNotice(res.message);
+    setNotice(res.message || `Saved ${cleanKeys.length} API Key(s) to server failover pool!`);
     setTimeout(() => setNotice(''), 4000);
   };
 
-  const handleTestAiPing = async () => {
+  const handleTestAiPingAll = async () => {
     setIsTestingAi(true);
-    setTestResult(null);
+    setPoolTestResults(null);
     try {
-      const res = await HybridQuizService.testConnection(apiKeyInput);
-      setTestResult(res);
+      const activeKeys = apiKeysList.map(k => k.trim()).filter(Boolean);
+      const res = await HybridQuizService.testConnection(undefined, true, activeKeys.length > 0 ? activeKeys : undefined);
+      setPoolTestResults(res);
+      if (res.success) {
+        setNotice(`✅ Failover Pool Verified: ${res.workingCount || 0}/${res.totalTested || 0} keys operational.`);
+      } else {
+        setNotice(`⚠️ Failover Pool Alert: ${res.message || 'Key test failed.'}`);
+      }
+      setTimeout(() => setNotice(''), 5000);
     } finally {
       setIsTestingAi(false);
     }
@@ -186,107 +242,231 @@ export const QuestionBankManager: React.FC = () => {
 
           <div className="flex items-center space-x-2">
             <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${
-              aiConfig.hasApiKey
+              (aiConfig.keyCount || 0) > 0 || apiKeysList.some(k => k.trim())
                 ? 'bg-emerald-950/60 border-emerald-700/60 text-emerald-300'
                 : 'bg-amber-950/60 border-amber-700/60 text-amber-300'
             }`}>
-              {aiConfig.hasApiKey ? '● Gemini API Key Armed' : '○ Resilient Offline Mode (No Key Set)'}
+              {(aiConfig.keyCount || 0) > 0 || apiKeysList.some(k => k.trim())
+                ? `● ${apiKeysList.filter(k => k.trim()).length || aiConfig.keyCount || 1}/5 Keys Armed in Pool`
+                : '○ Offline Mode (No Keys in Pool)'}
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Key Configuration */}
-          <div className="space-y-2">
-            <label className="block text-xs font-semibold text-slate-300 flex items-center justify-between">
-              <span className="flex items-center space-x-1.5">
-                <Key className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Google Gemini API Key:</span>
-              </span>
-              <span className="text-[10px] text-slate-500 font-mono">
-                {aiConfig.maskedApiKey ? `Active: ${aiConfig.maskedApiKey}` : 'process.env.GEMINI_API_KEY'}
-              </span>
-            </label>
-            <div className="relative">
-              <input
-                type={showKey ? 'text' : 'password'}
-                value={apiKeyInput}
-                onChange={e => setApiKeyInput(e.target.value)}
-                placeholder="AIzaSy... (Paste Gemini Key here to activate Live AI)"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 pr-10 font-mono"
-              />
-              <button
-                type="button"
-                onClick={() => setShowKey(!showKey)}
-                className="absolute right-2.5 top-2.5 text-slate-400 hover:text-white"
-              >
-                {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+        {/* 5-Key Cascading Failover Pipeline Banner */}
+        <div className="bg-slate-950/70 border border-indigo-950 rounded-2xl p-3.5 space-y-2">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="font-bold text-indigo-300 flex items-center space-x-1.5">
+              <Layers className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Multi-Key Real-Time Failover Pool (Cascading Architecture)</span>
+            </span>
+            <span className="text-[10px] text-slate-400 font-mono">
+              Auto-cascade: Key 1 ➔ Key 2 ➔ Key 3 ➔ Key 4 ➔ Key 5
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-mono">
+            {[1, 2, 3, 4, 5].map(slotNum => {
+              const hasKey = !!apiKeysList[slotNum - 1]?.trim();
+              const testSlot = poolTestResults?.results?.find(r => r.slot === slotNum);
+              return (
+                <React.Fragment key={slotNum}>
+                  <div className={`px-2.5 py-1 rounded-lg border flex items-center space-x-1 ${
+                    testSlot
+                      ? testSlot.ok
+                        ? 'bg-emerald-950/70 border-emerald-700 text-emerald-300'
+                        : 'bg-rose-950/70 border-rose-800 text-rose-300'
+                      : hasKey
+                      ? 'bg-indigo-950/60 border-indigo-800 text-indigo-200'
+                      : 'bg-slate-900 border-slate-800 text-slate-500'
+                  }`}>
+                    <span className="font-bold">Slot {slotNum}</span>
+                    <span>{slotNum === 1 ? '(Primary)' : '(Failover)'}</span>
+                    <span className="text-[9px]">
+                      {testSlot ? (testSlot.ok ? '✓' : '✗') : (hasKey ? '●' : '○')}
+                    </span>
+                  </div>
+                  {slotNum < 5 && <span className="text-slate-600">➔</span>}
+                </React.Fragment>
+              );
+            })}
+            <span className="text-slate-600">➔</span>
+            <div className="px-2.5 py-1 rounded-lg border bg-slate-900 border-slate-800 text-slate-400 flex items-center space-x-1">
+              <ShieldCheck className="w-3 h-3 text-emerald-400" />
+              <span>Zero-Latency Offline Bank</span>
             </div>
-            <p className="text-[10px] text-slate-500">
-              Key is stored securely in the server SQLite database & browser state. If left blank, offline bank serves 100% of quizzes.
-            </p>
+          </div>
+          <p className="text-[10px] text-slate-400">
+            If Key 1 hits Google rate limits (429), quota exhaustion, or error, the engine cascades immediately to Key 2, then Key 3, Key 4, and Key 5 without failing student quizzes.
+          </p>
+        </div>
+
+        {/* 5-Key Slot Editor */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
+              <Key className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Configure 5 Gemini API Key Slots:</span>
+            </label>
+            <span className="text-[10px] text-slate-500 font-mono">
+              Slots 1–5 stored securely in SQLite database
+            </span>
           </div>
 
-          {/* Mode Switch & Actions */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-950 border border-slate-800">
-              <div>
-                <span className="text-xs font-bold text-white block">Hybrid Preference</span>
-                <span className="text-[10px] text-slate-400">
-                  {aiConfig.preferLiveAi ? 'Try Gemini Live First -> Fallback on offline/error' : 'Force Curated Syllabus Bank Only'}
-                </span>
-              </div>
-              <button
-                onClick={() => {
-                  const newVal = !aiConfig.preferLiveAi;
-                  setAiConfig(prev => ({ ...prev, preferLiveAi: newVal }));
-                  HybridQuizService.saveConfig(apiKeyInput, newVal);
-                }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                  aiConfig.preferLiveAi
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-900/50'
-                    : 'bg-slate-800 text-slate-300'
-                }`}
-              >
-                {aiConfig.preferLiveAi ? '✨ Live AI First' : '🛡️ Bank Only'}
-              </button>
-            </div>
+          <div className="grid grid-cols-1 gap-2.5">
+            {[0, 1, 2, 3, 4].map(idx => {
+              const slotNumber = idx + 1;
+              const isPrimary = idx === 0;
+              const keyVal = apiKeysList[idx] || '';
+              const isFilled = keyVal.trim().length > 0;
+              const testSlot = poolTestResults?.results?.find(r => r.slot === slotNumber);
 
-            <div className="flex gap-2">
-              <button
-                onClick={handleSaveAiConfig}
-                className="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all"
-              >
-                Save API Key
-              </button>
-              <button
-                onClick={handleTestAiPing}
-                disabled={isTestingAi}
-                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center space-x-1"
-              >
-                <Zap className={`w-3.5 h-3.5 ${isTestingAi ? 'animate-spin' : ''}`} />
-                <span>{isTestingAi ? 'Pinging...' : 'Ping Test'}</span>
-              </button>
-            </div>
+              return (
+                <div key={idx} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-slate-950/80 border border-slate-800/80 rounded-2xl p-2.5 hover:border-slate-700 transition-colors">
+                  <div className="flex items-center justify-between sm:justify-start gap-2 min-w-[130px]">
+                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold border ${
+                      isPrimary
+                        ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
+                        : 'bg-slate-800 border-slate-700 text-slate-300'
+                    }`}>
+                      {isPrimary ? 'Slot #1 Primary' : `Slot #${slotNumber} Failover`}
+                    </span>
+                    <span className={`text-[10px] font-mono ${isFilled ? 'text-emerald-400' : 'text-slate-600'}`}>
+                      {isFilled ? '● Set' : '○ Empty'}
+                    </span>
+                  </div>
+
+                  <div className="relative flex-1">
+                    <input
+                      type={showKeys[idx] ? 'text' : 'password'}
+                      value={keyVal}
+                      onChange={e => handleKeyChange(idx, e.target.value)}
+                      placeholder={isPrimary ? "AIzaSy... (Paste Primary Google Gemini Key)" : `AIzaSy... (Paste Failover Key #${slotNumber})`}
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 pr-20 font-mono"
+                    />
+                    <div className="absolute right-2 top-1.5 flex items-center space-x-1.5">
+                      <button
+                        type="button"
+                        onClick={() => toggleShowKey(idx)}
+                        title={showKeys[idx] ? 'Hide Key' : 'Reveal Key'}
+                        className="text-slate-400 hover:text-white p-0.5"
+                      >
+                        {showKeys[idx] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePasteKey(idx)}
+                        title="Paste from clipboard"
+                        className="text-slate-400 hover:text-indigo-300 p-0.5"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                      {keyVal && (
+                        <button
+                          type="button"
+                          onClick={() => handleClearKey(idx)}
+                          title="Clear Key"
+                          className="text-slate-400 hover:text-rose-400 p-0.5"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {testSlot && (
+                    <div className={`px-2 py-1 rounded-xl text-[10px] font-mono border flex items-center space-x-1 flex-shrink-0 ${
+                      testSlot.ok
+                        ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300'
+                        : 'bg-rose-950/60 border-rose-800 text-rose-300'
+                    }`}>
+                      {testSlot.ok ? <CheckCircle2 className="w-3 h-3 text-emerald-400" /> : <AlertTriangle className="w-3 h-3 text-rose-400" />}
+                      <span>{testSlot.ok ? `${testSlot.latencyMs}ms OK` : (testSlot.error || 'Failed').slice(0, 24)}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Ping Test Feedback */}
-        {testResult && (
-          <div className={`p-3 rounded-2xl text-xs border flex items-center justify-between ${
-            testResult.success
-              ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300'
-              : 'bg-red-950/60 border-red-800 text-red-300'
-          }`}>
-            <div className="flex items-center space-x-2">
-              {testResult.success ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <AlertTriangle className="w-4 h-4 text-red-400" />}
-              <span>{testResult.message || testResult.error}</span>
-            </div>
-            {testResult.latencyMs !== undefined && (
-              <span className="font-mono text-[10px] bg-slate-900/80 px-2 py-0.5 rounded-md border border-slate-800">
-                {testResult.latencyMs}ms latency
+        {/* Global Action Toolbar & Hybrid Mode Switch */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          {/* Mode Switch */}
+          <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-950 border border-slate-800">
+            <div>
+              <span className="text-xs font-bold text-white block">Hybrid Preference</span>
+              <span className="text-[10px] text-slate-400">
+                {aiConfig.preferLiveAi ? 'Try 5-Key Gemini Pool First -> Cascading fallback' : 'Force Curated Syllabus Bank Only'}
               </span>
+            </div>
+            <button
+              onClick={() => {
+                const newVal = !aiConfig.preferLiveAi;
+                setAiConfig(prev => ({ ...prev, preferLiveAi: newVal }));
+                const cleanKeys = apiKeysList.map(k => k.trim()).filter(Boolean);
+                HybridQuizService.saveConfig(cleanKeys, newVal);
+              }}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                aiConfig.preferLiveAi
+                  ? 'bg-purple-600 text-white shadow-md shadow-purple-900/50'
+                  : 'bg-slate-800 text-slate-300'
+              }`}
+            >
+              {aiConfig.preferLiveAi ? '✨ Live AI First' : '🛡️ Bank Only'}
+            </button>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleSaveAiConfig}
+              className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5"
+            >
+              <Check className="w-4 h-4" />
+              <span>Save 5 API Keys</span>
+            </button>
+            <button
+              onClick={handleTestAiPingAll}
+              disabled={isTestingAi}
+              className="px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white font-bold text-xs rounded-xl border border-purple-600 transition-all flex items-center justify-center space-x-1.5"
+            >
+              <Zap className={`w-3.5 h-3.5 ${isTestingAi ? 'animate-spin' : ''}`} />
+              <span>{isTestingAi ? 'Testing Pool...' : 'Test All 5 Keys'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Pool Test Results Feedback */}
+        {poolTestResults && (
+          <div className={`p-3 rounded-2xl text-xs border space-y-2 ${
+            poolTestResults.success
+              ? 'bg-emerald-950/60 border-emerald-800 text-emerald-300'
+              : 'bg-rose-950/60 border-rose-800 text-rose-300'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                {poolTestResults.success ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <AlertTriangle className="w-4 h-4 text-rose-400" />}
+                <span className="font-bold">{poolTestResults.message}</span>
+              </div>
+              <span className="font-mono text-[10px] bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                {poolTestResults.workingCount || 0}/{poolTestResults.totalTested || 0} Operational
+              </span>
+            </div>
+
+            {poolTestResults.results && poolTestResults.results.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pt-1 border-t border-slate-800/80">
+                {poolTestResults.results.map((r, i) => (
+                  <div key={i} className="p-2 rounded-xl bg-slate-950/90 border border-slate-800 text-[11px] flex justify-between items-center">
+                    <div>
+                      <span className="font-bold text-white">Slot #{r.slot}:</span>
+                      <span className="ml-1 text-slate-400 font-mono">{r.masked}</span>
+                    </div>
+                    <span className={`font-mono text-[10px] px-1.5 py-0.5 rounded ${r.ok ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-rose-950 text-rose-300 border border-rose-800'}`}>
+                      {r.ok ? `${r.latencyMs}ms (${r.model || 'OK'})` : 'Failed'}
+                    </span>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}
