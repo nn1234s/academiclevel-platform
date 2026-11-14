@@ -59,6 +59,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           try {
             const studentData = await ApiClient.getStudent(session.learnerId);
             if (studentData.success && studentData.learner && isMounted) {
+              if (localLearner) {
+                if ((localLearner.coinBalance || 0) > (studentData.learner.coinBalance || 0)) {
+                  studentData.learner.coinBalance = localLearner.coinBalance;
+                }
+                if ((localLearner.levelsCompletedCount || 0) > (studentData.learner.levelsCompletedCount || 0)) {
+                  studentData.learner.levelsCompletedCount = localLearner.levelsCompletedCount;
+                }
+                if ((localLearner.quizzesCompletedCount || 0) > (studentData.learner.quizzesCompletedCount || 0)) {
+                  studentData.learner.quizzesCompletedCount = localLearner.quizzesCompletedCount;
+                }
+              }
               if (studentData.activeSub) {
                 StorageRLSLayer.saveSubscription(studentData.activeSub);
                 studentData.learner.hasActiveSubscription = true;
@@ -86,8 +97,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const onFocusOrVisible = () => {
       const session = StorageRLSLayer.getCurrentSession();
       if (session && session.learnerId) {
+        const localLearner = StorageRLSLayer.getLearnerById(session.learnerId, session.learnerId);
         ApiClient.getStudent(session.learnerId).then(studentData => {
           if (studentData.success && studentData.learner && isMounted) {
+            if (localLearner) {
+              if ((localLearner.coinBalance || 0) > (studentData.learner.coinBalance || 0)) {
+                studentData.learner.coinBalance = localLearner.coinBalance;
+              }
+              if ((localLearner.levelsCompletedCount || 0) > (studentData.learner.levelsCompletedCount || 0)) {
+                studentData.learner.levelsCompletedCount = localLearner.levelsCompletedCount;
+              }
+              if ((localLearner.quizzesCompletedCount || 0) > (studentData.learner.quizzesCompletedCount || 0)) {
+                studentData.learner.quizzesCompletedCount = localLearner.quizzesCompletedCount;
+              }
+            }
             if (studentData.activeSub) {
               StorageRLSLayer.saveSubscription(studentData.activeSub);
               studentData.learner.hasActiveSubscription = true;

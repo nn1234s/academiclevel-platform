@@ -195,9 +195,28 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner,
   const quota = QuotaService.evaluateQuota(learner);
   const isEnrolledScholar = quota.hasActiveSubscription || learner.role === 'SUPER_ADMIN';
   const minLevelsRequired = 3;
-  // 10 quizzes = 2 levels (5 quizzes = 1 level; 3 levels = 15 quizzes)
-  const levelsCount = Math.floor((learner.quizzesCompletedCount || 0) / 5);
+
+  // Genuine Curriculum Mastery: Count mastered course levels from learner record, quota, and storage progress
+  const progressList = typeof window !== 'undefined'
+    ? (StorageRLSLayer.getProgressForLearner(learner.id, learner.id) || [])
+    : [];
+  const completedProgressLevels = progressList.filter(
+    p => p.isCompleted || (p.bestScorePercent && p.bestScorePercent >= 70)
+  ).length;
+
+  const levelsCount = Math.max(
+    Number(learner.levelsCompletedCount || 0),
+    Number(quota.levelsCompleted || 0),
+    completedProgressLevels,
+    Number(learner.quizzesCompletedCount || 0)
+  );
   const hasAcademicMilestone = levelsCount >= minLevelsRequired || learner.role === 'SUPER_ADMIN';
+
+  // Ensure learner object stays synchronized across storage
+  if (typeof window !== 'undefined' && levelsCount > (learner.levelsCompletedCount || 0)) {
+    learner.levelsCompletedCount = levelsCount;
+    StorageRLSLayer.saveLearner(learner, learner.id);
+  }
 
   const [existingRequests, setExistingRequests] = useState<GiftRequest[]>(() =>
     StorageRLSLayer.getGiftRequestsForLearner(learner.id)
@@ -456,7 +475,7 @@ ${learner.fullName}`;
             🛡️
           </div>
           <div>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="font-bold text-white text-sm">Rapid Voucher Dispatch & Fair-Play Economics</span>
               {isEnrolledScholar ? (
                 <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
@@ -465,6 +484,16 @@ ${learner.fullName}`;
               ) : (
                 <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
                   Free Tier • Upgrade to Cash Out
+                </span>
+              )}
+              {hasAcademicMilestone ? (
+                <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold flex items-center space-x-1">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>Milestone Verified ({levelsCount}/3 Levels Mastered)</span>
+                </span>
+              ) : (
+                <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
+                  🎯 Proof of Study: {levelsCount}/3 Levels
                 </span>
               )}
             </div>

@@ -801,6 +801,31 @@ apiRouter.get('/students/:id', (req, res) => {
       learner.activePlan = null;
     }
 
+    // Reconcile and ensure levelsCompletedCount is accurate across progress and quiz attempts
+    try {
+      const distinctLevelsCount = db.prepare(`
+        SELECT count(*) as count FROM course_progress 
+        WHERE learnerId = ? AND (isCompleted = 1 OR passed = 1)
+      `).get(learner.id)?.count || 0;
+      
+      const attemptsCount = db.prepare(`
+        SELECT count(*) as count FROM quiz_attempts 
+        WHERE learnerId = ? AND (isPassed = 1 OR score >= 70)
+      `).get(learner.id)?.count || 0;
+
+      const reconciledLevels = Math.max(
+        Number(learner.levelsCompletedCount || 0),
+        distinctLevelsCount,
+        attemptsCount,
+        Number(learner.quizzesCompletedCount || 0)
+      );
+
+      if (reconciledLevels > Number(learner.levelsCompletedCount || 0)) {
+        db.prepare(`UPDATE learners SET levelsCompletedCount = ?, updatedAt = datetime('now') WHERE id = ?`).run(reconciledLevels, learner.id);
+        learner.levelsCompletedCount = reconciledLevels;
+      }
+    } catch {}
+
     delete learner.passwordHash;
     delete learner.passwordSalt;
 
@@ -827,7 +852,7 @@ apiRouter.patch('/students/:id', (req, res) => {
       });
     }
 
-    const { phone, parentName, parentPin, avatarFrame } = req.body;
+    const { phone, parentName, parentPin, avatarFrame, quizzesCompletedCount, levelsCompletedCount } = req.body;
     const updates = [];
     const params = [];
 
@@ -835,6 +860,8 @@ apiRouter.patch('/students/:id', (req, res) => {
     if (parentName !== undefined) { updates.push('parentName = ?'); params.push(parentName); }
     if (parentPin !== undefined) { updates.push('parentPin = ?'); params.push(parentPin); }
     if (avatarFrame !== undefined) { updates.push('avatarFrame = ?'); params.push(avatarFrame); }
+    if (quizzesCompletedCount !== undefined) { updates.push('quizzesCompletedCount = ?'); params.push(Number(quizzesCompletedCount)); }
+    if (levelsCompletedCount !== undefined) { updates.push('levelsCompletedCount = ?'); params.push(Number(levelsCompletedCount)); }
 
     if (updates.length > 0) {
       updates.push("updatedAt = datetime('now')");
