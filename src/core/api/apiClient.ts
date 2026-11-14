@@ -116,6 +116,16 @@ export class ApiClient {
     });
   }
 
+  public static async updateStudentProgressCounters(
+    id: string,
+    counters: { quizzesCompletedCount?: number; levelsCompletedCount?: number }
+  ): Promise<{ success: boolean; learner?: Learner }> {
+    return this.request(`/students/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(counters)
+    });
+  }
+
   public static async spinWheel(id: string): Promise<{
     success: boolean;
     coinsWon: number;

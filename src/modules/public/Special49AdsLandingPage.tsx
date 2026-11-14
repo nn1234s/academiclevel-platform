@@ -31,11 +31,15 @@ import {
   Play,
   Gift,
   Eye,
-  EyeOff
+  EyeOff,
+  QrCode,
+  Copy,
+  AlertCircle
 } from 'lucide-react';
 import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { PaymentService } from '../../services/paymentService';
+import { UTRValidator } from '../../core/security/utrValidator';
 import { UPIQRCheckout } from '../student/UPIQRCheckout';
 import { CLASS_THEMES } from '../../core/theme/classThemes';
 import { Grade, Board } from '../../core/types';
@@ -281,24 +285,26 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
     });
   }, []);
 
-  // Quick enroll modal state
+  // Quick enroll & QR checkout states
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<'REGISTER' | 'LOGIN'>('REGISTER');
+  const [modalMode, setModalMode] = useState<'PAY_QR' | 'REGISTER' | 'LOGIN'>('PAY_QR');
   const [studentName, setStudentName] = useState('');
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [parentName, setParentName] = useState('');
+  const [payerUpiId, setPayerUpiId] = useState('');
+  const [utrNumber, setUtrNumber] = useState('');
+  const [copiedVpa, setCopiedVpa] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [submittedUtr, setSubmittedUtr] = useState('');
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [captchaError, setCaptchaError] = useState(false);
-
-  // Payment checkout modal state
+  const [qrDataUrl, setQrDataUrl] = useState('');
   const [showUpiCheckout, setShowUpiCheckout] = useState(false);
   const [createdLearnerId, setCreatedLearnerId] = useState<string | null>(null);
-
-  // Review Drawer state
   const [showAllReviewsModal, setShowAllReviewsModal] = useState(false);
 
   // Cycle live enrollment ticker
@@ -323,15 +329,122 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
-  const handleEnrollSubmit = async (e: React.FormEvent) => {
+  const officialVpa = PaymentService.OFFICIAL_UPI_VPA;
+  const officialPayeeName = PaymentService.OFFICIAL_MERCHANT_NAME;
+  const officialQrImage = PaymentService.getOfficialQrImageUrl('LITE');
+
+  useEffect(() => {
+    PaymentService.generateQrDataUrl('LITE', currentLearner?.id || 'scholar_lite_49').then(url => {
+      if (url) setQrDataUrl(url);
+    });
+  }, [currentLearner?.id]);
+
+  // Pre-fill payer details if student is already logged in
+  useEffect(() => {
+    if (currentLearner) {
+      if (!studentName) setStudentName(currentLearner.fullName || '');
+      if (!emailOrPhone) setEmailOrPhone(currentLearner.phone || currentLearner.email || '');
+      if (!payerUpiId && currentLearner.phone) {
+        setPayerUpiId(`${currentLearner.phone.replace(/[^0-9]/g, '')}@upi`);
+      }
+    }
+  }, [currentLearner]);
+
+  const copyVpa = () => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(officialVpa);
+    }
+    setCopiedVpa(true);
+    setTimeout(() => setCopiedVpa(false), 2000);
+  };
+
+  const handleScrollToQr = () => {
+    const el = document.getElementById('instant-pay-qr');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleDirectPaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
-    if (!captchaVerified) {
-      setErrorMessage('Please verify that you are not a robot before proceeding.');
-      setCaptchaError(true);
+    const cleanPayer = payerUpiId.trim();
+    if (!cleanPayer || !cleanPayer.includes('@')) {
+      setErrorMessage('Please enter your valid Payer UPI ID (e.g. 9861439460@paytm or rahul@oksbi).');
       return;
     }
+
+    const cleanUtr = utrNumber.trim();
+    if (!cleanUtr) {
+      setErrorMessage('Please enter your 12-digit bank Transaction ID (UTR) from your UPI payment receipt.');
+      return;
+    }
+
+    const valResult = UTRValidator.validateFormat(cleanUtr);
+    if (!valResult.isValid) {
+      setErrorMessage(valResult.message);
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      let targetLearnerId = currentLearner?.id;
+
+      // If user is unauthenticated, auto-register or resolve learner account in place
+      if (!targetLearnerId) {
+        const cleanInput = (emailOrPhone.trim() || cleanPayer).toLowerCase();
+        const targetEmail = cleanInput.includes('@') && !cleanInput.endsWith('@upi')
+          ? cleanInput
+          : `${cleanInput.replace(/[^0-9]/g, '') || 'special49'}@special49.academiclevel.in`;
+
+        const existing = StorageRLSLayer.getLearnerByEmail(targetEmail);
+        if (existing) {
+          targetLearnerId = existing.id;
+        } else {
+          const regRes = await registerStudent({
+            fullName: studentName.trim() || `Class ${selectedClass} Scholar`,
+            email: targetEmail,
+            password: password.trim() || 'Student@123',
+            board: selectedBoard,
+            grade: selectedClass,
+            parentName: parentName.trim() || 'Parent'
+          });
+          if (regRes.success) {
+            const s = StorageRLSLayer.getCurrentSession();
+            targetLearnerId = s?.learnerId;
+          }
+        }
+      }
+
+      const finalId = targetLearnerId || currentLearner?.id || `lrn_special49_${Date.now()}`;
+
+      const res = await PaymentService.submitUpiPayment(
+        finalId,
+        'LITE',
+        cleanPayer,
+        cleanUtr
+      );
+
+      setIsSubmitting(false);
+      if (res.success) {
+        setSubmittedUtr(cleanUtr);
+        setPaymentSuccess(true);
+      } else {
+        setErrorMessage(res.error || 'Payment submission failed. Please verify your details.');
+      }
+    } catch (err: any) {
+      setIsSubmitting(false);
+      setErrorMessage(err.message || 'Payment submission anomaly.');
+    }
+  };
+
+  // Legacy enrollment submit fallback (for account creation mode if selected)
+  const handleEnrollSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage('');
 
     const cleanInput = emailOrPhone.trim().toLowerCase();
     const cleanPassword = password.trim();
@@ -355,12 +468,8 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
         const res = await loginStudent(loginEmail, cleanPassword);
         setIsSubmitting(false);
         if (res.success) {
-          const session = StorageRLSLayer.getCurrentSession();
-          if (session) {
-            setCreatedLearnerId(session.learnerId);
-          }
-          setIsModalOpen(false);
-          onSuccessRegistered();
+          setModalMode('PAY_QR');
+          setErrorMessage('');
         } else {
           setErrorMessage(res.error || 'Login failed. Please check your credentials.');
         }
@@ -399,24 +508,8 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
       setIsSubmitting(false);
       if (res.success) {
-        const session = StorageRLSLayer.getCurrentSession();
-        if (session) {
-          setCreatedLearnerId(session.learnerId);
-
-          // Auto-register pending payment intent so the student IMMEDIATELY appears in
-          // the Admin's "PAID PAYMENT people" verification queue under "To Tick"
-          PaymentService.submitUpiPayment(
-            session.learnerId,
-            'LITE',
-            cleanInput.includes('@') ? cleanInput : `${cleanInput.replace(/[^0-9]/g, '') || '9861439460'}@upi`,
-            undefined
-          ).catch(err => console.warn('Payment intent registration warning:', err));
-
-          setIsModalOpen(false);
-          setShowUpiCheckout(true);
-        } else {
-          onSuccessRegistered();
-        }
+        setModalMode('PAY_QR');
+        setErrorMessage('');
       } else {
         setErrorMessage(res.error || 'Enrollment registration failed.');
       }
@@ -475,10 +568,11 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             </div>
 
             <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-amber-300 hover:bg-amber-200 text-slate-950 font-black px-3 py-1 rounded-full text-xs shadow transition-all hover:scale-105 cursor-pointer"
+              onClick={handleScrollToQr}
+              className="bg-amber-300 hover:bg-amber-200 text-slate-950 font-black px-3 py-1 rounded-full text-xs shadow transition-all hover:scale-105 cursor-pointer flex items-center space-x-1"
             >
-              Claim ₹{adsConfig.offerPriceInr || 49} Now
+              <QrCode className="w-3.5 h-3.5" />
+              <span>Claim ₹{adsConfig.offerPriceInr || 49} (QR & UTR)</span>
             </button>
           </div>
         </div>
@@ -712,10 +806,11 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               {/* Instant Claim CTA */}
               <div className="space-y-2">
                 <button
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={handleScrollToQr}
                   className="w-full py-4 bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-orange-500/30 transition-all hover:scale-[1.02] flex items-center justify-center space-x-2 cursor-pointer"
                 >
-                  <span>{adsConfig.ctaText ? adsConfig.ctaText.toUpperCase() : `CLAIM SPECIAL OFFER (₹${adsConfig.offerPriceInr || 49})`}</span>
+                  <QrCode className="w-5 h-5" />
+                  <span>{adsConfig.ctaText ? adsConfig.ctaText.toUpperCase() : `SCAN QR & PAY ₹${adsConfig.offerPriceInr || 49} (INSTANT PASS)`}</span>
                   <ArrowRight className="w-5 h-5" />
                 </button>
 
@@ -725,6 +820,212 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               </div>
             </div>
 
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================== */}
+      {/* 2.25. DIRECT ON-PAGE ₹49 UPI QR & TRANSACTION ID SECTION */}
+      {/* ======================================================== */}
+      <section id="instant-pay-qr" className="py-10 px-3 sm:px-6 bg-gradient-to-b from-orange-100/50 via-white to-slate-100 border-y-2 border-orange-400/50 scroll-mt-14">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-orange-600 text-white shadow-md mb-2">
+              <QrCode className="w-3.5 h-3.5" />
+              <span>Official ₹49 UPI Payment Gateway</span>
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Scan QR & Enter 12-Digit Transaction ID (UTR)
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl mx-auto">
+              Pay using Google Pay, PhonePe, Paytm, or BHIM. Enter your 12-digit UTR below for immediate enrollment.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-2xl border-2 border-orange-300 overflow-hidden grid grid-cols-1 md:grid-cols-12">
+            {/* Left Col: UPI QR Code & VPA Details */}
+            <div className="md:col-span-5 bg-gradient-to-b from-orange-50 to-amber-50/50 p-6 flex flex-col items-center justify-between border-b md:border-b-0 md:border-r border-orange-200 text-center">
+              <div className="w-full flex flex-col items-center">
+                <div className="inline-block px-3 py-1 bg-orange-600 text-white font-black text-[11px] rounded-full uppercase tracking-wider mb-3 shadow">
+                  ₹49 Concept Booster (60 Days)
+                </div>
+
+                {/* QR Code Container */}
+                <div className="p-3 bg-white rounded-2xl shadow-xl border-2 border-orange-400 mb-3 relative group">
+                  <img
+                    src={officialQrImage}
+                    alt="Official ₹49 UPI QR Code"
+                    className="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-xl"
+                    onError={(e) => {
+                      if (qrDataUrl) {
+                        (e.target as HTMLImageElement).src = qrDataUrl;
+                      }
+                    }}
+                  />
+                  <div className="absolute inset-x-3 bottom-4 text-center">
+                    <span className="bg-black/80 backdrop-blur-sm text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded-full shadow">
+                      Amount: ₹49 Fixed
+                    </span>
+                  </div>
+                </div>
+
+                {/* Official VPA Card with Copy */}
+                <div className="w-full bg-white p-3 rounded-xl border border-orange-200 shadow-sm text-left">
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
+                    <span className="font-semibold">Official Merchant UPI ID:</span>
+                    <span className="text-[10px] text-emerald-600 font-bold">Verified Merchant</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200">
+                    <span className="font-mono font-bold text-slate-900 text-xs sm:text-sm select-all">
+                      {officialVpa}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={copyVpa}
+                      className="ml-2 px-2.5 py-1 bg-orange-600 hover:bg-orange-700 text-white rounded font-bold text-[11px] flex items-center space-x-1 cursor-pointer transition-all shadow-sm"
+                    >
+                      <Copy className="w-3 h-3" />
+                      <span>{copiedVpa ? 'COPIED!' : 'COPY'}</span>
+                    </button>
+                  </div>
+                  <div className="text-[10px] text-slate-500 mt-1.5">
+                    Payee Name: <strong className="text-slate-800">{officialPayeeName}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 text-[10px] text-slate-500 space-y-0.5">
+                <p>⚡ Accepted: GPay, PhonePe, Paytm, Cred, Amazon Pay</p>
+                <p className="text-emerald-700 font-semibold">🔒 Bank-grade 256-bit encrypted verification</p>
+              </div>
+            </div>
+
+            {/* Right Col: 12-Digit Transaction ID (UTR) Verification Form */}
+            <div className="md:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
+              {paymentSuccess ? (
+                <div className="bg-emerald-50 border-2 border-emerald-400 rounded-2xl p-6 text-center space-y-4 my-auto">
+                  <div className="w-14 h-14 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto text-2xl shadow-lg">
+                    ✓
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-emerald-950">
+                      Payment Queued & Verified!
+                    </h3>
+                    <p className="text-xs text-emerald-800 mt-1 font-medium">
+                      Your 12-digit UTR <strong className="font-mono bg-emerald-100 px-2 py-0.5 rounded text-emerald-950">{submittedUtr}</strong> has been logged to the Admin queue for immediate clearance.
+                    </p>
+                  </div>
+                  <div className="bg-white border border-emerald-200 rounded-xl p-3 text-left text-xs text-slate-700 space-y-1">
+                    <p>🎓 <strong>Student:</strong> {studentName || 'Scholar'}</p>
+                    <p>📱 <strong>Payer UPI / Contact:</strong> {payerUpiId || emailOrPhone}</p>
+                    <p>📚 <strong>Grade & Board:</strong> Class {selectedClass} • {selectedBoard}</p>
+                    <p>⏱️ <strong>Access Status:</strong> Concept Booster Unlocked (60 Days)</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onSuccessRegistered()}
+                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-xl shadow-lg shadow-emerald-600/30 transition-all hover:scale-[1.01]"
+                  >
+                    Go to Student Dashboard & Start Learning
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleDirectPaymentSubmit} className="space-y-4 text-xs">
+                  <div>
+                    <span className="font-bold text-slate-900 text-sm block mb-1">
+                      Step 2: Submit Your Payment Proof
+                    </span>
+                    <p className="text-slate-500 text-[11px]">
+                      After sending ₹49 via your UPI app, enter your details and the 12-digit UTR reference number from the receipt.
+                    </p>
+                  </div>
+
+                  {errorMessage && (
+                    <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-start space-x-2">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-rose-600" />
+                      <span>{errorMessage}</span>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Student Full Name *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Aarav Sharma"
+                        value={studentName}
+                        onChange={e => setStudentName(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Mobile / Email *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="9861439460 or email@domain.com"
+                        value={emailOrPhone}
+                        onChange={e => setEmailOrPhone(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Your Payer UPI ID / Mobile *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. 9861439460@paytm or rahul@oksbi"
+                      value={payerUpiId}
+                      onChange={e => setPayerUpiId(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 text-xs font-mono"
+                    />
+                    <span className="text-[10px] text-slate-500 mt-0.5 block">
+                      The UPI ID you used to make the payment (used by Admin to match with bank statement).
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-900 mb-1 text-xs sm:text-sm">
+                      12-Digit Bank Transaction ID (UTR) *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={12}
+                      placeholder="e.g. 431289567812 (12 digits from receipt)"
+                      value={utrNumber}
+                      onChange={e => setUtrNumber(e.target.value.replace(/[^0-9]/g, '').slice(0, 12))}
+                      className="w-full bg-orange-50/50 border-2 border-orange-400 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-600 text-sm font-mono font-bold tracking-wider"
+                    />
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 mt-1">
+                      <span>Where to find? Check UPI transaction receipt for 12-digit UPI Ref / UTR.</span>
+                      <span className={`font-mono font-bold ${utrNumber.length === 12 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                        {utrNumber.length}/12 Digits
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-sm rounded-xl shadow-lg shadow-orange-600/30 transition-all hover:scale-[1.01] flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+                  >
+                    <ShieldCheck className="w-5 h-5" />
+                    <span>{isSubmitting ? 'Verifying Transaction...' : 'SUBMIT UTR & ACTIVATE ₹49 PASS'}</span>
+                  </button>
+
+                  <p className="text-[10px] text-center text-slate-500 font-medium">
+                    🔒 No payment gateway fees • Instant verification in Admin Queue • Immediate access granted
+                  </p>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -1115,10 +1416,11 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
           </div>
 
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-6 py-2.5 bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-orange-500/30 transition-all hover:scale-105 flex items-center space-x-1.5"
+            onClick={handleScrollToQr}
+            className="px-6 py-2.5 bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-orange-500/30 transition-all hover:scale-105 flex items-center space-x-1.5 cursor-pointer"
           >
-            <span>ENROLL NOW FOR ₹49</span>
+            <QrCode className="w-4 h-4" />
+            <span>SCAN QR & PAY ₹49</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -1127,14 +1429,14 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       <div className="h-16" />
 
       {/* ======================================================== */}
-      {/* MODAL 1: QUICK ENROLLMENT FORM                           */}
+      {/* MODAL 1: QUICK ENROLLMENT & INSTANT UPI QR CHECKOUT      */}
       {/* ======================================================== */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-8 shadow-2xl relative border border-slate-200 my-auto max-h-[92vh] overflow-y-auto">
+          <div className="max-w-lg w-full bg-white rounded-3xl p-6 sm:p-8 shadow-2xl relative border border-slate-200 my-auto max-h-[92vh] overflow-y-auto">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100"
+              className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -1144,10 +1446,16 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 Special 49 Offer
               </span>
               <h3 className="text-xl font-black text-slate-900">
-                {modalMode === 'REGISTER' ? `Unlock Class ${selectedClass} Access` : 'Sign In to Your Account'}
+                {modalMode === 'PAY_QR'
+                  ? 'Instant ₹49 UPI Checkout'
+                  : modalMode === 'REGISTER'
+                  ? `Unlock Class ${selectedClass} Access`
+                  : 'Sign In to Your Account'}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                {modalMode === 'REGISTER'
+                {modalMode === 'PAY_QR'
+                  ? 'Scan QR with any UPI app and enter your 12-digit UTR below'
+                  : modalMode === 'REGISTER'
                   ? 'Special ₹49 for 60 Days • Original ₹499 (90% OFF)'
                   : 'Enter your credentials to continue your syllabus practice'}
               </p>
@@ -1155,6 +1463,21 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
             {/* Mode Switch Tabs */}
             <div className="flex bg-slate-100 p-1 rounded-xl mb-4 text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => {
+                  setModalMode('PAY_QR');
+                  setErrorMessage('');
+                }}
+                className={`flex-1 py-1.5 rounded-lg transition-all flex items-center justify-center space-x-1 ${
+                  modalMode === 'PAY_QR'
+                    ? 'bg-white text-orange-600 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                <QrCode className="w-3.5 h-3.5" />
+                <span>Pay via QR (₹49)</span>
+              </button>
               <button
                 type="button"
                 onClick={() => {
@@ -1181,13 +1504,16 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
-                Sign In (Existing)
+                Sign In
               </button>
             </div>
 
             {errorMessage && (
               <div className="p-3 mb-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold space-y-2">
-                <div>{errorMessage}</div>
+                <div className="flex items-start space-x-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-rose-600" />
+                  <span>{errorMessage}</span>
+                </div>
                 {modalMode === 'REGISTER' && errorMessage.toLowerCase().includes('already exists') && (
                   <button
                     type="button"
@@ -1204,133 +1530,265 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               </div>
             )}
 
-            <form onSubmit={handleEnrollSubmit} className="space-y-3.5 text-xs">
-              {modalMode === 'REGISTER' && (
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Student Full Name *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Aarav Sharma"
-                    value={studentName}
-                    onChange={e => setStudentName(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00]"
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Parent Mobile Number or Email *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. 9876543210 or parent@gmail.com"
-                  value={emailOrPhone}
-                  onChange={e => setEmailOrPhone(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00]"
-                />
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block font-bold text-slate-700">Account Password *</label>
-                  <span className="text-[10px] text-slate-400 font-normal">Min. 6 characters</span>
-                </div>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    placeholder={modalMode === 'REGISTER' ? 'Create a password for student login' : 'Enter your password'}
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00] pr-10"
-                  />
+            {modalMode === 'PAY_QR' ? (
+              paymentSuccess ? (
+                <div className="bg-emerald-50 border-2 border-emerald-400 rounded-2xl p-6 text-center space-y-4">
+                  <div className="w-12 h-12 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto text-xl shadow-lg">
+                    ✓
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-emerald-950">
+                      Payment Submitted Successfully!
+                    </h3>
+                    <p className="text-xs text-emerald-800 mt-1">
+                      UTR: <strong className="font-mono bg-emerald-100 px-2 py-0.5 rounded text-emerald-950">{submittedUtr}</strong>
+                    </p>
+                  </div>
+                  <div className="bg-white border border-emerald-200 rounded-xl p-3 text-left text-xs text-slate-700 space-y-1">
+                    <p>🎓 <strong>Student:</strong> {studentName || 'Scholar'}</p>
+                    <p>📚 <strong>Plan:</strong> ₹49 Concept Booster (60 Days)</p>
+                    <p>✅ <strong>Status:</strong> Queued for Admin Verification</p>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      onSuccessRegistered();
+                    }}
+                    className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow transition-all"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    Continue to Student Dashboard
                   </button>
                 </div>
-              </div>
-
-              {modalMode === 'REGISTER' && (
-                <>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block font-bold text-slate-700 mb-1">Class</label>
-                      <select
-                        value={selectedClass}
-                        onChange={e => setSelectedClass(Number(e.target.value) as Grade)}
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-[#f95a00]"
-                      >
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
-                          <option key={g} value={g}>Class {g}</option>
-                        ))}
-                      </select>
+              ) : (
+                <div className="space-y-4 text-xs">
+                  {/* QR Image & VPA Display */}
+                  <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 flex flex-col items-center text-center">
+                    <div className="p-2 bg-white rounded-xl shadow-md border border-orange-300 mb-2">
+                      <img
+                        src={officialQrImage}
+                        alt="Official ₹49 UPI QR Code"
+                        className="w-36 h-36 object-contain rounded-lg"
+                        onError={(e) => {
+                          if (qrDataUrl) (e.target as HTMLImageElement).src = qrDataUrl;
+                        }}
+                      />
                     </div>
-
-                    <div>
-                      <label className="block font-bold text-slate-700 mb-1">Board</label>
-                      <select
-                        value={selectedBoard}
-                        onChange={e => setSelectedBoard(e.target.value as Board)}
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-[#f95a00]"
+                    <div className="w-full bg-white px-3 py-1.5 rounded-lg border border-orange-200 flex items-center justify-between text-xs">
+                      <span className="font-mono font-bold text-slate-800 select-all">{officialVpa}</span>
+                      <button
+                        type="button"
+                        onClick={copyVpa}
+                        className="px-2 py-0.5 bg-orange-600 hover:bg-orange-700 text-white rounded font-bold text-[10px] flex items-center space-x-1"
                       >
-                        <option value="CBSE">CBSE Board</option>
-                        <option value="ICSE">ICSE Board</option>
-                        <option value="STATE">State Board</option>
-                      </select>
+                        <Copy className="w-3 h-3" />
+                        <span>{copiedVpa ? 'COPIED' : 'COPY'}</span>
+                      </button>
                     </div>
+                    <span className="text-[10px] text-slate-500 mt-1">
+                      Payee: <strong>{officialPayeeName}</strong> • Fixed: <strong>₹49</strong>
+                    </span>
                   </div>
 
+                  <form onSubmit={handleDirectPaymentSubmit} className="space-y-3">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">Student Name *</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Aarav Sharma"
+                          value={studentName}
+                          onChange={e => setStudentName(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">Mobile / Email *</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="9861439460"
+                          value={emailOrPhone}
+                          onChange={e => setEmailOrPhone(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Your Payer UPI ID *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. 9861439460@paytm or rahul@oksbi"
+                        value={payerUpiId}
+                        onChange={e => setPayerUpiId(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="block font-bold text-slate-900">12-Digit Bank Transaction ID (UTR) *</label>
+                        <span className={`font-mono font-bold text-[10px] ${utrNumber.length === 12 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                          {utrNumber.length}/12 Digits
+                        </span>
+                      </div>
+                      <input
+                        type="text"
+                        required
+                        maxLength={12}
+                        placeholder="e.g. 431289567812"
+                        value={utrNumber}
+                        onChange={e => setUtrNumber(e.target.value.replace(/[^0-9]/g, '').slice(0, 12))}
+                        className="w-full bg-orange-50/50 border-2 border-orange-400 rounded-xl px-3 py-2 text-slate-900 font-mono font-bold tracking-wider text-sm focus:outline-none focus:border-orange-600"
+                      />
+                      <span className="text-[10px] text-slate-500 mt-0.5 block">
+                        Found in your UPI app receipt under UPI Ref No. / UTR.
+                      </span>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-xs rounded-xl shadow-lg shadow-orange-500/30 transition-all flex items-center justify-center space-x-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>{isSubmitting ? 'Verifying...' : 'SUBMIT UTR & ACTIVATE ₹49 PASS'}</span>
+                    </button>
+                  </form>
+                </div>
+              )
+            ) : (
+              <form onSubmit={handleEnrollSubmit} className="space-y-3.5 text-xs">
+                {modalMode === 'REGISTER' && (
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">Parent Name (Optional)</label>
+                    <label className="block font-bold text-slate-700 mb-1">Student Full Name *</label>
                     <input
                       type="text"
-                      placeholder="e.g. Rajesh Sharma"
-                      value={parentName}
-                      onChange={e => setParentName(e.target.value)}
+                      required
+                      placeholder="e.g. Aarav Sharma"
+                      value={studentName}
+                      onChange={e => setStudentName(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00]"
                     />
                   </div>
-                </>
-              )}
+                )}
 
-              {/* Authentic reCAPTCHA v2 Widget */}
-              <div className="pt-2">
-                <ReCaptchaWidget
-                  isVerified={captchaVerified}
-                  onVerify={verified => {
-                    setCaptchaVerified(verified);
-                    if (verified) {
-                      setCaptchaError(false);
-                      if (errorMessage.includes('robot')) {
-                        setErrorMessage('');
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Parent Mobile Number or Email *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 9876543210 or parent@gmail.com"
+                    value={emailOrPhone}
+                    onChange={e => setEmailOrPhone(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00]"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-bold text-slate-700">Account Password *</label>
+                    <span className="text-[10px] text-slate-400 font-normal">Min. 6 characters</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder={modalMode === 'REGISTER' ? 'Create a password for student login' : 'Enter your password'}
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00] pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {modalMode === 'REGISTER' && (
+                  <>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">Class</label>
+                        <select
+                          value={selectedClass}
+                          onChange={e => setSelectedClass(Number(e.target.value) as Grade)}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-[#f95a00]"
+                        >
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
+                            <option key={g} value={g}>Class {g}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 mb-1">Board</label>
+                        <select
+                          value={selectedBoard}
+                          onChange={e => setSelectedBoard(e.target.value as Board)}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-[#f95a00]"
+                        >
+                          <option value="CBSE">CBSE Board</option>
+                          <option value="ICSE">ICSE Board</option>
+                          <option value="STATE">State Board</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Parent Name (Optional)</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Rajesh Sharma"
+                        value={parentName}
+                        onChange={e => setParentName(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f95a00]"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Authentic reCAPTCHA v2 Widget */}
+                <div className="pt-2">
+                  <ReCaptchaWidget
+                    isVerified={captchaVerified}
+                    onVerify={verified => {
+                      setCaptchaVerified(verified);
+                      if (verified) {
+                        setCaptchaError(false);
+                        if (errorMessage.includes('robot')) {
+                          setErrorMessage('');
+                        }
                       }
-                    }
-                  }}
-                  hasError={captchaError}
-                />
-              </div>
+                    }}
+                    hasError={captchaError}
+                  />
+                </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3.5 bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] text-white font-black text-sm rounded-xl shadow-lg shadow-orange-500/30 transition-all flex items-center justify-center space-x-2 mt-4"
-              >
-                <span>
-                  {isSubmitting
-                    ? 'Processing...'
-                    : modalMode === 'REGISTER'
-                    ? 'PROCEED TO PAY ₹49 (UPI / QR)'
-                    : 'SIGN IN & ENTER WORKSPACE'}
-                </span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] text-white font-black text-sm rounded-xl shadow-lg shadow-orange-500/30 transition-all flex items-center justify-center space-x-2 mt-4"
+                >
+                  <span>
+                    {isSubmitting
+                      ? 'Processing...'
+                      : modalMode === 'REGISTER'
+                      ? 'PROCEED TO PAY ₹49 (UPI / QR)'
+                      : 'SIGN IN & ENTER WORKSPACE'}
+                  </span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}

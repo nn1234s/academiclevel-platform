@@ -1,5 +1,6 @@
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../core/storage/StorageRLSLayer';
 import { Learner, Subscription } from '../core/types';
+import { ApiClient } from '../core/api/apiClient';
 
 export const FREE_TIER_MAX_QUIZZES = 25;
 export const FREE_TIER_MAX_LEVELS = 3;
@@ -154,6 +155,10 @@ export class QuotaService {
 
     learner.quizzesCompletedCount = (learner.quizzesCompletedCount || 0) + 1;
     StorageRLSLayer.saveLearner(learner, learnerId);
+    // Background sync to server API
+    ApiClient.updateStudentProgressCounters(learnerId, {
+      quizzesCompletedCount: learner.quizzesCompletedCount
+    }).catch(() => {});
   }
 
   /**
@@ -167,5 +172,9 @@ export class QuotaService {
     const completedLevels = progressList.filter(p => p.isCompleted).length;
     learner.levelsCompletedCount = Math.max(completedLevels, (learner.levelsCompletedCount || 0) + 1);
     StorageRLSLayer.saveLearner(learner, learnerId);
+    // Background sync to server API
+    ApiClient.updateStudentProgressCounters(learnerId, {
+      levelsCompletedCount: learner.levelsCompletedCount
+    }).catch(() => {});
   }
 }

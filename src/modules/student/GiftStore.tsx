@@ -367,8 +367,10 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner,
       coinsCost: selectedLevel.coinsCost,
       deliveryEmail: deliveryEmail.trim(),
       deliveryPhone: deliveryPhone.trim(),
-      upiId: selectedBrand === 'UPI_CASH' && upiIdInput ? upiIdInput.trim() : undefined
-    }).catch(() => {});
+      upiId: selectedBrand === 'UPI_CASH' && upiIdInput ? upiIdInput.trim() : undefined,
+      levelsCount,
+      quizzesCount: Number(learner.quizzesCompletedCount || 0)
+    } as any).catch(() => {});
 
     // 3. Prepare formal email request directed to academiclevels@gmail.com
     const mailSubject = `[Gift Card Claim] Level ${selectedLevel.level} (₹${selectedLevel.rsAmount} ${brandName}) - ${learner.fullName}`;
