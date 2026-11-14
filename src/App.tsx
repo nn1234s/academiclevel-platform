@@ -45,6 +45,7 @@ import { OfflineBankView } from './modules/student/OfflineBankView';
 import { ACodesRedemption } from './modules/student/ACodesRedemption';
 import { UPIQRCheckout } from './modules/student/UPIQRCheckout';
 import { WorldwideScholarships } from './modules/student/WorldwideScholarships';
+import { PokemonVaultHub } from './modules/pokemon/PokemonVaultHub';
 
 // Icons
 import {
@@ -145,6 +146,11 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
     return { route: 'ADMIN_VAULT' };
   }
 
+  // 1.1 Secret Pokemon & Pokedex Vault (/pika, /pikachu, /pokemon, /pokedex)
+  if (p === '/pika' || p === '/pikachu' || p === '/pokemon' || p === '/pokedex') {
+    return { route: 'POKEMON_VAULT' };
+  }
+
   // 2. Advertising & Campaign Landing Pages (Additional Module)
   if (ADS_ROUTES[p]) {
     return { route: 'SPECIAL_49_FUNNEL' };
@@ -192,6 +198,7 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
 function getPathForRoute(route: string): string {
   switch (route) {
     case 'ADMIN_VAULT': return '/adminservice';
+    case 'POKEMON_VAULT': return '/pika';
     case 'SPECIAL_49_FUNNEL': return '/special49';
     case 'ADS_FUNNEL': return '/special49';
     case 'ADVERT1_FUNNEL': return '/special49';
@@ -366,6 +373,21 @@ export const App: React.FC = () => {
         onSuccessRegistered={() => {
           refreshCurrentLearner();
           navigateTo('DASHBOARD');
+        }}
+      />
+    );
+  }
+
+  // Secret Pokemon & Pokedex Arcade (/pika, /pikachu, /pokemon, /pokedex)
+  if (currentRoute === 'POKEMON_VAULT') {
+    return (
+      <PokemonVaultHub
+        onBackToApp={() => {
+          if (isAuthenticated) {
+            navigateTo('DASHBOARD');
+          } else {
+            navigateTo('HOME');
+          }
         }}
       />
     );
