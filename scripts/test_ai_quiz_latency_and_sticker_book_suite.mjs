@@ -35,14 +35,15 @@ assert(dashboardFile.includes('unlockedStickersCount'), 'Must dynamically calcul
 
 console.log('✓ TEST 2 PASSED: Student Dashboard seamlessly opens Leo Sticker Book and tracks real progress\n');
 
-// 3. Verify AI Quiz MaxOutputTokens is 8192 (not limited to 2500)
-console.log('TEST 3: Verify server AI quiz maxOutputTokens is 8192 and timeout accommodates Google latency (7094ms+)');
+// 3. Verify AI Quiz MaxOutputTokens is strictly 2430 (preventing cost overruns/losses) and timeout accommodates Google latency (7094ms+)
+console.log('TEST 3: Verify server AI quiz maxOutputTokens is strictly 2430 and timeout accommodates Google latency (7094ms+)');
 const serverApiContent = fs.readFileSync(path.resolve('server/api.js'), 'utf8');
 
 assert(!serverApiContent.includes('maxOutputTokens: 2500'), 'Must NOT limit maxOutputTokens to 2500');
-assert(serverApiContent.includes('maxOutputTokens: 8192'), 'Must allow up to 8192 output tokens for full quiz generation');
+assert(!serverApiContent.includes('maxOutputTokens: 8192'), 'Must NOT allow 8192 tokens to prevent financial loss');
+assert(serverApiContent.includes('maxOutputTokens: 2430'), 'Must strictly set maxOutputTokens to 2430');
 assert(serverApiContent.includes('callGeminiApiWithFallback(apiKey, bodyPayload, 20000)'), 'Quiz generation must allow 20,000ms timeout for Google latency');
-console.log('✓ TEST 3 PASSED: Server API allows 8192 tokens and 20,000ms timeout\n');
+console.log('✓ TEST 3 PASSED: Server API enforces strict maxOutputTokens: 2430 and 20,000ms timeout\n');
 
 // 4. Verify HybridQuizService and NovaAiService timeouts
 console.log('TEST 4: Verify client race guards accommodate Google latency');

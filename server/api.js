@@ -3687,7 +3687,7 @@ CRITICAL REQUIREMENTS:
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 8192,
+        maxOutputTokens: 2430,
         responseMimeType: 'application/json'
       }
     };
