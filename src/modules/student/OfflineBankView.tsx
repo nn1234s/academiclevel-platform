@@ -36,7 +36,7 @@ export const OfflineBankView: React.FC<OfflineBankViewProps> = ({ learner }) => 
             Offline Question Bank
           </h2>
           <p className="text-xs text-slate-300 mt-1 max-w-md">
-            Guarantees uninterrupted learning even during 2G/3G network drops or AI response timeouts. Automatically activates if network latency exceeds 2,500ms.
+            Guarantees uninterrupted learning even during 2G/3G network drops or connection interruptions. Seamlessly activates whenever offline or when remote network is unavailable.
           </p>
         </div>
 

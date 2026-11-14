@@ -3278,7 +3278,7 @@ async function discoverAvailableGeminiModels(apiKey) {
   for (const ver of versions) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3500);
+      const timeout = setTimeout(() => controller.abort(), 8000);
       const res = await fetch(`https://generativelanguage.googleapis.com/${ver}/models?key=${apiKey}`, {
         signal: controller.signal
       });
@@ -3326,7 +3326,7 @@ async function discoverAvailableGeminiModels(apiKey) {
 }
 
 // Resilient Multi-Model Caller with Automatic Dynamic Discovery & Failover
-async function callGeminiApiWithFallback(apiKey, bodyPayload, timeoutMs = 7000) {
+async function callGeminiApiWithFallback(apiKey, bodyPayload, timeoutMs = 20000) {
   let candidates = await discoverAvailableGeminiModels(apiKey);
 
   const cacheEntry = discoveredModelsCache.get(apiKey);
@@ -3687,12 +3687,12 @@ CRITICAL REQUIREMENTS:
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 2500,
+        maxOutputTokens: 8192,
         responseMimeType: 'application/json'
       }
     };
 
-    const result = await callGeminiApiWithFallback(apiKey, bodyPayload, 7000);
+    const result = await callGeminiApiWithFallback(apiKey, bodyPayload, 20000);
     if (!result.ok) {
       console.warn(`[Hybrid AI] Generation fallback triggered: ${result.error}`);
       return res.json({ success: false, fallback: true, error: result.error });
@@ -3779,7 +3779,7 @@ Keep the response direct, engaging, and under 150 words.`;
       generationConfig: { temperature: 0.4, maxOutputTokens: 400 }
     };
 
-    const result = await callGeminiApiWithFallback(apiKey, bodyPayload, 5000);
+    const result = await callGeminiApiWithFallback(apiKey, bodyPayload, 15000);
     if (!result.ok) return res.json({ success: false, fallback: true });
 
     const explanationText = result.data?.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -3891,7 +3891,7 @@ Rules:
       generationConfig: { temperature: 0.5, maxOutputTokens: 350 }
     };
 
-    const result = await callGeminiApiWithFallback(apiKey, bodyPayload, 5500);
+    const result = await callGeminiApiWithFallback(apiKey, bodyPayload, 15000);
 
     if (!result.ok) {
       if (resolvedLearnerId) consumeStudentAiMessage(resolvedLearnerId);
