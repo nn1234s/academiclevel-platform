@@ -389,6 +389,11 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       return;
     }
 
+    if (!currentLearner && (!password || password.trim().length < 6)) {
+      setErrorMessage('Please create an account password (minimum 6 characters) so you can log into your student account anytime.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       let targetLearnerId = currentLearner?.id;
@@ -403,11 +408,14 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
         const existing = StorageRLSLayer.getLearnerByEmail(targetEmail);
         if (existing) {
           targetLearnerId = existing.id;
+          if (password.trim()) {
+            await loginStudent(targetEmail, password.trim()).catch(() => {});
+          }
         } else {
           const regRes = await registerStudent({
             fullName: studentName.trim() || `Class ${selectedClass} Scholar`,
             email: targetEmail,
-            password: password.trim() || 'Student@123',
+            password: password.trim(),
             board: selectedBoard,
             grade: selectedClass,
             parentName: parentName.trim() || 'Parent'
@@ -972,6 +980,43 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       />
                     </div>
                   </div>
+
+                  {!currentLearner ? (
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block font-bold text-slate-700">Account Password *</label>
+                        <span className="text-[10px] text-slate-400 font-normal">Min. 6 characters to log into your account</span>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          placeholder="Create password for student login"
+                          value={password}
+                          onChange={e => setPassword(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 pr-10 text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-2.5 rounded-xl bg-orange-50 border border-orange-200 text-orange-950 text-xs flex items-center justify-between">
+                      <div>
+                        <span className="font-bold block">Connected Scholar Account:</span>
+                        <span className="text-[11px] text-orange-800">{currentLearner.fullName} ({currentLearner.email})</span>
+                      </div>
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                        Logged In
+                      </span>
+                    </div>
+                  )}
 
                   <div>
                     <label className="block font-bold text-slate-700 mb-1">
@@ -1615,6 +1660,43 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                         />
                       </div>
                     </div>
+
+                    {!currentLearner ? (
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block font-bold text-slate-700">Account Password *</label>
+                          <span className="text-[10px] text-slate-400 font-normal">Min. 6 chars to log in later</span>
+                        </div>
+                        <div className="relative">
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            required
+                            placeholder="Create password for student login"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 pr-10 text-xs"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                          >
+                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-2.5 rounded-xl bg-orange-50 border border-orange-200 text-orange-950 text-xs flex items-center justify-between">
+                        <div>
+                          <span className="font-bold block">Connected Scholar Account:</span>
+                          <span className="text-[11px] text-orange-800">{currentLearner.fullName} ({currentLearner.email})</span>
+                        </div>
+                        <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                          Logged In
+                        </span>
+                      </div>
+                    )}
 
                     <div>
                       <label className="block font-bold text-slate-700 mb-1">Your Payer UPI ID *</label>
