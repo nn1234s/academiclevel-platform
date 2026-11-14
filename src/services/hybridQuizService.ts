@@ -184,7 +184,7 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ role: 'user', parts: [{ text: prompt }] }],
-              generationConfig: { responseMimeType: 'application/json', temperature: 0.3 }
+              generationConfig: { responseMimeType: 'application/json', temperature: 0.3, maxOutputTokens: 2430 }
             }),
             signal: controller.signal
           }
