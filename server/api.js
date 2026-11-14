@@ -1273,15 +1273,51 @@ apiRouter.post('/gifts/redeem', (req, res) => {
     }
 
     // Academic Milestone Validation (Guarantees genuine learning progress)
+    let distinctLevelsCount = 0;
+    let attemptsCount = 0;
+    let totalAttempts = 0;
+    try {
+      distinctLevelsCount = db.prepare(`
+        SELECT count(*) as count FROM course_progress 
+        WHERE learnerId = ? AND (isCompleted = 1 OR passed = 1)
+      `).get(learner.id)?.count || 0;
+      
+      attemptsCount = db.prepare(`
+        SELECT count(*) as count FROM quiz_attempts 
+        WHERE learnerId = ? AND (isPassed = 1 OR score >= 70)
+      `).get(learner.id)?.count || 0;
+
+      totalAttempts = db.prepare(`
+        SELECT count(*) as count FROM quiz_attempts 
+        WHERE learnerId = ?
+      `).get(learner.id)?.count || 0;
+    } catch {}
+
+    const clientLevels = Number(req.body.levelsCount || 0);
+    const clientQuizzes = Number(req.body.quizzesCount || 0);
+
     const levelsCount = Math.max(
       Number(learner.levelsCompletedCount || 0),
-      Number(learner.quizzesCompletedCount || 0)
+      Number(learner.quizzesCompletedCount || 0),
+      distinctLevelsCount,
+      attemptsCount,
+      totalAttempts,
+      clientLevels,
+      clientQuizzes
     );
+
     if (levelsCount < 3 && learner.role !== 'SUPER_ADMIN') {
       return res.status(400).json({
         success: false,
         error: `Proof of Study Milestone: Complete at least 3 curriculum levels with >= 70% score (currently completed: ${levelsCount}/3) before redeeming.`
       });
+    }
+
+    // Keep learner levels and quiz counts reconciled in DB
+    if (levelsCount > Number(learner.levelsCompletedCount || 0)) {
+      try {
+        db.prepare('UPDATE learners SET levelsCompletedCount = ?, updatedAt = datetime("now") WHERE id = ?').run(levelsCount, learner.id);
+      } catch {}
     }
 
     const newBalance = learner.coinBalance - cost;

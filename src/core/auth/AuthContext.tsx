@@ -170,6 +170,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (localLearner && (localLearner.levelsCompletedCount || 0) > (res.learner.levelsCompletedCount || 0)) {
             res.learner.levelsCompletedCount = localLearner.levelsCompletedCount;
           }
+          if (localLearner && (localLearner.quizzesCompletedCount || 0) > (res.learner.quizzesCompletedCount || 0)) {
+            res.learner.quizzesCompletedCount = localLearner.quizzesCompletedCount;
+          }
           if (res.activeSub) {
             StorageRLSLayer.saveSubscription(res.activeSub);
             res.learner.hasActiveSubscription = true;

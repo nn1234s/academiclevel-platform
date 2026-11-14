@@ -165,10 +165,6 @@ function resolveRouteFromPath(path, isAuth, hasPaid = true) {
   const p = path.toLowerCase().replace(/\/$/, '');
   if (p === '/adminservice' || p === '/ops-vault-al99') return { route: 'ADMIN_VAULT' };
   if (ADS_ROUTES[p]) {
-    if (isAuth) {
-      if (hasPaid || p === '/ad' || p === '/ads') return { route: 'DASHBOARD' };
-      return { route: 'PREMIUM' };
-    }
     return { route: 'SPECIAL_49_FUNNEL' };
   }
   if (p === '/pricing') return { route: 'PRICING' };
@@ -203,21 +199,21 @@ check('Authenticated students access /certificates, /nova-ai, /profile directly 
 );
 
 // ----------------------------------------------------
-// TEST 8: Ads route /special49 redirects already paid students to DASHBOARD
+// TEST 8: Ads routes (/special49, /offer) stay on SPECIAL_49_FUNNEL without throwing to homepage
 // ----------------------------------------------------
 const adAuthPaidSpecial49 = resolveRouteFromPath('/special49', true, true);
 const adAuthPaidOffer = resolveRouteFromPath('/offer', true, true);
 const adAuthUnpaidSpecial49 = resolveRouteFromPath('/special49', true, false);
-check('Already paid students visiting /special49 or /offer go directly to DASHBOARD',
-  adAuthPaidSpecial49.route === 'DASHBOARD' && adAuthPaidOffer.route === 'DASHBOARD' && adAuthUnpaidSpecial49.route === 'PREMIUM'
+check('All users visiting /special49 or /offer can view SPECIAL_49_FUNNEL without being thrown to homepage',
+  adAuthPaidSpecial49.route === 'SPECIAL_49_FUNNEL' && adAuthPaidOffer.route === 'SPECIAL_49_FUNNEL' && adAuthUnpaidSpecial49.route === 'SPECIAL_49_FUNNEL'
 );
 
 // ----------------------------------------------------
-// TEST 9: Additional Module - Ad page /ad redirects authenticated students to DASHBOARD
+// TEST 9: Additional Module - Ad page /ad remains accessible as SPECIAL_49_FUNNEL
 // ----------------------------------------------------
 const adAuthGeneric = resolveRouteFromPath('/ad', true);
-check('Additional Module: Authenticated student visiting /ad is redirected to DASHBOARD',
-  adAuthGeneric.route === 'DASHBOARD'
+check('Additional Module: Authenticated student visiting /ad sees SPECIAL_49_FUNNEL',
+  adAuthGeneric.route === 'SPECIAL_49_FUNNEL'
 );
 
 // ----------------------------------------------------

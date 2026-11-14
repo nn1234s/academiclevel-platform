@@ -147,13 +147,6 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
 
   // 2. Advertising & Campaign Landing Pages (Additional Module)
   if (ADS_ROUTES[p]) {
-    if (isAuth) {
-      // For those who already paid, the ads page must go to DASHBOARD!
-      if (checkHasPaidSubscription() || p === '/ad' || p === '/ads') {
-        return { route: 'DASHBOARD' };
-      }
-      return { route: 'PREMIUM' };
-    }
     return { route: 'SPECIAL_49_FUNNEL' };
   }
 
@@ -368,23 +361,6 @@ export const App: React.FC = () => {
     currentRoute === 'ADVERT1_FUNNEL' ||
     currentRoute === 'YT_ADS_FUNNEL'
   ) {
-    // If student is already authenticated, intelligently direct them to Dashboard or Premium Center
-    // For those who already paid, the ads page goes to DASHBOARD!
-    if (isAuthenticated) {
-      const hasPaid = Boolean(
-        currentLearner?.hasActiveSubscription ||
-        (currentLearner as any)?.activeSub ||
-        checkHasPaidSubscription()
-      );
-
-      if (hasPaid) {
-        navigateTo('DASHBOARD');
-      } else {
-        navigateTo('PREMIUM');
-      }
-      return null;
-    }
-
     return (
       <Special49AdsLandingPage
         onSuccessRegistered={() => {
