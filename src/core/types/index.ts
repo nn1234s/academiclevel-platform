@@ -190,6 +190,9 @@ export interface ACode {
   createdBy: string;
   expiresAt: string;
   createdAt: string;
+  maxUses?: number;
+  usedCount?: number;
+  usesRemaining?: number;
 }
 
 export interface Friendship {
@@ -239,6 +242,22 @@ export interface AuditLogEntry {
   details: string;
 }
 
+export interface ScholarshipAwardRank {
+  learnerId: string;
+  learnerName: string;
+  learnerEmail?: string;
+  accuracy: number;
+  coins: number;
+  acode: string;
+  awardedAt: string;
+}
+
+export interface ScholarshipAwards {
+  first?: ScholarshipAwardRank;
+  second?: ScholarshipAwardRank;
+  third?: ScholarshipAwardRank;
+}
+
 export interface Scholarship {
   id: string;
   title: string;
@@ -257,6 +276,9 @@ export interface Scholarship {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+  acode?: string;
+  awards?: ScholarshipAwards;
+  awardsJson?: string;
 }
 
 export interface ScholarshipClaim {
@@ -268,6 +290,9 @@ export interface ScholarshipClaim {
   learnerEmail?: string;
   coinsAwarded: number;
   claimedAt: string;
+  accuracy?: number;
+  awardedRank?: '1st' | '2nd' | '3rd' | 'PARTICIPANT';
+  acodeAwarded?: string;
 }
 
 export interface SystemMetrics {

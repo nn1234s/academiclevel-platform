@@ -577,4 +577,35 @@ export class ApiClient {
       headers: this.adminHeaders(adminEmail)
     });
   }
+
+  public static async adminAwardScholarshipPodium(
+    adminEmail: string,
+    scholarshipId: string,
+    awards: {
+      first?: { learnerId: string; coins?: number; planTier?: string; durationDays?: number; accuracy?: number };
+      second?: { learnerId: string; coins?: number; planTier?: string; durationDays?: number; accuracy?: number };
+      third?: { learnerId: string; coins?: number; planTier?: string; durationDays?: number; accuracy?: number };
+    }
+  ): Promise<{ success: boolean; message: string; awards: any }> {
+    return this.request(`/admin/scholarships/${scholarshipId}/awards`, {
+      method: 'POST',
+      headers: this.adminHeaders(adminEmail),
+      body: JSON.stringify(awards)
+    });
+  }
+
+  public static async getLearnerACodes(learnerId: string): Promise<{ success: boolean; acodes: any[] }> {
+    return this.request(`/learners/${learnerId}/acodes`);
+  }
+
+  public static async generateLearnerACode(
+    learnerId: string,
+    planTier: 'LITE' | 'PLUS' = 'LITE',
+    durationDays: number = 7
+  ): Promise<{ success: boolean; message: string; acode: any }> {
+    return this.request(`/learners/${learnerId}/acodes/generate`, {
+      method: 'POST',
+      body: JSON.stringify({ planTier, durationDays })
+    });
+  }
 }

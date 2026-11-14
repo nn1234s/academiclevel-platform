@@ -723,10 +723,149 @@ class StorageRLSLayerClass {
 
   public saveScholarshipClaim(claim: ScholarshipClaim): void {
     const all = this.getScholarshipClaims();
-    if (!all.some(c => c.scholarshipId === claim.scholarshipId && c.learnerId === claim.learnerId)) {
+    const idx = all.findIndex(c => c.scholarshipId === claim.scholarshipId && c.learnerId === claim.learnerId);
+    if (idx >= 0) {
+      all[idx] = { ...all[idx], ...claim };
+    } else {
       all.unshift(claim);
-      this.writeRaw(STORAGE_KEYS.SCHOLARSHIP_CLAIMS, all);
     }
+    this.writeRaw(STORAGE_KEYS.SCHOLARSHIP_CLAIMS, all);
+  }
+
+  public awardScholarshipPodium(
+    adminEmail: string,
+    scholarshipId: string,
+    awardsInput: { first?: any; second?: any; third?: any }
+  ): { success: boolean; awards: any } {
+    if (!this.isAdminAuthorized(adminEmail)) {
+      throw new Error('403 Forbidden');
+    }
+
+    const sch = this.getAllScholarships().find(s => s.id === scholarshipId);
+    if (!sch) throw new Error('Scholarship not found');
+
+    const now = new Date();
+    const awards: any = {};
+
+    const processRank = (rankKey: string, rankTitle: string, rankData: any, defaultCoins: number, defaultTier: 'LITE' | 'PLUS', defaultDays: number) => {
+      if (!rankData || !rankData.learnerId) return;
+      const learner = this.getLearnerById(rankData.learnerId, adminEmail);
+      if (!learner) return;
+
+      const coins = Number(rankData.coins) || defaultCoins;
+      const planTier = (rankData.planTier as 'LITE' | 'PLUS') || defaultTier;
+      const durationDays = Number(rankData.durationDays) || defaultDays;
+
+      const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const num = Math.floor(1000 + Math.random() * 9000);
+      const acodeKey = `AL-WIN${rankTitle.replace(/[^0-9]/g, '') || '1'}-${rand}-${num}`;
+
+      // Save ACode
+      const acodeObj: ACode = {
+        code: acodeKey,
+        planTier,
+        durationDays,
+        isRedeemed: false,
+        createdBy: `SCHOLARSHIP_${rankKey.toUpperCase()}_AWARD`,
+        expiresAt: new Date(now.getTime() + 180 * 86400000).toISOString(),
+        createdAt: now.toISOString()
+      };
+      this.saveACode(acodeObj);
+
+      // Credit Coins
+      learner.coinBalance = (learner.coinBalance || 0) + coins;
+      this.saveLearner(learner, adminEmail);
+
+      // Update or create claim
+      this.saveScholarshipClaim({
+        id: 'clm_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+        scholarshipId,
+        scholarshipTitle: sch.title,
+        learnerId: learner.id,
+        learnerName: learner.fullName,
+        learnerEmail: learner.email,
+        coinsAwarded: coins,
+        claimedAt: now.toISOString(),
+        accuracy: Number(rankData.accuracy) || 0,
+        awardedRank: rankTitle as any,
+        acodeAwarded: acodeKey
+      });
+
+      awards[rankKey] = {
+        learnerId: learner.id,
+        learnerName: learner.fullName,
+        learnerEmail: learner.email,
+        accuracy: Number(rankData.accuracy) || 0,
+        coins,
+        acode: acodeKey,
+        planTier,
+        durationDays,
+        awardedAt: now.toISOString()
+      };
+    };
+
+    processRank('first', '1st', awardsInput.first, 500, 'PLUS', 180);
+    processRank('second', '2nd', awardsInput.second, 300, 'LITE', 60);
+    processRank('third', '3rd', awardsInput.third, 150, 'LITE', 30);
+
+    sch.awards = awards;
+    sch.awardsJson = JSON.stringify(awards);
+    sch.updatedAt = now.toISOString();
+    this.saveScholarship(sch);
+
+    return { success: true, awards };
+  }
+
+  public getLearnerACodes(learnerId: string): ACode[] {
+    const all = this.readRaw<ACode[]>(STORAGE_KEYS.ACODES, []);
+    const learnerCodes = all.filter(c => c.createdBy === learnerId);
+    if (learnerCodes.length === 0) {
+      const starterCodes: ACode[] = [];
+      const now = new Date();
+      for (let i = 0; i < 3; i++) {
+        const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const num = Math.floor(1000 + Math.random() * 9000);
+        const code = `AL-FRND-${rand}-${num}`;
+        const acode: ACode = {
+          code,
+          planTier: 'LITE',
+          durationDays: 7,
+          isRedeemed: false,
+          createdBy: learnerId,
+          expiresAt: new Date(now.getTime() + 90 * 86400000).toISOString(),
+          createdAt: now.toISOString()
+        };
+        starterCodes.push(acode);
+        all.push(acode);
+      }
+      this.writeRaw(STORAGE_KEYS.ACODES, all);
+      return starterCodes;
+    }
+    return learnerCodes;
+  }
+
+  public generateLearnerACode(
+    learnerId: string,
+    durationDays: number = 7,
+    planTier: 'LITE' | 'PLUS' = 'LITE'
+  ): ACode {
+    const all = this.readRaw<ACode[]>(STORAGE_KEYS.ACODES, []);
+    const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const num = Math.floor(1000 + Math.random() * 9000);
+    const code = `AL-FRND-${rand}-${num}`;
+    const now = new Date();
+    const acode: ACode = {
+      code,
+      planTier,
+      durationDays,
+      isRedeemed: false,
+      createdBy: learnerId,
+      expiresAt: new Date(now.getTime() + 90 * 86400000).toISOString(),
+      createdAt: now.toISOString()
+    };
+    all.unshift(acode);
+    this.writeRaw(STORAGE_KEYS.ACODES, all);
+    return acode;
   }
 
   // ==========================================

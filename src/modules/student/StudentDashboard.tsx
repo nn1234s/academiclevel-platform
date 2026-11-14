@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../core/auth/AuthContext';
-import { Learner, Board, Grade, Subject } from '../../core/types';
+import { Learner, Board, Grade, Subject, GiftRequest } from '../../core/types';
+import { ApiClient } from '../../core/api/apiClient';
+import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { QuotaService } from '../../services/quotaService';
 import { CurriculumService } from '../../services/curriculumService';
 import { CLASS_THEMES, getClassTheme } from '../../core/theme/classThemes';
@@ -29,7 +31,10 @@ import {
   Rocket,
   Atom,
   HelpCircle,
-  BarChart3
+  BarChart3,
+  Gift,
+  Copy,
+  ExternalLink
 } from 'lucide-react';
 
 interface StudentDashboardProps {
@@ -49,9 +54,103 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 }) => {
   const { refreshCurrentLearner } = useAuth();
 
+  // Dispatched Gift Cards State & Automatic Backend Sync
+  const [dispatchedGifts, setDispatchedGifts] = useState<GiftRequest[]>(() => {
+    return StorageRLSLayer.getGiftRequestsForLearner(learner.id).filter(
+      r => r.status === 'APPROVED_DISPATCHED'
+    );
+  });
+  const [copiedGiftCode, setCopiedGiftCode] = useState<string | null>(null);
+
   useEffect(() => {
     refreshCurrentLearner();
-  }, []);
+    const fetchGifts = async () => {
+      try {
+        const res = await ApiClient.getMyGifts(learner.id);
+        if (res && res.success && Array.isArray(res.requests)) {
+          res.requests.forEach(r => StorageRLSLayer.saveGiftRequest(r));
+          const dispatched = res.requests.filter(r => r.status === 'APPROVED_DISPATCHED');
+          setDispatchedGifts(dispatched);
+          return;
+        }
+      } catch {
+        // Fallback to local storage
+      }
+      const local = StorageRLSLayer.getGiftRequestsForLearner(learner.id).filter(
+        r => r.status === 'APPROVED_DISPATCHED'
+      );
+      setDispatchedGifts(local);
+    };
+    fetchGifts();
+  }, [learner.id]);
+
+  const handleCopyGiftCode = (code: string, id: string) => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code);
+      } else {
+        const el = document.createElement('textarea');
+        el.value = code;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+      }
+      setCopiedGiftCode(id);
+      setTimeout(() => setCopiedGiftCode(null), 3000);
+    } catch (e) {
+      console.error('Clipboard copy error:', e);
+    }
+  };
+
+  const getExtractedVoucherCode = (req: GiftRequest): string => {
+    if (req.voucherCode && req.voucherCode.trim()) return req.voucherCode.trim();
+    const match = req.shippingAddress?.match(/Voucher Code:\s*([^\s|]+)/i);
+    if (match && match[1]) return match[1].trim();
+    return 'AL-GC-DISPATCHED';
+  };
+
+  const getGiftBrandHelp = (title: string) => {
+    const t = (title || '').toLowerCase();
+    if (t.includes('amazon')) {
+      return {
+        brand: 'Amazon Pay',
+        emoji: '📦',
+        url: 'https://www.amazon.in/addgiftcard',
+        instructions: 'Open Amazon App → Amazon Pay → Add Gift Card to balance, paste code.'
+      };
+    }
+    if (t.includes('google') || t.includes('play')) {
+      return {
+        brand: 'Google Play',
+        emoji: '🎮',
+        url: 'https://play.google.com/redeem',
+        instructions: 'Open Google Play Store → Profile → Payments & subscriptions → Redeem code.'
+      };
+    }
+    if (t.includes('flipkart')) {
+      return {
+        brand: 'Flipkart',
+        emoji: '🛍️',
+        url: 'https://www.flipkart.com',
+        instructions: 'Open Flipkart App → Account → My Cards & Wallet → Add Flipkart Gift Card.'
+      };
+    }
+    if (t.includes('swiggy') || t.includes('zomato')) {
+      return {
+        brand: 'Swiggy / Zomato',
+        emoji: '🍕',
+        url: 'https://www.swiggy.com',
+        instructions: 'Open Swiggy App → Account → Swiggy Money → Add Gift Card / Voucher.'
+      };
+    }
+    return {
+      brand: 'Direct UPI Transfer',
+      emoji: '💸',
+      url: '',
+      instructions: 'Direct cash transfer processed to your UPI address. Check your UPI app!'
+    };
+  };
   const isSuperAdmin = learner.role === 'SUPER_ADMIN';
   // Normal students always see the UI according to their sign up class (learner.grade)
   const activeGrade: Grade = (isSuperAdmin && activeGradeOverride) ? activeGradeOverride : (learner.grade || 10);
@@ -146,6 +245,133 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
         </div>
       </div>
+
+      {/* 2.5 Celebratory Dispatched Gift Cards & Rewards Showcase */}
+      {dispatchedGifts.length > 0 && (
+        <div className="bg-gradient-to-r from-emerald-950/70 via-slate-900 to-amber-950/60 border-2 border-emerald-500/50 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+          <div className="relative z-10 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center space-x-2">
+                  <span className="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 shadow-sm">
+                    <Gift className="w-3.5 h-3.5" />
+                    <span>Official Reward Dispatched</span>
+                  </span>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-500/40">
+                    {dispatchedGifts.length} {dispatchedGifts.length === 1 ? 'Reward' : 'Rewards'} Ready
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-white mt-1.5 flex items-center space-x-2">
+                  <span>🎁 Your Dispatched Gift Cards & Rewards</span>
+                </h2>
+                <p className="text-xs text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
+                  Congratulations! Your academic milestone redemption has been verified and fulfilled by the admin team. Use the real voucher codes below to redeem your balance immediately.
+                </p>
+              </div>
+
+              <button
+                onClick={() => onNavigate('GIFT_STORE')}
+                className="px-3.5 py-2 bg-slate-950/80 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs font-bold text-emerald-300 flex items-center space-x-1.5 transition-all self-start sm:self-auto flex-shrink-0"
+              >
+                <span>Gift Card Arena</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+              {dispatchedGifts.map((gift) => {
+                const voucherCode = getExtractedVoucherCode(gift);
+                const help = getGiftBrandHelp(gift.itemTitle);
+                const isCopied = copiedGiftCode === gift.id;
+
+                return (
+                  <div
+                    key={gift.id}
+                    className="bg-slate-950/90 border border-emerald-500/40 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4 relative group hover:border-emerald-400 transition-colors"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 flex items-center space-x-1.5">
+                          <span className="text-base">{help.emoji}</span>
+                          <span>{help.brand}</span>
+                        </span>
+                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center space-x-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>Active & Verified</span>
+                        </span>
+                      </div>
+
+                      <h3 className="text-base font-black text-white group-hover:text-amber-300 transition-colors">
+                        {gift.itemTitle}
+                      </h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        Claimed with {gift.coinsCost.toLocaleString()} Study Coins
+                      </p>
+                    </div>
+
+                    {/* Voucher Code Box */}
+                    <div className="bg-slate-900 border-2 border-amber-500/50 rounded-xl p-3.5 shadow-inner">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 flex items-center space-x-1">
+                          <Sparkles className="w-3 h-3 text-amber-400" />
+                          <span>Official Voucher Code / PIN</span>
+                        </span>
+                        <span className="text-[9px] font-mono text-slate-400">100% Verified</span>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                        <code className="text-base sm:text-lg font-mono font-black text-amber-300 tracking-wider select-all break-all bg-black/40 px-3 py-1.5 rounded-lg border border-amber-500/30">
+                          {voucherCode}
+                        </code>
+
+                        <button
+                          onClick={() => handleCopyGiftCode(voucherCode, gift.id)}
+                          className={`px-3.5 py-2 font-black text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 active:scale-95 ${
+                            isCopied
+                              ? 'bg-emerald-500 text-slate-950 font-black'
+                              : 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950'
+                          }`}
+                        >
+                          {isCopied ? (
+                            <>
+                              <Check className="w-4 h-4" />
+                              <span>Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-4 h-4" />
+                              <span>Copy Code</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Redemption Instructions & Link */}
+                    <div className="pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {help.instructions}
+                      </p>
+
+                      {help.url && (
+                        <a
+                          href={help.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center space-x-1 text-emerald-400 hover:text-emerald-300 font-bold text-xs flex-shrink-0 self-start sm:self-auto hover:underline"
+                        >
+                          <span>Redeem on {help.brand}</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 3. Class-Specific Specialized Feature Widget */}
       {theme.stage === 'PRIMARY' ? (

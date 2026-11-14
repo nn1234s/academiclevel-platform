@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Learner, GiftRequest } from '../../core/types';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { CoinLedgerService } from '../../services/coinLedgerService';
@@ -199,7 +199,27 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner,
   const levelsCount = Math.floor((learner.quizzesCompletedCount || 0) / 5);
   const hasAcademicMilestone = levelsCount >= minLevelsRequired || learner.role === 'SUPER_ADMIN';
 
-  const existingRequests = StorageRLSLayer.getGiftRequestsForLearner(learner.id);
+  const [existingRequests, setExistingRequests] = useState<GiftRequest[]>(() =>
+    StorageRLSLayer.getGiftRequestsForLearner(learner.id)
+  );
+
+  useEffect(() => {
+    const fetchGifts = async () => {
+      try {
+        const res = await ApiClient.getMyGifts(learner.id);
+        if (res && res.success && Array.isArray(res.requests)) {
+          res.requests.forEach(r => StorageRLSLayer.saveGiftRequest(r));
+          setExistingRequests(res.requests);
+          return;
+        }
+      } catch {
+        // Fallback to local
+      }
+      const local = StorageRLSLayer.getGiftRequestsForLearner(learner.id);
+      setExistingRequests(local);
+    };
+    fetchGifts();
+  }, [learner.id]);
 
   // Calculate progress toward next reachable level
   const nextTargetLevel = GIFT_CARD_LEVELS.find(l => l.coinsCost > learner.coinBalance) || GIFT_CARD_LEVELS[0];
@@ -317,6 +337,7 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner,
     };
 
     StorageRLSLayer.saveGiftRequest(newRequest);
+    setExistingRequests(prev => [newRequest, ...prev]);
 
     // Sync redemption to server database queue
     ApiClient.redeemGift({

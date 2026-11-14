@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Board, Grade } from '../../core/types';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
+import { KidFounderGlazeShowcase } from '../shared/KidFounderGlazeShowcase';
 import { SiteConfigService } from '../../services/siteConfigService';
 import {
   Sparkles,
@@ -258,6 +259,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <span>Offline Question Bank Fallback</span>
           </div>
         </div>
+      </section>
+
+      {/* 1.5. FOUNDER CREDENTIALS & CERTIFICATION GLAZE */}
+      <section className="max-w-6xl mx-auto px-4">
+        <KidFounderGlazeShowcase theme="dark" variant="full" />
       </section>
 
       {/* 2. MOST POPULAR CONCEPT BOOSTER COURSE (ADVERT1 MIX) */}
