@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Board, Grade } from '../../core/types';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
+import { SiteConfigService } from '../../services/siteConfigService';
 import {
   Sparkles,
   Zap,
@@ -41,6 +42,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [selectedBoard, setSelectedBoard] = useState<Board>('CBSE');
   const [selectedGrade, setSelectedGrade] = useState<Grade>(10);
   const [activeTab, setActiveTab] = useState<'ALL' | 'PARENTS' | 'STUDENTS'>('ALL');
+  const [homeConfig, setHomeConfig] = useState(() => SiteConfigService.getHome());
+  const [pricingConfig, setPricingConfig] = useState(() => SiteConfigService.getPricing());
+
+  useEffect(() => {
+    return SiteConfigService.subscribe(() => {
+      setHomeConfig(SiteConfigService.getHome());
+      setPricingConfig(SiteConfigService.getPricing());
+    });
+  }, []);
 
   const handleHallOfFameClick = (e: React.MouseEvent) => {
     if (onNavigate) {
@@ -144,6 +154,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-10 right-10 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
+        {/* Announcement Ticker from CMS */}
+        {homeConfig.announcementActive && homeConfig.announcementText && (
+          <div className="mb-6 inline-flex items-center space-x-2 px-4 py-2 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold animate-in fade-in duration-300 max-w-2xl mx-auto shadow-md">
+            <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0" />
+            <span>{homeConfig.announcementText}</span>
+          </div>
+        )}
+
         {/* Top Badges Ribbon */}
         <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
           <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-bold bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 backdrop-blur-md shadow-xs">
@@ -175,15 +193,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         {/* Main Hero Header */}
         <div className="space-y-4 max-w-4xl mx-auto">
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-tight">
-            Most Elite AI Quiz Platform. <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-indigo-400">
-              Supercharged with AI.
-            </span>
+            {homeConfig.heroTitle ? (
+              <span>{homeConfig.heroTitle}</span>
+            ) : (
+              <>
+                Most Elite AI Quiz Platform. <br className="hidden sm:inline" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-indigo-400">
+                  Supercharged with AI.
+                </span>
+              </>
+            )}
           </h1>
 
           <p className="text-base sm:text-xl text-slate-200 font-medium max-w-3xl mx-auto leading-relaxed">
-            Live Interaction. Deeper Learning. Stronger Results. <br className="hidden sm:inline" />
-            <span className="text-indigo-300 font-semibold">India’s Smartest AI Socratic Engine</span> knows your gaps and solves them fast. All subjects, one platform, real academic progress.
+            {homeConfig.heroSubtitle || (
+              <>
+                Live Interaction. Deeper Learning. Stronger Results. <br className="hidden sm:inline" />
+                <span className="text-indigo-300 font-semibold">India’s Smartest AI Socratic Engine</span> knows your gaps and solves them fast. All subjects, one platform, real academic progress.
+              </>
+            )}
           </p>
         </div>
 
@@ -194,7 +222,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="w-6 h-6 rounded-full bg-amber-500 border border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">12K</div>
             <div className="w-6 h-6 rounded-full bg-emerald-500 border border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">★</div>
           </div>
-          <span>Trusted by <strong className="text-white">4,000+ Students</strong> across India</span>
+          <span>Trusted by <strong className="text-white">{homeConfig.statsStudents || '10,000+ Students'}</strong> across India</span>
         </div>
 
         {/* Action CTAs */}
@@ -675,12 +703,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-bold text-slate-300">LITE PLAN</span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-500/20 text-indigo-300">
-                  60 Days
+                  {pricingConfig.liteDurationDays || 60} Days
                 </span>
               </div>
               <div className="flex items-baseline space-x-1 mb-4">
-                <span className="text-4xl font-black text-white">₹49</span>
-                <span className="text-xs text-slate-400">/ 60 days</span>
+                <span className="text-4xl font-black text-white">₹{pricingConfig.litePriceInr || 49}</span>
+                <span className="text-xs text-slate-400">/ {pricingConfig.liteDurationDays || 60} days</span>
               </div>
               <ul className="space-y-2 text-xs text-slate-300">
                 <li className="flex items-center space-x-2">
@@ -701,7 +729,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               onClick={() => onOpenAuth('REGISTER')}
               className="mt-6 w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer"
             >
-              Get Started with Lite
+              Get Started with Lite (₹{pricingConfig.litePriceInr || 49})
             </button>
           </div>
 
@@ -713,17 +741,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-bold text-indigo-300">PLUS PLAN</span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
-                  180 Days
+                  {pricingConfig.plusDurationDays || 180} Days
                 </span>
               </div>
               <div className="flex items-baseline space-x-1 mb-4">
-                <span className="text-4xl font-black text-white">₹129</span>
-                <span className="text-xs text-slate-400">/ 180 days (~₹21/mo)</span>
+                <span className="text-4xl font-black text-white">₹{pricingConfig.plusPriceInr || 129}</span>
+                <span className="text-xs text-slate-400">/ {pricingConfig.plusDurationDays || 180} days (~₹{Math.round((pricingConfig.plusPriceInr || 129) / ((pricingConfig.plusDurationDays || 180) / 30))}/mo)</span>
               </div>
               <ul className="space-y-2 text-xs text-slate-200">
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span>Full 180-Day Unlimited Access</span>
+                  <span>Full {pricingConfig.plusDurationDays || 180}-Day Unlimited Access</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
@@ -739,7 +767,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               onClick={() => onOpenAuth('REGISTER')}
               className="mt-6 w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all cursor-pointer"
             >
-              Unlock Plus Plan
+              Unlock Plus Plan (₹{pricingConfig.plusPriceInr || 129})
             </button>
           </div>
         </div>

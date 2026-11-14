@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
+import { SiteConfigService } from '../../services/siteConfigService';
 import {
   Star,
   Check,
@@ -271,6 +272,13 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const [tickerIndex, setTickerIndex] = useState(0);
   const [secondsRemaining, setSecondsRemaining] = useState(847);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [adsConfig, setAdsConfig] = useState(() => SiteConfigService.getAds());
+
+  useEffect(() => {
+    return SiteConfigService.subscribe(() => {
+      setAdsConfig(SiteConfigService.getAds());
+    });
+  }, []);
 
   // Quick enroll modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -452,10 +460,10 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               <span>Special Offer</span>
             </span>
             <span className="font-extrabold hidden sm:inline">
-              Special 49 Offer • Original Price ₹499 (90% OFF)
+              {adsConfig.urgentNotice || `Special ${adsConfig.offerPriceInr || 49} Offer • Original Price ₹${adsConfig.originalPriceInr || 999} (${adsConfig.discountPercent || 95}% OFF)`}
             </span>
             <span className="font-bold sm:hidden">
-              Special 49 Offer (Orig. ₹499)
+              Special ₹{adsConfig.offerPriceInr || 49} (Orig. ₹{adsConfig.originalPriceInr || 999})
             </span>
           </div>
 
@@ -467,9 +475,9 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
             <button
               onClick={() => setIsModalOpen(true)}
-              className="bg-amber-300 hover:bg-amber-200 text-slate-950 font-black px-3 py-1 rounded-full text-xs shadow transition-all hover:scale-105"
+              className="bg-amber-300 hover:bg-amber-200 text-slate-950 font-black px-3 py-1 rounded-full text-xs shadow transition-all hover:scale-105 cursor-pointer"
             >
-              Claim ₹49 Now
+              Claim ₹{adsConfig.offerPriceInr || 49} Now
             </button>
           </div>
         </div>
@@ -498,10 +506,10 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   </div>
 
                   <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-snug text-white">
-                    CONCEPT BOOSTER COURSE
+                    {adsConfig.mainHeading || 'CONCEPT BOOSTER COURSE'}
                   </h1>
                   <p className="text-xs sm:text-sm font-bold text-[#ffea79] mt-0.5">
-                    Unlock Potential to Score 100% with AI Adaptive Quizzes
+                    {adsConfig.subHeading || 'Unlock Potential to Score 100% with AI Adaptive Quizzes'}
                   </p>
 
                   {/* Live Enrolled Student Pill */}
@@ -604,28 +612,28 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <div className="bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-red-500/10 border-2 border-orange-500/40 rounded-3xl p-5 mb-6 text-center relative overflow-hidden">
                   <div className="absolute top-2 right-2">
                     <span className="px-2 py-0.5 bg-red-600 text-white font-black text-[9px] uppercase tracking-wider rounded-md animate-pulse">
-                      Save 90%
+                      Save {adsConfig.discountPercent || 95}%
                     </span>
                   </div>
 
                   <span className="text-[11px] font-black uppercase tracking-wider text-orange-600 block">
-                    Special 49 Scholar Pricing
+                    Special {adsConfig.offerPriceInr || 49} Scholar Pricing
                   </span>
 
                   <div className="mt-2 flex items-baseline justify-center space-x-3">
                     <span className="text-sm font-bold text-slate-400 line-through">
-                      ₹499
+                      ₹{adsConfig.originalPriceInr || 999}
                     </span>
                     <span className="text-4xl sm:text-5xl font-black text-[#f95a00]">
-                      ₹49
+                      ₹{adsConfig.offerPriceInr || 49}
                     </span>
                     <span className="text-xs font-bold text-slate-600">
-                      / 60 Days
+                      / {adsConfig.guaranteeDays || 60} Days
                     </span>
                   </div>
 
                   <p className="text-[11px] text-slate-500 mt-1">
-                    Just ₹0.81 per day. Unlimited practice quizzes across all subjects.
+                    Just ₹{((adsConfig.offerPriceInr || 49) / (adsConfig.guaranteeDays || 60)).toFixed(2)} per day. Unlimited practice quizzes across all subjects.
                   </p>
                 </div>
 
@@ -706,7 +714,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   onClick={() => setIsModalOpen(true)}
                   className="w-full py-4 bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-orange-500/30 transition-all hover:scale-[1.02] flex items-center justify-center space-x-2 cursor-pointer"
                 >
-                  <span>CLAIM SPECIAL 49 OFFER (₹49)</span>
+                  <span>{adsConfig.ctaText ? adsConfig.ctaText.toUpperCase() : `CLAIM SPECIAL OFFER (₹${adsConfig.offerPriceInr || 49})`}</span>
                   <ArrowRight className="w-5 h-5" />
                 </button>
 

@@ -27,9 +27,9 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13T16:52:40.737Z",
-      "updatedAt": "2026-11-13T16:52:40.737Z",
-      "passwordHash": "2ae143e7e8c2ec3efdf92ba1f4557444c3652e8bc28c2aef1a16532272860adb5390a069319a538a6fe29a20c972ba36f116d81845b5b9089484d8d5d3e90232",
-      "passwordSalt": "c0c04d4ded869a742d9595ab54273c9b",
+      "updatedAt": "2026-11-14T05:30:55.089Z",
+      "passwordHash": null,
+      "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
       "lastAiMessageDateUtc": null,
       "bonusAiMessages": 0
@@ -61,7 +61,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": "2026-11-09T13:30:06.834Z",
       "createdAt": "2026-11-09T13:29:42.565Z",
-      "updatedAt": "2026-11-14T04:43:12.975Z",
+      "updatedAt": "2026-11-14T05:30:55.089Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -95,7 +95,7 @@
       "avatarFrame": "Emerald",
       "lastSpinTimestampUtc": "2026-11-09T13:57:04.753Z",
       "createdAt": "2026-11-09T13:46:57.966Z",
-      "updatedAt": "2026-11-14T04:43:12.981Z",
+      "updatedAt": "2026-11-14T05:30:55.090Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -129,7 +129,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-09T13:55:04.826Z",
-      "updatedAt": "2026-11-14T04:43:12.982Z",
+      "updatedAt": "2026-11-14T05:30:55.090Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -163,7 +163,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13 05:20:09",
-      "updatedAt": "2026-11-14T04:43:12.982Z",
+      "updatedAt": "2026-11-14T05:30:55.090Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -197,7 +197,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13T06:42:32.181Z",
-      "updatedAt": "2026-11-14T04:43:12.982Z",
+      "updatedAt": "2026-11-14T05:30:55.090Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -206,6 +206,23 @@
     }
   ],
   "al_prod_subscriptions_v1": [
+    {
+      "id": "sub_del_1794634203902",
+      "learnerId": "lrn_test_deletion_1794634203891",
+      "planTier": "LITE",
+      "status": "ACTIVE",
+      "paymentMethod": "UPI_QR",
+      "utrReference": null,
+      "payerUpiId": null,
+      "amountInr": 49,
+      "durationDays": 60,
+      "startsAt": "2026-11-14 05:30:03",
+      "expiresAt": "2027-01-13 05:30:03",
+      "verifiedByAdmin": null,
+      "verifiedAt": null,
+      "invoiceNumber": "INV-TEST-01",
+      "createdAt": "2026-11-14 05:30:03"
+    },
     {
       "id": "sub_mw9ck59l_32he",
       "learnerId": "lrn_mw9cjlfa_kvf2",
@@ -413,13 +430,24 @@
   ],
   "al_prod_coin_ledger_v1": [
     {
+      "entryId": "c_del_1794634203903",
+      "learnerId": "lrn_test_deletion_1794634203891",
+      "amount": 25,
+      "transactionType": "CREDIT",
+      "reasonCode": "LEVEL_MASTERY",
+      "balanceAfter": 125,
+      "metadataJson": null,
+      "timestampUtc": "2026-11-14 05:30:03",
+      "signatureHash": "SIG_TEST"
+    },
+    {
       "entryId": "c_tx_1794233910071_l5jw",
       "learnerId": "lrn_mw9cjlfa_kvf2",
       "amount": 10,
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T14:18:30.071Z",
       "signatureHash": "SIG_f03a1fe70f78"
     },
@@ -430,7 +458,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "ADMIN_ADJUSTMENT",
       "balanceAfter": 200010,
-      "metadataJson": "{\"admin\":\"naitiknanda1235@gmail.com\",\"note\":\"Level 1 GC Grant\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T14:19:50.698Z",
       "signatureHash": "SIG_03f160255f85"
     },
@@ -441,7 +469,7 @@
       "transactionType": "DEBIT",
       "reasonCode": "GIFT_STORE_REDEMPTION",
       "balanceAfter": 10,
-      "metadataJson": "{\"level\":1,\"rsAmount\":20,\"brand\":\"Amazon Pay Gift Card\",\"deliveryEmail\":\"ananya.sharma@example.com\",\"deliveryPhone\":\"9876543210\",\"targetEmail\":\"academiclevels@gmail.com\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-09T14:19:50.717Z",
       "signatureHash": "SIG_c901f43a8c36"
     },
@@ -452,7 +480,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "ADMIN_ADJUSTMENT",
       "balanceAfter": 110,
-      "metadataJson": "{\"admin\":\"naitiknanda1235@gmail.com\",\"note\":\"Admin grant for academic excellence\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-10T13:54:38.823Z",
       "signatureHash": "SIG_bc87792e19c7"
     },
@@ -463,7 +491,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-10T14:28:18.588Z",
       "signatureHash": "SIG_797cdb1d2a5b"
     },
@@ -474,7 +502,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-10T14:28:18.597Z",
       "signatureHash": "SIG_5fa4c4de8bf8"
     },
@@ -496,7 +524,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-10T14:28:34.284Z",
       "signatureHash": "SIG_8cf6d4d75b88"
     },
@@ -507,7 +535,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-10T14:28:34.294Z",
       "signatureHash": "SIG_9c4d1ad24108"
     },
@@ -540,7 +568,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-12T14:01:54.316Z",
       "signatureHash": "SIG_d0967f0ff9ca"
     },
@@ -551,7 +579,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-12T14:01:54.372Z",
       "signatureHash": "SIG_63838fb7aab6"
     },
@@ -562,7 +590,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-12T14:02:22.238Z",
       "signatureHash": "SIG_7871a8f98a02"
     },
@@ -573,7 +601,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-12T14:02:22.280Z",
       "signatureHash": "SIG_af609c518380"
     },
@@ -584,7 +612,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-12T14:02:36.959Z",
       "signatureHash": "SIG_ea40d483b665"
     },
@@ -595,7 +623,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-12T14:02:37.011Z",
       "signatureHash": "SIG_2915e1d16dfa"
     },
@@ -606,7 +634,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-12T14:03:02.930Z",
       "signatureHash": "SIG_dee1dd5adea4"
     },
@@ -617,7 +645,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-12T14:03:02.984Z",
       "signatureHash": "SIG_6ee1866d2893"
     },
@@ -628,7 +656,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-12T14:04:42.347Z",
       "signatureHash": "SIG_823e97930ccf"
     },
@@ -639,7 +667,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-12T14:04:42.397Z",
       "signatureHash": "SIG_e829a5690b88"
     },
@@ -650,7 +678,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-12T14:30:17.625Z",
       "signatureHash": "SIG_f0f42e34e01c"
     },
@@ -661,7 +689,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-12T14:30:17.687Z",
       "signatureHash": "SIG_7037211d6085"
     },
@@ -672,7 +700,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-13T09:27:12.249Z",
       "signatureHash": "SIG_a58017c703c8"
     },
@@ -683,7 +711,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-13T09:44:51.301Z",
       "signatureHash": "SIG_d041c980a28e"
     },
@@ -694,7 +722,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "DAILY_SPIN_WHEEL",
       "balanceAfter": 12,
-      "metadataJson": "{\"isJackpot\":false}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-13T09:51:00.623Z",
       "signatureHash": "SIG_efdccc7b5cec"
     },
@@ -705,7 +733,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-13T16:51:12.368Z",
       "signatureHash": "SIG_c3ad9b4d4fb4"
     },
@@ -716,7 +744,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-13T16:51:27.514Z",
       "signatureHash": "SIG_f6779995ea90"
     },
@@ -727,7 +755,7 @@
       "transactionType": "CREDIT",
       "reasonCode": "WELCOME_BONUS",
       "balanceAfter": 10,
-      "metadataJson": "{\"note\":\"Welcome starter coins\"}",
+      "metadataJson": null,
       "timestampUtc": "2026-11-13T16:52:40.737Z",
       "signatureHash": "SIG_f47aade33e8b"
     },
@@ -1086,6 +1114,60 @@
       "targetId": "lrn_mw9asujp_rzun",
       "severity": "INFO",
       "details": "Granted 365-day PLUS subscription to Bengaluru customer Prabir (lrn_mw9asujp_rzun)"
+    },
+    {
+      "id": "admin_del_1794634231179_kd5c",
+      "timestampUtc": "2026-11-14T05:30:31.179Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "DELETE_LEARNER",
+      "targetId": "lrn_test_deletion_1794634231174",
+      "severity": "WARNING",
+      "details": "Super-Admin deleted learner Temporary Student (delete_me_1794634231174@temp.test, ID: lrn_test_deletion_1794634231174) and purged all associated data."
+    },
+    {
+      "id": "admin_del_1794634255107_m2ds",
+      "timestampUtc": "2026-11-14T05:30:55.107Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "DELETE_LEARNER",
+      "targetId": "lrn_test_deletion_1794634255102",
+      "severity": "WARNING",
+      "details": "Super-Admin deleted learner Temporary Student (delete_me_1794634255102@temp.test, ID: lrn_test_deletion_1794634255102) and purged all associated data."
+    },
+    {
+      "id": "admin_cfg_1794634255116",
+      "timestampUtc": "2026-11-14T05:30:55.115Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_pricing",
+      "severity": "INFO",
+      "details": "Super-Admin updated PRICING settings."
+    },
+    {
+      "id": "admin_cfg_1794634255124",
+      "timestampUtc": "2026-11-14T05:30:55.124Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_home",
+      "severity": "INFO",
+      "details": "Super-Admin updated HOME settings."
+    },
+    {
+      "id": "admin_cfg_1794634255135",
+      "timestampUtc": "2026-11-14T05:30:55.133Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_legal",
+      "severity": "INFO",
+      "details": "Super-Admin updated LEGAL settings."
+    },
+    {
+      "id": "admin_cfg_1794634255140",
+      "timestampUtc": "2026-11-14T05:30:55.139Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_ads",
+      "severity": "INFO",
+      "details": "Super-Admin updated ADS settings."
     }
   ]
 }

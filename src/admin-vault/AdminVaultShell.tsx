@@ -20,7 +20,10 @@ import {
   ChevronRight,
   Menu,
   X,
-  Award
+  Award,
+  FileText,
+  Megaphone,
+  Coins
 } from 'lucide-react';
 
 import { StudentManagement } from './modules/StudentManagement';
@@ -36,10 +39,16 @@ import { ScholarshipManager } from './modules/ScholarshipManager';
 import { ModerationReports } from './modules/ModerationReports';
 import { AuditLogViewer } from './modules/AuditLogViewer';
 import { SystemHealthAnalytics } from './modules/SystemHealthAnalytics';
+import { PricingManager } from './modules/PricingManager';
+import { SiteContentManager } from './modules/SiteContentManager';
+import { AdPagesManager } from './modules/AdPagesManager';
 
 type AdminTab =
   | 'STUDENTS'
   | 'PAYMENTS'
+  | 'PRICING'
+  | 'CONTENT'
+  | 'ADS'
   | 'ENTITLEMENTS'
   | 'SCHOLARSHIPS'
   | 'ACODES'
@@ -76,7 +85,10 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
       icon: <CreditCard className="w-4 h-4" />,
       badge: pendingCount > 0 ? `${pendingCount} NEW` : undefined
     },
-    { id: 'STUDENTS', label: 'Kid Control & Finder', icon: <Users className="w-4 h-4" /> },
+    { id: 'STUDENTS', label: 'Kid Control & Delete', icon: <Users className="w-4 h-4" /> },
+    { id: 'PRICING', label: 'Modify Prices & UPI', icon: <Coins className="w-4 h-4 text-emerald-400" /> },
+    { id: 'CONTENT', label: 'Modify Home & Privacy', icon: <FileText className="w-4 h-4 text-indigo-400" /> },
+    { id: 'ADS', label: 'Modify Ad Pages & Funnels', icon: <Megaphone className="w-4 h-4 text-orange-400" /> },
     { id: 'SCHOLARSHIPS', label: 'Worldwide Scholarships', icon: <Award className="w-4 h-4" /> },
     { id: 'ENTITLEMENTS', label: 'Entitlement & Trials', icon: <Zap className="w-4 h-4" /> },
     { id: 'GIFTS', label: 'Gift & Amazon GC Dispatch', icon: <Truck className="w-4 h-4" /> },
@@ -154,7 +166,7 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
           >
             <div className="p-4 space-y-1 overflow-y-auto">
               <div className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest px-3 py-2">
-                12 Vault Modules
+                15 Vault Modules
               </div>
               {navItems.map(item => (
                 <button
@@ -193,6 +205,9 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-950">
             {activeTab === 'PAYMENTS' && <PaymentVerificationQueue />}
             {activeTab === 'STUDENTS' && <StudentManagement />}
+            {activeTab === 'PRICING' && <PricingManager />}
+            {activeTab === 'CONTENT' && <SiteContentManager />}
+            {activeTab === 'ADS' && <AdPagesManager />}
             {activeTab === 'SCHOLARSHIPS' && <ScholarshipManager />}
             {activeTab === 'ENTITLEMENTS' && <EntitlementManager />}
             {activeTab === 'ACODES' && <ACodeManager />}
