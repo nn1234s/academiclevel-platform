@@ -1194,7 +1194,8 @@ apiRouter.post('/coins/transact', (req, res) => {
       'WEEKLY_CHALLENGE_REWARD',
       'QUIZ_PERFECT_SCORE',
       'STREAK_MILESTONE',
-      'SCHOLARSHIP_AWARD'
+      'SCHOLARSHIP_AWARD',
+      'POKEMON_GUESS_REWARD'
     ];
 
     const isAllowedStudentCredit = (isAuthorizedStudent || Boolean(learner)) && ALLOWED_STUDENT_CREDIT_REASONS.includes(reasonCode);
@@ -1216,6 +1217,9 @@ apiRouter.post('/coins/transact', (req, res) => {
       }
       if (reasonCode === 'DAILY_SPIN_REWARD' && numAmount > 50) {
         return res.status(400).json({ success: false, error: 'Exceeded maximum daily spin reward of 50 coins.' });
+      }
+      if (reasonCode === 'POKEMON_GUESS_REWARD' && numAmount > 1) {
+        return res.status(400).json({ success: false, error: 'Exceeded maximum Pokemon guess reward of 1 coin.' });
       }
     }
 

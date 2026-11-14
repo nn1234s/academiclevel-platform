@@ -9,6 +9,9 @@ import {
   getTypeMultiplier,
   PokemonMove
 } from '../../services/pokeApiService';
+import { Learner } from '../../core/types';
+import { CoinLedgerService } from '../../services/coinLedgerService';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import {
   Volume2,
   Sparkles,
@@ -25,16 +28,25 @@ import {
   CheckCircle2,
   AlertCircle,
   Eye,
-  Info
+  Info,
+  Coins
 } from 'lucide-react';
 
-interface PokemonVaultHubProps {
+export interface PokemonVaultHubProps {
   onBackToApp: () => void;
+  learner?: Learner | null;
+  onRefreshLearner?: () => void;
+  onOpenAuth?: (mode: 'LOGIN' | 'REGISTER') => void;
 }
 
 type VaultTab = 'pokedex' | 'whos_that' | 'battle' | 'type_master';
 
-export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({ onBackToApp }) => {
+export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
+  onBackToApp,
+  learner,
+  onRefreshLearner,
+  onOpenAuth
+}) => {
   const [activeTab, setActiveTab] = useState<VaultTab>('pokedex');
 
   // ==========================================
@@ -60,6 +72,12 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({ onBackToApp })
   const [bestStreak, setBestStreak] = useState<number>(() => {
     return Number(localStorage.getItem('al_poke_best_streak') || 0);
   });
+  const [coinsAwardedThisSession, setCoinsAwardedThisSession] = useState(0);
+  const [coinAwardNotice, setCoinAwardNotice] = useState<{
+    amount: number;
+    message: string;
+    balance?: number;
+  } | null>(null);
 
   // ==========================================
   // BATTLE ARENA STATE
@@ -128,6 +146,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({ onBackToApp })
     setHasGuessed(false);
     setIsCorrectGuess(false);
     setSelectedOption(null);
+    setCoinAwardNotice(null);
 
     // Pick 1 target and 3 random distractors from iconic roster or full list
     const pool = ICONIC_POKEMON_ROSTER;
@@ -161,8 +180,52 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({ onBackToApp })
         setBestStreak(newStreak);
         localStorage.setItem('al_poke_best_streak', String(newStreak));
       }
+
+      setCoinsAwardedThisSession(prev => prev + 1);
+
+      // Award strictly 1 coin for truly correct pokemon guess
+      if (learner?.id) {
+        try {
+          const res = CoinLedgerService.appendTransaction(
+            learner.id,
+            1,
+            'POKEMON_GUESS_REWARD',
+            {
+              pokemonId: quizPokemon.id,
+              pokemonName: quizPokemon.name,
+              streak: newStreak,
+              game: 'WHOS_THAT_POKEMON'
+            }
+          );
+          if (res.success) {
+            setCoinAwardNotice({
+              amount: 1,
+              message: '+1 Study Coin Awarded! 🪙 Added to your balance',
+              balance: res.newBalance
+            });
+            onRefreshLearner?.();
+          } else {
+            setCoinAwardNotice({
+              amount: 1,
+              message: '+1 PokéCoin earned!'
+            });
+          }
+        } catch (err) {
+          console.error('Error awarding coin for pokemon guess:', err);
+          setCoinAwardNotice({
+            amount: 1,
+            message: '+1 PokéCoin earned!'
+          });
+        }
+      } else {
+        setCoinAwardNotice({
+          amount: 1,
+          message: '+1 PokéCoin earned! 🪙 Sign in to save coins to your AcademicLevel balance'
+        });
+      }
     } else {
       setStreak(0);
+      setCoinAwardNotice(null);
     }
   };
 
@@ -350,8 +413,30 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({ onBackToApp })
             </div>
           </div>
 
-          {/* Navigation Bar & Return Button */}
-          <div className="flex items-center space-x-2">
+          {/* Navigation Bar & Live Balance / Return Button */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {learner ? (
+              <div
+                className="flex items-center space-x-1.5 px-3 py-1.5 bg-black/40 border border-amber-400/40 rounded-xl text-xs font-mono font-bold text-amber-300 shadow-sm"
+                title="Your AcademicLevel Study Coin Balance"
+              >
+                <StudyCoinIcon className="w-4 h-4" glow />
+                <span>{learner.coinBalance ?? 0} Coins</span>
+              </div>
+            ) : (
+              onOpenAuth && (
+                <button
+                  onClick={() => onOpenAuth('LOGIN')}
+                  className="px-2.5 py-1.5 bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 font-bold text-xs rounded-xl border border-amber-400/30 transition-all flex items-center space-x-1.5 cursor-pointer"
+                  title="Sign In to Save PokéCoins to your AcademicLevel Account"
+                >
+                  <StudyCoinIcon className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Sign In to Save Coins</span>
+                  <span className="sm:hidden">Sign In</span>
+                </button>
+              )
+            )}
+
             <button
               onClick={onBackToApp}
               className="px-3 py-1.5 bg-black/50 hover:bg-black/80 text-white font-bold text-xs rounded-xl border border-white/20 shadow transition-all flex items-center space-x-1.5 cursor-pointer"
@@ -653,30 +738,90 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({ onBackToApp })
         {activeTab === 'whos_that' && (
           <div className="max-w-2xl mx-auto space-y-6">
             {/* Header Score Card */}
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-amber-400 font-mono">
-                  ANIME CLASSIC GAME
-                </span>
-                <h2 className="text-xl font-black text-white">Who&apos;s That Pokémon?!</h2>
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-amber-400 font-mono">
+                    ANIME CLASSIC GAME
+                  </span>
+                  <h2 className="text-xl font-black text-white">Who&apos;s That Pokémon?!</h2>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="text-right">
+                    <span className="text-[10px] text-slate-400 block">Streak</span>
+                    <span className="font-mono font-black text-lg text-emerald-400 flex items-center gap-1 justify-end">
+                      <Flame className="w-4 h-4 text-orange-400 fill-orange-400" />
+                      {streak}
+                    </span>
+                  </div>
+                  <div className="text-right border-l border-slate-800 pl-4">
+                    <span className="text-[10px] text-slate-400 block">Best Record</span>
+                    <span className="font-mono font-black text-lg text-amber-400 flex items-center gap-1 justify-end">
+                      <Trophy className="w-4 h-4 text-amber-400" />
+                      {bestStreak}
+                    </span>
+                  </div>
+                  <div className="text-right border-l border-slate-800 pl-4">
+                    <span className="text-[10px] text-slate-400 block">Earned Today</span>
+                    <span className="font-mono font-black text-lg text-amber-300 flex items-center gap-1 justify-end">
+                      <StudyCoinIcon className="w-4 h-4" />
+                      +{coinsAwardedThisSession}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="text-right">
-                  <span className="text-[10px] text-slate-400 block">Streak</span>
-                  <span className="font-mono font-black text-lg text-emerald-400 flex items-center gap-1">
-                    <Flame className="w-4 h-4 text-orange-400 fill-orange-400" />
-                    {streak}
-                  </span>
+
+              {/* Reward Rules Banner */}
+              <div className="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-slate-800/80 text-xs">
+                <div className="flex items-center space-x-1.5 text-amber-300 font-semibold">
+                  <StudyCoinIcon className="w-3.5 h-3.5" glow />
+                  <span>Win <strong>+1 Study Coin</strong> for every correct Pokémon identified!</span>
                 </div>
-                <div className="text-right border-l border-slate-800 pl-4">
-                  <span className="text-[10px] text-slate-400 block">Best Record</span>
-                  <span className="font-mono font-black text-lg text-amber-400 flex items-center gap-1">
-                    <Trophy className="w-4 h-4 text-amber-400" />
-                    {bestStreak}
+                {learner && (
+                  <span className="text-[11px] font-mono text-slate-400">
+                    Wallet: <strong className="text-amber-300 font-bold">{learner.coinBalance ?? 0} Coins</strong>
                   </span>
-                </div>
+                )}
               </div>
             </div>
+
+            {/* Coin Award Notification Banner */}
+            {hasGuessed && isCorrectGuess && coinAwardNotice && (
+              <div className="bg-gradient-to-r from-amber-500/20 via-yellow-500/25 to-amber-500/20 border-2 border-amber-400/50 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-amber-100 shadow-xl shadow-amber-500/10 animate-in zoom-in-95 duration-200">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center flex-shrink-0">
+                    <StudyCoinIcon className="w-6 h-6 animate-bounce" glow />
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs font-black uppercase tracking-wider text-amber-300">
+                        Correct Guess Reward
+                      </span>
+                      <span className="px-1.5 py-0.5 rounded bg-amber-400/30 text-[10px] font-mono font-bold text-amber-200 border border-amber-400/40">
+                        +1 Coin
+                      </span>
+                    </div>
+                    <p className="text-sm font-black text-white drop-shadow">
+                      {coinAwardNotice.message}
+                    </p>
+                    {coinAwardNotice.balance !== undefined && (
+                      <p className="text-[11px] text-amber-300/80 font-mono mt-0.5">
+                        New Account Balance: {coinAwardNotice.balance} Coins
+                      </p>
+                    )}
+                  </div>
+                </div>
+                {!learner && onOpenAuth && (
+                  <button
+                    onClick={() => onOpenAuth('LOGIN')}
+                    className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-xs rounded-xl shadow-lg cursor-pointer transition-all flex items-center space-x-1.5 flex-shrink-0"
+                  >
+                    <StudyCoinIcon className="w-3.5 h-3.5" />
+                    <span>Claim &amp; Save Coins</span>
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Silhouette Box with Authentic Dramatic Frame */}
             <div className="bg-gradient-to-br from-indigo-950 via-slate-900 to-red-950 border-4 border-red-600 rounded-3xl p-8 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl min-h-[340px]">

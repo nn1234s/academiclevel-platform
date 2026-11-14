@@ -43,7 +43,7 @@ assert.strictEqual(getTypeMultiplier('ghost', ['normal']), 0, 'Ghost vs Normal m
 assert.strictEqual(getTypeMultiplier('rock', ['fire', 'flying']), 4, 'Rock vs Fire/Flying must be 4x Quadruple damage');
 console.log('✓ TEST 3 PASSED: Type effectiveness matrix accurately mirrors official Pokémon mechanics.');
 
-// 4. Verify PokemonVaultHub features
+// 4. Verify PokemonVaultHub features & Coin Award Integration
 const hubContent = fs.readFileSync(path.join(platformDir, 'src', 'modules', 'pokemon', 'PokemonVaultHub.tsx'), 'utf-8');
 
 assert(hubContent.includes('Pokédex Explorer'), 'Must contain Pokédex Explorer');
@@ -51,6 +51,18 @@ assert(hubContent.includes('That Pokémon'), "Must contain Who's That Pokémon? 
 assert(hubContent.includes('Battle Arena'), 'Must contain Battle Arena turn-based combat');
 assert(hubContent.includes('Type Matchup Master'), 'Must contain Type Matchup quiz');
 assert(hubContent.includes('playCry'), 'Must support audio cry playback');
-console.log('✓ TEST 4 PASSED: PokemonVaultHub contains all 4 arcade modules & Pokédex.');
+assert(hubContent.includes('CoinLedgerService.appendTransaction'), 'Must append coin transaction to cryptographic ledger');
+assert(hubContent.includes('POKEMON_GUESS_REWARD'), 'Must use reasonCode POKEMON_GUESS_REWARD');
+assert(hubContent.includes('+1 Study Coin Awarded!'), 'Must display coin award message');
+console.log('✓ TEST 4 PASSED: PokemonVaultHub contains all 4 arcade modules & +1 Coin reward integration.');
 
-console.log('🎉 ALL 4 POKÉMON VAULT TESTS PASSED PERFECTLY!');
+// 5. Verify Core Types and Server Coin Reason Codes
+const typesContent = fs.readFileSync(path.join(platformDir, 'src', 'core', 'types', 'index.ts'), 'utf-8');
+assert(typesContent.includes("'POKEMON_GUESS_REWARD'"), "Must have POKEMON_GUESS_REWARD in CoinReasonCode type");
+
+const serverApiContent = fs.readFileSync(path.join(platformDir, 'server', 'api.js'), 'utf-8');
+assert(serverApiContent.includes("'POKEMON_GUESS_REWARD'"), "Must permit POKEMON_GUESS_REWARD in server ALLOWED_STUDENT_CREDIT_REASONS");
+assert(serverApiContent.includes("reasonCode === 'POKEMON_GUESS_REWARD' && numAmount > 1"), "Must cap POKEMON_GUESS_REWARD at 1 coin on server");
+console.log('✓ TEST 5 PASSED: CoinReasonCode and server-side 1-coin safety guard verified.');
+
+console.log('🎉 ALL 5 POKÉMON VAULT & COIN REWARD TESTS PASSED PERFECTLY!');
