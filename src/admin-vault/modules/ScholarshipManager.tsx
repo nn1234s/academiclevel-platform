@@ -18,7 +18,9 @@ import {
   Flame,
   X,
   Target,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Trophy,
+  KeyRound
 } from 'lucide-react';
 
 export const ScholarshipManager: React.FC = () => {
@@ -39,6 +41,17 @@ export const ScholarshipManager: React.FC = () => {
   const [targetBoard, setTargetBoard] = useState<Board | 'ALL'>('ALL');
   const [badgeTitle, setBadgeTitle] = useState('🏆 National Scholar Sprint Laureate');
   const [maxRecipients, setMaxRecipients] = useState<number>(0);
+  const [acodeVoucher, setAcodeVoucher] = useState<string>('');
+
+  // Podium Selection State for Claims Modal
+  const [podiumFirstId, setPodiumFirstId] = useState<string>('');
+  const [podiumSecondId, setPodiumSecondId] = useState<string>('');
+  const [podiumThirdId, setPodiumThirdId] = useState<string>('');
+  const [podiumCoinsFirst, setPodiumCoinsFirst] = useState<number>(500);
+  const [podiumCoinsSecond, setPodiumCoinsSecond] = useState<number>(300);
+  const [podiumCoinsThird, setPodiumCoinsThird] = useState<number>(150);
+  const [isDisbursing, setIsDisbursing] = useState<boolean>(false);
+  const [podiumNotice, setPodiumNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const fetchScholarships = async () => {
     try {
@@ -80,7 +93,8 @@ export const ScholarshipManager: React.FC = () => {
       targetGrade: targetGrade === 'ALL' ? undefined : Number(targetGrade),
       targetBoard: targetBoard === 'ALL' ? undefined : targetBoard,
       badgeTitle: badgeTitle.trim() || '🏆 National Scholar Sprint Laureate',
-      maxRecipients: Number(maxRecipients) || 0
+      maxRecipients: Number(maxRecipients) || 0,
+      acode: acodeVoucher.trim() ? acodeVoucher.trim().toUpperCase() : undefined
     };
 
     try {
@@ -117,7 +131,8 @@ export const ScholarshipManager: React.FC = () => {
         endDate: new Date(now.getTime() + durationDays * 86400000).toISOString(),
         createdBy: SUPER_ADMIN_EMAIL,
         createdAt: now.toISOString(),
-        updatedAt: now.toISOString()
+        updatedAt: now.toISOString(),
+        acode: acodeVoucher.trim() ? acodeVoucher.trim().toUpperCase() : undefined
       };
       StorageRLSLayer.saveScholarship(newSch);
       setNotice({ type: 'success', text: `Published scholarship: "${title}" live worldwide!` });
@@ -138,6 +153,7 @@ export const ScholarshipManager: React.FC = () => {
     setTargetBoard('ALL');
     setBadgeTitle('🏆 National Scholar Sprint Laureate');
     setMaxRecipients(0);
+    setAcodeVoucher('');
   };
 
   const handleToggle = async (sch: Scholarship) => {
@@ -155,6 +171,102 @@ export const ScholarshipManager: React.FC = () => {
     });
     fetchScholarships();
     setTimeout(() => setNotice(null), 3000);
+  };
+
+  const openClaimsModal = (sch: Scholarship) => {
+    setClaimsModalSch(sch);
+    setPodiumNotice(null);
+
+    const schClaims = claims
+      .filter(c => c.scholarshipId === sch.id)
+      .sort((a, b) => (Number((b as any).accuracy) || 0) - (Number((a as any).accuracy) || 0));
+
+    if (sch.awards?.first) {
+      setPodiumFirstId(sch.awards.first.learnerId);
+    } else if (schClaims[0]) {
+      setPodiumFirstId(schClaims[0].learnerId);
+    } else {
+      setPodiumFirstId('');
+    }
+
+    if (sch.awards?.second) {
+      setPodiumSecondId(sch.awards.second.learnerId);
+    } else if (schClaims[1]) {
+      setPodiumSecondId(schClaims[1].learnerId);
+    } else {
+      setPodiumSecondId('');
+    }
+
+    if (sch.awards?.third) {
+      setPodiumThirdId(sch.awards.third.learnerId);
+    } else if (schClaims[2]) {
+      setPodiumThirdId(schClaims[2].learnerId);
+    } else {
+      setPodiumThirdId('');
+    }
+  };
+
+  const handleDisbursePodiumAwards = async () => {
+    if (!claimsModalSch) return;
+    if (!podiumFirstId) {
+      setPodiumNotice({ type: 'error', text: 'Please select at least a 1st Place winner by accuracy.' });
+      return;
+    }
+
+    setIsDisbursing(true);
+    setPodiumNotice(null);
+
+    const schClaims = claims.filter(c => c.scholarshipId === claimsModalSch.id);
+    const firstClaim = schClaims.find(c => c.learnerId === podiumFirstId);
+    const secondClaim = schClaims.find(c => c.learnerId === podiumSecondId);
+    const thirdClaim = schClaims.find(c => c.learnerId === podiumThirdId);
+
+    const payload = {
+      first: podiumFirstId ? {
+        learnerId: podiumFirstId,
+        coins: Number(podiumCoinsFirst) || 500,
+        planTier: 'PLUS',
+        durationDays: 180,
+        accuracy: Number((firstClaim as any)?.accuracy) || 98.0
+      } : undefined,
+      second: podiumSecondId ? {
+        learnerId: podiumSecondId,
+        coins: Number(podiumCoinsSecond) || 300,
+        planTier: 'LITE',
+        durationDays: 60,
+        accuracy: Number((secondClaim as any)?.accuracy) || 94.0
+      } : undefined,
+      third: podiumThirdId ? {
+        learnerId: podiumThirdId,
+        coins: Number(podiumCoinsThird) || 150,
+        planTier: 'LITE',
+        durationDays: 30,
+        accuracy: Number((thirdClaim as any)?.accuracy) || 90.0
+      } : undefined
+    };
+
+    try {
+      const res = await ApiClient.adminAwardScholarshipPodium(SUPER_ADMIN_EMAIL, claimsModalSch.id, payload);
+      setIsDisbursing(false);
+      if (res.success) {
+        setPodiumNotice({ type: 'success', text: '1st, 2nd, and 3rd place prizes disbursed and winner ACodes minted!' });
+        await fetchScholarships();
+        setTimeout(() => setPodiumNotice(null), 5000);
+      } else {
+        throw new Error(res.message || 'Failed to disburse awards.');
+      }
+    } catch (err: any) {
+      try {
+        StorageRLSLayer.awardScholarshipPodium(SUPER_ADMIN_EMAIL, claimsModalSch.id, payload);
+        setIsDisbursing(false);
+        setPodiumNotice({ type: 'success', text: 'Podium awards disbursed & winner ACodes minted!' });
+        await fetchScholarships();
+        setTimeout(() => setPodiumNotice(null), 5000);
+      } catch (localErr: any) {
+        setIsDisbursing(false);
+        setPodiumNotice({ type: 'error', text: localErr.message || err.message });
+      }
+    }
   };
 
   const handleDelete = async (sch: Scholarship) => {
@@ -350,16 +462,49 @@ export const ScholarshipManager: React.FC = () => {
                         </span>
                       </div>
                     </div>
+
+                    {/* ACode Voucher & Accuracy Podium Preview */}
+                    {(sch.acode || sch.awards) && (
+                      <div className="space-y-1.5 pt-2 border-t border-slate-800/80">
+                        {sch.acode && (
+                          <div className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-lg font-mono text-[10px] font-bold bg-indigo-950/80 border border-indigo-700/80 text-indigo-300">
+                            <span>🎟️ ACode Voucher: {sch.acode}</span>
+                          </div>
+                        )}
+                        {sch.awards && (
+                          <div className="bg-amber-950/25 border border-amber-800/40 rounded-xl p-2.5 text-[11px] space-y-1">
+                            <span className="font-bold text-amber-400 block text-[10px] uppercase">🏆 Accuracy Podium Laureates:</span>
+                            <div className="flex flex-wrap gap-2 text-white">
+                              {sch.awards.first && (
+                                <span className="bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded text-amber-200">
+                                  🥇 1st: <strong>{sch.awards.first.learnerName}</strong> ({sch.awards.first.accuracy}%)
+                                </span>
+                              )}
+                              {sch.awards.second && (
+                                <span className="bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-slate-200">
+                                  🥈 2nd: <strong>{sch.awards.second.learnerName}</strong> ({sch.awards.second.accuracy}%)
+                                </span>
+                              )}
+                              {sch.awards.third && (
+                                <span className="bg-orange-950/40 border border-orange-800/40 px-2 py-0.5 rounded text-orange-200">
+                                  🥉 3rd: <strong>{sch.awards.third.learnerName}</strong> ({sch.awards.third.accuracy}%)
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Actions Footer */}
                   <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
                     <button
-                      onClick={() => setClaimsModalSch(sch)}
+                      onClick={() => openClaimsModal(sch)}
                       className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition-all"
                     >
                       <FileSpreadsheet className="w-3.5 h-3.5 text-indigo-400" />
-                      <span>View Claim Ledger ({schClaims.length})</span>
+                      <span>Claims &amp; Accuracy Awards ({schClaims.length})</span>
                     </button>
 
                     <div className="flex items-center space-x-2">
@@ -538,6 +683,27 @@ export const ScholarshipManager: React.FC = () => {
                 </div>
               </div>
 
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block font-bold text-slate-300">Scholarship ACode Voucher Key (Optional)</label>
+                  <button
+                    type="button"
+                    onClick={() => setAcodeVoucher(`AL-SCH-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`)}
+                    className="text-[10px] text-amber-400 hover:underline font-mono"
+                  >
+                    + Auto-Mint Code
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={acodeVoucher}
+                  onChange={e => setAcodeVoucher(e.target.value.toUpperCase())}
+                  placeholder="e.g. AL-SCHOLAR-SPRINT"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white font-mono uppercase focus:outline-none focus:border-amber-500"
+                />
+                <span className="text-[10px] text-slate-500">Attach a promotional ACode voucher to this scholarship.</span>
+              </div>
+
               <div className="pt-4 flex items-center justify-end space-x-3 border-t border-slate-800">
                 <button
                   type="button"
@@ -559,54 +725,242 @@ export const ScholarshipManager: React.FC = () => {
         </div>
       )}
 
-      {/* Claims Ledger Modal */}
-      {claimsModalSch && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
-            <button
-              onClick={() => setClaimsModalSch(null)}
-              className="absolute top-5 right-5 p-2 text-slate-400 hover:text-white rounded-full bg-slate-800"
-            >
-              <X className="w-4 h-4" />
-            </button>
+      {/* Claims Ledger & Accuracy Podium Awards Modal */}
+      {claimsModalSch && (() => {
+        const sortedClaims = claims
+          .filter(c => c.scholarshipId === claimsModalSch.id)
+          .sort((a, b) => (Number((b as any).accuracy) || 0) - (Number((a as any).accuracy) || 0));
 
-            <div className="mb-4">
-              <h3 className="text-base font-black text-white flex items-center space-x-2">
-                <Award className="w-5 h-5 text-amber-400" />
-                <span>Scholarship Claim Ledger</span>
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5 font-medium">
-                {claimsModalSch.title} • {claimsModalSch.rewardCoins} Coins per recipient
-              </p>
-            </div>
+        return (
+          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+            <div className="max-w-4xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] flex flex-col text-slate-100">
+              <button
+                onClick={() => setClaimsModalSch(null)}
+                className="absolute top-5 right-5 p-2 text-slate-400 hover:text-white rounded-full bg-slate-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
 
-            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-              {claims.filter(c => c.scholarshipId === claimsModalSch.id).length === 0 ? (
-                <div className="text-center py-10 text-slate-500 text-xs">
-                  No students have completed and claimed this scholarship reward yet.
+              <div className="mb-4">
+                <div className="flex items-center space-x-2">
+                  <span className="px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950">
+                    Leaderboard &amp; Accuracy Awards
+                  </span>
+                  {claimsModalSch.acode && (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-indigo-950 border border-indigo-700 text-indigo-300">
+                      🎟️ ACode: {claimsModalSch.acode}
+                    </span>
+                  )}
                 </div>
-              ) : (
-                <div className="divide-y divide-slate-800">
-                  {claims
-                    .filter(c => c.scholarshipId === claimsModalSch.id)
-                    .map(c => (
-                      <div key={c.id} className="py-2.5 flex items-center justify-between text-xs">
-                        <div>
-                          <span className="font-bold text-white block">{c.learnerName || 'Student'}</span>
-                          <span className="text-[11px] text-slate-400">{c.learnerEmail}</span>
-                        </div>
-                        <div className="text-right">
-                          <span className="font-mono font-bold text-amber-300 block">+{c.coinsAwarded} Coins</span>
-                          <span className="text-[10px] text-slate-500">{new Date(c.claimedAt).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    ))}
+                <h3 className="text-lg sm:text-xl font-black text-white mt-1 flex items-center space-x-2">
+                  <Award className="w-5 h-5 text-amber-400" />
+                  <span>{claimsModalSch.title}</span>
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Choose 1st, 2nd, and 3rd place winners based on kids&apos; quiz accuracy to disburse bonus coins and mint VIP ACodes.
+                </p>
+              </div>
+
+              {podiumNotice && (
+                <div
+                  className={`p-3 rounded-xl text-xs font-semibold flex items-center space-x-2 mb-4 border ${
+                    podiumNotice.type === 'success'
+                      ? 'bg-emerald-950/70 border-emerald-800 text-emerald-300'
+                      : 'bg-rose-950/70 border-rose-800 text-rose-300'
+                  }`}
+                >
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                  <span>{podiumNotice.text}</span>
                 </div>
               )}
+
+              {/* Accuracy Podium Control Panel */}
+              <div className="bg-slate-950/90 border border-amber-500/40 rounded-2xl p-5 mb-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center space-x-1.5">
+                    <Trophy className="w-4 h-4" />
+                    <span>Choose 1st, 2nd &amp; 3rd Awards by Kids&apos; Accuracy</span>
+                  </h4>
+                  <span className="text-[11px] text-slate-400">
+                    {sortedClaims.length} participating scholars ranked
+                  </span>
+                </div>
+
+                {sortedClaims.length === 0 ? (
+                  <p className="text-xs text-slate-500 italic py-2">
+                    No participants have claimed this scholarship yet. Once students complete the required quizzes, their accuracy will appear here for ranking.
+                  </p>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {/* 1st Place (Gold) */}
+                      <div className="bg-slate-900 border-2 border-amber-500/70 rounded-xl p-3.5 space-y-2">
+                        <div className="flex items-center justify-between text-xs font-black text-amber-300">
+                          <span>🥇 1st Place (Gold)</span>
+                          <span className="font-mono text-[10px] text-amber-400/80">Plus Pass (180d)</span>
+                        </div>
+                        <select
+                          value={podiumFirstId}
+                          onChange={e => setPodiumFirstId(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                        >
+                          <option value="">Select 1st Winner...</option>
+                          {sortedClaims.map(c => (
+                            <option key={c.learnerId} value={c.learnerId}>
+                              {c.learnerName || 'Student'} ({(c as any).accuracy || 95}% Acc)
+                            </option>
+                          ))}
+                        </select>
+                        <div className="flex items-center space-x-2">
+                          <label className="text-[10px] text-slate-400">Coins:</label>
+                          <input
+                            type="number"
+                            value={podiumCoinsFirst}
+                            onChange={e => setPodiumCoinsFirst(Number(e.target.value))}
+                            className="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-amber-300 font-bold"
+                          />
+                        </div>
+                      </div>
+
+                      {/* 2nd Place (Silver) */}
+                      <div className="bg-slate-900 border border-slate-500/70 rounded-xl p-3.5 space-y-2">
+                        <div className="flex items-center justify-between text-xs font-black text-slate-200">
+                          <span>🥈 2nd Place (Silver)</span>
+                          <span className="font-mono text-[10px] text-slate-400">Lite Pass (60d)</span>
+                        </div>
+                        <select
+                          value={podiumSecondId}
+                          onChange={e => setPodiumSecondId(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-slate-400"
+                        >
+                          <option value="">Select 2nd Winner...</option>
+                          {sortedClaims.map(c => (
+                            <option key={c.learnerId} value={c.learnerId}>
+                              {c.learnerName || 'Student'} ({(c as any).accuracy || 95}% Acc)
+                            </option>
+                          ))}
+                        </select>
+                        <div className="flex items-center space-x-2">
+                          <label className="text-[10px] text-slate-400">Coins:</label>
+                          <input
+                            type="number"
+                            value={podiumCoinsSecond}
+                            onChange={e => setPodiumCoinsSecond(Number(e.target.value))}
+                            className="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-amber-300 font-bold"
+                          />
+                        </div>
+                      </div>
+
+                      {/* 3rd Place (Bronze) */}
+                      <div className="bg-slate-900 border border-orange-700/70 rounded-xl p-3.5 space-y-2">
+                        <div className="flex items-center justify-between text-xs font-black text-orange-300">
+                          <span>🥉 3rd Place (Bronze)</span>
+                          <span className="font-mono text-[10px] text-orange-400/80">Lite Pass (30d)</span>
+                        </div>
+                        <select
+                          value={podiumThirdId}
+                          onChange={e => setPodiumThirdId(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500"
+                        >
+                          <option value="">Select 3rd Winner...</option>
+                          {sortedClaims.map(c => (
+                            <option key={c.learnerId} value={c.learnerId}>
+                              {c.learnerName || 'Student'} ({(c as any).accuracy || 95}% Acc)
+                            </option>
+                          ))}
+                        </select>
+                        <div className="flex items-center space-x-2">
+                          <label className="text-[10px] text-slate-400">Coins:</label>
+                          <input
+                            type="number"
+                            value={podiumCoinsThird}
+                            onChange={e => setPodiumCoinsThird(Number(e.target.value))}
+                            className="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-amber-300 font-bold"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex justify-end">
+                      <button
+                        onClick={handleDisbursePodiumAwards}
+                        disabled={isDisbursing || !podiumFirstId}
+                        className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-950 transition-all flex items-center space-x-2"
+                      >
+                        <Trophy className="w-4 h-4" />
+                        <span>{isDisbursing ? 'Disbursing & Minting ACodes...' : '🏆 Disburse 1st, 2nd & 3rd Awards by Accuracy'}</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Claims & Accuracy Table */}
+              <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+                <h4 className="text-xs font-bold text-white mb-2">
+                  All Claimed Students (Ranked by Accuracy)
+                </h4>
+                {sortedClaims.length === 0 ? (
+                  <div className="text-center py-8 text-slate-500 text-xs">
+                    No student claims yet.
+                  </div>
+                ) : (
+                  <div className="border border-slate-800 rounded-xl overflow-hidden">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-950 text-slate-400 font-mono text-[11px] border-b border-slate-800">
+                        <tr>
+                          <th className="p-3">Rank</th>
+                          <th className="p-3">Student</th>
+                          <th className="p-3 text-center">Quiz Accuracy</th>
+                          <th className="p-3 text-center">Base Reward</th>
+                          <th className="p-3 text-right">Award Status / ACode</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/80">
+                        {sortedClaims.map((c, idx) => (
+                          <tr key={c.id} className="hover:bg-slate-800/40">
+                            <td className="p-3 font-mono font-bold">
+                              {idx === 0 ? '🥇 #1' : idx === 1 ? '🥈 #2' : idx === 2 ? '🥉 #3' : `#${idx + 1}`}
+                            </td>
+                            <td className="p-3">
+                              <span className="font-bold text-white block">{c.learnerName || 'Student'}</span>
+                              <span className="text-[11px] text-slate-400 font-mono">{c.learnerEmail}</span>
+                            </td>
+                            <td className="p-3 text-center">
+                              <span className="px-2 py-0.5 rounded font-mono font-bold text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                {(c as any).accuracy || 95}%
+                              </span>
+                            </td>
+                            <td className="p-3 text-center font-mono font-bold text-amber-300">
+                              +{c.coinsAwarded} Coins
+                            </td>
+                            <td className="p-3 text-right">
+                              {(c as any).awardedRank ? (
+                                <div>
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-black bg-amber-500 text-slate-950">
+                                    {(c as any).awardedRank} Place Laureate
+                                  </span>
+                                  {(c as any).acodeAwarded && (
+                                    <span className="block font-mono text-[10px] text-indigo-300 mt-0.5 font-bold">
+                                      {(c as any).acodeAwarded}
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-[11px] text-slate-500">Participant</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };

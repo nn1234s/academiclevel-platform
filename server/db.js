@@ -322,6 +322,12 @@ export function initDatabaseSchema() {
   addColumnSafe('certificates', 'levelName TEXT');
   addColumnSafe('certificates', 'issuedAt TEXT');
 
+  addColumnSafe('scholarships', 'acode TEXT');
+  addColumnSafe('scholarships', 'awardsJson TEXT');
+  addColumnSafe('scholarship_claims', 'accuracy REAL DEFAULT 0');
+  addColumnSafe('scholarship_claims', 'awardedRank TEXT');
+  addColumnSafe('scholarship_claims', 'acodeAwarded TEXT');
+
   // AI Message Quotas & Coin Recharge Fields
   addColumnSafe('learners', 'dailyAiMessagesUsed INTEGER DEFAULT 0');
   addColumnSafe('learners', 'lastAiMessageDateUtc TEXT');
@@ -636,9 +642,17 @@ function migrateFromJsonStore() {
 
 export function exportDbToJsonStore() {
   try {
-    const learners = db.prepare('SELECT * FROM learners').all();
-    const subscriptions = db.prepare('SELECT * FROM subscriptions').all();
-    const coin_ledger = db.prepare('SELECT * FROM coin_ledger').all();
+    const learners = db.prepare(`
+      SELECT * FROM learners
+      WHERE email NOT LIKE '%@example.com'
+        AND email NOT LIKE '%@test.com'
+        AND email NOT LIKE '%@al.test'
+        AND email NOT LIKE '%naitrik%'
+        AND email NOT LIKE '%naitikfriend%'
+    `).all();
+    const validLearnerIds = new Set(learners.map(l => l.id));
+    const subscriptions = db.prepare('SELECT * FROM subscriptions').all().filter(s => validLearnerIds.has(s.learnerId));
+    const coin_ledger = db.prepare('SELECT * FROM coin_ledger').all().filter(c => validLearnerIds.has(c.learnerId));
     const acodes = db.prepare('SELECT * FROM acodes').all();
     const gift_requests = db.prepare('SELECT * FROM gift_requests').all();
     const security_audit_logs = db.prepare('SELECT * FROM security_audit_logs').all();

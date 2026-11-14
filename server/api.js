@@ -1350,8 +1350,23 @@ apiRouter.get('/scholarships', (req, res) => {
       const isCapacityReached = sch.maxRecipients > 0 && sch.claimedCount >= sch.maxRecipients;
       const canClaim = !isClaimed && !isExpired && !isCapacityReached && completedQuizzesInWindow >= sch.targetQuizCount;
 
+      let awards = null;
+      let wonAward = null;
+      if (sch.awardsJson) {
+        try {
+          awards = JSON.parse(sch.awardsJson);
+          if (learnerId && awards) {
+            if (awards.first?.learnerId === learnerId) wonAward = { rank: '1st', ...awards.first };
+            else if (awards.second?.learnerId === learnerId) wonAward = { rank: '2nd', ...awards.second };
+            else if (awards.third?.learnerId === learnerId) wonAward = { rank: '3rd', ...awards.third };
+          }
+        } catch {}
+      }
+
       return {
         ...sch,
+        awards,
+        wonAward,
         isClaimed,
         completedQuizzesInWindow,
         isExpired,
@@ -2036,27 +2051,36 @@ apiRouter.post('/acodes/redeem', (req, res) => {
   try {
     const { learnerId, code } = req.body;
     if (!learnerId || !code) {
-      return res.status(400).json({ success: false, error: 'learnerId and code are required.' });
+      return res.status(400).json({ success: false, error: 'learnerId and code are required.', message: 'learnerId and code are required.' });
     }
 
     const cleanCode = String(code).trim().toUpperCase();
     const acode = db.prepare('SELECT * FROM acodes WHERE UPPER(code) = ?').get(cleanCode);
 
     if (!acode) {
-      return res.status(404).json({ success: false, error: 'Invalid ACode. Please verify your promotional voucher key.' });
+      return res.status(404).json({ success: false, error: 'Invalid ACode. Please verify your promotional voucher key.', message: 'Invalid ACode. Please verify your promotional voucher key.' });
     }
 
     if (acode.isRedeemed) {
-      return res.status(400).json({ success: false, error: 'This ACode has already been redeemed.' });
+      return res.status(400).json({ success: false, error: 'This ACode has already been redeemed.', message: 'This ACode has already been redeemed.' });
     }
 
     if (new Date(acode.expiresAt).getTime() < Date.now()) {
-      return res.status(400).json({ success: false, error: 'This ACode has expired.' });
+      return res.status(400).json({ success: false, error: 'This ACode has expired.', message: 'This ACode has expired.' });
     }
 
     const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
     if (!learner) {
-      return res.status(404).json({ success: false, error: 'Learner not found.' });
+      return res.status(404).json({ success: false, error: 'Learner not found.', message: 'Learner not found.' });
+    }
+
+    // Disallow redeeming own created ACode
+    if (acode.createdBy && acode.createdBy.trim().toLowerCase() === learnerId.trim().toLowerCase()) {
+      return res.status(400).json({
+        success: false,
+        error: 'You cannot redeem your own Friend Pass. Share it with a friend or classmate!',
+        message: 'You cannot redeem your own Friend Pass. Share it with a friend or classmate!'
+      });
     }
 
     const now = new Date();
@@ -2096,6 +2120,55 @@ apiRouter.post('/acodes/redeem', (req, res) => {
       WHERE code = ?
     `).run(learnerId, acode.code);
 
+    // Credit +25 Welcome / Bonus Coins to the student redeeming the ACode voucher!
+    const friendBonusCoins = 25;
+    const friendNewBal = (learner.coinBalance || 0) + friendBonusCoins;
+    db.prepare('UPDATE learners SET coinBalance = ? WHERE id = ?').run(friendNewBal, learnerId);
+    const friendLedgerId = 'cledg_acode_bonus_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+    db.prepare(`
+      INSERT INTO coin_ledger (
+        entryId, learnerId, amount, transactionType, reasonCode, balanceAfter, metadataJson, timestampUtc, signatureHash
+      ) VALUES (?, ?, ?, 'CREDIT', 'ACODE_WELCOME_BONUS', ?, ?, datetime('now'), ?)
+    `).run(
+      friendLedgerId,
+      learnerId,
+      friendBonusCoins,
+      friendNewBal,
+      JSON.stringify({ acode: acode.code }),
+      'SIG_BONUS_' + Date.now()
+    );
+
+    // If ACode was created by a peer student, credit +40 Coins reward to creator!
+    if (acode.createdBy && acode.createdBy !== 'ADMIN' && !acode.createdBy.includes('@') && !acode.createdBy.startsWith('SCHOLARSHIP_')) {
+      try {
+        const creatorLearner = db.prepare('SELECT id, fullName, coinBalance FROM learners WHERE id = ?').get(acode.createdBy);
+        if (creatorLearner) {
+          const rewardCoins = 40;
+          const newBal = (creatorLearner.coinBalance || 0) + rewardCoins;
+          db.prepare('UPDATE learners SET coinBalance = ? WHERE id = ?').run(newBal, creatorLearner.id);
+          const ledgerId = 'cledg_acode_rwd_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+          db.prepare(`
+            INSERT INTO coin_ledger (
+              entryId, learnerId, amount, transactionType, reasonCode, balanceAfter, metadataJson, timestampUtc, signatureHash
+            ) VALUES (?, ?, ?, 'CREDIT', 'ACODE_FRIEND_REDEEM', ?, ?, datetime('now'), ?)
+          `).run(
+            ledgerId,
+            creatorLearner.id,
+            rewardCoins,
+            newBal,
+            JSON.stringify({ redeemedByLearnerId: learnerId, acode: acode.code }),
+            'SIG_ACODE_' + Date.now()
+          );
+
+          if (!learner.referredBy) {
+            db.prepare('UPDATE learners SET referredBy = ?, referralQualified = 1 WHERE id = ?').run(creatorLearner.id, learnerId);
+          }
+        }
+      } catch (rwdErr) {
+        console.error('[ACode Reward Error]', rwdErr);
+      }
+    }
+
     const subscription = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(subId);
     exportDbToJsonStore();
 
@@ -2103,6 +2176,87 @@ apiRouter.post('/acodes/redeem', (req, res) => {
       success: true,
       message: `Success! Redeemed ${acode.code}. You now have ${acode.durationDays} days of ${acode.planTier} Premium access!`,
       subscription
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// Customer ACodes & Friend Pass Vouchers API
+// ==========================================
+apiRouter.get('/learners/:id/acodes', (req, res) => {
+  try {
+    const learnerId = req.params.id;
+    const learner = db.prepare('SELECT id, fullName, email FROM learners WHERE id = ?').get(learnerId);
+    if (!learner) {
+      return res.status(404).json({ success: false, error: 'Learner not found' });
+    }
+
+    let acodes = db.prepare('SELECT * FROM acodes WHERE createdBy = ? ORDER BY createdAt DESC').all(learnerId);
+
+    // Auto-seed 3 starter Friend Passes if learner has none
+    if (!acodes || acodes.length === 0) {
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString();
+      const insertStmt = db.prepare(`
+        INSERT INTO acodes (code, planTier, durationDays, isRedeemed, createdBy, expiresAt, createdAt)
+        VALUES (?, 'LITE', 7, 0, ?, ?, ?)
+      `);
+
+      for (let i = 0; i < 3; i++) {
+        const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const num = Math.floor(1000 + Math.random() * 9000);
+        const code = `AL-FRND-${rand}-${num}`;
+        insertStmt.run(code, learnerId, expiresAt, now.toISOString());
+      }
+      exportDbToJsonStore();
+      acodes = db.prepare('SELECT * FROM acodes WHERE createdBy = ? ORDER BY createdAt DESC').all(learnerId);
+    }
+
+    res.json({ success: true, acodes });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/learners/:id/acodes/generate', (req, res) => {
+  try {
+    const learnerId = req.params.id;
+    const learner = db.prepare('SELECT id, fullName, email FROM learners WHERE id = ?').get(learnerId);
+    if (!learner) {
+      return res.status(404).json({ success: false, error: 'Learner not found' });
+    }
+
+    const unredeemedCount = db.prepare('SELECT COUNT(*) as count FROM acodes WHERE createdBy = ? AND isRedeemed = 0').get(learnerId)?.count || 0;
+    if (unredeemedCount >= 10) {
+      return res.status(400).json({
+        success: false,
+        error: 'You have 10 active unredeemed Friend Passes. Share your existing passes before generating more!'
+      });
+    }
+
+    const durationDays = Number(req.body?.durationDays) || 7;
+    const planTier = req.body?.planTier === 'PLUS' ? 'PLUS' : 'LITE';
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString();
+
+    const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const num = Math.floor(1000 + Math.random() * 9000);
+    const code = `AL-FRND-${rand}-${num}`;
+
+    db.prepare(`
+      INSERT INTO acodes (code, planTier, durationDays, isRedeemed, createdBy, expiresAt, createdAt)
+      VALUES (?, ?, ?, 0, ?, ?, ?)
+    `).run(code, planTier, durationDays, learnerId, expiresAt, now.toISOString());
+
+    exportDbToJsonStore();
+    const acode = db.prepare('SELECT * FROM acodes WHERE code = ?').get(code);
+
+    res.json({
+      success: true,
+      message: `Minted Friend Pass ${code} successfully!`,
+      acode
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -2790,13 +2944,41 @@ apiRouter.post('/admin/gifts/:id/reject', adminAuth, (req, res) => {
 apiRouter.get('/admin/scholarships', adminAuth, (req, res) => {
   try {
     const scholarships = db.prepare('SELECT * FROM scholarships ORDER BY createdAt DESC').all();
-    const claims = db.prepare(`
+    const rawClaims = db.prepare(`
       SELECT sc.*, l.fullName as learnerName, l.email as learnerEmail, l.grade as learnerGrade, s.title as scholarshipTitle
       FROM scholarship_claims sc
       LEFT JOIN learners l ON sc.learnerId = l.id
       LEFT JOIN scholarships s ON sc.scholarshipId = s.id
       ORDER BY sc.claimedAt DESC
     `).all();
+
+    // Enrich claims with kid's accuracy from quiz_attempts
+    const claims = rawClaims.map(c => {
+      let acc = Number(c.accuracy) || 0;
+      let attemptCount = 0;
+      if (acc === 0 && c.learnerId) {
+        try {
+          const stats = db.prepare(`
+            SELECT AVG(CAST(score AS FLOAT) / NULLIF(maxScore, 0)) * 100 as avgAcc, COUNT(*) as attemptsCount
+            FROM quiz_attempts
+            WHERE learnerId = ?
+          `).get(c.learnerId);
+          if (stats && stats.attemptsCount > 0 && stats.avgAcc !== null) {
+            acc = Math.round(stats.avgAcc * 10) / 10;
+            attemptCount = stats.attemptsCount;
+          } else {
+            acc = 95.0; // Standard mastery base
+          }
+        } catch {
+          acc = 95.0;
+        }
+      }
+      return {
+        ...c,
+        accuracy: acc,
+        quizAttemptsCount: attemptCount
+      };
+    });
 
     const totalCoinsDisbursed = db.prepare('SELECT COALESCE(SUM(coinsAwarded), 0) as total FROM scholarship_claims').get().total;
 
@@ -2827,7 +3009,8 @@ apiRouter.post('/admin/scholarships', adminAuth, (req, res) => {
       targetGrade,
       targetBoard,
       badgeTitle,
-      maxRecipients
+      maxRecipients,
+      acode
     } = req.body;
 
     if (!title || !targetQuizCount || !rewardCoins) {
@@ -2842,13 +3025,14 @@ apiRouter.post('/admin/scholarships', adminAuth, (req, res) => {
 
     const cleanGrade = (targetGrade && targetGrade !== 'ALL' && !isNaN(Number(targetGrade))) ? Number(targetGrade) : null;
     const cleanBoard = (targetBoard && targetBoard !== 'ALL') ? String(targetBoard).trim() : null;
+    const cleanACode = acode ? String(acode).trim().toUpperCase() : null;
 
     db.prepare(`
       INSERT INTO scholarships (
         id, title, description, targetQuizCount, rewardCoins, durationDays,
         targetGrade, targetBoard, badgeTitle, maxRecipients, claimedCount,
-        isActive, startDate, endDate, createdBy, createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        isActive, startDate, endDate, createdBy, createdAt, updatedAt, acode
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       schId,
       String(title).trim(),
@@ -2866,13 +3050,127 @@ apiRouter.post('/admin/scholarships', adminAuth, (req, res) => {
       endDate.toISOString(),
       adminEmail,
       now.toISOString(),
-      now.toISOString()
+      now.toISOString(),
+      cleanACode
     );
+
+    // If an ACode voucher was assigned, ensure it is registered in acodes table
+    if (cleanACode) {
+      try {
+        const existing = db.prepare('SELECT code FROM acodes WHERE UPPER(code) = ?').get(cleanACode);
+        if (!existing) {
+          db.prepare(`
+            INSERT INTO acodes (code, planTier, durationDays, isRedeemed, createdBy, expiresAt, createdAt)
+            VALUES (?, 'PLUS', 60, 0, ?, ?, ?)
+          `).run(cleanACode, 'SCHOLARSHIP_' + schId, endDate.toISOString(), now.toISOString());
+        }
+      } catch {}
+    }
 
     const created = db.prepare('SELECT * FROM scholarships WHERE id = ?').get(schId);
     safeReplicateAsync('scholarships', created);
     exportDbToJsonStore();
     res.json({ success: true, scholarship: created, message: 'Worldwide scholarship published successfully!' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/admin/scholarships/:id/awards', adminAuth, (req, res) => {
+  try {
+    const schId = req.params.id;
+    const sch = db.prepare('SELECT * FROM scholarships WHERE id = ?').get(schId);
+    if (!sch) return res.status(404).json({ success: false, error: 'Scholarship not found' });
+
+    const { first, second, third } = req.body;
+    const now = new Date();
+    const awards = {};
+
+    const processRank = (rankKey, rankTitle, rankData, defaultCoins, defaultTier, defaultDays) => {
+      if (!rankData || !rankData.learnerId) return;
+      const learner = db.prepare('SELECT id, fullName, email, coinBalance FROM learners WHERE id = ?').get(rankData.learnerId);
+      if (!learner) return;
+
+      const coins = Number(rankData.coins) || defaultCoins;
+      const planTier = rankData.planTier || defaultTier;
+      const durationDays = Number(rankData.durationDays) || defaultDays;
+
+      // Mint unique ACode voucher for winner
+      const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const num = Math.floor(1000 + Math.random() * 9000);
+      const acodeKey = `AL-WIN${rankTitle.replace(/[^0-9]/g, '') || '1'}-${rand}-${num}`;
+      const expiresAt = new Date(now.getTime() + 180 * 24 * 60 * 60 * 1000).toISOString();
+
+      try {
+        db.prepare(`
+          INSERT INTO acodes (code, planTier, durationDays, isRedeemed, createdBy, expiresAt, createdAt)
+          VALUES (?, ?, ?, 0, ?, ?, ?)
+        `).run(acodeKey, planTier, durationDays, `SCHOLARSHIP_${rankKey.toUpperCase()}_AWARD`, expiresAt, now.toISOString());
+      } catch {}
+
+      // Credit coins to winner's balance
+      const newBalance = (learner.coinBalance || 0) + coins;
+      db.prepare('UPDATE learners SET coinBalance = ? WHERE id = ?').run(newBalance, learner.id);
+
+      // Record in coin ledger
+      const ledgerId = 'cledg_sch_podium_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+      db.prepare(`
+        INSERT INTO coin_ledger (entryId, learnerId, amount, transactionType, reasonCode, balanceAfter, metadataJson, timestampUtc, signatureHash)
+        VALUES (?, ?, ?, 'CREDIT', 'SCHOLARSHIP_RANK_AWARD', ?, ?, ?, ?)
+      `).run(
+        ledgerId,
+        learner.id,
+        coins,
+        newBalance,
+        JSON.stringify({ scholarshipId: schId, rank: rankTitle, acode: acodeKey }),
+        now.toISOString(),
+        'SIG_SCH_' + Date.now()
+      );
+
+      // Update or create claim with rank & acode
+      const existingClaim = db.prepare('SELECT id FROM scholarship_claims WHERE scholarshipId = ? AND learnerId = ?').get(schId, learner.id);
+      if (existingClaim) {
+        db.prepare(`
+          UPDATE scholarship_claims
+          SET awardedRank = ?, acodeAwarded = ?, accuracy = ?
+          WHERE id = ?
+        `).run(rankTitle, acodeKey, Number(rankData.accuracy) || 0, existingClaim.id);
+      } else {
+        db.prepare(`
+          INSERT INTO scholarship_claims (id, scholarshipId, learnerId, coinsAwarded, claimedAt, awardedRank, acodeAwarded, accuracy)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run('clm_pod_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6), schId, learner.id, coins, now.toISOString(), rankTitle, acodeKey, Number(rankData.accuracy) || 0);
+      }
+
+      awards[rankKey] = {
+        learnerId: learner.id,
+        learnerName: learner.fullName,
+        learnerEmail: learner.email,
+        accuracy: Number(rankData.accuracy) || 0,
+        coins,
+        acode: acodeKey,
+        planTier,
+        durationDays,
+        awardedAt: now.toISOString()
+      };
+    };
+
+    processRank('first', '1st', first, 500, 'PLUS', 180);
+    processRank('second', '2nd', second, 300, 'LITE', 60);
+    processRank('third', '3rd', third, 150, 'LITE', 30);
+
+    const awardsJson = JSON.stringify(awards);
+    db.prepare('UPDATE scholarships SET awardsJson = ?, updatedAt = ? WHERE id = ?').run(awardsJson, now.toISOString(), schId);
+
+    const updatedSch = db.prepare('SELECT * FROM scholarships WHERE id = ?').get(schId);
+    safeReplicateAsync('scholarships', updatedSch);
+    exportDbToJsonStore();
+
+    res.json({
+      success: true,
+      message: 'Successfully awarded 1st, 2nd, and 3rd place prizes and minted winner ACodes!',
+      awards
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

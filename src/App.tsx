@@ -89,6 +89,8 @@ const PROTECTED_STUDENT_ROUTES: Record<string, string> = {
   '/spin-wheel': 'SPIN_WHEEL',
   '/referral': 'REFERRAL',
   '/referrals': 'REFERRAL',
+  '/acodes': 'REFERRAL',
+  '/friend-passes': 'REFERRAL',
   '/coins': 'COIN_MALL',
   '/coin-mall': 'COIN_MALL',
   '/gifts': 'GIFT_STORE',
@@ -700,7 +702,7 @@ export const App: React.FC = () => {
                   onClick={() => navigateTo('REFERRAL')}
                   className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center justify-between"
                 >
-                  <span>Referral Programme</span>
+                  <span>Friend ACodes & Invites</span>
                   <span className="flex items-center space-x-1 text-xs text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full">
                     <StudyCoinIcon className="w-3.5 h-3.5" />
                     <span>+40 Coins</span>
@@ -887,7 +889,12 @@ export const App: React.FC = () => {
                 />
               )}
 
-              {currentRoute === 'REFERRAL' && <ReferralProgramme learner={currentLearner} />}
+              {currentRoute === 'REFERRAL' && (
+                <ReferralProgramme
+                  learner={currentLearner}
+                  onRefreshLearner={() => refreshCurrentLearner()}
+                />
+              )}
 
               {currentRoute === 'QOTD' && (
                 <QOTD learner={currentLearner} onRefreshLearner={() => refreshCurrentLearner()} />
