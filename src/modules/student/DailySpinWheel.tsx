@@ -4,6 +4,7 @@ import { CoinLedgerService } from '../../services/coinLedgerService';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { ApiClient } from '../../core/api/apiClient';
 import confetti from 'canvas-confetti';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { Sparkles, Clock, Lock, Unlock, Trophy, AlertCircle } from 'lucide-react';
 
 interface DailySpinWheelProps {
@@ -154,8 +155,8 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
           </div>
 
           {/* Center Hub */}
-          <div className="absolute inset-0 m-auto w-14 h-14 bg-slate-950 border-2 border-amber-400 rounded-full flex items-center justify-center text-amber-400 font-extrabold text-xs shadow-inner">
-            AL
+          <div className="absolute inset-0 m-auto w-14 h-14 bg-slate-950 border-2 border-amber-400 rounded-full flex items-center justify-center shadow-inner overflow-hidden">
+            <StudyCoinIcon className="w-12 h-12" glow />
           </div>
         </div>
       </div>
@@ -195,12 +196,12 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
         >
           {spinResult.isJackpot ? (
             <div className="flex items-center justify-center space-x-2">
-              <Trophy className="w-5 h-5 text-amber-400" />
+              <StudyCoinIcon className="w-5 h-5" glow />
               <span>JACKPOT! You won +40 Study Coins! Ledger updated.</span>
             </div>
           ) : (
             <div className="flex items-center justify-center space-x-2">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
+              <StudyCoinIcon className="w-4 h-4" />
               <span>Congratulations! You won +{spinResult.coinsAwarded} Study Coins!</span>
             </div>
           )}
@@ -214,7 +215,7 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
           disabled={isSpinning}
           className="w-full py-3.5 px-6 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-sm rounded-2xl shadow-xl shadow-amber-950 transition-all flex items-center justify-center space-x-2"
         >
-          <Sparkles className="w-4 h-4" />
+          <StudyCoinIcon className="w-4 h-4" />
           <span>{isSpinning ? 'Spinning Wheel...' : 'Spin the Wheel Now'}</span>
         </button>
       ) : (

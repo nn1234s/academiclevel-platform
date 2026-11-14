@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Learner } from '../../core/types';
 import { CoinLedgerService } from '../../services/coinLedgerService';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { ShoppingBag, ShieldCheck, Flame, BookOpen, Sparkles, Check, AlertCircle, Gift, ArrowRight } from 'lucide-react';
 
 interface CoinMallProps {
@@ -77,10 +78,10 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
           </p>
         </div>
 
-        <div className="bg-slate-950/80 border border-amber-500/30 rounded-2xl p-4 text-center min-w-[160px]">
+        <div className="bg-slate-950/80 border border-amber-500/30 rounded-2xl p-4 text-center min-w-[160px] shadow-lg shadow-amber-950/20">
           <span className="text-[11px] text-slate-400 block font-medium">Your Available Coins</span>
-          <div className="flex items-center justify-center space-x-1.5 mt-1">
-            <Sparkles className="w-5 h-5 text-amber-400 animate-spin-slow" />
+          <div className="flex items-center justify-center space-x-2 mt-1">
+            <StudyCoinIcon className="w-6 h-6" glow />
             <span className="text-2xl font-black text-amber-400">{learner.coinBalance}</span>
           </div>
         </div>
@@ -156,6 +157,7 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
             onClick={handleBuyStreakFreeze}
             className="mt-6 w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5"
           >
+            <StudyCoinIcon className="w-4 h-4" />
             <span>Buy Freeze (15 Coins)</span>
           </button>
         </div>
@@ -176,6 +178,7 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
             onClick={() => handleBuyAvatarFrame('Emerald', 20)}
             className="mt-6 w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5"
           >
+            <StudyCoinIcon className="w-4 h-4" />
             <span>{learner.avatarFrame === 'Emerald' ? 'Equipped' : 'Equip (20 Coins)'}</span>
           </button>
         </div>
@@ -204,6 +207,7 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
             }}
             className="mt-6 w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5"
           >
+            <StudyCoinIcon className="w-4 h-4" />
             <span>Unlock PDF (30 Coins)</span>
           </button>
         </div>

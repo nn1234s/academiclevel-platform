@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
 import { GiftRequest } from '../../core/types';
 import { ApiClient } from '../../core/api/apiClient';
+import { StudyCoinIcon } from '../../modules/shared/StudyCoinIcon';
 import { Gift, Check, X, Truck, Mail, Phone, Tag, Copy, Sparkles, ExternalLink } from 'lucide-react';
 
 export const GiftFulfillment: React.FC = () => {
@@ -133,7 +134,10 @@ export const GiftFulfillment: React.FC = () => {
                   <div className="space-y-1.5 max-w-xl">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-extrabold text-white text-sm">{req.itemTitle}</span>
-                      <span className="text-amber-400 font-mono font-bold">({req.coinsCost.toLocaleString()} Coins)</span>
+                      <span className="text-amber-400 font-mono font-bold flex items-center gap-1">
+                        <StudyCoinIcon className="w-3.5 h-3.5" />
+                        <span>({req.coinsCost.toLocaleString()} Coins)</span>
+                      </span>
                       <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
                         Target: {req.shippingAddress.split('|')[0] || req.shippingAddress}
                       </span>

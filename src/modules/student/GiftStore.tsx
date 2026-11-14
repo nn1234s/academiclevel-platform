@@ -4,6 +4,7 @@ import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { CoinLedgerService } from '../../services/coinLedgerService';
 import { ApiClient } from '../../core/api/apiClient';
 import { QuotaService } from '../../services/quotaService';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import {
   Gift,
   Sparkles,
@@ -380,7 +381,7 @@ ${learner.fullName}`;
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="max-w-xl">
             <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full inline-flex items-center space-x-1.5 mb-3">
-              <Sparkles className="w-3 h-3 text-amber-400 animate-spin-slow" />
+              <StudyCoinIcon className="w-3.5 h-3.5" />
               <span>Real Rewards • Instant Digital Delivery</span>
             </span>
             <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
@@ -396,7 +397,7 @@ ${learner.fullName}`;
           <div className="bg-slate-950/80 border border-amber-500/30 rounded-3xl p-5 text-center min-w-[200px] shadow-xl">
             <span className="text-[11px] text-slate-400 block font-medium">Your Study Coins</span>
             <div className="flex items-center justify-center space-x-2 mt-1">
-              <Sparkles className="w-5 h-5 text-amber-400 animate-spin-slow" />
+              <StudyCoinIcon className="w-7 h-7" glow />
               <span className="text-3xl font-black text-amber-400 font-mono">
                 {learner.coinBalance.toLocaleString()}
               </span>
@@ -559,8 +560,9 @@ ${learner.fullName}`;
 
                   <div className="flex justify-between items-center text-xs mb-1">
                     <span className="text-slate-400">Coin Requirement:</span>
-                    <span className="font-mono font-bold text-amber-400 text-sm">
-                      {tier.coinsCost.toLocaleString()} Coins
+                    <span className="font-mono font-bold text-amber-400 text-sm flex items-center space-x-1">
+                      <StudyCoinIcon className="w-4 h-4" />
+                      <span>{tier.coinsCost.toLocaleString()} Coins</span>
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-500 font-mono">
@@ -608,7 +610,10 @@ ${learner.fullName}`;
                     <div>
                       <div className="flex items-center space-x-2">
                         <p className="font-bold text-white text-sm">{req.itemTitle}</p>
-                        <span className="text-amber-400 font-mono text-xs">(-{req.coinsCost.toLocaleString()} Coins)</span>
+                        <span className="text-amber-400 font-mono text-xs flex items-center gap-1">
+                          <StudyCoinIcon className="w-3.5 h-3.5" />
+                          <span>(-{req.coinsCost.toLocaleString()} Coins)</span>
+                        </span>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-0.5">
                         Delivered to: {req.shippingAddress.split('|')[0] || req.shippingAddress} • Phone: {req.contactPhone}
@@ -792,8 +797,9 @@ ${learner.fullName}`;
               {/* Summary */}
               <div className="p-3 bg-amber-950/20 border border-amber-900/40 rounded-xl text-[11px] text-amber-300 flex items-center justify-between">
                 <span>Coins to be debited:</span>
-                <span className="font-mono font-bold text-amber-400">
-                  -{selectedLevel.coinsCost.toLocaleString()} Coins
+                <span className="font-mono font-bold text-amber-400 flex items-center gap-1">
+                  <StudyCoinIcon className="w-3.5 h-3.5" />
+                  <span>-{selectedLevel.coinsCost.toLocaleString()} Coins</span>
                 </span>
               </div>
 
@@ -832,7 +838,7 @@ ${learner.fullName}`;
                 ₹{submittedClaim.amount} {submittedClaim.brandName} Claimed!
               </h3>
               <p className="text-xs text-slate-300">
-                Your <strong className="text-amber-400">{submittedClaim.coinsCost.toLocaleString()} Study Coins</strong> have been debited from the ledger. An official redemption request has been formatted for <strong>academiclevels@gmail.com</strong>.
+                Your <strong className="text-amber-400 inline-flex items-center gap-1"><StudyCoinIcon className="w-3.5 h-3.5" /> {submittedClaim.coinsCost.toLocaleString()} Study Coins</strong> have been debited from the ledger. An official redemption request has been formatted for <strong>academiclevels@gmail.com</strong>.
               </p>
             </div>
 

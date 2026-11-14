@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Board, Grade, Learner, Question } from '../../core/types';
 import { NovaAiService, NovaMessage, StudentAiQuota } from '../../services/novaAiService';
 import { Sparkles, Send, Bot, User, Lightbulb, RefreshCw, Coins, X, CheckCircle, Zap } from 'lucide-react';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 
 interface NovaAiTutorProps {
   board: Board;
@@ -230,7 +231,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-all cursor-pointer"
                 title="Refill AI Messages using AL Coins"
               >
-                <Coins className="w-3.5 h-3.5 text-amber-400" />
+                <StudyCoinIcon className="w-4 h-4" />
                 <span>
                   {quota ? `${quota.remainingToday} left` : '8 daily'}
                 </span>
@@ -357,7 +358,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
               <div>
                 <h4 className="text-sm font-black text-white">Unlock Extra AI Messages</h4>
                 <p className="text-[11px] text-slate-400">
-                  Your Balance: <strong className="text-amber-400 font-mono">{learner?.coinBalance || 0} AL Coins</strong>
+                  Your Balance: <strong className="text-amber-400 font-mono inline-flex items-center gap-1"><StudyCoinIcon className="w-3.5 h-3.5" /> {learner?.coinBalance || 0} AL Coins</strong>
                 </p>
               </div>
             </div>
@@ -415,7 +416,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                       disabled={isRefilling}
                       className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-40"
                     >
-                      <Coins className="w-3.5 h-3.5" />
+                      <StudyCoinIcon className="w-4 h-4" />
                       <span>10 Coins</span>
                     </button>
                   </div>
@@ -437,7 +438,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                       disabled={isRefilling}
                       className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-40"
                     >
-                      <Coins className="w-3.5 h-3.5" />
+                      <StudyCoinIcon className="w-4 h-4" />
                       <span>20 Coins</span>
                     </button>
                   </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Board, Grade } from '../../core/types';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import {
   Sparkles,
   Zap,
@@ -425,8 +426,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Card 2: Abundant Rewards */}
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-3 hover:border-amber-500/40 transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl font-bold">
-              💎
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
+              <StudyCoinIcon className="w-8 h-8" glow />
             </div>
             <h3 className="font-extrabold text-white text-base">Abundant Rewards</h3>
             <p className="text-xs text-slate-400 leading-relaxed">

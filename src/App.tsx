@@ -6,6 +6,7 @@ import { QuotaService } from './services/quotaService';
 import { ErrorBoundary } from './modules/shared/ErrorBoundary';
 import { PaywallGateModal } from './modules/shared/PaywallGateModal';
 import { AuthModal } from './modules/shared/AuthModal';
+import { StudyCoinIcon } from './modules/shared/StudyCoinIcon';
 
 // Public Pages
 import { LandingPage } from './modules/public/LandingPage';
@@ -518,11 +519,12 @@ export const App: React.FC = () => {
                   </button>
                   <button
                     onClick={() => navigateTo('COIN_MALL')}
-                    className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'COIN_MALL' || currentRoute === 'GIFT_STORE' ? 'text-indigo-400 font-bold bg-indigo-500/10' : 'text-slate-300 hover:text-white'
+                    className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1.5 ${
+                      currentRoute === 'COIN_MALL' || currentRoute === 'GIFT_STORE' ? 'text-amber-400 font-bold bg-amber-500/10' : 'text-slate-300 hover:text-white'
                     }`}
                   >
-                    Coin Mall
+                    <StudyCoinIcon className="w-3.5 h-3.5" glow />
+                    <span>Coin Mall</span>
                   </button>
                   <button
                     onClick={() => navigateTo('CERTIFICATES')}
@@ -561,9 +563,9 @@ export const App: React.FC = () => {
                   {/* Coin Badge */}
                   <button
                     onClick={() => navigateTo('COIN_MALL')}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-bold hover:bg-amber-500/20 transition-all"
+                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-bold hover:bg-amber-500/20 transition-all shadow-sm"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin-slow" />
+                    <StudyCoinIcon className="w-4 h-4" glow />
                     <span>{currentLearner?.coinBalance || 0}</span>
                   </button>
 
@@ -696,15 +698,20 @@ export const App: React.FC = () => {
                 </button>
                 <button
                   onClick={() => navigateTo('REFERRAL')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
+                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center justify-between"
                 >
-                  Referral Programme (+40 Coins)
+                  <span>Referral Programme</span>
+                  <span className="flex items-center space-x-1 text-xs text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full">
+                    <StudyCoinIcon className="w-3.5 h-3.5" />
+                    <span>+40 Coins</span>
+                  </span>
                 </button>
                 <button
                   onClick={() => navigateTo('COIN_MALL')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
+                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
                 >
-                  Study Coin Mall
+                  <StudyCoinIcon className="w-4 h-4" />
+                  <span>Study Coin Mall</span>
                 </button>
                 <button
                   onClick={() => navigateTo('GIFT_STORE')}

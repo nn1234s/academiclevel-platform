@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import {
   Star,
   Check,
@@ -805,8 +806,8 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             </div>
 
             <div className="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
-                <Star className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
+                <StudyCoinIcon className="w-7 h-7" glow />
               </div>
               <h3 className="text-base font-extrabold text-slate-900">
                 Abundant Rewards
@@ -1005,7 +1006,12 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <tr>
                   <td className="p-4 font-bold text-slate-900">Gamification &amp; Motivation</td>
                   <td className="p-4 text-slate-600">Rote homework pressure</td>
-                  <td className="p-4 font-black text-emerald-700 bg-orange-50/30">Study Coins, Streak Freeze &amp; Real Gift Cards</td>
+                  <td className="p-4 font-black text-emerald-700 bg-orange-50/30">
+                    <span className="flex items-center gap-1.5">
+                      <StudyCoinIcon className="w-4 h-4 flex-shrink-0" glow />
+                      <span>Study Coins, Streak Freeze &amp; Real Gift Cards</span>
+                    </span>
+                  </td>
                 </tr>
                 <tr>
                   <td className="p-4 font-bold text-slate-900">Certification &amp; Validation</td>

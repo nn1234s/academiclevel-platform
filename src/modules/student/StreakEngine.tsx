@@ -1,5 +1,6 @@
 import React from 'react';
 import { Learner } from '../../core/types';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { Flame, Shield, Calendar, Sparkles, Check, AlertCircle } from 'lucide-react';
 
 interface StreakEngineProps {
@@ -65,7 +66,7 @@ export const StreakEngine: React.FC<StreakEngineProps> = ({ learner, onBuyFreeze
           onClick={onBuyFreeze}
           className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5"
         >
-          <Sparkles className="w-3.5 h-3.5" />
+          <StudyCoinIcon className="w-4 h-4" />
           <span>Get Freeze in Mall (15 Coins)</span>
         </button>
       </div>

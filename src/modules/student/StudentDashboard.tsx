@@ -5,6 +5,7 @@ import { QuotaService } from '../../services/quotaService';
 import { CurriculumService } from '../../services/curriculumService';
 import { CLASS_THEMES, getClassTheme } from '../../core/theme/classThemes';
 import { ClassSwitcherBar } from '../shared/ClassSwitcherBar';
+import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { WorldwideScholarships } from './WorldwideScholarships';
 import {
   Flame,
@@ -130,8 +131,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
             <div className="flex items-center space-x-3 w-full justify-between pt-2 border-t border-white/10">
               <span className="text-xs font-bold text-white/80">Study Coins:</span>
-              <div className="flex items-center space-x-1 font-black text-amber-300">
-                <Sparkles className="w-4 h-4" />
+              <div className="flex items-center space-x-1.5 font-black text-amber-300">
+                <StudyCoinIcon className="w-4 h-4" glow />
                 <span>{learner.coinBalance.toLocaleString()}</span>
               </div>
             </div>
@@ -409,7 +410,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 text-left transition-all group"
         >
           <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-            <Sparkles className="w-5 h-5" />
+            <StudyCoinIcon className="w-6 h-6" glow />
           </div>
           <p className="text-xs font-bold text-white">Daily Spin Wheel</p>
           <span className="text-[10px] text-slate-400">24h UTC Cooldown</span>

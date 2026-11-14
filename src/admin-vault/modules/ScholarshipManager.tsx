@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
 import { ApiClient } from '../../core/api/apiClient';
 import { Scholarship, ScholarshipClaim, Board, Grade } from '../../core/types';
+import { StudyCoinIcon } from '../../modules/shared/StudyCoinIcon';
 import {
   Award,
   Plus,
@@ -233,7 +234,7 @@ export const ScholarshipManager: React.FC = () => {
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Coins Disbursed</span>
           <div className="flex items-center space-x-2 mt-1">
-            <Sparkles className="w-4 h-4 text-amber-400" />
+            <StudyCoinIcon className="w-5 h-5" glow />
             <span className="text-xl font-black text-amber-300">{totalCoinsDisbursed.toLocaleString()}</span>
             <span className="text-xs text-slate-500 font-normal">Coins</span>
           </div>
@@ -304,7 +305,7 @@ export const ScholarshipManager: React.FC = () => {
                       </div>
 
                       <div className="flex items-center space-x-1.5 font-black text-xs text-amber-400 bg-amber-950/50 border border-amber-800/80 px-2.5 py-1 rounded-full">
-                        <Sparkles className="w-3.5 h-3.5" />
+                        <StudyCoinIcon className="w-3.5 h-3.5" glow />
                         <span>+{sch.rewardCoins} Coins</span>
                       </div>
                     </div>
