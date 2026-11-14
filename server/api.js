@@ -1272,6 +1272,18 @@ apiRouter.post('/gifts/redeem', (req, res) => {
       return res.status(400).json({ success: false, error: `Insufficient Study Coins. Required: ${cost.toLocaleString()}, Available: ${learner.coinBalance.toLocaleString()}` });
     }
 
+    // Academic Milestone Validation (Guarantees genuine learning progress)
+    const levelsCount = Math.max(
+      Number(learner.levelsCompletedCount || 0),
+      Number(learner.quizzesCompletedCount || 0)
+    );
+    if (levelsCount < 3 && learner.role !== 'SUPER_ADMIN') {
+      return res.status(400).json({
+        success: false,
+        error: `Proof of Study Milestone: Complete at least 3 curriculum levels with >= 70% score (currently completed: ${levelsCount}/3) before redeeming.`
+      });
+    }
+
     const newBalance = learner.coinBalance - cost;
     const now = new Date().toISOString();
     const reqId = 'gc_req_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
@@ -3770,6 +3782,8 @@ apiRouter.post('/admin/ai/config', adminAuth, (req, res) => {
       `).run(preferLiveAi ? 'true' : 'false', now);
     }
 
+    exportDbToJsonStore();
+
     res.json({ success: true, message: 'AI configuration updated successfully', ...getAiSettings() });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -4394,14 +4408,30 @@ const DEFAULT_CONFIG = {
 };
 
 function getStoredConfigGroup(groupKey) {
+  const normKey = groupKey.toLowerCase();
   try {
-    const row = db.prepare('SELECT value FROM system_settings WHERE key = ?').get(`cfg_${groupKey.toLowerCase()}`);
+    const row = db.prepare('SELECT value FROM system_settings WHERE key = ?').get(`cfg_${normKey}`);
     if (row && row.value) {
       const parsed = JSON.parse(row.value);
-      return { ...DEFAULT_CONFIG[groupKey.toLowerCase()], ...parsed };
+      return { ...DEFAULT_CONFIG[normKey], ...parsed };
     }
   } catch {}
-  return DEFAULT_CONFIG[groupKey.toLowerCase()] || {};
+
+  // Fallback: Check data-store.json directly if DB was just provisioned
+  try {
+    if (fs.existsSync(DATA_STORE_JSON)) {
+      const raw = fs.readFileSync(DATA_STORE_JSON, 'utf8');
+      const data = JSON.parse(raw || '{}');
+      const settings = data['al_prod_system_settings_v1'] || [];
+      const match = settings.find(s => s.key === `cfg_${normKey}`);
+      if (match && match.value) {
+        const parsed = typeof match.value === 'object' ? match.value : JSON.parse(match.value);
+        return { ...DEFAULT_CONFIG[normKey], ...parsed };
+      }
+    }
+  } catch {}
+
+  return DEFAULT_CONFIG[normKey] || {};
 }
 
 // Public endpoint for clients to read current live config

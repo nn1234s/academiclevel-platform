@@ -634,6 +634,97 @@ function migrateFromJsonStore() {
       console.error('[Database Weekly Challenges Error]:', wcErr);
     }
 
+    // 8. Migrate System Settings (CMS config, 5 API keys, pricing, ads, legal)
+    try {
+      const systemSettings = data['al_prod_system_settings_v1'] || [];
+      const insertSetting = db.prepare(`
+        INSERT OR REPLACE INTO system_settings (key, value, updatedAt)
+        VALUES (?, ?, ?)
+      `);
+
+      systemSettings.forEach(s => {
+        insertSetting.run(
+          s.key,
+          typeof s.value === 'object' ? JSON.stringify(s.value) : String(s.value),
+          s.updatedAt || new Date().toISOString()
+        );
+      });
+
+      // Seed default CMS settings in SQLite if not present
+      const defaultSettingsMap = {
+        cfg_pricing: JSON.stringify({
+          litePriceInr: 49,
+          liteDurationDays: 60,
+          plusPriceInr: 129,
+          plusDurationDays: 180,
+          upiVpa: 'theattirebbsr@okicici',
+          merchantName: '17 Pratyusha Nanda',
+          discountBadge: 'Special Launch Offer (95% Off)',
+          liteFeatures: [
+            'Unlimited Quizzes & Adaptive Assessments',
+            'Full Access to All 4 Progression Levels',
+            'Nova AI Socratic Tutor 24/7',
+            'Level Mastery Certificates',
+            'Max 1 Class Change during active cycle'
+          ],
+          plusFeatures: [
+            'Everything in Lite, Extended to 180 Days',
+            'Olympiad & Competitive Reasoning Track',
+            'Annual Master Certificate Eligibility',
+            'Offline Question Bank Full Synchronization',
+            'Bonus 40-Coin Referral Jackpot eligibility',
+            'Max 1 Class Change during active cycle'
+          ]
+        }),
+        cfg_home: JSON.stringify({
+          heroTitle: 'Master Your School Curriculum with Adaptive AI Quizzes',
+          heroSubtitle: 'CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant Socratic guidance, verifiable certificates, and an earnable Study Coin economy.',
+          announcementActive: true,
+          announcementText: '🚀 12,000 Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
+          statsStudents: '10,000+',
+          statsQuizzes: '500,000+',
+          statsPassRate: '99.4%',
+          bannerCtaText: 'Start Free Practice Now'
+        }),
+        cfg_legal: JSON.stringify({
+          contactEmail: 'academiclevels@gmail.com',
+          lastUpdatedDate: 'November 2026',
+          privacyPolicyHeading: 'AcademicLevel Privacy & Data Protection Policy',
+          privacySummary: 'We collect only what is strictly necessary for academic assessment, certificate generation, and parent reporting. Learner data is never sold or used for third-party ad tracking.',
+          termsHeading: 'AcademicLevel Terms of Service & Learner Agreement',
+          termsSummary: 'Subscriptions grant non-transferable access for the specified duration. Study Coins are gamified reward tokens redeemable for verified gift cards and platform cosmetics according to published rules.',
+          refundPolicySummary: 'Subscriptions can be cancelled within 48 hours if no quizzes or certificate entitlements have been generated. Contact academiclevels@gmail.com with your transaction UTR.'
+        }),
+        cfg_ads: JSON.stringify({
+          mainHeading: 'Score 95%+ in School Exams Without Expensive Tuitions',
+          subHeading: 'CBSE & ICSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Socratic Nova AI Tutor & Real Study Coin Rewards.',
+          offerPriceInr: 49,
+          originalPriceInr: 999,
+          discountPercent: 95,
+          guaranteeDays: 60,
+          timerHours: 48,
+          ctaText: 'Claim 60-Day Unlimited Pass for ₹49',
+          urgentNotice: '⚡ FLASH OFFER: Only 17 spots remaining at ₹49 for today\'s cohort.'
+        })
+      };
+
+      let seededCount = 0;
+      Object.entries(defaultSettingsMap).forEach(([key, val]) => {
+        const existing = db.prepare('SELECT key FROM system_settings WHERE key = ?').get(key);
+        if (!existing) {
+          insertSetting.run(key, val, new Date().toISOString());
+          seededCount++;
+        }
+      });
+
+      console.log(`[Database] System settings initialized: ${systemSettings.length} migrated from JSON, ${seededCount} seeded with defaults.`);
+      if (!data['al_prod_system_settings_v1'] || seededCount > 0) {
+        exportDbToJsonStore();
+      }
+    } catch (ssErr) {
+      console.error('[Database System Settings Error]:', ssErr);
+    }
+
     console.log(`[Database] Initialized and migrated data: ${learners.length} learners, ${subscriptions.length} subs, ${giftRequests.length} gifts.`);
   } catch (err) {
     console.error('[Database Migration Error]:', err);
@@ -656,6 +747,7 @@ export function exportDbToJsonStore() {
     const acodes = db.prepare('SELECT * FROM acodes').all().filter(a => !a.code.includes('TEST') && (!a.createdBy || validLearnerIds.has(a.createdBy) || a.createdBy === 'SYSTEM_SCHOLARSHIP'));
     const gift_requests = db.prepare('SELECT * FROM gift_requests').all().filter(g => validLearnerIds.has(g.learnerId));
     const security_audit_logs = db.prepare('SELECT * FROM security_audit_logs').all();
+    const system_settings = db.prepare('SELECT * FROM system_settings').all();
 
     const data = {
       al_prod_learners_v1: learners,
@@ -663,7 +755,8 @@ export function exportDbToJsonStore() {
       al_prod_coin_ledger_v1: coin_ledger,
       al_prod_acodes_v1: acodes,
       al_prod_gift_requests_v1: gift_requests,
-      al_prod_security_audit_logs_v1: security_audit_logs
+      al_prod_security_audit_logs_v1: security_audit_logs,
+      al_prod_system_settings_v1: system_settings
     };
 
     fs.writeFileSync(DATA_STORE_JSON, JSON.stringify(data, null, 2), 'utf8');

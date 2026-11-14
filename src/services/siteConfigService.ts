@@ -10,6 +10,7 @@ export interface PricingConfig {
   discountBadge: string;
   liteFeatures: string[];
   plusFeatures: string[];
+  updatedAt?: string;
 }
 
 export interface HomeConfig {
@@ -21,6 +22,7 @@ export interface HomeConfig {
   statsQuizzes: string;
   statsPassRate: string;
   bannerCtaText: string;
+  updatedAt?: string;
 }
 
 export interface LegalConfig {
@@ -31,6 +33,7 @@ export interface LegalConfig {
   termsHeading: string;
   termsSummary: string;
   refundPolicySummary: string;
+  updatedAt?: string;
 }
 
 export interface AdsConfig {
@@ -43,6 +46,7 @@ export interface AdsConfig {
   timerHours: number;
   ctaText: string;
   urgentNotice: string;
+  updatedAt?: string;
 }
 
 export interface SiteConfig {
@@ -160,11 +164,18 @@ class SiteConfigServiceClass {
     try {
       const res = await ApiClient.getPublicConfig();
       if (res && res.success && res.config) {
+        // Safe intelligent merge: server values override cache, but local custom values are preserved
+        // against being blanked out by empty responses.
+        const serverPricing = res.config.pricing || {};
+        const serverHome = res.config.home || {};
+        const serverLegal = res.config.legal || {};
+        const serverAds = res.config.ads || {};
+
         this.cache = {
-          pricing: { ...DEFAULT_CONFIG.pricing, ...res.config.pricing },
-          home: { ...DEFAULT_CONFIG.home, ...res.config.home },
-          legal: { ...DEFAULT_CONFIG.legal, ...res.config.legal },
-          ads: { ...DEFAULT_CONFIG.ads, ...res.config.ads }
+          pricing: { ...DEFAULT_CONFIG.pricing, ...this.cache.pricing, ...serverPricing },
+          home: { ...DEFAULT_CONFIG.home, ...this.cache.home, ...serverHome },
+          legal: { ...DEFAULT_CONFIG.legal, ...this.cache.legal, ...serverLegal },
+          ads: { ...DEFAULT_CONFIG.ads, ...this.cache.ads, ...serverAds }
         };
         this.saveToStorage();
         this.notify();
@@ -189,7 +200,7 @@ class SiteConfigServiceClass {
   }
 
   public async updatePricing(adminEmail: string, data: Partial<PricingConfig>): Promise<boolean> {
-    const updated = { ...this.cache.pricing, ...data };
+    const updated = { ...this.cache.pricing, ...data, updatedAt: new Date().toISOString() };
     this.cache.pricing = updated;
     this.saveToStorage();
     this.notify();
@@ -203,7 +214,7 @@ class SiteConfigServiceClass {
   }
 
   public async updateHome(adminEmail: string, data: Partial<HomeConfig>): Promise<boolean> {
-    const updated = { ...this.cache.home, ...data };
+    const updated = { ...this.cache.home, ...data, updatedAt: new Date().toISOString() };
     this.cache.home = updated;
     this.saveToStorage();
     this.notify();
@@ -217,7 +228,7 @@ class SiteConfigServiceClass {
   }
 
   public async updateLegal(adminEmail: string, data: Partial<LegalConfig>): Promise<boolean> {
-    const updated = { ...this.cache.legal, ...data };
+    const updated = { ...this.cache.legal, ...data, updatedAt: new Date().toISOString() };
     this.cache.legal = updated;
     this.saveToStorage();
     this.notify();
@@ -231,7 +242,7 @@ class SiteConfigServiceClass {
   }
 
   public async updateAds(adminEmail: string, data: Partial<AdsConfig>): Promise<boolean> {
-    const updated = { ...this.cache.ads, ...data };
+    const updated = { ...this.cache.ads, ...data, updatedAt: new Date().toISOString() };
     this.cache.ads = updated;
     this.saveToStorage();
     this.notify();
