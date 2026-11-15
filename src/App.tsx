@@ -93,10 +93,12 @@ const PROTECTED_STUDENT_ROUTES: Record<string, string> = {
   '/referrals': 'REFERRAL',
   '/acodes': 'REFERRAL',
   '/friend-passes': 'REFERRAL',
-  '/coins': 'COIN_MALL',
-  '/coin-mall': 'COIN_MALL',
+  '/coins': 'GIFT_STORE',
+  '/coin-mall': 'GIFT_STORE',
   '/gifts': 'GIFT_STORE',
   '/gift-store': 'GIFT_STORE',
+  '/mall': 'GIFT_STORE',
+  '/rewards': 'GIFT_STORE',
   '/certificates': 'CERTIFICATES',
   '/master-certificate': 'MASTER_CERT',
   '/profile': 'PROFILE',
@@ -224,8 +226,9 @@ function getPathForRoute(route: string): string {
     case 'COMMUNITY': return '/community';
     case 'SPIN_WHEEL': return '/spin-wheel';
     case 'REFERRAL': return '/referral';
-    case 'COIN_MALL': return '/coin-mall';
-    case 'GIFT_STORE': return '/gift-store';
+    case 'COIN_MALL':
+    case 'GIFT_STORE':
+      return '/gift-store';
     case 'CERTIFICATES': return '/certificates';
     case 'MASTER_CERT': return '/master-certificate';
     case 'PROFILE': return '/profile';
@@ -538,13 +541,13 @@ export const App: React.FC = () => {
                     StudentPacks
                   </button>
                   <button
-                    onClick={() => navigateTo('COIN_MALL')}
+                    onClick={() => navigateTo('GIFT_STORE')}
                     className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1.5 ${
-                      currentRoute === 'COIN_MALL' || currentRoute === 'GIFT_STORE' ? 'text-amber-400 font-bold bg-amber-500/10' : 'text-slate-300 hover:text-white'
+                      currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' ? 'text-amber-400 font-bold bg-amber-500/10' : 'text-slate-300 hover:text-white'
                     }`}
                   >
-                    <StudyCoinIcon className="w-3.5 h-3.5" glow />
-                    <span>Coin Mall</span>
+                    <Gift className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Gift Store</span>
                   </button>
                   <button
                     onClick={() => navigateTo('CERTIFICATES')}
@@ -582,8 +585,9 @@ export const App: React.FC = () => {
                 <div className="flex items-center space-x-2 sm:space-x-3">
                   {/* Coin Badge */}
                   <button
-                    onClick={() => navigateTo('COIN_MALL')}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-bold hover:bg-amber-500/20 transition-all shadow-sm"
+                    onClick={() => navigateTo('GIFT_STORE')}
+                    title="Open Scholar's Gift Store"
+                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-bold hover:bg-amber-500/20 transition-all shadow-sm cursor-pointer"
                   >
                     <StudyCoinIcon className="w-4 h-4" glow />
                     <span>{currentLearner?.coinBalance || 0}</span>
@@ -727,17 +731,11 @@ export const App: React.FC = () => {
                   </span>
                 </button>
                 <button
-                  onClick={() => navigateTo('COIN_MALL')}
+                  onClick={() => navigateTo('GIFT_STORE')}
                   className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
                 >
-                  <StudyCoinIcon className="w-4 h-4" />
-                  <span>Study Coin Mall</span>
-                </button>
-                <button
-                  onClick={() => navigateTo('GIFT_STORE')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
-                >
-                  Scholar&apos;s Gift Store
+                  <Gift className="w-4 h-4 text-amber-400" />
+                  <span>Scholar&apos;s Gift Store (Worldwide Rewards)</span>
                 </button>
                 <button
                   onClick={() => navigateTo('CERTIFICATES')}
@@ -936,15 +934,7 @@ export const App: React.FC = () => {
                 />
               )}
 
-              {currentRoute === 'COIN_MALL' && (
-                <CoinMall
-                  learner={currentLearner}
-                  onRefreshLearner={() => refreshCurrentLearner()}
-                  onNavigateToGiftStore={() => navigateTo('GIFT_STORE')}
-                />
-              )}
-
-              {currentRoute === 'GIFT_STORE' && (
+              {(currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL') && (
                 <GiftStore
                   learner={currentLearner}
                   onRefreshLearner={() => refreshCurrentLearner()}
@@ -984,7 +974,7 @@ export const App: React.FC = () => {
               {currentRoute === 'STREAKS' && (
                 <StreakEngine
                   learner={currentLearner}
-                  onBuyFreeze={() => navigateTo('COIN_MALL')}
+                  onBuyFreeze={() => navigateTo('GIFT_STORE')}
                 />
               )}
 

@@ -111,4 +111,28 @@ assert(novaServiceContent.includes('AI_CREDITS_LIMIT = 8500'), 'novaAiService.ts
 assert(novaTutorContent.includes('8,500 Credits'), 'NovaAiTutor.tsx must display 8,500 Credits');
 console.log('  ✓ AI Credits Limit enforced at 8,500 credits across all systems');
 
+// 5. Verify Unified Gift Store Routing in App.tsx
+console.log('\nTest 5: Verifying Unified Gift Store Routing in App.tsx...');
+const appContent = fs.readFileSync(path.join(ROOT_DIR, 'src/App.tsx'), 'utf-8');
+
+assert(appContent.includes("navigateTo('GIFT_STORE')"), 'App.tsx must navigate directly to GIFT_STORE');
+assert(appContent.includes("<span>Gift Store</span>"), 'App.tsx navbar must label button as Gift Store');
+assert(appContent.includes("currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL'"), 'App.tsx must render GiftStore for both GIFT_STORE and COIN_MALL routes');
+assert(appContent.includes("'/coin-mall': 'GIFT_STORE'"), '/coin-mall route must map directly to GIFT_STORE');
+assert(appContent.includes("'/coins': 'GIFT_STORE'"), '/coins route must map directly to GIFT_STORE');
+console.log('  ✓ Unified Gift Store navigation: Navbar, coin badge, and all routes lead directly to GiftStore without intermediate mall clicks');
+
+// 6. Verify Worldwide Delivery & Country Selector & Integrated Power-Ups
+console.log('\nTest 6: Verifying Truly Worldwide Delivery & Integrated Power-Ups in GiftStore.tsx...');
+assert(giftStoreContent.includes('recipientCountry'), 'GiftStore must track recipientCountry');
+assert(giftStoreContent.includes('United States') && giftStoreContent.includes('United Kingdom'), 'GiftStore country options must include US, UK, etc.');
+assert(giftStoreContent.includes('cleanPin.length < 3 || cleanPin.length > 12'), 'GiftStore must accept international postal/ZIP codes');
+assert(giftStoreContent.includes('digitsOnly.length < 7 || digitsOnly.length > 15'), 'GiftStore must accept international phone numbers');
+assert(giftStoreContent.includes('Streak Freeze Shield'), 'GiftStore must integrate Streak Freeze Shield');
+assert(giftStoreContent.includes('Emerald Scholar Frame'), 'GiftStore must integrate Emerald Scholar Frame');
+assert(giftStoreContent.includes('Class Practice Worksheets'), 'GiftStore must integrate Class Practice Worksheets');
+assert(adminFulfillmentContent.includes('getExtractedCountry'), 'Admin GiftFulfillment must extract and display destination country');
+assert(adminFulfillmentContent.includes('Amazon Global') && adminFulfillmentContent.includes('DHL Express'), 'Admin GiftFulfillment must include global courier carriers');
+console.log('  ✓ Truly Worldwide Delivery verified: Country selector, international postal & phone validation, admin global tracking, and unified digital power-ups');
+
 console.log('\n=== ALL TESTS PASSED WITH 100% SUCCESS! ===');

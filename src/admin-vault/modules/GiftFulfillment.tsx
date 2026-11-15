@@ -24,7 +24,8 @@ import {
   KeyRound,
   Package,
   MapPin,
-  Home
+  Home,
+  Globe
 } from 'lucide-react';
 
 export const GiftFulfillment: React.FC = () => {
@@ -228,11 +229,21 @@ export const GiftFulfillment: React.FC = () => {
 
   const handleCopyAddress = (address: string, id: string) => {
     try {
-      const cleanAddress = address.replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim();
+      const cleanAddress = address
+        .replace('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]', '')
+        .replace('[PHYSICAL DELIVERY VIA AMAZON]', '')
+        .replace('[PHYSICAL DELIVERY]', '')
+        .trim();
       navigator.clipboard.writeText(cleanAddress);
       setCopiedAddressId(id);
       setTimeout(() => setCopiedAddressId(null), 2500);
     } catch {}
+  };
+
+  const getExtractedCountry = (address?: string): string => {
+    if (!address) return '';
+    const match = address.match(/Country:\s*([^|]+)/i);
+    return match && match[1] ? match[1].trim() : '';
   };
 
   const handleShareWhatsAppShipping = (req: GiftRequest, status: string, trackingId?: string, courierName?: string) => {
@@ -561,9 +572,27 @@ export const GiftFulfillment: React.FC = () => {
                         </div>
                       </div>
 
+                      {/* Destination Country Badge & Worldwide Indicator */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        {getExtractedCountry(req.shippingAddress) ? (
+                          <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[10px] font-bold flex items-center space-x-1">
+                            <Globe className="w-3 h-3 text-indigo-400" />
+                            <span>Destination: <strong className="text-white">{getExtractedCountry(req.shippingAddress)}</strong></span>
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold flex items-center space-x-1">
+                            <Globe className="w-3 h-3 text-emerald-400" />
+                            <span>Destination: <strong className="text-white">India (Domestic)</strong></span>
+                          </span>
+                        )}
+                        <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400 text-[10px] font-mono">
+                          🌍 Amazon Worldwide &amp; Global Courier
+                        </span>
+                      </div>
+
                       {/* FULL UN-TRUNCATED COURIER ADDRESS DISPLAY */}
                       <div className="bg-slate-950 p-3 rounded-xl border border-amber-500/25 text-xs text-white font-mono leading-relaxed select-all">
-                        {req.shippingAddress.replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim()}
+                        {req.shippingAddress.replace('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]', '').replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim()}
                       </div>
 
                       {/* Shipping Tracking Status Strip */}
@@ -779,7 +808,7 @@ export const GiftFulfillment: React.FC = () => {
               </div>
 
               {/* If SHIPPED or ORDERED: Show Courier Carrier & Tracking Number inputs */}
-              {(modalStatus === 'SHIPPED' || modalStatus === 'ORDERED' || modalReq.isPhysical || (modalReq.shippingAddress && (modalReq.shippingAddress.includes('[PHYSICAL DELIVERY]') || modalReq.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]'))) || modalReq.itemTitle.toLowerCase().includes('bottle') || modalReq.itemTitle.toLowerCase().includes('squishy') || modalReq.itemTitle.toLowerCase().includes('blaster') || modalReq.itemTitle.toLowerCase().includes('stationery')) && (
+              {(modalStatus === 'SHIPPED' || modalStatus === 'ORDERED' || modalReq.isPhysical || (modalReq.shippingAddress && (modalReq.shippingAddress.includes('[PHYSICAL DELIVERY]') || modalReq.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]') || modalReq.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]'))) || modalReq.itemTitle.toLowerCase().includes('bottle') || modalReq.itemTitle.toLowerCase().includes('squishy') || modalReq.itemTitle.toLowerCase().includes('blaster') || modalReq.itemTitle.toLowerCase().includes('stationery')) && (
                 <div className="space-y-3 p-3 bg-slate-950/70 border border-slate-800 rounded-2xl">
                   <div>
                     <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-1">
@@ -792,6 +821,19 @@ export const GiftFulfillment: React.FC = () => {
                       placeholder="e.g. Amazon Logistics, BlueDart, Delhivery, DTDC, India Post"
                       className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400 font-medium"
                     />
+                    {/* Global Courier Carrier Presets */}
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {['Amazon Global', 'Amazon Logistics', 'DHL Express', 'FedEx', 'UPS', 'Aramex', 'BlueDart', 'Delhivery', 'India Post'].map(c => (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => setModalCourierName(c)}
+                          className="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] rounded border border-slate-700 font-medium"
+                        >
+                          + {c}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   <div>

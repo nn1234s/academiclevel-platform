@@ -31,8 +31,13 @@ import {
   Star,
   Box,
   Info,
-  X
+  X,
+  Globe,
+  Flame,
+  FileText,
+  Printer
 } from 'lucide-react';
+import { PracticeWorksheetViewer } from './PracticeWorksheetViewer';
 
 interface GiftStoreProps {
   learner: Learner;
@@ -334,8 +339,10 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner,
   const [copiedEmailText, setCopiedEmailText] = useState(false);
   const [copiedVoucherId, setCopiedVoucherId] = useState<string | null>(null);
 
-  // Physical Merchandise States
+  // Physical Merchandise & International Worldwide Delivery States
   const [selectedPhysicalItem, setSelectedPhysicalItem] = useState<PhysicalRewardItem | null>(null);
+  const [recipientCountry, setRecipientCountry] = useState<string>('India');
+  const [customCountry, setCustomCountry] = useState<string>('');
   const [recipientName, setRecipientName] = useState<string>(learner.fullName || '');
   const [flatHouse, setFlatHouse] = useState<string>('');
   const [streetArea, setStreetArea] = useState<string>('');
@@ -347,6 +354,77 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner,
   const [submittedPhysicalClaim, setSubmittedPhysicalClaim] = useState<SubmittedPhysicalClaimInfo | null>(null);
   const [copiedPhysicalEmailText, setCopiedPhysicalEmailText] = useState(false);
   const [previewProductItem, setPreviewProductItem] = useState<PhysicalRewardItem | null>(null);
+
+  // Digital Study Power-Up States (Streak Freeze, Avatar Frames, Worksheets)
+  const [isWorksheetModalOpen, setIsWorksheetModalOpen] = useState<boolean>(false);
+  const [powerUpSuccess, setPowerUpSuccess] = useState<string>('');
+  const [powerUpError, setPowerUpError] = useState<string>('');
+
+  const isWorksheetUnlocked = typeof window !== 'undefined' && (
+    localStorage.getItem(`al_unlocked_worksheets_${learner.id}`) === 'true' ||
+    (learner.metadataJson && JSON.parse(learner.metadataJson || '{}').unlockedWorksheets)
+  );
+
+  const handleBuyStreakFreeze = () => {
+    setPowerUpSuccess('');
+    setPowerUpError('');
+    const cost = 15;
+    if (learner.coinBalance < cost) {
+      setPowerUpError(`Insufficient coins. You have ${learner.coinBalance} coins, but 15 are required.`);
+      return;
+    }
+    const tx = CoinLedgerService.appendTransaction(learner.id, -cost, 'MALL_PURCHASE', {
+      item: 'STREAK_FREEZE_1X'
+    });
+    if (tx.success) {
+      learner.streakFreezesAvailable = (learner.streakFreezesAvailable || 0) + 1;
+      StorageRLSLayer.saveLearner(learner, learner.id);
+      onRefreshLearner();
+      setPowerUpSuccess('Streak Freeze purchased! Your study streak is protected for 1 missed day.');
+    } else {
+      setPowerUpError(tx.error || 'Transaction failed.');
+    }
+  };
+
+  const handleBuyAvatarFrame = (frameName: string, cost: number) => {
+    setPowerUpSuccess('');
+    setPowerUpError('');
+    if (learner.coinBalance < cost) {
+      setPowerUpError(`Insufficient coins. You have ${learner.coinBalance} coins, but ${cost} are required.`);
+      return;
+    }
+    const tx = CoinLedgerService.appendTransaction(learner.id, -cost, 'MALL_PURCHASE', {
+      item: `AVATAR_FRAME_${frameName.toUpperCase()}`
+    });
+    if (tx.success) {
+      learner.avatarFrame = frameName;
+      StorageRLSLayer.saveLearner(learner, learner.id);
+      onRefreshLearner();
+      setPowerUpSuccess(`Equipped ${frameName} Avatar Frame!`);
+    } else {
+      setPowerUpError(tx.error || 'Transaction failed.');
+    }
+  };
+
+  const handleUnlockWorksheets = () => {
+    setPowerUpSuccess('');
+    setPowerUpError('');
+    if (learner.coinBalance < 30) {
+      setPowerUpError(`Insufficient coins. You have ${learner.coinBalance} coins, but 30 coins are required for Practice Worksheets.`);
+      return;
+    }
+    const tx = CoinLedgerService.appendTransaction(learner.id, -30, 'MALL_PURCHASE', {
+      item: 'PRACTICE_WORKSHEETS_ALL_CLASSES'
+    });
+    if (tx.success) {
+      localStorage.setItem(`al_unlocked_worksheets_${learner.id}`, 'true');
+      onRefreshLearner();
+      setPowerUpSuccess('🎉 Practice Worksheets unlocked for all classes! Opening your printable worksheet generator...');
+      setIsWorksheetModalOpen(true);
+    } else {
+      setPowerUpError(tx.error || 'Transaction failed.');
+    }
+  };
 
   const handleCopyVoucher = (code: string, id: string) => {
     try {
@@ -665,6 +743,10 @@ ${learner.fullName}`;
       return;
     }
 
+    const effectiveCountry = recipientCountry === 'Worldwide / Other Country' && customCountry.trim()
+      ? customCountry.trim()
+      : recipientCountry;
+
     if (
       !recipientName.trim() ||
       !flatHouse.trim() ||
@@ -676,24 +758,25 @@ ${learner.fullName}`;
     ) {
       setMessage({
         type: 'error',
-        text: 'Please complete all courier shipping address fields (Recipient Name, House/Flat, Street/Locality, City, State, 6-digit PIN, and WhatsApp phone) so courier can deliver.'
+        text: 'Please complete all courier shipping address fields (Recipient Name, House/Flat, Street/Locality, City, State/Province, Postal/ZIP Code, and Phone) so courier can deliver.'
       });
       return;
     }
 
-    const cleanPin = pincode.replace(/\D/g, '');
-    if (cleanPin.length !== 6) {
-      setMessage({ type: 'error', text: 'Please enter a valid 6-digit postal PIN code.' });
+    const cleanPin = pincode.trim().toUpperCase();
+    if (cleanPin.length < 3 || cleanPin.length > 12) {
+      setMessage({ type: 'error', text: 'Please enter a valid postal / ZIP code (3 to 12 alphanumeric characters).' });
       return;
     }
 
-    const cleanPhone = physicalPhone.replace(/\D/g, '');
-    if (cleanPhone.length < 10) {
-      setMessage({ type: 'error', text: 'Please enter a valid 10-digit WhatsApp phone number for courier delivery updates.' });
+    const digitsOnly = physicalPhone.replace(/\D/g, '');
+    if (digitsOnly.length < 7 || digitsOnly.length > 15) {
+      setMessage({ type: 'error', text: 'Please enter a valid phone / WhatsApp number with country code (7 to 15 digits).' });
       return;
     }
+    const cleanPhone = physicalPhone.trim();
 
-    const fullShippingAddress = `[PHYSICAL DELIVERY] Recipient: ${recipientName.trim()} | House/Flat: ${flatHouse.trim()} | Street/Area: ${streetArea.trim()}${landmark.trim() ? ` | Landmark: ${landmark.trim()}` : ''} | City: ${city.trim()} | State: ${stateName.trim()} | PIN: ${cleanPin} | Phone: ${cleanPhone}`;
+    const fullShippingAddress = `[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE] Country: ${effectiveCountry} | Recipient: ${recipientName.trim()} | Flat/House: ${flatHouse.trim()} | Street/Area: ${streetArea.trim()}${landmark.trim() ? ` | Landmark: ${landmark.trim()}` : ''} | City: ${city.trim()} | State/Province: ${stateName.trim()} | Postal/ZIP: ${cleanPin} | Phone: ${cleanPhone}`;
 
     const targetEmail = 'academiclevels@gmail.com';
 
@@ -707,6 +790,7 @@ ${learner.fullName}`;
         itemName: selectedPhysicalItem.name,
         isPhysical: true,
         shippingAddress: fullShippingAddress,
+        country: effectiveCountry,
         phone: cleanPhone,
         dispatchedTo: targetEmail
       }
@@ -743,7 +827,7 @@ ${learner.fullName}`;
       brand: selectedPhysicalItem.name,
       rsAmount: 0,
       coinsCost: selectedPhysicalItem.coinsCost,
-      deliveryEmail: learner.email || `${cleanPhone}@sms.academiclevel.in`,
+      deliveryEmail: learner.email || `${cleanPhone.replace(/\D/g, '')}@sms.academiclevel.in`,
       deliveryPhone: cleanPhone,
       itemTitle: selectedPhysicalItem.name,
       shippingAddress: fullShippingAddress,
@@ -753,14 +837,15 @@ ${learner.fullName}`;
     } as any).catch(() => {});
 
     // 4. Format official email request
-    const mailSubject = `[Physical Reward Claim] ${selectedPhysicalItem.name} - ${recipientName.trim()} (${learner.fullName})`;
+    const mailSubject = `[Physical Reward Claim - ${effectiveCountry}] ${selectedPhysicalItem.name} - ${recipientName.trim()} (${learner.fullName})`;
     const mailBody = `Hello AcademicLevel Fulfillment Team,
 
-I have accumulated Study Coins on AcademicLevel and redeemed a physical reward for doorstep courier delivery!
+I have accumulated Study Coins on AcademicLevel and redeemed a physical reward for worldwide doorstep courier delivery!
 
 Redemption Details:
 • Student Name: ${learner.fullName}
 • Recipient Name: ${recipientName.trim()}
+• Destination Country: ${effectiveCountry}
 • Student Email: ${learner.email}
 • WhatsApp / Courier Phone: ${cleanPhone}
 • Board & Class: ${learner.board} Class ${learner.grade}
@@ -769,7 +854,8 @@ Redemption Details:
 • Coins Debited: ${selectedPhysicalItem.coinsCost.toLocaleString()} Coins
 • Doorstep Courier Shipping Address:
   ${flatHouse.trim()}, ${streetArea.trim()}${landmark.trim() ? `, Near ${landmark.trim()}` : ''}
-  City: ${city.trim()}, State: ${stateName.trim()} - PIN: ${cleanPin}
+  City: ${city.trim()}, State/Province: ${stateName.trim()} - Postal/ZIP: ${cleanPin}
+  Country: ${effectiveCountry}
 • Request ID: ${reqId}
 • Submitted At: ${new Date().toLocaleString()}
 
@@ -804,16 +890,16 @@ ${recipientName.trim()}`;
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="max-w-xl">
             <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full inline-flex items-center space-x-1.5 mb-3">
-              <StudyCoinIcon className="w-3.5 h-3.5" />
-              <span>Real Rewards • Instant Digital Delivery</span>
+              <Globe className="w-3.5 h-3.5 text-amber-400" />
+              <span>🌍 Truly Worldwide Rewards • Instant Digital Delivery &amp; Global Courier</span>
             </span>
             <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-              Study Coin Gift Card & Physical Merch Arena
+              Scholar&apos;s Gift Store &amp; Global Arena
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
-              Convert your academic consistency into real-world rewards!
+              Convert your hard-earned Study Coins into real gifts, physical scholar merchandise delivered worldwide, and essential study power-ups!
               <br />
-              <strong className="text-amber-400">Level 1 starts at 2,500 Coins (₹10 Gift Card)</strong> up to Level 6 at <strong className="text-amber-400">37,500 Coins (₹150 Gift Card)</strong>, plus authentic physical scholar hydration bottles!
+              <strong className="text-amber-400">Doorstep delivery to any country in the world</strong> via Amazon Worldwide &amp; global courier networks.
             </p>
           </div>
 
@@ -915,22 +1001,22 @@ ${recipientName.trim()}`;
       )}
 
       {/* ======================================================== */}
-      {/* 1. PHYSICAL SCHOLAR MERCHANDISE (DOORSTEP DELIVERY) */}
+      {/* 1. PHYSICAL SCHOLAR MERCHANDISE (WORLDWIDE DOORSTEP DELIVERY) */}
       {/* ======================================================== */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h2 className="text-lg font-bold text-white flex items-center space-x-2">
               <Package className="w-5 h-5 text-amber-400" />
-              <span>Physical Scholar Merchandise (Doorstep Courier Delivery)</span>
+              <span>Physical Scholar Merchandise (Worldwide Doorstep Delivery)</span>
             </h2>
             <p className="text-xs text-slate-400">
-              Authentic study hydration gear shipped directly to your verified home address. Both Lite &amp; Plus scholars are eligible!
+              Authentic study merchandise, toys, and hydration gear shipped directly to your verified address in any country worldwide! Both Lite &amp; Plus scholars are eligible!
             </p>
           </div>
-          <span className="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold rounded-full uppercase tracking-wider self-start sm:self-auto flex items-center gap-1">
-            <Truck className="w-3.5 h-3.5" />
-            <span>Free Doorstep Delivery Across India</span>
+          <span className="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold rounded-full uppercase tracking-wider self-start sm:self-auto flex items-center gap-1.5 shadow-sm">
+            <Globe className="w-3.5 h-3.5 text-amber-400" />
+            <span>🌍 Free Doorstep Delivery Worldwide (Amazon &amp; Global Couriers)</span>
           </span>
         </div>
 
@@ -1166,6 +1252,141 @@ ${recipientName.trim()}`;
         </div>
       </div>
 
+      {/* ======================================================== */}
+      {/* 3. DIGITAL STUDY POWER-UPS & UTILITIES (15 to 30 COINS) */}
+      {/* ======================================================== */}
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-lg font-bold text-white flex items-center space-x-2">
+            <Zap className="w-5 h-5 text-amber-400" />
+            <span>Digital Study Power-Ups &amp; Academic Perks</span>
+          </h2>
+          <p className="text-xs text-slate-400">
+            Instant digital utilities: protect your study streaks, equip profile frames, and generate practice worksheets.
+          </p>
+        </div>
+
+        {/* Notifications for Power-ups */}
+        {powerUpSuccess && (
+          <div className="p-3.5 bg-emerald-950/40 border border-emerald-800 rounded-2xl text-xs text-emerald-300 flex items-center space-x-2">
+            <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            <span>{powerUpSuccess}</span>
+          </div>
+        )}
+
+        {powerUpError && (
+          <div className="p-3.5 bg-red-950/40 border border-red-800 rounded-2xl text-xs text-red-300 flex items-center space-x-2">
+            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+            <span>{powerUpError}</span>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Streak Freeze Shield */}
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition-all shadow-xl">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mb-4">
+                <Flame className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-white text-base">Streak Freeze Shield</h3>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                Missing a study day won&apos;t reset your streak. Automatically activates if you miss 24 hours.
+              </p>
+              <div className="mt-4 flex items-center justify-between text-xs text-slate-300 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                <span>Active Freezes:</span>
+                <span className="font-mono font-bold text-amber-400">{learner.streakFreezesAvailable || 0}</span>
+              </div>
+            </div>
+
+            <button
+              onClick={handleBuyStreakFreeze}
+              className="mt-6 w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+            >
+              <StudyCoinIcon className="w-4 h-4" />
+              <span>Buy Freeze (15 Coins)</span>
+            </button>
+          </div>
+
+          {/* Emerald Frame */}
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition-all shadow-xl">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-4">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-white text-base">Emerald Scholar Frame</h3>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                Equip an exclusive animated emerald border for your avatar across StudentPacks and leaderboards.
+              </p>
+            </div>
+
+            <button
+              onClick={() => handleBuyAvatarFrame('Emerald', 20)}
+              className="mt-6 w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+            >
+              <StudyCoinIcon className="w-4 h-4" />
+              <span>{learner.avatarFrame === 'Emerald' ? 'Equipped' : 'Equip (20 Coins)'}</span>
+            </button>
+          </div>
+
+          {/* Practice Worksheets Generator */}
+          <div className={`border rounded-3xl p-6 flex flex-col justify-between transition-all shadow-xl ${
+            isWorksheetUnlocked
+              ? 'bg-gradient-to-br from-indigo-950/40 via-slate-900 to-emerald-950/30 border-emerald-500/50 shadow-emerald-950/20'
+              : 'bg-slate-900 border-slate-800 hover:border-indigo-500/50'
+          }`}>
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center">
+                  <FileText className="w-6 h-6" />
+                </div>
+                {isWorksheetUnlocked ? (
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 flex items-center space-x-1">
+                    <Check className="w-3 h-3" />
+                    <span>Unlocked &amp; Ready</span>
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 border border-amber-500/30 text-amber-300">
+                    30 Coins
+                  </span>
+                )}
+              </div>
+
+              <h3 className="font-bold text-white text-base">Class Practice Worksheets &amp; PDF</h3>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                Generate curriculum practice worksheets from the 12,000-question bank for all classes (1–12), with rough work workspace and detachable step-by-step solutions.
+              </p>
+
+              <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-mono">
+                <span className="px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 border border-slate-700/60">
+                  All Classes (1 to 12)
+                </span>
+                <span className="px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 border border-slate-700/60">
+                  1-Click PDF Print
+                </span>
+              </div>
+            </div>
+
+            {isWorksheetUnlocked ? (
+              <button
+                onClick={() => setIsWorksheetModalOpen(true)}
+                className="mt-6 w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+              >
+                <Printer className="w-4 h-4" />
+                <span>📄 Open &amp; Print Worksheets</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleUnlockWorksheets}
+                className="mt-6 w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+              >
+                <StudyCoinIcon className="w-4 h-4" />
+                <span>Unlock Practice Worksheets (30 Coins)</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Redemption History */}
       {existingRequests.length > 0 && (
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
@@ -1176,7 +1397,7 @@ ${recipientName.trim()}`;
 
           <div className="divide-y divide-slate-800">
             {existingRequests.map(req => {
-              const isPhysical = req.isPhysical || (req.shippingAddress && req.shippingAddress.includes('[PHYSICAL DELIVERY]')) || req.itemTitle.toLowerCase().includes('bottle');
+              const isPhysical = req.isPhysical || (req.shippingAddress && (req.shippingAddress.includes('[PHYSICAL DELIVERY]') || req.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]'))) || req.itemTitle.toLowerCase().includes('bottle') || req.itemTitle.toLowerCase().includes('squishy') || req.itemTitle.toLowerCase().includes('blaster') || req.itemTitle.toLowerCase().includes('stationery');
               const code = getVoucherDetails(req);
               const help = getRedemptionHelp(req.itemTitle);
               const isDispatched = req.status === 'APPROVED_DISPATCHED';
@@ -1196,7 +1417,7 @@ ${recipientName.trim()}`;
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
-                        📍 <strong>Destination:</strong> {req.shippingAddress.replace('[PHYSICAL DELIVERY]', '').trim()}
+                        📍 <strong>Destination:</strong> {req.shippingAddress.replace('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]', '').replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim()}
                       </p>
                       <p className="text-[10px] text-slate-500 mt-0.5">
                         Phone: {req.contactPhone} • Requested on: {new Date(req.requestedAt).toLocaleString()}
@@ -1777,15 +1998,58 @@ ${recipientName.trim()}`;
               </p>
             </div>
 
-            {/* Amazon Delivery Notice */}
-            <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center space-x-2.5 text-xs text-amber-300 mb-4">
-              <Truck className="w-4 h-4 text-amber-400 flex-shrink-0" />
+            {/* Amazon Worldwide Delivery Notice */}
+            <div className="p-3 bg-gradient-to-r from-amber-500/15 via-indigo-500/10 to-emerald-500/15 border border-amber-500/30 rounded-2xl flex items-center space-x-2.5 text-xs text-amber-300 mb-4">
+              <Globe className="w-5 h-5 text-amber-400 flex-shrink-0" />
               <span>
-                <strong>Amazon Doorstep Delivery:</strong> Please provide your complete delivery address below. Your parcel will be dispatched directly via Amazon logistics with live tracking.
+                <strong>Truly Worldwide Doorstep Delivery:</strong> We ship directly to students in <strong>any country worldwide</strong> via Amazon Global and international courier networks with live tracking updates!
               </span>
             </div>
 
             <form onSubmit={handleConfirmPhysicalRedeem} className="space-y-3.5 text-xs">
+              {/* Destination Country / Region */}
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1 flex items-center space-x-1">
+                  <Globe className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Destination Country / Region <span className="text-rose-400">*</span></span>
+                </label>
+                <select
+                  value={recipientCountry}
+                  onChange={e => setRecipientCountry(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
+                >
+                  <option value="India">🇮🇳 India</option>
+                  <option value="United States">🇺🇸 United States</option>
+                  <option value="United Kingdom">🇬🇧 United Kingdom</option>
+                  <option value="United Arab Emirates">🇦🇪 United Arab Emirates</option>
+                  <option value="Canada">🇨🇦 Canada</option>
+                  <option value="Australia">🇦🇺 Australia</option>
+                  <option value="Singapore">🇸🇬 Singapore</option>
+                  <option value="Germany">🇩🇪 Germany</option>
+                  <option value="France">🇫🇷 France</option>
+                  <option value="Japan">🇯🇵 Japan</option>
+                  <option value="Saudi Arabia">🇸🇦 Saudi Arabia</option>
+                  <option value="Qatar">🇶🇦 Qatar</option>
+                  <option value="Kuwait">🇰🇼 Kuwait</option>
+                  <option value="Malaysia">🇲🇾 Malaysia</option>
+                  <option value="New Zealand">🇳🇿 New Zealand</option>
+                  <option value="South Africa">🇿🇦 South Africa</option>
+                  <option value="Worldwide / Other Country">🌍 Worldwide / Other Country</option>
+                </select>
+                {recipientCountry === 'Worldwide / Other Country' && (
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      required
+                      placeholder="Please enter your country name"
+                      value={customCountry}
+                      onChange={e => setCustomCountry(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl px-3 py-2 text-white text-xs focus:outline-none"
+                    />
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Recipient Full Name */}
                 <div>
@@ -1802,20 +2066,19 @@ ${recipientName.trim()}`;
                   />
                 </div>
 
-                {/* WhatsApp Phone */}
+                {/* Phone with Country Code */}
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1 flex items-center space-x-1">
                     <Phone className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>WhatsApp / Mobile <span className="text-rose-400">*</span></span>
+                    <span>Phone / WhatsApp (with Country Code) <span className="text-rose-400">*</span></span>
                   </label>
                   <input
                     type="tel"
                     required
-                    maxLength={10}
-                    placeholder="10-digit mobile number"
+                    placeholder="e.g. +91 9876543210 or +1 4155552671"
                     value={physicalPhone}
                     onChange={e => setPhysicalPhone(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none font-mono"
                   />
                 </div>
               </div>
@@ -1829,7 +2092,7 @@ ${recipientName.trim()}`;
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Flat 302, Sai Residency, Plot No. 42"
+                  placeholder="e.g. Flat 302, Sai Residency, Plot No. 42 / 123 Main St"
                   value={flatHouse}
                   onChange={e => setFlatHouse(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
@@ -1845,7 +2108,7 @@ ${recipientName.trim()}`;
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Master Canteen Area, Kharavela Nagar"
+                  placeholder="e.g. Downtown, Baker Street, Kharavela Nagar"
                   value={streetArea}
                   onChange={e => setStreetArea(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
@@ -1859,7 +2122,7 @@ ${recipientName.trim()}`;
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Near Royal High School, Opposite SBI Bank"
+                  placeholder="e.g. Near Royal High School, Opposite Central Park"
                   value={landmark}
                   onChange={e => setLandmark(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
@@ -1875,41 +2138,41 @@ ${recipientName.trim()}`;
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Bhubaneswar"
+                    placeholder="e.g. New York / London / Delhi"
                     value={city}
                     onChange={e => setCity(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2 text-white focus:outline-none"
                   />
                 </div>
 
-                {/* State */}
+                {/* State / Province */}
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1">
-                    State <span className="text-rose-400">*</span>
+                    State / Province / Region <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Odisha"
+                    placeholder="e.g. CA / Ontario / Odisha"
                     value={stateName}
                     onChange={e => setStateName(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2 text-white focus:outline-none"
                   />
                 </div>
 
-                {/* Pincode */}
+                {/* Postal / ZIP Code */}
                 <div>
                   <label className="block text-slate-300 font-semibold mb-1">
-                    6-Digit PIN <span className="text-rose-400">*</span>
+                    Postal / ZIP Code <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
                     required
-                    maxLength={6}
-                    placeholder="e.g. 751001"
+                    maxLength={12}
+                    placeholder="e.g. 751001 / 90210 / SW1A 1AA"
                     value={pincode}
                     onChange={e => setPincode(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2 text-white font-mono focus:outline-none"
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2 text-white font-mono focus:outline-none uppercase"
                   />
                 </div>
               </div>
@@ -2017,7 +2280,7 @@ ${recipientName.trim()}`;
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-400">Shipping Address:</span>
-                <span className="text-amber-300 break-words text-[11px]">{submittedPhysicalClaim.fullAddress.replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim()}</span>
+                <span className="text-amber-300 break-words text-[11px]">{submittedPhysicalClaim.fullAddress.replace('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]', '').replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim()}</span>
               </div>
               <div className="flex justify-between pt-1 border-t border-slate-800">
                 <span className="text-slate-400">Request ID:</span>
@@ -2042,6 +2305,14 @@ ${recipientName.trim()}`;
             </button>
           </div>
         </div>
+      )}
+
+      {/* PRACTICE WORKSHEETS MODAL */}
+      {isWorksheetModalOpen && (
+        <PracticeWorksheetViewer
+          learner={learner}
+          onClose={() => setIsWorksheetModalOpen(false)}
+        />
       )}
     </div>
   );
