@@ -26,6 +26,8 @@ export interface StudentAiQuota {
   coinBalance?: number;
 }
 
+export const AI_CREDITS_LIMIT = 8500;
+
 export class NovaAiService {
   private static AI_TIMEOUT_MS = 20000;
   private static CLIENT_CANDIDATES: { version: string; model: string }[] = [
@@ -206,7 +208,7 @@ export class NovaAiService {
           const errData = await r.json().catch(() => ({}));
           return {
             success: true,
-            text: `🪙 **Daily AI Limit Reached (8/8 Free Messages)**\n\nYou've used your 8 daily AI tutor queries! Refill instantly using your AL Coins (10 Coins = 5 Messages) by clicking the Refill button in the header.`
+            text: `🪙 **AI Credit Limit Reached (8,500 Credits Limit)**\n\nYou've reached the 8,500 AI credits limit! Refill extra queries using your AL Coins (10 Coins = 5 Messages) by clicking the Refill button in the header.`
           };
         }
         if (!r.ok) throw new Error(`HTTP ${r.status}`);

@@ -278,6 +278,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const [secondsRemaining, setSecondsRemaining] = useState(847);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [adsConfig, setAdsConfig] = useState(() => SiteConfigService.getAds());
+  const [selectedPlanTier, setSelectedPlanTier] = useState<'LITE' | 'PLUS'>('LITE');
 
   useEffect(() => {
     return SiteConfigService.subscribe(() => {
@@ -382,18 +383,22 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
   const officialVpa = PaymentService.OFFICIAL_UPI_VPA;
   const officialPayeeName = PaymentService.OFFICIAL_MERCHANT_NAME;
-  const officialQrImage = PaymentService.getOfficialQrImageUrl('LITE');
-  const offerAmount = Number(adsConfig.offerPriceInr || 49);
+  const activeAmount = selectedPlanTier === 'PLUS' ? 129 : Number(adsConfig.offerPriceInr || 49);
+  const activeDurationDays = selectedPlanTier === 'PLUS' ? 180 : 60;
+  const activePlanName = selectedPlanTier === 'PLUS' ? 'AcademicLevel Plus (180 Days / 6 Months)' : 'AcademicLevel Lite (60 Days)';
+  const activeOrderNote = `Order_AL_${selectedPlanTier === 'PLUS' ? '129' : '49'}_${(currentLearner?.id || 'guest').slice(-6)}`;
+  const officialQrImage = PaymentService.getOfficialQrImageUrl(selectedPlanTier);
+  const offerAmount = activeAmount;
   const upiUri = PaymentService.buildStandardUpiUri({
-    amount: offerAmount,
-    note: `Order_AL_49_${(currentLearner?.id || 'guest').slice(-6)}`
+    amount: activeAmount,
+    note: activeOrderNote
   });
 
   useEffect(() => {
-    PaymentService.generateQrDataUrl(offerAmount, `Order_AL_49_${(currentLearner?.id || 'guest').slice(-6)}`).then(url => {
+    PaymentService.generateQrDataUrl(activeAmount, activeOrderNote).then(url => {
       if (url) setQrDataUrl(url);
     });
-  }, [offerAmount, currentLearner?.id]);
+  }, [activeAmount, activeOrderNote, currentLearner?.id]);
 
   // Pre-fill payer details if student is already logged in
   useEffect(() => {
@@ -483,7 +488,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
       const res = await PaymentService.submitUpiPayment(
         finalId,
-        'LITE',
+        selectedPlanTier,
         cleanPayer,
         cleanUtr
       );
@@ -885,36 +890,114 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       </section>
 
       {/* ======================================================== */}
-      {/* 2.25. DIRECT ON-PAGE ₹49 UPI QR & TRANSACTION ID SECTION */}
+      {/* 2.25. DIRECT ON-PAGE ₹49 & ₹129 UPI QR & UTR SECTION     */}
       {/* ======================================================== */}
       <section id="instant-pay-qr" className="py-10 px-3 sm:px-6 bg-gradient-to-b from-orange-100/50 via-white to-slate-100 border-y-2 border-orange-400/50 scroll-mt-14">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-orange-600 text-white shadow-md mb-2">
               <QrCode className="w-3.5 h-3.5" />
-              <span>Official ₹49 UPI Payment Gateway</span>
+              <span>Official ₹{offerAmount} UPI Payment Gateway</span>
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Scan QR & Enter 12-Digit Transaction ID (UTR)
+              Select Plan, Scan QR &amp; Enter 12-Digit Transaction ID (UTR)
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl mx-auto">
-              Pay using Google Pay, PhonePe, Paytm, or BHIM. Enter your 12-digit UTR below for immediate enrollment.
+              Choose your plan below, pay via Google Pay, PhonePe, Paytm, or BHIM, and submit your 12-digit UTR for immediate activation.
             </p>
+          </div>
+
+          {/* BIG 2-OPTION PLAN SELECTOR: ₹49 vs ₹129 */}
+          <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Option 1: ₹49 Concept Booster */}
+            <button
+              type="button"
+              onClick={() => setSelectedPlanTier('LITE')}
+              className={`p-5 rounded-3xl border-2 text-left transition-all cursor-pointer relative overflow-hidden ${
+                selectedPlanTier === 'LITE'
+                  ? 'border-orange-500 bg-gradient-to-br from-orange-50 to-amber-50/60 shadow-xl ring-2 ring-orange-400 scale-[1.01]'
+                  : 'border-slate-200 bg-white hover:border-slate-300 opacity-90'
+              }`}
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-orange-100 text-orange-800 mb-1.5">
+                    Concept Booster (Lite)
+                  </span>
+                  <div className="flex items-baseline space-x-2">
+                    <span className="text-2xl sm:text-3xl font-black text-slate-900">₹49</span>
+                    <span className="text-xs text-slate-400 line-through font-bold">₹499</span>
+                    <span className="text-[11px] font-black text-emerald-600 uppercase tracking-wide">90% OFF</span>
+                  </div>
+                </div>
+                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-xs ${
+                  selectedPlanTier === 'LITE' ? 'border-orange-600 bg-orange-600 text-white' : 'border-slate-300 text-transparent'
+                }`}>
+                  ✓
+                </div>
+              </div>
+              <p className="text-xs font-bold text-slate-800 mt-2">60 Days Full Syllabus Access</p>
+              <ul className="text-[11px] text-slate-600 mt-2 space-y-1 font-medium">
+                <li>✓ Full syllabus adaptive AI quiz for Classes 1–12</li>
+                <li>✓ Nova AI interactive homework &amp; doubt solver</li>
+                <li>✓ Milton Costa 1000 &amp; Steel Bottle reward redemptions</li>
+              </ul>
+            </button>
+
+            {/* Option 2: ₹129 Term Mastery (BIG & HIGHLIGHTED) */}
+            <button
+              type="button"
+              onClick={() => setSelectedPlanTier('PLUS')}
+              className={`p-5 rounded-3xl border-2 text-left transition-all cursor-pointer relative overflow-hidden ${
+                selectedPlanTier === 'PLUS'
+                  ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50/60 shadow-xl ring-2 ring-emerald-400 scale-[1.01]'
+                  : 'border-slate-200 bg-white hover:border-slate-300 opacity-90'
+              }`}
+            >
+              <div className="absolute top-2.5 right-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow">
+                ⭐ BEST VALUE • 6 MONTHS
+              </div>
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 mb-1.5">
+                    Term Mastery (Plus)
+                  </span>
+                  <div className="flex items-baseline space-x-2">
+                    <span className="text-2xl sm:text-3xl font-black text-slate-900">₹129</span>
+                    <span className="text-xs text-slate-400 line-through font-bold">₹1,299</span>
+                    <span className="text-[11px] font-black text-emerald-600 uppercase tracking-wide">90% OFF</span>
+                  </div>
+                </div>
+                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-xs mt-3 ${
+                  selectedPlanTier === 'PLUS' ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300 text-transparent'
+                }`}>
+                  ✓
+                </div>
+              </div>
+              <p className="text-xs font-bold text-emerald-950 mt-2">180 Days (Full Semester / Term Exam Prep)</p>
+              <ul className="text-[11px] text-slate-600 mt-2 space-y-1 font-medium">
+                <li>✓ Full semester access: midterms + finals preparation</li>
+                <li>✓ 8,500 AI credits limit with priority response speeds</li>
+                <li>✓ Priority gift card &amp; courier reward dispatch tracking</li>
+              </ul>
+            </button>
           </div>
 
           <div className="bg-white rounded-3xl shadow-2xl border-2 border-orange-300 overflow-hidden grid grid-cols-1 md:grid-cols-12">
             {/* Left Col: UPI QR Code & VPA Details */}
             <div className="md:col-span-5 bg-gradient-to-b from-orange-50 to-amber-50/50 p-6 flex flex-col items-center justify-between border-b md:border-b-0 md:border-r border-orange-200 text-center">
               <div className="w-full flex flex-col items-center">
-                <div className="inline-block px-3 py-1 bg-orange-600 text-white font-black text-[11px] rounded-full uppercase tracking-wider mb-3 shadow">
-                  ₹49 Concept Booster (60 Days)
+                <div className={`inline-block px-3 py-1 text-white font-black text-[11px] rounded-full uppercase tracking-wider mb-3 shadow ${
+                  selectedPlanTier === 'PLUS' ? 'bg-emerald-600' : 'bg-orange-600'
+                }`}>
+                  {selectedPlanTier === 'PLUS' ? '₹129 Term Mastery (180 Days)' : '₹49 Concept Booster (60 Days)'}
                 </div>
 
                 {/* Dynamic QR Code Container */}
                 <div className="p-3 bg-white rounded-2xl shadow-xl border-2 border-orange-400 mb-3 relative group">
                   <img
                     src={qrDataUrl || officialQrImage}
-                    alt="Official Dynamic ₹49 UPI QR Code"
+                    alt={`Official Dynamic ₹${offerAmount} UPI QR Code`}
                     className="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-xl select-none"
                   />
                   <div className="absolute inset-x-3 bottom-4 text-center">
@@ -971,7 +1054,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     <p>🎓 <strong>Student:</strong> {studentName || 'Scholar'}</p>
                     <p>📱 <strong>Payer UPI / Contact:</strong> {payerUpiId || emailOrPhone}</p>
                     <p>📚 <strong>Grade & Board:</strong> Class {selectedClass} • {selectedBoard}</p>
-                    <p>⏱️ <strong>Access Status:</strong> Concept Booster Unlocked (60 Days)</p>
+                    <p>⏱️ <strong>Access Status:</strong> {selectedPlanTier === 'PLUS' ? 'Term Mastery Unlocked (180 Days / 6 Months)' : 'Concept Booster Unlocked (60 Days)'}</p>
                   </div>
                   <button
                     type="button"
@@ -985,10 +1068,10 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <form onSubmit={handleDirectPaymentSubmit} className="space-y-4 text-xs">
                   <div>
                     <span className="font-bold text-slate-900 text-sm block mb-1">
-                      Step 2: Submit Your Payment Proof
+                      Step 2: Submit Your Payment Proof (₹{offerAmount})
                     </span>
                     <p className="text-slate-500 text-[11px]">
-                      After sending ₹49 via your UPI app, enter your details and the 12-digit UTR reference number from the receipt.
+                      After sending ₹{offerAmount} via your UPI app, enter your details and the 12-digit UTR reference number from the receipt.
                     </p>
                   </div>
 
@@ -1091,7 +1174,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     className="w-full py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-sm rounded-xl shadow-lg shadow-orange-600/30 transition-all hover:scale-[1.01] flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
                   >
                     <ShieldCheck className="w-5 h-5" />
-                    <span>{isSubmitting ? 'Verifying Transaction...' : 'SUBMIT UTR & ACTIVATE ₹49 PASS'}</span>
+                    <span>{isSubmitting ? 'Verifying Transaction...' : `SUBMIT UTR & ACTIVATE ₹${offerAmount} PASS`}</span>
                   </button>
 
                   <p className="text-[10px] text-center text-slate-500 font-medium">
@@ -1476,25 +1559,55 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       {/* ======================================================== */}
       {/* 9. STICKY BOTTOM ENROLLMENT BAR                          */}
       {/* ======================================================== */}
-      <div className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 z-30 shadow-2xl">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center space-x-3">
-            <div className="hidden sm:block">
-              <span className="text-[10px] font-mono text-orange-600 font-bold block uppercase">Special 49 Offer</span>
-              <span className="text-xs font-black text-slate-900">Classes 1–12 • Full 60 Days Access</span>
+      <div className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 sm:px-4 py-2.5 z-30 shadow-2xl">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* Quick 49 vs 129 Selector Pill */}
+            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setSelectedPlanTier('LITE')}
+                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                  selectedPlanTier === 'LITE'
+                    ? 'bg-orange-600 text-white shadow-sm font-black'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                ₹49 (60D)
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedPlanTier('PLUS')}
+                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                  selectedPlanTier === 'PLUS'
+                    ? 'bg-emerald-600 text-white shadow-sm font-black'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                ₹129 (180D)
+              </button>
             </div>
-            <div className="flex items-baseline space-x-1.5">
-              <span className="text-xs text-slate-400 line-through font-bold">₹499</span>
-              <span className="text-2xl font-black text-[#f95a00]">₹49</span>
+
+            <div className="hidden sm:block">
+              <span className="text-[10px] font-mono text-slate-500 font-bold block uppercase">
+                {selectedPlanTier === 'PLUS' ? 'Plus Term Mastery' : 'Concept Booster'}
+              </span>
+              <span className="text-xs font-black text-slate-900">
+                {selectedPlanTier === 'PLUS' ? 'Classes 1–12 • Full 6 Months' : 'Classes 1–12 • Full 60 Days'}
+              </span>
             </div>
           </div>
 
           <button
             onClick={handleScrollToQr}
-            className="px-6 py-2.5 bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-orange-500/30 transition-all hover:scale-105 flex items-center space-x-1.5 cursor-pointer"
+            className={`px-4 sm:px-6 py-2.5 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg transition-all hover:scale-105 flex items-center space-x-1.5 cursor-pointer ${
+              selectedPlanTier === 'PLUS'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-500/30'
+                : 'bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] shadow-orange-500/30'
+            }`}
           >
             <QrCode className="w-4 h-4" />
-            <span>SCAN QR & PAY ₹49</span>
+            <span>SCAN QR &amp; PAY ₹{offerAmount}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -1517,11 +1630,11 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
             <div className="text-center mb-4">
               <span className="px-3 py-1 bg-orange-100 text-orange-600 text-[10px] font-black uppercase tracking-wider rounded-full inline-block mb-2">
-                Special 49 Offer
+                Special Offer • Classes 1–12
               </span>
               <h3 className="text-xl font-black text-slate-900">
                 {modalMode === 'PAY_QR'
-                  ? 'Instant ₹49 UPI Checkout'
+                  ? `Instant ₹${offerAmount} UPI Checkout`
                   : modalMode === 'REGISTER'
                   ? `Unlock Class ${selectedClass} Access`
                   : 'Sign In to Your Account'}
@@ -1530,7 +1643,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 {modalMode === 'PAY_QR'
                   ? 'Scan QR with any UPI app and enter your 12-digit UTR below'
                   : modalMode === 'REGISTER'
-                  ? 'Special ₹49 for 60 Days • Original ₹499 (90% OFF)'
+                  ? `Special ₹${offerAmount} Pass • 90% Discounted`
                   : 'Enter your credentials to continue your syllabus practice'}
               </p>
             </div>
@@ -1550,7 +1663,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 }`}
               >
                 <QrCode className="w-3.5 h-3.5" />
-                <span>Pay via QR (₹49)</span>
+                <span>Pay via QR (₹{offerAmount})</span>
               </button>
               <button
                 type="button"
@@ -1620,7 +1733,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   </div>
                   <div className="bg-white border border-emerald-200 rounded-xl p-3 text-left text-xs text-slate-700 space-y-1">
                     <p>🎓 <strong>Student:</strong> {studentName || 'Scholar'}</p>
-                    <p>📚 <strong>Plan:</strong> ₹49 Concept Booster (60 Days)</p>
+                    <p>📚 <strong>Plan:</strong> {selectedPlanTier === 'PLUS' ? '₹129 Term Mastery (180 Days / 6 Months)' : '₹49 Concept Booster (60 Days)'}</p>
                     <p>✅ <strong>Status:</strong> Queued for Admin Verification</p>
                   </div>
                   <button
@@ -1636,12 +1749,40 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 </div>
               ) : (
                 <div className="space-y-4 text-xs">
+                  {/* Quick Plan Switcher inside Modal */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedPlanTier('LITE')}
+                      className={`p-2.5 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                        selectedPlanTier === 'LITE'
+                          ? 'border-orange-500 bg-orange-50 text-orange-950 font-bold shadow-sm'
+                          : 'border-slate-200 bg-white text-slate-600'
+                      }`}
+                    >
+                      <div className="text-[10px] uppercase font-black tracking-wider text-orange-700">60 Days</div>
+                      <div className="text-sm font-black">₹49 <span className="text-[10px] text-slate-400 line-through font-normal">₹499</span></div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedPlanTier('PLUS')}
+                      className={`p-2.5 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                        selectedPlanTier === 'PLUS'
+                          ? 'border-emerald-500 bg-emerald-50 text-emerald-950 font-bold shadow-sm'
+                          : 'border-slate-200 bg-white text-slate-600'
+                      }`}
+                    >
+                      <div className="text-[10px] uppercase font-black tracking-wider text-emerald-700">180 Days (Plus)</div>
+                      <div className="text-sm font-black">₹129 <span className="text-[10px] text-slate-400 line-through font-normal">₹1,299</span></div>
+                    </button>
+                  </div>
+
                   {/* Dynamic QR Image & VPA Display */}
                   <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 flex flex-col items-center text-center">
                     <div className="p-2 bg-white rounded-xl shadow-md border border-orange-300 mb-2">
                       <img
                         src={qrDataUrl || officialQrImage}
-                        alt="Official Dynamic ₹49 UPI QR Code"
+                        alt={`Official Dynamic ₹${offerAmount} UPI QR Code`}
                         className="w-36 h-36 object-contain rounded-lg select-none"
                       />
                     </div>
@@ -1754,7 +1895,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-xs rounded-xl shadow-lg shadow-orange-500/30 transition-all flex items-center justify-center space-x-1.5 cursor-pointer disabled:opacity-50"
                     >
                       <ShieldCheck className="w-4 h-4" />
-                      <span>{isSubmitting ? 'Verifying...' : 'SUBMIT UTR & ACTIVATE ₹49 PASS'}</span>
+                      <span>{isSubmitting ? 'Verifying...' : `SUBMIT UTR & ACTIVATE ₹${offerAmount} PASS`}</span>
                     </button>
                   </form>
                 </div>
@@ -1881,7 +2022,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     {isSubmitting
                       ? 'Processing...'
                       : modalMode === 'REGISTER'
-                      ? 'PROCEED TO PAY ₹49 (UPI / QR)'
+                      ? `PROCEED TO PAY ₹${offerAmount} (UPI / QR)`
                       : 'SIGN IN & ENTER WORKSPACE'}
                   </span>
                   <ArrowRight className="w-4 h-4" />
@@ -1909,7 +2050,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             </button>
 
             <UPIQRCheckout
-              planTier="LITE"
+              planTier={selectedPlanTier}
               learnerId={createdLearnerId}
               onBack={() => {
                 setShowUpiCheckout(false);
@@ -1999,7 +2140,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 Payment Completed in UPI App?
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed max-w-sm mx-auto">
-                To instantly activate your <strong>₹49 Concept Booster (60 Days)</strong> pass, please enter your details and the <strong>12-digit UTR reference</strong> from your UPI payment receipt below, then click submit.
+                To instantly activate your <strong>₹{offerAmount} {selectedPlanTier === 'PLUS' ? 'Term Mastery (180 Days / 6 Months)' : 'Concept Booster (60 Days)'}</strong> pass, please enter your details and the <strong>12-digit UTR reference</strong> from your UPI payment receipt below, then click submit.
               </p>
             </div>
 

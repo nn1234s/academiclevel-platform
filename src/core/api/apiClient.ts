@@ -502,6 +502,18 @@ export class ApiClient {
     });
   }
 
+  public static async adminUpdateGiftStatus(
+    adminEmail: string,
+    reqId: string,
+    payload: { status: string; voucherCode?: string; trackingId?: string; courierName?: string; adminNotes?: string }
+  ): Promise<{ success: boolean; message: string; gift?: GiftRequest }> {
+    return this.request(`/admin/gifts/${reqId}/status`, {
+      method: 'POST',
+      headers: this.adminHeaders(adminEmail),
+      body: JSON.stringify(payload)
+    });
+  }
+
   public static async adminRejectGift(adminEmail: string, reqId: string): Promise<{ success: boolean; message: string }> {
     return this.request(`/admin/gifts/${reqId}/reject`, {
       method: 'POST',

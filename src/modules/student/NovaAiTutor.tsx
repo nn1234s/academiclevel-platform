@@ -214,32 +214,22 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
 
         <div className="flex items-center space-x-2">
           {learner && (
-            isSubscriber ? (
-              <div
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm"
-                title="Active Subscriber • Unlimited Nova AI Access"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{quota?.planTier || (learner as any)?.activePlan || 'PLUS'} Scholar • Unlimited</span>
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  setRefillStatus(null);
-                  setShowRefillModal(true);
-                }}
-                className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-all cursor-pointer"
-                title="Refill AI Messages using AL Coins"
-              >
-                <StudyCoinIcon className="w-4 h-4" />
-                <span>
-                  {quota ? `${quota.remainingToday} left` : '8 daily'}
-                </span>
-                <span className="text-[9px] bg-amber-400/20 text-amber-200 px-1 py-0.5 rounded uppercase font-black">
-                  +Refill
-                </span>
-              </button>
-            )
+            <button
+              onClick={() => {
+                setRefillStatus(null);
+                setShowRefillModal(true);
+              }}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-all cursor-pointer shadow-sm"
+              title="AI Credits Limit: 8,500 Credits"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>
+                {quota ? `${quota.remainingToday.toLocaleString()} / 8,500 Credits` : '8,500 Credits'}
+              </span>
+              <span className="text-[9px] bg-amber-400/20 text-amber-200 px-1 py-0.5 rounded uppercase font-black">
+                +Refill
+              </span>
+            </button>
           )}
 
           {onClose && (

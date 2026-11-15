@@ -1395,7 +1395,7 @@ apiRouter.post('/coins/transact', (req, res) => {
 
 apiRouter.post('/gifts/redeem', (req, res) => {
   try {
-    const { learnerId, level, brand, rsAmount, coinsCost, deliveryEmail, deliveryPhone, upiId } = req.body;
+    const { learnerId, level, brand, rsAmount, coinsCost, deliveryEmail, deliveryPhone, upiId, itemTitle, shippingAddress } = req.body;
     const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
     if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
 
@@ -1483,8 +1483,8 @@ apiRouter.post('/gifts/redeem', (req, res) => {
       'SIG_' + crypto.randomBytes(6).toString('hex')
     );
 
-    const title = `Level ${level}: ₹${rsAmount} ${brand}`;
-    const shipping = `Email Request to ${targetEmail} | Delivery: ${deliveryEmail}${upiId ? ` | UPI: ${upiId}` : ''}`;
+    const title = itemTitle || (level ? `Level ${level}: ₹${rsAmount} ${brand}` : 'Scholar Reward');
+    const shipping = shippingAddress || `Email Request to ${targetEmail} | Delivery: ${deliveryEmail}${upiId ? ` | UPI: ${upiId}` : ''}`;
 
     db.prepare(`
       INSERT INTO gift_requests (
@@ -3117,6 +3117,38 @@ apiRouter.post('/admin/gifts/:id/dispatch', adminAuth, (req, res) => {
   }
 });
 
+apiRouter.post('/admin/gifts/:id/status', adminAuth, (req, res) => {
+  try {
+    const { status, voucherCode, trackingId, courierName, adminNotes } = req.body;
+    const reqItem = db.prepare('SELECT * FROM gift_requests WHERE id = ?').get(req.params.id);
+    if (!reqItem) return res.status(404).json({ success: false, error: 'Request not found' });
+
+    const newStatus = status || 'SHIPPED';
+    const code = voucherCode ? String(voucherCode).trim() : (trackingId ? String(trackingId).trim() : (reqItem.voucherCode || ''));
+    
+    let updatedAddress = reqItem.shippingAddress || '';
+    if (trackingId || courierName) {
+      const trackingStr = ` | Tracking: ${courierName ? courierName + ' ' : ''}${trackingId || code}`;
+      if (!updatedAddress.includes(' | Tracking:')) {
+        updatedAddress = `${updatedAddress}${trackingStr}`;
+      }
+    }
+
+    db.prepare(`
+      UPDATE gift_requests
+      SET status = ?, voucherCode = ?, adminNotes = ?, shippingAddress = ?, updatedAt = datetime('now')
+      WHERE id = ?
+    `).run(newStatus, code, adminNotes || reqItem.adminNotes || '', updatedAddress, reqItem.id);
+
+    exportDbToJsonStore();
+    const updated = db.prepare('SELECT * FROM gift_requests WHERE id = ?').get(reqItem.id);
+
+    res.json({ success: true, message: `Status updated to ${newStatus}.`, gift: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 apiRouter.post('/admin/gifts/:id/reject', adminAuth, (req, res) => {
   try {
     db.prepare(`UPDATE gift_requests SET status = 'REJECTED', updatedAt = datetime('now') WHERE id = ?`).run(req.params.id);
@@ -3657,32 +3689,20 @@ async function callGeminiApiWithMultiKeyFallback(bodyPayload, timeoutMs = 20000)
 }
 
 // Per-Student Daily AI Quota & Coin Recharge Engine
-const DAILY_FREE_AI_MESSAGES = 8; // 8 free messages per day per student
+const AI_CREDITS_LIMIT = 8500; // 8,500 credits limit for AI
+const DAILY_FREE_AI_MESSAGES = 8500; // 8,500 credits limit
 
 function getStudentAiQuota(learnerId) {
   if (!learnerId) {
-    return { dailyUsed: 0, dailyLimit: DAILY_FREE_AI_MESSAGES, bonusMessages: 0, remainingToday: DAILY_FREE_AI_MESSAGES, isExhausted: false, isSubscriber: false };
+    return { dailyUsed: 0, dailyLimit: AI_CREDITS_LIMIT, bonusMessages: 0, remainingToday: AI_CREDITS_LIMIT, isExhausted: false, isSubscriber: false };
   }
   const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
   if (!learner) {
-    return { dailyUsed: 0, dailyLimit: DAILY_FREE_AI_MESSAGES, bonusMessages: 0, remainingToday: DAILY_FREE_AI_MESSAGES, isExhausted: false, isSubscriber: false };
+    return { dailyUsed: 0, dailyLimit: AI_CREDITS_LIMIT, bonusMessages: 0, remainingToday: AI_CREDITS_LIMIT, isExhausted: false, isSubscriber: false };
   }
 
-  // Active subscribers and Super-Admin have unlimited Socratic AI
   const activeSub = getActiveSubscriptionForLearner(learner);
-  if (learner.role === 'SUPER_ADMIN' || activeSub) {
-    return {
-      dailyUsed: 0,
-      dailyLimit: Infinity,
-      bonusMessages: 9999,
-      remainingToday: 9999,
-      isExhausted: false,
-      isSuperAdmin: learner.role === 'SUPER_ADMIN',
-      isSubscriber: true,
-      planTier: activeSub ? activeSub.planTier : 'PLUS',
-      coinBalance: Number(learner.coinBalance || 0)
-    };
-  }
+  const isSuperAdmin = learner.role === 'SUPER_ADMIN';
 
   const todayUtc = new Date().toISOString().slice(0, 10);
   let dailyUsed = Number(learner.dailyAiMessagesUsed || 0);
@@ -3694,16 +3714,18 @@ function getStudentAiQuota(learnerId) {
   }
 
   const bonusMessages = Number(learner.bonusAiMessages || 0);
-  const freeRemaining = Math.max(0, DAILY_FREE_AI_MESSAGES - dailyUsed);
-  const totalRemaining = freeRemaining + bonusMessages;
+  const totalLimit = AI_CREDITS_LIMIT + bonusMessages;
+  const remainingToday = Math.max(0, totalLimit - dailyUsed);
 
   return {
     dailyUsed,
-    dailyLimit: DAILY_FREE_AI_MESSAGES,
+    dailyLimit: AI_CREDITS_LIMIT,
     bonusMessages,
-    remainingToday: totalRemaining,
-    isExhausted: totalRemaining <= 0,
-    isSubscriber: false,
+    remainingToday,
+    isExhausted: remainingToday <= 0,
+    isSuperAdmin,
+    isSubscriber: Boolean(activeSub),
+    planTier: activeSub ? activeSub.planTier : 'PLUS',
     coinBalance: Number(learner.coinBalance || 0)
   };
 }
@@ -3713,10 +3735,6 @@ function consumeStudentAiMessage(learnerId) {
   const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
   if (!learner || learner.role === 'SUPER_ADMIN') return true;
 
-  // Active subscribers have unlimited AI queries
-  const activeSub = getActiveSubscriptionForLearner(learner);
-  if (activeSub) return true;
-
   const todayUtc = new Date().toISOString().slice(0, 10);
   let dailyUsed = Number(learner.dailyAiMessagesUsed || 0);
   let bonus = Number(learner.bonusAiMessages || 0);
@@ -3725,7 +3743,7 @@ function consumeStudentAiMessage(learnerId) {
     dailyUsed = 0;
   }
 
-  if (dailyUsed < DAILY_FREE_AI_MESSAGES) {
+  if (dailyUsed < AI_CREDITS_LIMIT) {
     dailyUsed++;
   } else if (bonus > 0) {
     bonus--;
@@ -3733,11 +3751,13 @@ function consumeStudentAiMessage(learnerId) {
     return false; // Quota exceeded
   }
 
-  db.prepare(`
-    UPDATE learners
-    SET dailyAiMessagesUsed = ?, bonusAiMessages = ?, lastAiMessageDateUtc = ?
-    WHERE id = ?
-  `).run(dailyUsed, bonus, todayUtc, learnerId);
+  try {
+    db.prepare(`
+      UPDATE learners
+      SET dailyAiMessagesUsed = ?, bonusAiMessages = ?, lastAiMessageDateUtc = ?
+      WHERE id = ?
+    `).run(dailyUsed, bonus, todayUtc, learnerId);
+  } catch {}
   return true;
 }
 
@@ -4201,7 +4221,7 @@ apiRouter.post('/ai/chat', aiChatLimiter, async (req, res) => {
           success: false,
           limitReached: true,
           remaining: 0,
-          error: `Daily free AI limit reached (${DAILY_FREE_AI_MESSAGES}/${DAILY_FREE_AI_MESSAGES} messages). Spend 10 AL Coins to unlock 5 extra Nova AI messages!`,
+          error: `AI credit limit reached (${AI_CREDITS_LIMIT} credits limit). Spend 10 AL Coins to unlock 5 extra Nova AI messages!`,
           canBuyWithCoins: true,
           coinCost: 10,
           coinBalance: quota.coinBalance

@@ -23,7 +23,11 @@ import {
   ExternalLink,
   Send,
   ShieldCheck,
-  Award
+  Award,
+  MapPin,
+  Package,
+  Home,
+  X
 } from 'lucide-react';
 
 interface GiftStoreProps {
@@ -45,6 +49,65 @@ export interface SubmittedClaimInfo {
   mailBody: string;
   mailtoUrl: string;
 }
+
+export interface SubmittedPhysicalClaimInfo {
+  reqId: string;
+  item: PhysicalRewardItem;
+  recipientName: string;
+  fullAddress: string;
+  phone: string;
+  coinsCost: number;
+  targetEmail: string;
+  mailSubject: string;
+  mailBody: string;
+  mailtoUrl: string;
+}
+
+export interface PhysicalRewardItem {
+  id: string;
+  name: string;
+  category: 'PHYSICAL_MERCH';
+  coinsCost: number;
+  coinsCostFormatted: string;
+  image: string;
+  badge: string;
+  gradient: string;
+  description: string;
+  popular?: boolean;
+  requiredPlan?: 'LITE' | 'PLUS';
+  specs: string[];
+}
+
+export const PHYSICAL_REWARDS: PhysicalRewardItem[] = [
+  {
+    id: 'milton-costa-1000',
+    name: 'Milton Costa 1000 PET Water Bottle',
+    category: 'PHYSICAL_MERCH',
+    coinsCost: 25000,
+    coinsCostFormatted: '25,000 Coins',
+    image: '/rewards/milton-costa-1000-bottle.png',
+    badge: '🎒 Scholar Hydration (Lite & Plus Eligible)',
+    gradient: 'from-amber-500 via-orange-500 to-amber-600',
+    description: '1000ml authentic Milton Costa PET hydration bottle with lemon/mint infusion neck, crystal-clear food-grade body, and leak-proof stainless steel cap. Shipped directly to your doorstep.',
+    popular: true,
+    requiredPlan: 'LITE',
+    specs: ['1000 ml Capacity', 'BPA-Free Food Grade', 'Infusion Cap', 'Home Courier Delivery']
+  },
+  {
+    id: 'steel-water-bottle',
+    name: 'Premium Insulated Stainless Steel Water Bottle',
+    category: 'PHYSICAL_MERCH',
+    coinsCost: 37500,
+    coinsCostFormatted: '37,500 Coins',
+    image: '/rewards/steel-water-bottle.jpg',
+    badge: '🏆 Heavy Duty Thermos (Lite & Plus Eligible)',
+    gradient: 'from-slate-700 via-zinc-600 to-slate-900',
+    description: 'High-grade insulated stainless steel vacuum sports bottle with durable carry loop. Keeps water icy cold or warm throughout school and study hours. Shipped directly to your doorstep.',
+    popular: true,
+    requiredPlan: 'LITE',
+    specs: ['Stainless Steel Body', 'Vacuum Insulated', 'Durable Carry Strap', 'Home Courier Delivery']
+  }
+];
 
 export interface GiftCardLevel {
   level: number;
@@ -114,24 +177,6 @@ export const GIFT_CARD_LEVELS: GiftCardLevel[] = [
     badge: 'Diamond Scholar (Plus Plan)',
     gradient: 'from-violet-600 to-purple-600',
     requiredPlan: 'PLUS'
-  },
-  {
-    level: 7,
-    rsAmount: 250,
-    coinsCost: 60000,
-    coinsCostFormatted: '60,000 Coins',
-    badge: 'Master Scholar (Plus Plan)',
-    gradient: 'from-cyan-500 to-blue-600',
-    requiredPlan: 'PLUS'
-  },
-  {
-    level: 8,
-    rsAmount: 500,
-    coinsCost: 120000,
-    coinsCostFormatted: '120,000 Coins',
-    badge: 'Olympiad Champion (Plus Plan)',
-    gradient: 'from-amber-400 via-yellow-500 to-amber-600',
-    requiredPlan: 'PLUS'
   }
 ];
 
@@ -153,6 +198,19 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner,
   const [submittedClaim, setSubmittedClaim] = useState<SubmittedClaimInfo | null>(null);
   const [copiedEmailText, setCopiedEmailText] = useState(false);
   const [copiedVoucherId, setCopiedVoucherId] = useState<string | null>(null);
+
+  // Physical Merchandise States
+  const [selectedPhysicalItem, setSelectedPhysicalItem] = useState<PhysicalRewardItem | null>(null);
+  const [recipientName, setRecipientName] = useState<string>(learner.fullName || '');
+  const [flatHouse, setFlatHouse] = useState<string>('');
+  const [streetArea, setStreetArea] = useState<string>('');
+  const [landmark, setLandmark] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [stateName, setStateName] = useState<string>('');
+  const [pincode, setPincode] = useState<string>('');
+  const [physicalPhone, setPhysicalPhone] = useState<string>(learner.phone || '');
+  const [submittedPhysicalClaim, setSubmittedPhysicalClaim] = useState<SubmittedPhysicalClaimInfo | null>(null);
+  const [copiedPhysicalEmailText, setCopiedPhysicalEmailText] = useState(false);
 
   const handleCopyVoucher = (code: string, id: string) => {
     try {
@@ -426,6 +484,171 @@ ${learner.fullName}`;
     setSelectedLevel(null);
   };
 
+  const handleOpenPhysicalModal = (item: PhysicalRewardItem) => {
+    setSelectedPhysicalItem(item);
+    setMessage(null);
+  };
+
+  const handleConfirmPhysicalRedeem = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedPhysicalItem) return;
+
+    if (!isEnrolledScholar) {
+      setMessage({
+        type: 'error',
+        text: '🌟 Enrolled Scholar Privilege: Physical merchandise claims are exclusively reserved for active Lite (₹49) or Plus (₹129) subscribers. Upgrade your plan to unlock doorstep reward deliveries!'
+      });
+      return;
+    }
+
+    if (!hasAcademicMilestone) {
+      setMessage({
+        type: 'error',
+        text: `🎯 Proof of Study Milestone: Complete at least ${minLevelsRequired} curriculum levels with >= 70% score (currently completed: ${levelsCount}/${minLevelsRequired}) to verify genuine learning progress before redeeming.`
+      });
+      return;
+    }
+
+    if (learner.coinBalance < selectedPhysicalItem.coinsCost) {
+      setMessage({
+        type: 'error',
+        text: `Insufficient Study Coins. Required: ${selectedPhysicalItem.coinsCost.toLocaleString()} (${selectedPhysicalItem.coinsCostFormatted}), Available: ${learner.coinBalance.toLocaleString()} Coins.`
+      });
+      return;
+    }
+
+    if (
+      !recipientName.trim() ||
+      !flatHouse.trim() ||
+      !streetArea.trim() ||
+      !city.trim() ||
+      !stateName.trim() ||
+      !pincode.trim() ||
+      !physicalPhone.trim()
+    ) {
+      setMessage({
+        type: 'error',
+        text: 'Please complete all courier shipping address fields (Recipient Name, House/Flat, Street/Locality, City, State, 6-digit PIN, and WhatsApp phone) so courier can deliver.'
+      });
+      return;
+    }
+
+    const cleanPin = pincode.replace(/\D/g, '');
+    if (cleanPin.length !== 6) {
+      setMessage({ type: 'error', text: 'Please enter a valid 6-digit postal PIN code.' });
+      return;
+    }
+
+    const cleanPhone = physicalPhone.replace(/\D/g, '');
+    if (cleanPhone.length < 10) {
+      setMessage({ type: 'error', text: 'Please enter a valid 10-digit WhatsApp phone number for courier delivery updates.' });
+      return;
+    }
+
+    const fullShippingAddress = `[PHYSICAL DELIVERY] Recipient: ${recipientName.trim()} | House/Flat: ${flatHouse.trim()} | Street/Area: ${streetArea.trim()}${landmark.trim() ? ` | Landmark: ${landmark.trim()}` : ''} | City: ${city.trim()} | State: ${stateName.trim()} | PIN: ${cleanPin} | Phone: ${cleanPhone}`;
+
+    const targetEmail = 'academiclevels@gmail.com';
+
+    // 1. Append-only ledger debit
+    const tx = CoinLedgerService.appendTransaction(
+      learner.id,
+      -selectedPhysicalItem.coinsCost,
+      'GIFT_STORE_REDEMPTION',
+      {
+        itemId: selectedPhysicalItem.id,
+        itemName: selectedPhysicalItem.name,
+        isPhysical: true,
+        shippingAddress: fullShippingAddress,
+        phone: cleanPhone,
+        dispatchedTo: targetEmail
+      }
+    );
+
+    if (!tx.success) {
+      setMessage({ type: 'error', text: tx.error || 'Ledger transaction failed.' });
+      return;
+    }
+
+    // 2. Queue physical merchandise request
+    const reqId = 'phys_req_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+    const newRequest: GiftRequest = {
+      id: reqId,
+      learnerId: learner.id,
+      learnerName: learner.fullName,
+      itemTitle: selectedPhysicalItem.name,
+      coinsCost: selectedPhysicalItem.coinsCost,
+      shippingAddress: fullShippingAddress,
+      contactPhone: cleanPhone,
+      status: 'PENDING_APPROVAL',
+      isPhysical: true,
+      requestedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    StorageRLSLayer.saveGiftRequest(newRequest);
+    setExistingRequests(prev => [newRequest, ...prev]);
+
+    // 3. Sync to backend database
+    ApiClient.redeemGift({
+      learnerId: learner.id,
+      level: 0,
+      brand: selectedPhysicalItem.name,
+      rsAmount: 0,
+      coinsCost: selectedPhysicalItem.coinsCost,
+      deliveryEmail: learner.email || `${cleanPhone}@sms.academiclevel.in`,
+      deliveryPhone: cleanPhone,
+      itemTitle: selectedPhysicalItem.name,
+      shippingAddress: fullShippingAddress,
+      isPhysical: true,
+      levelsCount,
+      quizzesCount: Number(learner.quizzesCompletedCount || 0)
+    } as any).catch(() => {});
+
+    // 4. Format official email request
+    const mailSubject = `[Physical Reward Claim] ${selectedPhysicalItem.name} - ${recipientName.trim()} (${learner.fullName})`;
+    const mailBody = `Hello AcademicLevel Fulfillment Team,
+
+I have accumulated Study Coins on AcademicLevel and redeemed a physical reward for doorstep courier delivery!
+
+Redemption Details:
+• Student Name: ${learner.fullName}
+• Recipient Name: ${recipientName.trim()}
+• Student Email: ${learner.email}
+• WhatsApp / Courier Phone: ${cleanPhone}
+• Board & Class: ${learner.board} Class ${learner.grade}
+• Learner ID: ${learner.id}
+• Selected Reward: ${selectedPhysicalItem.name}
+• Coins Debited: ${selectedPhysicalItem.coinsCost.toLocaleString()} Coins
+• Doorstep Courier Shipping Address:
+  ${flatHouse.trim()}, ${streetArea.trim()}${landmark.trim() ? `, Near ${landmark.trim()}` : ''}
+  City: ${city.trim()}, State: ${stateName.trim()} - PIN: ${cleanPin}
+• Request ID: ${reqId}
+• Submitted At: ${new Date().toLocaleString()}
+
+Please verify my coin ledger record, pack my item, and update the courier tracking status (Ordered / Shipped / Delivered).
+
+Thank you,
+${recipientName.trim()}`;
+
+    const mailtoUrl = `mailto:${targetEmail}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+
+    setSubmittedPhysicalClaim({
+      reqId,
+      item: selectedPhysicalItem,
+      recipientName: recipientName.trim(),
+      fullAddress: fullShippingAddress,
+      phone: cleanPhone,
+      coinsCost: selectedPhysicalItem.coinsCost,
+      targetEmail,
+      mailSubject,
+      mailBody,
+      mailtoUrl
+    });
+
+    onRefreshLearner();
+    setSelectedPhysicalItem(null);
+  };
+
   return (
     <div className="max-w-5xl mx-auto space-y-8 text-slate-100">
       {/* Hero Banner */}
@@ -437,12 +660,12 @@ ${learner.fullName}`;
               <span>Real Rewards • Instant Digital Delivery</span>
             </span>
             <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-              Study Coin Gift Card Arena
+              Study Coin Gift Card & Physical Merch Arena
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
               Convert your academic consistency into real-world rewards!
               <br />
-              <strong className="text-amber-400">Level 1 starts at 2,500 Coins (₹10 Gift Card)</strong>, scaling up across 8 milestones to <strong className="text-amber-400">120,000 Coins (₹500 Gift Card)</strong>!
+              <strong className="text-amber-400">Level 1 starts at 2,500 Coins (₹10 Gift Card)</strong> up to Level 6 at <strong className="text-amber-400">37,500 Coins (₹150 Gift Card)</strong>, plus authentic physical scholar hydration bottles!
             </p>
           </div>
 
@@ -510,7 +733,7 @@ ${learner.fullName}`;
               )}
             </div>
             <p className="text-slate-400 text-[11px] mt-1 leading-relaxed">
-              Earn <strong className="text-amber-400">+25 coins</strong> per level mastered (70%+ accuracy) plus daily streak bonuses. Real gift cards are reserved for enrolled Lite/Plus Scholars with min. 3 levels mastered. Digital avatars, streak freezes, and PDFs are available to all students in the Coin Mall!
+              Earn <strong className="text-amber-400">+25 coins</strong> per level mastered (70%+ accuracy) plus daily streak bonuses. Real gift cards and physical merchandise are reserved for enrolled Lite/Plus Scholars with min. 3 levels mastered. Digital avatars, streak freezes, and PDFs are available to all students in the Coin Mall!
             </p>
           </div>
         </div>
@@ -543,13 +766,136 @@ ${learner.fullName}`;
         </div>
       )}
 
-      {/* Gift Card Grid (8 Levels) */}
+      {/* ======================================================== */}
+      {/* 1. PHYSICAL SCHOLAR MERCHANDISE (DOORSTEP DELIVERY) */}
+      {/* ======================================================== */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 className="text-lg font-bold text-white flex items-center space-x-2">
+              <Package className="w-5 h-5 text-amber-400" />
+              <span>Physical Scholar Merchandise (Doorstep Courier Delivery)</span>
+            </h2>
+            <p className="text-xs text-slate-400">
+              Authentic study hydration gear shipped directly to your verified home address. Both Lite &amp; Plus scholars are eligible!
+            </p>
+          </div>
+          <span className="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold rounded-full uppercase tracking-wider self-start sm:self-auto flex items-center gap-1">
+            <Truck className="w-3.5 h-3.5" />
+            <span>Free Doorstep Delivery Across India</span>
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {PHYSICAL_REWARDS.map(item => {
+            const canAfford = learner.coinBalance >= item.coinsCost;
+            const isSuperAdmin = learner.role === 'SUPER_ADMIN';
+            const existingClaims = existingRequests.filter(r => r.status !== 'REJECTED');
+            const hasUsedLimit = quota.activePlan === 'LITE' && existingClaims.length >= 1 && !isSuperAdmin;
+
+            let buttonDisabled = !canAfford || !isEnrolledScholar || hasUsedLimit;
+            let buttonLabel = canAfford
+              ? `Claim to Home Address`
+              : `Need ${(item.coinsCost - learner.coinBalance).toLocaleString()} more Coins`;
+
+            if (!isEnrolledScholar) {
+              buttonDisabled = true;
+              buttonLabel = 'Requires Lite (₹49) or Plus (₹129)';
+            } else if (hasUsedLimit) {
+              buttonDisabled = true;
+              buttonLabel = 'Term Limit Reached (1 Claim/60d)';
+            }
+
+            return (
+              <div
+                key={item.id}
+                className={`bg-slate-900 border rounded-3xl p-6 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all group ${
+                  canAfford && !buttonDisabled
+                    ? 'border-amber-500/60 hover:border-amber-400 shadow-amber-950/20'
+                    : 'border-slate-800 hover:border-slate-700'
+                }`}
+              >
+                {item.popular && (
+                  <span className="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-orange-500 text-slate-950 text-[10px] font-black uppercase px-3.5 py-1 rounded-bl-2xl tracking-wider shadow-sm">
+                    Scholar Favorite
+                  </span>
+                )}
+
+                <div>
+                  <div className="flex items-center space-x-2 mb-3">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-slate-950 text-amber-300 border border-slate-800">
+                      Physical Item
+                    </span>
+                    <span className="text-[10px] font-semibold text-slate-400">{item.badge}</span>
+                  </div>
+
+                  {/* Product Visual Image Showcase */}
+                  <div className="w-full h-56 bg-slate-950/80 rounded-2xl border border-slate-800 flex items-center justify-center p-4 mb-4 relative overflow-hidden group-hover:border-amber-500/40 transition-all">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="max-h-full max-w-full object-contain filter drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute bottom-2 left-2 bg-slate-950/90 backdrop-blur-sm border border-slate-800 px-2.5 py-1 rounded-xl text-[10px] text-slate-300 flex items-center space-x-1 font-mono">
+                      <Truck className="w-3 h-3 text-emerald-400" />
+                      <span>Direct Courier</span>
+                    </div>
+                  </div>
+
+                  <h3 className="text-lg font-black text-white group-hover:text-amber-300 transition-colors">
+                    {item.name}
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                    {item.description}
+                  </p>
+
+                  {/* Specs Chips */}
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {item.specs.map((spec, i) => (
+                      <span key={i} className="px-2 py-0.5 bg-slate-950 rounded-lg text-[10px] text-slate-400 border border-slate-800 font-mono">
+                        ✓ {spec}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                    <span className="text-slate-400">Required Coins:</span>
+                    <span className="font-mono font-black text-amber-400 text-base flex items-center space-x-1">
+                      <StudyCoinIcon className="w-4 h-4" />
+                      <span>{item.coinsCost.toLocaleString()} Coins</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <button
+                    onClick={() => handleOpenPhysicalModal(item)}
+                    disabled={buttonDisabled}
+                    className={`w-full py-3 px-4 font-black text-xs rounded-xl transition-all flex items-center justify-center space-x-2 ${
+                      !buttonDisabled
+                        ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-lg shadow-amber-950'
+                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                    }`}
+                  >
+                    <Package className="w-4 h-4" />
+                    <span>{buttonLabel}</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ======================================================== */}
+      {/* 2. DIGITAL GIFT CARD GRID (LEVELS 1 TO 6) */}
+      {/* ======================================================== */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-white flex items-center space-x-2">
               <Gift className="w-5 h-5 text-indigo-400" />
-              <span>Available Gift Card Tiers (Levels 1 to 8)</span>
+              <span>Available Gift Card Tiers (Levels 1 to 6: ₹10 to ₹150)</span>
             </h2>
             <p className="text-xs text-slate-400">
               Redeemable for Amazon Pay, Google Play, Flipkart, Swiggy, or Direct UPI.
@@ -657,14 +1003,18 @@ ${learner.fullName}`;
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
           <h3 className="text-sm font-bold text-white flex items-center space-x-2">
             <Truck className="w-4 h-4 text-amber-400" />
-            <span>Your Redemptions & Digital Delivery Status ({existingRequests.length})</span>
+            <span>Your Redemptions &amp; Delivery Tracking ({existingRequests.length})</span>
           </h3>
 
           <div className="divide-y divide-slate-800">
             {existingRequests.map(req => {
+              const isPhysical = req.isPhysical || (req.shippingAddress && req.shippingAddress.includes('[PHYSICAL DELIVERY]')) || req.itemTitle.toLowerCase().includes('bottle');
               const code = getVoucherDetails(req);
               const help = getRedemptionHelp(req.itemTitle);
               const isDispatched = req.status === 'APPROVED_DISPATCHED';
+              const isOrdered = req.status === 'ORDERED';
+              const isShipped = req.status === 'SHIPPED';
+              const isDelivered = req.status === 'DELIVERED';
 
               return (
                 <div key={req.id} className="py-4 space-y-3">
@@ -677,36 +1027,92 @@ ${learner.fullName}`;
                           <span>(-{req.coinsCost.toLocaleString()} Coins)</span>
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
-                        Delivered to: {req.shippingAddress.split('|')[0] || req.shippingAddress} • Phone: {req.contactPhone}
+                      <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                        📍 <strong>Destination:</strong> {req.shippingAddress.replace('[PHYSICAL DELIVERY]', '').trim()}
                       </p>
                       <p className="text-[10px] text-slate-500 mt-0.5">
-                        Requested on: {new Date(req.requestedAt).toLocaleString()}
+                        Phone: {req.contactPhone} • Requested on: {new Date(req.requestedAt).toLocaleString()}
                       </p>
                     </div>
 
                     <div>
                       <span
                         className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-[10px] font-bold ${
-                          isDispatched
+                          isDelivered
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                            : isShipped
+                            ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30'
+                            : isOrdered
+                            ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30'
+                            : isDispatched
                             ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
                             : req.status === 'REJECTED'
                             ? 'bg-red-500/10 text-red-400 border border-red-500/30'
                             : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
                         }`}
                       >
-                        <span>{isDispatched ? '✓ Dispatched & Ready to Use' : req.status === 'REJECTED' ? 'Rejected' : '⏳ Verification in Progress'}</span>
+                        <span>
+                          {isDelivered
+                            ? '🎉 Delivered to Doorstep'
+                            : isShipped
+                            ? '🚚 Shipped via Courier'
+                            : isOrdered
+                            ? '📦 Order Placed with Courier'
+                            : isDispatched
+                            ? '✓ Dispatched & Ready to Use'
+                            : req.status === 'REJECTED'
+                            ? 'Rejected'
+                            : isPhysical
+                            ? '⏳ Preparing Shipment'
+                            : '⏳ Verification in Progress'}
+                        </span>
                       </span>
                     </div>
                   </div>
 
+                  {/* Physical Parcel Tracking Card */}
+                  {isPhysical && (isShipped || isOrdered || isDelivered) && (
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-950/40 via-slate-950 to-slate-900 border border-sky-500/40 shadow-xl space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-extrabold text-sky-400 flex items-center space-x-1.5">
+                          <Truck className="w-4 h-4 text-sky-400" />
+                          <span>
+                            {isDelivered
+                              ? 'Delivered to Doorstep'
+                              : isShipped
+                              ? 'In Transit with Courier Partner'
+                              : 'Order Confirmed & Processing'}
+                          </span>
+                        </span>
+                        {req.courierName && (
+                          <span className="text-[10px] font-mono text-sky-300 bg-sky-950/70 border border-sky-800 px-2 py-0.5 rounded-full">
+                            Carrier: {req.courierName}
+                          </span>
+                        )}
+                      </div>
+                      {req.trackingId && (
+                        <div className="bg-slate-950 p-3 rounded-xl border border-sky-500/30 flex items-center justify-between">
+                          <div>
+                            <span className="text-[10px] uppercase font-bold text-slate-400 block">Tracking ID / AWB:</span>
+                            <span className="font-mono text-sm font-black text-amber-300 tracking-wider select-all">
+                              {req.trackingId}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            Live on Courier Portal
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Dispatched Voucher Code Banner & 1-Click Copy */}
-                  {isDispatched && (
+                  {isDispatched && !isPhysical && (
                     <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/50 via-slate-950 to-slate-900 border-2 border-emerald-500/50 shadow-xl space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-extrabold text-emerald-400 flex items-center space-x-1.5">
                           <Sparkles className="w-4 h-4 text-emerald-400 animate-pulse" />
-                          <span>Voucher Code Generated & Verified</span>
+                          <span>Voucher Code Generated &amp; Verified</span>
                         </span>
                         <span className="text-[10px] font-mono text-emerald-300/80 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full">
                           Ready to Redeem
@@ -974,6 +1380,282 @@ ${learner.fullName}`;
               className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl"
             >
               Done & Return to Gift Store
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Physical Merchandise Courier Address Input */}
+      {selectedPhysicalItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
+          <div className="bg-slate-900 border border-amber-500/50 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl text-slate-100 relative my-8">
+            <button
+              onClick={() => setSelectedPhysicalItem(null)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/60"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="text-center mb-6">
+              <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
+                Physical Scholar Merchandise
+              </span>
+              <h3 className="text-xl font-extrabold text-white mt-2 flex items-center justify-center gap-2">
+                <Package className="w-5 h-5 text-amber-400" />
+                <span>Claim {selectedPhysicalItem.name}</span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Cost: <strong className="text-amber-400">{selectedPhysicalItem.coinsCost.toLocaleString()} Study Coins</strong> ({selectedPhysicalItem.coinsCostFormatted}) • Free Doorstep Delivery
+              </p>
+            </div>
+
+            <form onSubmit={handleConfirmPhysicalRedeem} className="space-y-3.5 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Recipient Full Name */}
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">
+                    Recipient Full Name <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Student or Parent Name"
+                    value={recipientName}
+                    onChange={e => setRecipientName(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
+                  />
+                </div>
+
+                {/* WhatsApp Phone */}
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1 flex items-center space-x-1">
+                    <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>WhatsApp / Mobile <span className="text-rose-400">*</span></span>
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    maxLength={10}
+                    placeholder="10-digit mobile number"
+                    value={physicalPhone}
+                    onChange={e => setPhysicalPhone(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Flat / House / Floor */}
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1 flex items-center space-x-1">
+                  <Home className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Flat / House No. / Building / Floor <span className="text-rose-400">*</span></span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Flat 302, Sai Residency, Plot No. 42"
+                  value={flatHouse}
+                  onChange={e => setFlatHouse(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
+                />
+              </div>
+
+              {/* Street / Locality */}
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1 flex items-center space-x-1">
+                  <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Street / Area / Colony / Locality <span className="text-rose-400">*</span></span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Master Canteen Area, Kharavela Nagar"
+                  value={streetArea}
+                  onChange={e => setStreetArea(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
+                />
+              </div>
+
+              {/* Landmark */}
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">
+                  Prominent Landmark (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Near Royal High School, Opposite SBI Bank"
+                  value={landmark}
+                  onChange={e => setLandmark(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {/* City */}
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">
+                    City / Town <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Bhubaneswar"
+                    value={city}
+                    onChange={e => setCity(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2 text-white focus:outline-none"
+                  />
+                </div>
+
+                {/* State */}
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">
+                    State <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Odisha"
+                    value={stateName}
+                    onChange={e => setStateName(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2 text-white focus:outline-none"
+                  />
+                </div>
+
+                {/* Pincode */}
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">
+                    6-Digit PIN <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={6}
+                    placeholder="e.g. 751001"
+                    value={pincode}
+                    onChange={e => setPincode(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2 text-white font-mono focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Coin Debit Summary */}
+              <div className="p-3 bg-amber-950/20 border border-amber-900/40 rounded-xl text-[11px] text-amber-300 flex items-center justify-between">
+                <span>Coins to be debited:</span>
+                <span className="font-mono font-bold text-amber-400 flex items-center gap-1">
+                  <StudyCoinIcon className="w-3.5 h-3.5" />
+                  <span>-{selectedPhysicalItem.coinsCost.toLocaleString()} Coins</span>
+                </span>
+              </div>
+
+              <div className="flex space-x-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedPhysicalItem(null)}
+                  className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-amber-950 transition-all"
+                >
+                  Confirm &amp; Ship to Address
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Physical Claim Email Request Confirmation */}
+      {submittedPhysicalClaim && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+          <div className="bg-slate-900 border border-amber-500/60 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl text-slate-100 relative space-y-5">
+            <div className="text-center space-y-2">
+              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto shadow-lg">
+                <Package className="w-7 h-7 text-amber-400" />
+              </div>
+              <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full inline-block">
+                Courier Claim Dispatched
+              </span>
+              <h3 className="text-xl sm:text-2xl font-extrabold text-white">
+                {submittedPhysicalClaim.item.name} Claimed!
+              </h3>
+              <p className="text-xs text-slate-300">
+                Your <strong className="text-amber-400 inline-flex items-center gap-1"><StudyCoinIcon className="w-3.5 h-3.5" /> {submittedPhysicalClaim.coinsCost.toLocaleString()} Study Coins</strong> have been debited from the ledger. An official parcel dispatch request has been logged to the admin queue.
+              </p>
+            </div>
+
+            {/* Email Dispatch Action Buttons */}
+            <div className="space-y-2.5">
+              <a
+                href={submittedPhysicalClaim.mailtoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2"
+              >
+                <Send className="w-4 h-4" />
+                <span>Open Mail &amp; Notify academiclevels@gmail.com</span>
+                <ExternalLink className="w-3.5 h-3.5 ml-1 opacity-70" />
+              </a>
+
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard?.writeText(submittedPhysicalClaim.mailBody);
+                  setCopiedPhysicalEmailText(true);
+                  setTimeout(() => setCopiedPhysicalEmailText(false), 2500);
+                }}
+                className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition-all flex items-center justify-center space-x-2"
+              >
+                {copiedPhysicalEmailText ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-400" />
+                    <span className="text-emerald-300">Copied Courier Claim Text to Clipboard!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 text-slate-400" />
+                    <span>Copy Pre-filled Courier Claim Text</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Request Summary details */}
+            <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-left text-xs font-mono space-y-2">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Recipient:</span>
+                <span className="text-white font-bold">{submittedPhysicalClaim.recipientName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">WhatsApp / Phone:</span>
+                <span className="text-emerald-400">{submittedPhysicalClaim.phone}</span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-slate-400">Shipping Address:</span>
+                <span className="text-amber-300 break-words text-[11px]">{submittedPhysicalClaim.fullAddress.replace('[PHYSICAL DELIVERY]', '').trim()}</span>
+              </div>
+              <div className="flex justify-between pt-1 border-t border-slate-800">
+                <span className="text-slate-400">Request ID:</span>
+                <span className="text-indigo-300">{submittedPhysicalClaim.reqId}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Courier Status:</span>
+                <span className="text-amber-400 font-bold">Queued for Order Placement</span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-slate-400 text-center leading-relaxed">
+              Our fulfillment team reviews your address, places the courier shipment, and updates the tracking ID right here on your dashboard!
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setSubmittedPhysicalClaim(null)}
+              className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl"
+            >
+              Done &amp; Return to Gift Store
             </button>
           </div>
         </div>

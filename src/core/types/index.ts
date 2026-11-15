@@ -229,9 +229,12 @@ export interface GiftRequest {
   coinsCost: number;
   shippingAddress: string;
   contactPhone: string;
-  status: 'PENDING_APPROVAL' | 'APPROVED_DISPATCHED' | 'REJECTED';
+  status: 'PENDING_APPROVAL' | 'APPROVED_DISPATCHED' | 'REJECTED' | 'ORDERED' | 'SHIPPED' | 'DELIVERED';
   adminNotes?: string;
   voucherCode?: string;
+  trackingId?: string;
+  courierName?: string;
+  isPhysical?: boolean;
   requestedAt: string;
   updatedAt: string;
 }

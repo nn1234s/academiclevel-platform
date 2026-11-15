@@ -21,7 +21,10 @@ import {
   Search,
   CheckCircle2,
   Clock,
-  KeyRound
+  KeyRound,
+  Package,
+  MapPin,
+  Home
 } from 'lucide-react';
 
 export const GiftFulfillment: React.FC = () => {
@@ -31,15 +34,20 @@ export const GiftFulfillment: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string>('');
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
+  const [copiedAddressId, setCopiedAddressId] = useState<string | null>(null);
 
-  // Dedicated Dispatch / Edit Code Modal State
+  // Dedicated Status & Dispatch Modal State
   const [modalReq, setModalReq] = useState<GiftRequest | null>(null);
+  const [modalStatus, setModalStatus] = useState<GiftRequest['status']>('APPROVED_DISPATCHED');
   const [modalCodeInput, setModalCodeInput] = useState<string>('');
+  const [modalCourierName, setModalCourierName] = useState<string>('');
+  const [modalTrackingId, setModalTrackingId] = useState<string>('');
+  const [modalAdminNotes, setModalAdminNotes] = useState<string>('');
   const [modalError, setModalError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Filter State
-  const [filterStatus, setFilterStatus] = useState<'ALL' | 'PENDING' | 'DISPATCHED'>('ALL');
+  const [filterStatus, setFilterStatus] = useState<'ALL' | 'PENDING' | 'ORDERED' | 'SHIPPED' | 'DELIVERED' | 'DISPATCHED'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch from server and sync with storage
@@ -65,15 +73,23 @@ export const GiftFulfillment: React.FC = () => {
     fetchRequests();
   }, []);
 
-  const openDispatchModal = (req: GiftRequest) => {
+  const openStatusModal = (req: GiftRequest, targetStatus?: GiftRequest['status']) => {
+    const isPhys = req.isPhysical || (req.shippingAddress && req.shippingAddress.includes('[PHYSICAL DELIVERY]')) || req.itemTitle.toLowerCase().includes('bottle');
     setModalReq(req);
+    setModalStatus(targetStatus || (isPhys ? (req.status === 'PENDING_APPROVAL' ? 'ORDERED' : req.status) : (req.status === 'PENDING_APPROVAL' ? 'APPROVED_DISPATCHED' : req.status)));
     setModalCodeInput(req.voucherCode || getExtractedVoucherCode(req) || '');
+    setModalCourierName(req.courierName || 'Delhivery');
+    setModalTrackingId(req.trackingId || '');
+    setModalAdminNotes('');
     setModalError(null);
   };
 
-  const closeDispatchModal = () => {
+  const closeStatusModal = () => {
     setModalReq(null);
     setModalCodeInput('');
+    setModalCourierName('');
+    setModalTrackingId('');
+    setModalAdminNotes('');
     setModalError(null);
   };
 
@@ -90,56 +106,91 @@ export const GiftFulfillment: React.FC = () => {
     setModalCodeInput(code);
   };
 
-  const handleConfirmDispatch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!modalReq) return;
-
-    const trimmedCode = modalCodeInput.trim().toUpperCase();
-    if (!trimmedCode) {
-      setModalError('Please enter the real gift card voucher code or PIN before dispatching.');
-      return;
-    }
-
+  const handleUpdateStatus = async (
+    req: GiftRequest,
+    newStatus: GiftRequest['status'],
+    details?: { voucherCode?: string; courierName?: string; trackingId?: string; adminNotes?: string }
+  ) => {
     setIsSubmitting(true);
-    setModalError(null);
-
     try {
       // 1. Update backend database
-      await ApiClient.adminDispatchGift(SUPER_ADMIN_EMAIL, modalReq.id, trimmedCode);
+      await ApiClient.adminUpdateGiftStatus(SUPER_ADMIN_EMAIL, req.id, {
+        status: newStatus,
+        voucherCode: details?.voucherCode,
+        courierName: details?.courierName,
+        trackingId: details?.trackingId,
+        adminNotes: details?.adminNotes
+      });
     } catch (err: any) {
-      console.warn('Backend dispatch sync fallback:', err.message);
+      console.warn('Backend status update fallback:', err.message);
     }
 
-    // 2. Update local state & RLS storage
+    // 2. Storage RLS Layer update
     const updatedReq: GiftRequest = {
-      ...modalReq,
-      status: 'APPROVED_DISPATCHED',
-      voucherCode: trimmedCode,
+      ...req,
+      status: newStatus,
+      voucherCode: details?.voucherCode !== undefined ? details.voucherCode : req.voucherCode,
+      courierName: details?.courierName !== undefined ? details.courierName : req.courierName,
+      trackingId: details?.trackingId !== undefined ? details.trackingId : req.trackingId,
       updatedAt: new Date().toISOString()
     };
 
-    let baseAddress = modalReq.shippingAddress || '';
-    if (baseAddress.includes(' | Voucher Code:')) {
-      baseAddress = baseAddress.split(' | Voucher Code:')[0].trim();
+    if (details?.voucherCode) {
+      let baseAddress = req.shippingAddress || '';
+      if (baseAddress.includes(' | Voucher Code:')) {
+        baseAddress = baseAddress.split(' | Voucher Code:')[0].trim();
+      }
+      updatedReq.shippingAddress = `${baseAddress} | Voucher Code: ${details.voucherCode}`;
     }
-    updatedReq.shippingAddress = `${baseAddress} | Voucher Code: ${trimmedCode}`;
 
     StorageRLSLayer.saveGiftRequest(updatedReq);
     StorageRLSLayer.recordAdminAction(
       SUPER_ADMIN_EMAIL,
-      'APPROVE_GIFT_DISPATCH',
-      modalReq.id,
-      `Approved and dispatched voucher code ${trimmedCode} for ${modalReq.itemTitle} to ${modalReq.learnerName}.`
+      'UPDATE_GIFT_STATUS',
+      req.id,
+      `Updated status to ${newStatus} for ${req.itemTitle} (${req.learnerName}). Tracking: ${details?.trackingId || 'N/A'}`
     );
 
-    setRequests(prev => prev.map(r => r.id === modalReq.id ? updatedReq : r));
-    confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
-    setNotice(`Dispatched real voucher "${trimmedCode}" to ${modalReq.learnerName}! It is now immediately visible on the student's dashboard.`);
-    setTimeout(() => setNotice(''), 5000);
-
+    setRequests(prev => prev.map(r => r.id === req.id ? updatedReq : r));
+    if (newStatus === 'APPROVED_DISPATCHED' || newStatus === 'SHIPPED' || newStatus === 'DELIVERED') {
+      confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+    }
+    setNotice(`Updated status to "${newStatus}" for ${req.learnerName}'s ${req.itemTitle}!`);
+    setTimeout(() => setNotice(''), 4500);
     setIsSubmitting(false);
-    closeDispatchModal();
-    fetchRequests();
+    closeStatusModal();
+  };
+
+  const handleModalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!modalReq) return;
+
+    if (modalStatus === 'APPROVED_DISPATCHED') {
+      const trimmedCode = modalCodeInput.trim().toUpperCase();
+      if (!trimmedCode) {
+        setModalError('Please enter the real gift card voucher code or PIN before dispatching.');
+        return;
+      }
+      await handleUpdateStatus(modalReq, 'APPROVED_DISPATCHED', { voucherCode: trimmedCode });
+      return;
+    }
+
+    if (modalStatus === 'SHIPPED') {
+      const tracking = modalTrackingId.trim();
+      const carrier = modalCourierName.trim() || 'Courier';
+      await handleUpdateStatus(modalReq, 'SHIPPED', {
+        trackingId: tracking || undefined,
+        courierName: carrier,
+        adminNotes: modalAdminNotes.trim() || undefined
+      });
+      return;
+    }
+
+    await handleUpdateStatus(modalReq, modalStatus, {
+      courierName: modalCourierName.trim() || undefined,
+      trackingId: modalTrackingId.trim() || undefined,
+      adminNotes: modalAdminNotes.trim() || undefined
+    });
   };
 
   const handleReject = async (req: GiftRequest) => {
@@ -175,6 +226,37 @@ export const GiftFulfillment: React.FC = () => {
     } catch {}
   };
 
+  const handleCopyAddress = (address: string, id: string) => {
+    try {
+      const cleanAddress = address.replace('[PHYSICAL DELIVERY]', '').trim();
+      navigator.clipboard.writeText(cleanAddress);
+      setCopiedAddressId(id);
+      setTimeout(() => setCopiedAddressId(null), 2500);
+    } catch {}
+  };
+
+  const handleShareWhatsAppShipping = (req: GiftRequest, status: string, trackingId?: string, courierName?: string) => {
+    const rawPhone = (req.contactPhone || '').replace(/\D/g, '');
+    const phone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+    let messageBody = '';
+    if (status === 'SHIPPED') {
+      messageBody = `🎉 Hello ${req.learnerName}!\n\n` +
+        `Great news! Your AcademicLevel scholar reward *"${req.itemTitle}"* has been dispatched via courier!\n\n` +
+        `🚚 *Courier Partner:* ${courierName || 'Courier'}\n` +
+        `📦 *Tracking ID:* ${trackingId || 'Track on portal'}\n\n` +
+        `Track your delivery anytime on your dashboard: https://academiclevel.in/dashboard\n\n` +
+        `Keep studying and achieving on AcademicLevel! 🚀`;
+    } else if (status === 'ORDERED') {
+      messageBody = `🎉 Hello ${req.learnerName}!\n\n` +
+        `Your AcademicLevel scholar reward *"${req.itemTitle}"* has been verified and placed for courier delivery!\n\n` +
+        `Our fulfillment team is preparing your package. We will share your tracking number shortly.\n\n` +
+        `Keep studying on AcademicLevel! 🚀`;
+    } else {
+      messageBody = `Hello ${req.learnerName}, your AcademicLevel reward "${req.itemTitle}" status is now: ${status}. Check: https://academiclevel.in/dashboard`;
+    }
+    window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(messageBody)}`, '_blank');
+  };
+
   const handleShareWhatsApp = (req: GiftRequest, code: string) => {
     const rawPhone = (req.contactPhone || '').replace(/\D/g, '');
     const phone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
@@ -198,6 +280,9 @@ export const GiftFulfillment: React.FC = () => {
   // Filtered requests
   const filteredRequests = requests.filter(req => {
     if (filterStatus === 'PENDING' && req.status !== 'PENDING_APPROVAL') return false;
+    if (filterStatus === 'ORDERED' && req.status !== 'ORDERED') return false;
+    if (filterStatus === 'SHIPPED' && req.status !== 'SHIPPED') return false;
+    if (filterStatus === 'DELIVERED' && req.status !== 'DELIVERED') return false;
     if (filterStatus === 'DISPATCHED' && req.status !== 'APPROVED_DISPATCHED') return false;
 
     if (searchQuery.trim()) {
@@ -206,12 +291,17 @@ export const GiftFulfillment: React.FC = () => {
       const matchItem = (req.itemTitle || '').toLowerCase().includes(q);
       const matchPhone = (req.contactPhone || '').toLowerCase().includes(q);
       const matchCode = (req.voucherCode || '').toLowerCase().includes(q);
-      if (!matchName && !matchItem && !matchPhone && !matchCode) return false;
+      const matchAddress = (req.shippingAddress || '').toLowerCase().includes(q);
+      const matchTracking = (req.trackingId || '').toLowerCase().includes(q);
+      if (!matchName && !matchItem && !matchPhone && !matchCode && !matchAddress && !matchTracking) return false;
     }
     return true;
   });
 
   const pendingCount = requests.filter(r => r.status === 'PENDING_APPROVAL').length;
+  const orderedCount = requests.filter(r => r.status === 'ORDERED').length;
+  const shippedCount = requests.filter(r => r.status === 'SHIPPED').length;
+  const deliveredCount = requests.filter(r => r.status === 'DELIVERED').length;
   const dispatchedCount = requests.filter(r => r.status === 'APPROVED_DISPATCHED').length;
 
   return (
@@ -221,10 +311,10 @@ export const GiftFulfillment: React.FC = () => {
         <div>
           <h2 className="text-xl font-bold text-white flex items-center space-x-2">
             <Gift className="w-5 h-5 text-amber-400" />
-            <span>Gift Card & Voucher Dispatch Console</span>
+            <span>Scholar Rewards Fulfillment &amp; Courier Dispatch Console</span>
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Fulfill real Amazon, Google Play, Flipkart & Swiggy gift cards. Dispatched voucher codes are instantly live on the student&apos;s dashboard.
+            Manage physical scholar bottles (Milton Costa 1000 &amp; Stainless Steel) and digital vouchers. Enter courier tracking or voucher codes live to students.
           </p>
         </div>
 
@@ -245,21 +335,33 @@ export const GiftFulfillment: React.FC = () => {
       )}
 
       {/* KPI Stats Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-center">
-          <span className="text-[11px] text-slate-400 block font-medium">Pending Dispatch</span>
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 text-center">
+          <span className="text-[11px] text-slate-400 block font-medium">Pending Review</span>
           <p className="text-2xl font-black text-amber-400 mt-1">{pendingCount}</p>
           <span className="text-[10px] text-slate-500 font-medium">Action Needed</span>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-center">
-          <span className="text-[11px] text-slate-400 block font-medium">Dispatched & Live</span>
-          <p className="text-2xl font-black text-emerald-400 mt-1">{dispatchedCount}</p>
-          <span className="text-[10px] text-slate-500 font-medium">Visible to Students</span>
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 text-center">
+          <span className="text-[11px] text-slate-400 block font-medium">Ordered (Vendor)</span>
+          <p className="text-2xl font-black text-indigo-400 mt-1">{orderedCount}</p>
+          <span className="text-[10px] text-slate-500 font-medium">Placed with Courier</span>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-center col-span-2 sm:col-span-1">
-          <span className="text-[11px] text-slate-400 block font-medium">Total Gift Redemptions</span>
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 text-center">
+          <span className="text-[11px] text-slate-400 block font-medium">Shipped (In Transit)</span>
+          <p className="text-2xl font-black text-sky-400 mt-1">{shippedCount}</p>
+          <span className="text-[10px] text-slate-500 font-medium">With Tracking ID</span>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 text-center">
+          <span className="text-[11px] text-slate-400 block font-medium">Delivered / Dispatched</span>
+          <p className="text-2xl font-black text-emerald-400 mt-1">{deliveredCount + dispatchedCount}</p>
+          <span className="text-[10px] text-slate-500 font-medium">Fulfilled</span>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 text-center col-span-2 sm:col-span-1">
+          <span className="text-[11px] text-slate-400 block font-medium">Total Redemptions</span>
           <p className="text-2xl font-black text-white mt-1">{requests.length}</p>
           <span className="text-[10px] text-slate-500 font-medium">All-Time Requests</span>
         </div>
@@ -267,7 +369,7 @@ export const GiftFulfillment: React.FC = () => {
 
       {/* Filter & Search Bar */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex items-center space-x-1.5 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
           <button
             onClick={() => setFilterStatus('ALL')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
@@ -291,6 +393,39 @@ export const GiftFulfillment: React.FC = () => {
           </button>
 
           <button
+            onClick={() => setFilterStatus('ORDERED')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              filterStatus === 'ORDERED'
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'bg-slate-950 text-slate-300 hover:text-white border border-slate-800'
+            }`}
+          >
+            Ordered ({orderedCount})
+          </button>
+
+          <button
+            onClick={() => setFilterStatus('SHIPPED')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              filterStatus === 'SHIPPED'
+                ? 'bg-sky-600 text-white shadow-md'
+                : 'bg-slate-950 text-slate-300 hover:text-white border border-slate-800'
+            }`}
+          >
+            Shipped ({shippedCount})
+          </button>
+
+          <button
+            onClick={() => setFilterStatus('DELIVERED')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              filterStatus === 'DELIVERED'
+                ? 'bg-emerald-600 text-white shadow-md'
+                : 'bg-slate-950 text-slate-300 hover:text-white border border-slate-800'
+            }`}
+          >
+            Delivered ({deliveredCount})
+          </button>
+
+          <button
             onClick={() => setFilterStatus('DISPATCHED')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               filterStatus === 'DISPATCHED'
@@ -298,7 +433,7 @@ export const GiftFulfillment: React.FC = () => {
                 : 'bg-slate-950 text-slate-300 hover:text-white border border-slate-800'
             }`}
           >
-            Dispatched ({dispatchedCount})
+            Vouchers ({dispatchedCount})
           </button>
         </div>
 
@@ -306,7 +441,7 @@ export const GiftFulfillment: React.FC = () => {
           <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-3" />
           <input
             type="text"
-            placeholder="Search by student, item, code..."
+            placeholder="Search by student, item, address, tracking..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="w-full pl-8 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
@@ -318,119 +453,261 @@ export const GiftFulfillment: React.FC = () => {
       <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
         {filteredRequests.length === 0 ? (
           <div className="text-center py-16 text-slate-500 text-xs">
-            No gift card redemptions found for this filter.
+            No gift redemptions found for this filter.
           </div>
         ) : (
           <div className="divide-y divide-slate-800">
             {filteredRequests.map(req => {
               const activeCode = getExtractedVoucherCode(req);
+              const isPhysical = req.isPhysical || (req.shippingAddress && req.shippingAddress.includes('[PHYSICAL DELIVERY]')) || req.itemTitle.toLowerCase().includes('bottle');
               const isDispatched = req.status === 'APPROVED_DISPATCHED';
+              const isOrdered = req.status === 'ORDERED';
+              const isShipped = req.status === 'SHIPPED';
+              const isDelivered = req.status === 'DELIVERED';
               const isPending = req.status === 'PENDING_APPROVAL';
 
               return (
-                <div key={req.id} className="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 text-xs">
-                  <div className="space-y-2 max-w-2xl">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-black text-white text-sm sm:text-base">{req.itemTitle}</span>
-                      <span className="text-amber-400 font-mono font-bold flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
-                        <StudyCoinIcon className="w-3.5 h-3.5" />
-                        <span>{req.coinsCost.toLocaleString()} Coins</span>
-                      </span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                        Destination: {req.shippingAddress.split('|')[0] || req.shippingAddress}
-                      </span>
+                <div key={req.id} className="p-5 flex flex-col space-y-3.5 text-xs">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                    <div className="space-y-1 max-w-3xl">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {isPhysical && (
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center space-x-1">
+                            <Package className="w-3 h-3 text-amber-400" />
+                            <span>Physical Courier Parcel</span>
+                          </span>
+                        )}
+                        <span className="font-black text-white text-sm sm:text-base">{req.itemTitle}</span>
+                        <span className="text-amber-400 font-mono font-bold flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
+                          <StudyCoinIcon className="w-3.5 h-3.5" />
+                          <span>{req.coinsCost.toLocaleString()} Coins</span>
+                        </span>
+                      </div>
+
+                      <div className="text-slate-300 space-y-0.5">
+                        <p>
+                          Student: <strong className="text-white">{req.learnerName}</strong> • Learner ID: <code className="text-[11px] text-slate-400 font-mono">{req.learnerId}</code>
+                        </p>
+                        <p className="text-slate-400 flex items-center space-x-1.5">
+                          <Phone className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                          <span>Phone / WhatsApp: <strong className="text-slate-200">{req.contactPhone || 'N/A'}</strong></span>
+                          <span className="text-slate-600">•</span>
+                          <Clock className="w-3 h-3 text-slate-500" />
+                          <span className="text-[11px]">{new Date(req.requestedAt).toLocaleString()}</span>
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="text-slate-300 space-y-0.5">
-                      <p>
-                        Student: <strong className="text-white">{req.learnerName}</strong> • ID: <code className="text-[11px] text-slate-400 font-mono">{req.learnerId}</code>
-                      </p>
-                      <p className="text-slate-400 flex items-center space-x-1.5">
-                        <Phone className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                        <span>Phone / WhatsApp: <strong className="text-slate-200">{req.contactPhone || 'N/A'}</strong></span>
-                        <span className="text-slate-600">•</span>
-                        <Clock className="w-3 h-3 text-slate-500" />
-                        <span className="text-[11px]">{new Date(req.requestedAt).toLocaleString()}</span>
-                      </p>
+                    {/* Status Badge */}
+                    <div className="flex items-center space-x-2 self-start lg:self-center">
+                      <span
+                        className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                          isDelivered
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                            : isShipped
+                            ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                            : isOrdered
+                            ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                            : isDispatched
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                            : req.status === 'REJECTED'
+                            ? 'bg-red-500/20 text-red-300 border border-red-500/40'
+                            : 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse'
+                        }`}
+                      >
+                        {isDelivered
+                          ? '🎉 Delivered'
+                          : isShipped
+                          ? '🚚 Shipped (In Transit)'
+                          : isOrdered
+                          ? '📦 Ordered with Vendor'
+                          : isDispatched
+                          ? '✓ Dispatched & Live'
+                          : req.status === 'REJECTED'
+                          ? 'Rejected'
+                          : '⏳ Pending Action'}
+                      </span>
                     </div>
+                  </div>
 
-                    {/* Dispatched Voucher Code Live Showcase */}
-                    {isDispatched && (
-                      <div className="mt-2 p-3 bg-gradient-to-r from-emerald-950/60 to-slate-950 border border-emerald-500/50 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-md">
-                        <div className="flex items-center space-x-2.5">
-                          <span className="text-[10px] uppercase font-black text-emerald-400 tracking-wider flex items-center space-x-1">
-                            <KeyRound className="w-3.5 h-3.5" />
-                            <span>Live Voucher Code:</span>
-                          </span>
-                          <span className="font-mono font-black text-amber-300 text-sm bg-slate-950 px-3 py-1 rounded-xl border border-emerald-500/40 tracking-wider">
-                            {activeCode || 'AL-GC-PROCESSED'}
-                          </span>
-                        </div>
-
+                  {/* PHYSICAL ITEMS: FULL ADDRESS SHOWCASE */}
+                  {isPhysical ? (
+                    <div className="p-3.5 bg-gradient-to-r from-amber-950/40 via-slate-950 to-slate-900 border-2 border-amber-500/40 rounded-2xl space-y-2.5 shadow-md">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <span className="text-[11px] font-black uppercase text-amber-400 tracking-wider flex items-center space-x-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Full Courier Shipping Address (Doorstep Delivery)</span>
+                        </span>
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => handleCopyCode(activeCode, req.id)}
-                            className="px-2.5 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-bold rounded-lg border border-emerald-500/40 flex items-center space-x-1 transition-all"
+                            onClick={() => handleCopyAddress(req.shippingAddress, req.id)}
+                            className="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-lg flex items-center space-x-1 shadow-sm transition-all"
+                            title="Copy Full Address for Courier / Amazon"
                           >
-                            {copiedCodeId === req.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                            <span>{copiedCodeId === req.id ? 'Copied' : 'Copy'}</span>
+                            {copiedAddressId === req.id ? <Check className="w-3.5 h-3.5 text-slate-950" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{copiedAddressId === req.id ? 'Copied Full Address!' : '📋 Copy Full Address'}</span>
                           </button>
 
                           {req.contactPhone && (
                             <button
-                              onClick={() => handleShareWhatsApp(req, activeCode)}
+                              onClick={() => handleShareWhatsAppShipping(req, req.status, req.trackingId, req.courierName)}
                               className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg flex items-center space-x-1 transition-all shadow-sm"
-                              title="Send Code via WhatsApp"
+                              title="WhatsApp Shipping Update to Student"
                             >
                               <Send className="w-3 h-3" />
                               <span>WhatsApp</span>
                             </button>
                           )}
-
-                          <button
-                            onClick={() => openDispatchModal(req)}
-                            className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg border border-slate-700 flex items-center space-x-1 transition-all"
-                            title="Edit Voucher Code"
-                          >
-                            <Edit3 className="w-3 h-3" />
-                            <span>Edit Code</span>
-                          </button>
                         </div>
                       </div>
-                    )}
-                  </div>
 
-                  {/* Actions & Status Column */}
-                  <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-between gap-3 flex-shrink-0">
-                    <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                        isDispatched
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                          : req.status === 'REJECTED'
-                          ? 'bg-red-500/20 text-red-300 border border-red-500/40'
-                          : 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse'
-                      }`}
-                    >
-                      {isDispatched ? '✓ Dispatched & Live' : req.status === 'REJECTED' ? 'Rejected' : '⏳ Pending Dispatch'}
-                    </span>
-
-                    {isPending && (
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => openDispatchModal(req)}
-                          className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-black text-xs rounded-xl flex items-center space-x-1.5 shadow-lg shadow-emerald-950 transition-all"
-                        >
-                          <KeyRound className="w-3.5 h-3.5" />
-                          <span>Enter Code &amp; Dispatch</span>
-                        </button>
-
-                        <button
-                          onClick={() => handleReject(req)}
-                          className="px-3 py-2 bg-red-950/60 hover:bg-red-900/60 text-red-300 border border-red-800 rounded-xl font-bold text-xs transition-all"
-                        >
-                          Reject
-                        </button>
+                      {/* FULL UN-TRUNCATED COURIER ADDRESS DISPLAY */}
+                      <div className="bg-slate-950 p-3 rounded-xl border border-amber-500/25 text-xs text-white font-mono leading-relaxed select-all">
+                        {req.shippingAddress.replace('[PHYSICAL DELIVERY]', '').trim()}
                       </div>
+
+                      {/* Shipping Tracking Status Strip */}
+                      {(isShipped || isOrdered || req.trackingId) && (
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800 text-xs">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-slate-400">Carrier:</span>
+                            <span className="font-bold text-sky-400 bg-sky-950/60 border border-sky-800 px-2 py-0.5 rounded">
+                              {req.courierName || 'Courier Partner'}
+                            </span>
+                            <span className="text-slate-500">•</span>
+                            <span className="text-slate-400">Tracking / AWB:</span>
+                            <span className="font-mono font-black text-amber-300 bg-slate-900 px-2.5 py-0.5 rounded border border-amber-500/30">
+                              {req.trackingId || 'Order Processing'}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-800 px-2 py-0.5 rounded-full">
+                            Live on Student Dashboard
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    /* DIGITAL VOUCHERS: FULL DESTINATION ADDRESS & VOUCHER CODE */
+                    <div className="space-y-2">
+                      <div className="bg-slate-950 p-2.5 rounded-xl border border-indigo-500/20 text-indigo-300 font-mono text-[11px]">
+                        <strong>Target Destination:</strong> {req.shippingAddress}
+                      </div>
+
+                      {isDispatched && (
+                        <div className="p-3 bg-gradient-to-r from-emerald-950/60 to-slate-950 border border-emerald-500/50 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-md">
+                          <div className="flex items-center space-x-2.5">
+                            <span className="text-[10px] uppercase font-black text-emerald-400 tracking-wider flex items-center space-x-1">
+                              <KeyRound className="w-3.5 h-3.5" />
+                              <span>Live Voucher Code:</span>
+                            </span>
+                            <span className="font-mono font-black text-amber-300 text-sm bg-slate-950 px-3 py-1 rounded-xl border border-emerald-500/40 tracking-wider">
+                              {activeCode || 'AL-GC-PROCESSED'}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleCopyCode(activeCode, req.id)}
+                              className="px-2.5 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-bold rounded-lg border border-emerald-500/40 flex items-center space-x-1 transition-all"
+                            >
+                              {copiedCodeId === req.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                              <span>{copiedCodeId === req.id ? 'Copied' : 'Copy'}</span>
+                            </button>
+
+                            {req.contactPhone && (
+                              <button
+                                onClick={() => handleShareWhatsApp(req, activeCode)}
+                                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg flex items-center space-x-1 transition-all shadow-sm"
+                                title="Send Code via WhatsApp"
+                              >
+                                <Send className="w-3 h-3" />
+                                <span>WhatsApp</span>
+                              </button>
+                            )}
+
+                            <button
+                              onClick={() => openStatusModal(req, 'APPROVED_DISPATCHED')}
+                              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg border border-slate-700 flex items-center space-x-1 transition-all"
+                              title="Edit Voucher Code"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                              <span>Edit Code</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* ACTION CONTROLS FOR ADMIN */}
+                  <div className="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {isPhysical ? (
+                        <>
+                          <button
+                            onClick={() => handleUpdateStatus(req, 'ORDERED')}
+                            className={`px-3 py-1.5 text-xs font-bold rounded-xl flex items-center space-x-1 transition-all ${
+                              isOrdered
+                                ? 'bg-indigo-600 text-white border border-indigo-400'
+                                : 'bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700'
+                            }`}
+                          >
+                            <Package className="w-3.5 h-3.5" />
+                            <span>Mark Ordered</span>
+                          </button>
+
+                          <button
+                            onClick={() => openStatusModal(req, 'SHIPPED')}
+                            className={`px-3 py-1.5 text-xs font-bold rounded-xl flex items-center space-x-1 transition-all ${
+                              isShipped
+                                ? 'bg-sky-600 text-white border border-sky-400'
+                                : 'bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white shadow-sm'
+                            }`}
+                          >
+                            <Truck className="w-3.5 h-3.5" />
+                            <span>{isShipped ? 'Update Shipping / Tracking' : 'Mark Shipped'}</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleUpdateStatus(req, 'DELIVERED')}
+                            className={`px-3 py-1.5 text-xs font-bold rounded-xl flex items-center space-x-1 transition-all ${
+                              isDelivered
+                                ? 'bg-emerald-600 text-white border border-emerald-400'
+                                : 'bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700'
+                            }`}
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Mark Delivered</span>
+                          </button>
+
+                          <button
+                            onClick={() => openStatusModal(req)}
+                            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl border border-slate-700 flex items-center space-x-1 transition-all"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Edit Status &amp; Notes</span>
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => openStatusModal(req, 'APPROVED_DISPATCHED')}
+                            className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-black text-xs rounded-xl flex items-center space-x-1.5 shadow-lg shadow-emerald-950 transition-all"
+                          >
+                            <KeyRound className="w-3.5 h-3.5" />
+                            <span>{isDispatched ? 'Edit Voucher Code' : 'Enter Code & Dispatch'}</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+
+                    {req.status !== 'REJECTED' && (
+                      <button
+                        onClick={() => handleReject(req)}
+                        className="px-3 py-1.5 bg-red-950/60 hover:bg-red-900/60 text-red-300 border border-red-800 rounded-xl font-bold text-xs transition-all"
+                      >
+                        Reject
+                      </button>
                     )}
                   </div>
                 </div>
@@ -440,93 +717,164 @@ export const GiftFulfillment: React.FC = () => {
         )}
       </div>
 
-      {/* DEDICATED REAL CODE DISPATCH MODAL */}
+      {/* COMPREHENSIVE STATUS & COURIER DISPATCH MODAL */}
       {modalReq && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-slate-900 border border-amber-500/50 rounded-3xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="max-w-md w-full bg-slate-900 border border-amber-500/50 rounded-3xl p-6 shadow-2xl relative my-8">
             <button
-              onClick={closeDispatchModal}
+              onClick={closeStatusModal}
               className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/50"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center mx-auto mb-3 text-amber-400">
-              <Gift className="w-6 h-6" />
+              {modalReq.itemTitle.toLowerCase().includes('bottle') ? (
+                <Package className="w-6 h-6" />
+              ) : (
+                <Gift className="w-6 h-6" />
+              )}
             </div>
 
             <h3 className="text-lg font-black text-white text-center">
-              Fulfill &amp; Dispatch Gift Card
+              Update Reward Status &amp; Fulfillment
             </h3>
             <p className="text-xs text-slate-400 text-center mt-1 mb-4">
-              Enter the real voucher code, gift certificate key, or PIN. It will be immediately delivered to the student&apos;s dashboard.
+              Set courier tracking, status (Ordered, Shipped, Delivered) or voucher codes. Updates are immediately visible to the student.
             </p>
 
             {/* Target Item Pill */}
-            <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-1.5 mb-4 text-xs">
+            <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2 mb-4 text-xs">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-white">{modalReq.itemTitle}</span>
-                <span className="text-amber-400 font-mono font-bold">({modalReq.coinsCost} Coins)</span>
+                <span className="text-amber-400 font-mono font-bold">({modalReq.coinsCost.toLocaleString()} Coins)</span>
               </div>
-              <div className="text-[11px] text-slate-400">
-                Student: <strong className="text-slate-200">{modalReq.learnerName}</strong> • Phone: {modalReq.contactPhone || 'N/A'}
+              <div className="text-[11px] text-slate-300">
+                Student: <strong className="text-white">{modalReq.learnerName}</strong> • Phone: {modalReq.contactPhone || 'N/A'}
               </div>
-              <div className="text-[11px] text-indigo-300 font-mono truncate">
-                Target: {modalReq.shippingAddress.split('|')[0] || modalReq.shippingAddress}
+              <div className="text-[11px] text-amber-300 font-mono leading-relaxed bg-slate-900 p-2 rounded-lg border border-slate-800 select-all">
+                <span className="text-slate-400 block text-[10px] uppercase font-bold">Address / Target:</span>
+                {modalReq.shippingAddress.replace('[PHYSICAL DELIVERY]', '').trim()}
               </div>
             </div>
 
-            <form onSubmit={handleConfirmDispatch} className="space-y-4">
+            <form onSubmit={handleModalSubmit} className="space-y-4 text-xs">
+              {/* Status Selector */}
               <div>
                 <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-1.5">
-                  Real Voucher Code / PIN (Required)
+                  Update Status
+                </label>
+                <select
+                  value={modalStatus}
+                  onChange={e => setModalStatus(e.target.value as any)}
+                  className="w-full px-3 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white font-bold focus:outline-none focus:border-amber-400"
+                >
+                  <option value="ORDERED">📦 ORDERED (Order placed with vendor / merchant)</option>
+                  <option value="SHIPPED">🚚 SHIPPED (Courier parcel dispatched with tracking)</option>
+                  <option value="DELIVERED">🎉 DELIVERED (Delivered to student&apos;s home)</option>
+                  <option value="APPROVED_DISPATCHED">🎁 APPROVED &amp; DISPATCHED (Voucher code ready)</option>
+                  <option value="PENDING_APPROVAL">⏳ PENDING APPROVAL (Verification in progress)</option>
+                  <option value="REJECTED">❌ REJECTED</option>
+                </select>
+              </div>
+
+              {/* If SHIPPED or ORDERED: Show Courier Carrier & Tracking Number inputs */}
+              {(modalStatus === 'SHIPPED' || modalStatus === 'ORDERED' || modalReq.itemTitle.toLowerCase().includes('bottle')) && (
+                <div className="space-y-3 p-3 bg-slate-950/70 border border-slate-800 rounded-2xl">
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-1">
+                      Courier Partner / Delivery Carrier
+                    </label>
+                    <input
+                      type="text"
+                      value={modalCourierName}
+                      onChange={e => setModalCourierName(e.target.value)}
+                      placeholder="e.g. Amazon, Delhivery, BlueDart, DTDC, India Post"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400 font-medium"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-1">
+                      Courier Tracking ID / Consignment / AWB No.
+                    </label>
+                    <input
+                      type="text"
+                      value={modalTrackingId}
+                      onChange={e => setModalTrackingId(e.target.value.toUpperCase())}
+                      placeholder="e.g. DELH-1928491823, AWB984128"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl font-mono text-amber-300 text-sm focus:outline-none focus:border-amber-400 font-bold uppercase"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* If APPROVED_DISPATCHED: Show Real Voucher Code */}
+              {modalStatus === 'APPROVED_DISPATCHED' && (
+                <div className="space-y-2">
+                  <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-1">
+                    Real Voucher Code / PIN (Required)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={modalCodeInput}
+                    onChange={e => setModalCodeInput(e.target.value.toUpperCase())}
+                    placeholder="e.g. AMZN-9X2M-4819-K81M, GPLAY-XXXX-YYYY"
+                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-center font-mono font-black text-base text-amber-300 placeholder-slate-600 focus:outline-none focus:border-amber-400 uppercase tracking-wider"
+                  />
+
+                  {/* Quick Format Presets */}
+                  <div className="space-y-1 pt-1">
+                    <span className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold block">
+                      Quick Format Presets:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleApplyPreset('AL-AMZ')}
+                        className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono rounded-lg border border-slate-700"
+                      >
+                        + Amazon
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleApplyPreset('AL-GPLAY')}
+                        className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono rounded-lg border border-slate-700"
+                      >
+                        + Play Store
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleApplyPreset('AL-FLPK')}
+                        className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono rounded-lg border border-slate-700"
+                      >
+                        + Flipkart
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleApplyPreset('AL-SWIG')}
+                        className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono rounded-lg border border-slate-700"
+                      >
+                        + Swiggy
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Admin Internal Notes */}
+              <div>
+                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                  Internal Admin Notes (Optional)
                 </label>
                 <input
                   type="text"
-                  autoFocus
-                  required
-                  value={modalCodeInput}
-                  onChange={e => setModalCodeInput(e.target.value.toUpperCase())}
-                  placeholder="e.g. AMZN-9X2M-4819-K81M, GPLAY-XXXX-YYYY"
-                  className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-center font-mono font-black text-base text-amber-300 placeholder-slate-600 focus:outline-none focus:border-amber-400 uppercase tracking-wider"
+                  value={modalAdminNotes}
+                  onChange={e => setModalAdminNotes(e.target.value)}
+                  placeholder="e.g. Dispatched via Amazon Prime, delivered on Friday"
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-slate-300 text-xs focus:outline-none focus:border-amber-400"
                 />
-              </div>
-
-              {/* Quick Format Presets */}
-              <div className="space-y-1.5">
-                <span className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold block">
-                  Quick Format Helper (Click to Auto-Fill):
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => handleApplyPreset('AL-AMZ')}
-                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono rounded-lg border border-slate-700"
-                  >
-                    + Amazon Format
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleApplyPreset('AL-GPLAY')}
-                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono rounded-lg border border-slate-700"
-                  >
-                    + Play Store
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleApplyPreset('AL-FLPK')}
-                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono rounded-lg border border-slate-700"
-                  >
-                    + Flipkart
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleApplyPreset('AL-SWIG')}
-                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono rounded-lg border border-slate-700"
-                  >
-                    + Swiggy
-                  </button>
-                </div>
               </div>
 
               {modalError && (
@@ -538,7 +886,7 @@ export const GiftFulfillment: React.FC = () => {
               <div className="pt-2 flex items-center space-x-2">
                 <button
                   type="button"
-                  onClick={closeDispatchModal}
+                  onClick={closeStatusModal}
                   className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all"
                 >
                   Cancel
@@ -546,10 +894,10 @@ export const GiftFulfillment: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-emerald-950 transition-all disabled:opacity-50 flex items-center justify-center space-x-1.5"
+                  className="flex-1 py-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-950 transition-all disabled:opacity-50 flex items-center justify-center space-x-1.5"
                 >
                   <Check className="w-4 h-4" />
-                  <span>{isSubmitting ? 'Dispatching...' : 'Confirm & Dispatch'}</span>
+                  <span>{isSubmitting ? 'Saving...' : 'Save & Update Status'}</span>
                 </button>
               </div>
             </form>

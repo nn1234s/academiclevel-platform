@@ -35,7 +35,10 @@ import {
   BarChart3,
   Gift,
   Copy,
-  ExternalLink
+  ExternalLink,
+  Package,
+  Truck,
+  MapPin
 } from 'lucide-react';
 
 interface StudentDashboardProps {
@@ -55,10 +58,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 }) => {
   const { refreshCurrentLearner } = useAuth();
 
-  // Dispatched Gift Cards State & Automatic Backend Sync
+  // Dispatched & Active Rewards State & Automatic Backend Sync
   const [dispatchedGifts, setDispatchedGifts] = useState<GiftRequest[]>(() => {
     return StorageRLSLayer.getGiftRequestsForLearner(learner.id).filter(
-      r => r.status === 'APPROVED_DISPATCHED'
+      r => r.status === 'APPROVED_DISPATCHED' || r.status === 'ORDERED' || r.status === 'SHIPPED' || r.status === 'DELIVERED'
     );
   });
   const [copiedGiftCode, setCopiedGiftCode] = useState<string | null>(null);
@@ -70,7 +73,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         const res = await ApiClient.getMyGifts(learner.id);
         if (res && res.success && Array.isArray(res.requests)) {
           res.requests.forEach(r => StorageRLSLayer.saveGiftRequest(r));
-          const dispatched = res.requests.filter(r => r.status === 'APPROVED_DISPATCHED');
+          const dispatched = res.requests.filter(
+            r => r.status === 'APPROVED_DISPATCHED' || r.status === 'ORDERED' || r.status === 'SHIPPED' || r.status === 'DELIVERED'
+          );
           setDispatchedGifts(dispatched);
           return;
         }
@@ -78,7 +83,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         // Fallback to local storage
       }
       const local = StorageRLSLayer.getGiftRequestsForLearner(learner.id).filter(
-        r => r.status === 'APPROVED_DISPATCHED'
+        r => r.status === 'APPROVED_DISPATCHED' || r.status === 'ORDERED' || r.status === 'SHIPPED' || r.status === 'DELIVERED'
       );
       setDispatchedGifts(local);
     };
@@ -288,6 +293,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
               {dispatchedGifts.map((gift) => {
+                const isPhysical = gift.isPhysical || (gift.shippingAddress && gift.shippingAddress.includes('[PHYSICAL DELIVERY]')) || gift.itemTitle.toLowerCase().includes('bottle');
+                const isShipped = gift.status === 'SHIPPED';
+                const isOrdered = gift.status === 'ORDERED';
+                const isDelivered = gift.status === 'DELIVERED';
                 const voucherCode = getExtractedVoucherCode(gift);
                 const help = getGiftBrandHelp(gift.itemTitle);
                 const isCopied = copiedGiftCode === gift.id;
@@ -300,12 +309,39 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 flex items-center space-x-1.5">
-                          <span className="text-base">{help.emoji}</span>
-                          <span>{help.brand}</span>
+                          {isPhysical ? (
+                            <>
+                              <Package className="w-3.5 h-3.5 text-amber-400" />
+                              <span>Doorstep Delivery</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-base">{help.emoji}</span>
+                              <span>{help.brand}</span>
+                            </>
+                          )}
                         </span>
-                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center space-x-1">
+                        <span
+                          className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border flex items-center space-x-1 ${
+                            isDelivered
+                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                              : isShipped
+                              ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+                              : isOrdered
+                              ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
+                              : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                          }`}
+                        >
                           <CheckCircle2 className="w-3 h-3" />
-                          <span>Active & Verified</span>
+                          <span>
+                            {isDelivered
+                              ? 'Delivered to Doorstep'
+                              : isShipped
+                              ? 'Dispatched & In Transit'
+                              : isOrdered
+                              ? 'Order Placed with Courier'
+                              : 'Active & Verified'}
+                          </span>
                         </span>
                       </div>
 
@@ -317,8 +353,50 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       </p>
                     </div>
 
-                    {/* Voucher Code Box */}
-                    <div className="bg-slate-900 border-2 border-amber-500/50 rounded-xl p-3.5 shadow-inner">
+                    {/* PHYSICAL ITEM COURIER TRACKING BOX */}
+                    {isPhysical ? (
+                      <div className="bg-slate-900 border-2 border-sky-500/40 rounded-xl p-3.5 space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-bold text-sky-400 flex items-center space-x-1">
+                            <Truck className="w-3.5 h-3.5" />
+                            <span>
+                              {isDelivered
+                                ? 'Delivered to Doorstep'
+                                : isShipped
+                                ? 'In Transit with Courier Partner'
+                                : 'Courier Order Placed'}
+                            </span>
+                          </span>
+                          {gift.courierName && (
+                            <span className="text-[10px] font-mono text-sky-300 bg-sky-950 px-2 py-0.5 rounded border border-sky-800">
+                              {gift.courierName}
+                            </span>
+                          )}
+                        </div>
+
+                        {gift.trackingId ? (
+                          <div className="bg-slate-950 p-2.5 rounded-lg border border-sky-500/30 flex items-center justify-between">
+                            <div>
+                              <span className="text-[9px] uppercase font-bold text-slate-400 block">AWB / Tracking Number:</span>
+                              <span className="font-mono text-sm font-black text-amber-300 tracking-wider select-all">
+                                {gift.trackingId}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 font-mono">Live Tracking</span>
+                          </div>
+                        ) : (
+                          <p className="text-[11px] text-slate-400 italic">
+                            Tracking details will appear here once the courier parcel is dispatched.
+                          </p>
+                        )}
+
+                        <p className="text-[10px] text-slate-400 border-t border-slate-800 pt-1.5 truncate">
+                          📍 {gift.shippingAddress.replace('[PHYSICAL DELIVERY]', '').trim()}
+                        </p>
+                      </div>
+                    ) : (
+                      /* Voucher Code Box */
+                      <div className="bg-slate-900 border-2 border-amber-500/50 rounded-xl p-3.5 shadow-inner">
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 flex items-center space-x-1">
                           <Sparkles className="w-3 h-3 text-amber-400" />
@@ -354,8 +432,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         </button>
                       </div>
                     </div>
+                  )}
 
-                    {/* Redemption Instructions & Link */}
+                  {/* Redemption Instructions & Link */}
+                  {!isPhysical && (
                     <div className="pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                       <p className="text-slate-300 text-[11px] leading-relaxed">
                         {help.instructions}
@@ -373,6 +453,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         </a>
                       )}
                     </div>
+                  )}
                   </div>
                 );
               })}
@@ -702,8 +783,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Award className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-white">Gift Card Arena</p>
-          <span className="text-[10px] text-slate-400">₹20 - ₹500 Vouchers</span>
+          <p className="text-xs font-bold text-white">Rewards &amp; Bottles</p>
+          <span className="text-[10px] text-slate-400">₹10 - ₹150 &amp; Bottles</span>
         </button>
       </div>
 
