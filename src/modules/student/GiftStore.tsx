@@ -27,6 +27,10 @@ import {
   MapPin,
   Package,
   Home,
+  Eye,
+  Star,
+  Box,
+  Info,
   X
 } from 'lucide-react';
 
@@ -76,9 +80,92 @@ export interface PhysicalRewardItem {
   popular?: boolean;
   requiredPlan?: 'LITE' | 'PLUS';
   specs: string[];
+  features: string[];
+  deliveryPartner?: string;
+  deliveryTag?: string;
+  originalPriceInr?: number;
+  estimatedDelivery?: string;
 }
 
 export const PHYSICAL_REWARDS: PhysicalRewardItem[] = [
+  {
+    id: 'pokemon-stationery-set',
+    name: 'Official Pokémon Licensed 11-Piece Stationery Set',
+    category: 'PHYSICAL_MERCH',
+    coinsCost: 25000,
+    coinsCostFormatted: '25,000 Coins',
+    image: '/rewards/pokemon-stationery-set.png',
+    badge: '⚡ Official Pokémon Licensed (Lite & Plus Eligible)',
+    gradient: 'from-blue-600 via-indigo-600 to-violet-700',
+    description: 'Officially licensed Pokémon Sports Time complete 11-piece study stationery kit featuring Pikachu, Scorbunny, Sobble, Grookey, and Jigglypuff. Perfect for all school homework and creative writing tasks.',
+    popular: true,
+    requiredPlan: 'LITE',
+    deliveryPartner: 'Amazon Logistics',
+    deliveryTag: 'Delivered using Amazon',
+    originalPriceInr: 499,
+    estimatedDelivery: '3–5 Business Days',
+    specs: ['11 Pcs Complete Set', '9 Smooth Writing Pens', '1 High-Quality Rubber', '1 Safety Sharpener', 'Amazon Doorstep Delivery'],
+    features: [
+      'Complete 11 pcs Stationery Set – 9 pens, 1 rubber, 1 sharpener included',
+      'Smooth Writing Pens – Perfect for homework, school notes, and office tasks',
+      'High-Quality Rubber – Erases cleanly without damaging paper',
+      'Perfect for Kids & Students – Ideal for school, college, or home study',
+      'Multi-Purpose Use – Suitable for school, office, drawing, and writing tasks',
+      '100% Genuine Officially Licensed Pokémon merchandise delivered safely using Amazon'
+    ]
+  },
+  {
+    id: 'milk-squishy',
+    name: 'Milk Bar Slow-Rising Sensory Squishy',
+    category: 'PHYSICAL_MERCH',
+    coinsCost: 26000,
+    coinsCostFormatted: '26,000 Coins',
+    image: '/rewards/milk-squishy.png',
+    badge: '🥛 Sensory Focus Toy (Lite & Plus Eligible)',
+    gradient: 'from-sky-500 via-blue-500 to-indigo-600',
+    description: 'Ultra-soft slow-rising Japanese style milk block sensory squishy with cute embossed cartoon cow art. Relieves study stress, exam anxiety, and fidgeting during long study sessions.',
+    popular: true,
+    requiredPlan: 'LITE',
+    deliveryPartner: 'Amazon Logistics',
+    deliveryTag: 'Delivered using Amazon',
+    originalPriceInr: 399,
+    estimatedDelivery: '3–5 Business Days',
+    specs: ['Super Slow-Rising PU Foam', 'Sweet Mild Scent', 'Pocket-Friendly Size', 'Tear-Resistant & Washable', 'Amazon Doorstep Delivery'],
+    features: [
+      'Super Slow-Rising PU Memory Foam – Slowly and gently returns to its original block shape',
+      'Study Stress Relief – Relieves mental fatigue, tension, and fidgeting during homework',
+      'Sensory Tactile Feel – Ultra-soft velvety skin with cute embossed cow graphic',
+      'Child Safe & Non-Toxic – Eco-friendly, odorless PU material safe for everyday school use',
+      'Pocket & Desk Size – Easily fits inside backpacks, pencil pouches, and study desks',
+      'Delivered securely in damage-proof packaging using Amazon delivery network'
+    ]
+  },
+  {
+    id: 'cheese-squishy',
+    name: 'Swiss Cheese Wedge Slow-Rising Squishy',
+    category: 'PHYSICAL_MERCH',
+    coinsCost: 26000,
+    coinsCostFormatted: '26,000 Coins',
+    image: '/rewards/cheese-squishy.png',
+    badge: '🧀 Study Stress Reliever (Lite & Plus Eligible)',
+    gradient: 'from-amber-400 via-yellow-500 to-orange-500',
+    description: 'Fun realistic textured Swiss cheese wedge squishy toy with holes and tactile grip. Ultra-satisfying slow rebound that keeps hands busy and minds focused while studying.',
+    popular: true,
+    requiredPlan: 'LITE',
+    deliveryPartner: 'Amazon Logistics',
+    deliveryTag: 'Delivered using Amazon',
+    originalPriceInr: 399,
+    estimatedDelivery: '3–5 Business Days',
+    specs: ['Realistic Swiss Cheese Texture', 'Slow Rebound Memory Foam', 'Non-Toxic & BPA Free', 'Ergonomic Palm Fit', 'Amazon Doorstep Delivery'],
+    features: [
+      'Realistic Swiss Cheese Holes – Textured surface provides stimulating tactile feedback',
+      'Focus & Calming Tool – Great for ADHD, restlessness, and exam nervousness',
+      'Durable Elastic Foam – Withstands thousands of repetitive high-pressure squeezes',
+      'Ergonomic Palm Fit – Contoured wedge shape sits comfortably in young scholars hands',
+      'Easy to Clean – Wipe with a damp cloth to keep fresh and pristine',
+      'Delivered quickly and safely right to your doorstep using Amazon fulfillment'
+    ]
+  },
   {
     id: 'milton-costa-1000',
     name: 'Milton Costa 1000 PET Water Bottle',
@@ -88,10 +175,21 @@ export const PHYSICAL_REWARDS: PhysicalRewardItem[] = [
     image: '/rewards/milton-costa-1000-bottle.png',
     badge: '🎒 Scholar Hydration (Lite & Plus Eligible)',
     gradient: 'from-amber-500 via-orange-500 to-amber-600',
-    description: '1000ml authentic Milton Costa PET hydration bottle with lemon/mint infusion neck, crystal-clear food-grade body, and leak-proof stainless steel cap. Shipped directly to your doorstep.',
+    description: '1000ml authentic Milton Costa PET hydration bottle with lemon/mint infusion neck, crystal-clear food-grade body, and leak-proof stainless steel cap.',
     popular: true,
     requiredPlan: 'LITE',
-    specs: ['1000 ml Capacity', 'BPA-Free Food Grade', 'Infusion Cap', 'Home Courier Delivery']
+    deliveryPartner: 'Amazon Logistics',
+    deliveryTag: 'Delivered using Amazon',
+    originalPriceInr: 299,
+    estimatedDelivery: '3–5 Business Days',
+    specs: ['1000 ml Capacity', 'BPA-Free Food Grade Body', 'Lemon/Herb Infusion Neck', 'Stainless Steel Leak-Proof Cap', 'Amazon Doorstep Delivery'],
+    features: [
+      '100% Food-Grade BPA-Free Material – Crystal-clear, odorless, and completely child-safe',
+      'Flavor Infusion Neck – Built-in strainer for infusing fresh lemon, mint, or fruit slices',
+      'Spill-Proof Stainless Steel Cap – Threaded seal prevents leaks inside school bags',
+      'Ergonomic Scholar Grip – Lightweight design fits standard bicycle and backpack bottle holders',
+      'Delivered safely to your doorstep using Amazon logistics'
+    ]
   },
   {
     id: 'steel-water-bottle',
@@ -102,10 +200,47 @@ export const PHYSICAL_REWARDS: PhysicalRewardItem[] = [
     image: '/rewards/steel-water-bottle.jpg',
     badge: '🏆 Heavy Duty Thermos (Lite & Plus Eligible)',
     gradient: 'from-slate-700 via-zinc-600 to-slate-900',
-    description: 'High-grade insulated stainless steel vacuum sports bottle with durable carry loop. Keeps water icy cold or warm throughout school and study hours. Shipped directly to your doorstep.',
+    description: 'High-grade double-wall vacuum insulated stainless steel thermos bottle with durable braided carry loop. Keeps water icy cold or warm throughout school and study hours.',
     popular: true,
     requiredPlan: 'LITE',
-    specs: ['Stainless Steel Body', 'Vacuum Insulated', 'Durable Carry Strap', 'Home Courier Delivery']
+    deliveryPartner: 'Amazon Logistics',
+    deliveryTag: 'Delivered using Amazon',
+    originalPriceInr: 899,
+    estimatedDelivery: '3–5 Business Days',
+    specs: ['Double-Wall Vacuum Insulation', 'SUS304 Stainless Steel', 'Heavy-Duty Carry Strap', 'Condensation-Free Finish', 'Amazon Doorstep Delivery'],
+    features: [
+      '24h Cold / 12h Hot Temperature Lock – Double-wall vacuum insulation maintains optimal temperature',
+      'Pure SUS304 Stainless Steel – Rust-proof, toxin-free interior that never retains past flavors',
+      'Heavy-Duty Braided Carry Strap – Easy to carry to school, tuition, sports, and outdoor camps',
+      'Sweat-Proof Exterior – Powder-coated matte finish prevents condensation slips',
+      'Shipped directly to your home using Amazon delivery network'
+    ]
+  },
+  {
+    id: 'nerf-blaster-gun',
+    name: 'Hot Fire Rapid Foam Dart Blaster Gun',
+    category: 'PHYSICAL_MERCH',
+    coinsCost: 38500,
+    coinsCostFormatted: '38,500 Coins',
+    image: '/rewards/nerf-blaster-gun.jpg',
+    badge: '🎯 Action & Recess Fun (Lite & Plus Eligible)',
+    gradient: 'from-blue-600 via-cyan-600 to-blue-800',
+    description: 'High-velocity Hot Fire foam dart blaster with 10 soft suction foam darts and dual-dart storage rail. High-precision pull-to-prime mechanism for safe, high-energy indoor and garden marksmanship practice.',
+    popular: true,
+    requiredPlan: 'LITE',
+    deliveryPartner: 'Amazon Logistics',
+    deliveryTag: 'Delivered using Amazon',
+    originalPriceInr: 799,
+    estimatedDelivery: '3–5 Business Days',
+    specs: ['Hot Fire Blaster Unit', '10 Soft Suction Foam Darts', 'Under-Barrel Dart Storage', 'Up to 35ft Launch Range', 'Amazon Doorstep Delivery'],
+    features: [
+      'Child-Safe Suction Darts – Soft EVA foam darts stick safely to smooth targets, walls, and glass',
+      'High-Power Spring Action – 100% mechanical manual pull-to-prime (no batteries ever needed)',
+      'Dual-Dart Tactical Storage – Under-barrel clips hold spare darts for lightning-fast reloads',
+      'Ergonomic Marksmanship Grip – Textured handle designed specifically for young champions',
+      'Healthy Active Fun – Great for target shooting games and coordination between study breaks',
+      'Delivered safely in sealed protective packaging using Amazon logistics'
+    ]
   }
 ];
 
@@ -211,6 +346,7 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner,
   const [physicalPhone, setPhysicalPhone] = useState<string>(learner.phone || '');
   const [submittedPhysicalClaim, setSubmittedPhysicalClaim] = useState<SubmittedPhysicalClaimInfo | null>(null);
   const [copiedPhysicalEmailText, setCopiedPhysicalEmailText] = useState(false);
+  const [previewProductItem, setPreviewProductItem] = useState<PhysicalRewardItem | null>(null);
 
   const handleCopyVoucher = (code: string, id: string) => {
     try {
@@ -484,7 +620,19 @@ ${learner.fullName}`;
     setSelectedLevel(null);
   };
 
+  const handleOpenProductDetails = (item: PhysicalRewardItem) => {
+    setPreviewProductItem(item);
+    setMessage(null);
+  };
+
   const handleOpenPhysicalModal = (item: PhysicalRewardItem) => {
+    // Show product details and Amazon delivery information popup before redeeming!
+    setPreviewProductItem(item);
+    setMessage(null);
+  };
+
+  const handleProceedToAddressForm = (item: PhysicalRewardItem) => {
+    setPreviewProductItem(null);
     setSelectedPhysicalItem(item);
     setMessage(null);
   };
@@ -830,22 +978,32 @@ ${recipientName.trim()}`;
                   </div>
 
                   {/* Product Visual Image Showcase */}
-                  <div className="w-full h-56 bg-slate-950/80 rounded-2xl border border-slate-800 flex items-center justify-center p-4 mb-4 relative overflow-hidden group-hover:border-amber-500/40 transition-all">
+                  <div
+                    onClick={() => handleOpenProductDetails(item)}
+                    className="w-full h-56 bg-slate-950/80 rounded-2xl border border-slate-800 flex items-center justify-center p-4 mb-4 relative overflow-hidden group-hover:border-amber-500/40 transition-all cursor-pointer"
+                  >
                     <img
                       src={item.image}
                       alt={item.name}
                       className="max-h-full max-w-full object-contain filter drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
                     />
-                    <div className="absolute bottom-2 left-2 bg-slate-950/90 backdrop-blur-sm border border-slate-800 px-2.5 py-1 rounded-xl text-[10px] text-slate-300 flex items-center space-x-1 font-mono">
-                      <Truck className="w-3 h-3 text-emerald-400" />
-                      <span>Direct Courier</span>
+                    <div className="absolute bottom-2 left-2 bg-slate-950/90 backdrop-blur-sm border border-slate-800 px-2.5 py-1 rounded-xl text-[10px] text-amber-300 flex items-center space-x-1.5 font-mono shadow">
+                      <Truck className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Delivered using Amazon</span>
+                    </div>
+                    <div className="absolute top-2 right-2 bg-slate-950/80 backdrop-blur-sm px-2 py-0.5 rounded-lg border border-slate-800 text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1">
+                      <Eye className="w-3 h-3 text-amber-400" />
+                      <span>View Details</span>
                     </div>
                   </div>
 
-                  <h3 className="text-lg font-black text-white group-hover:text-amber-300 transition-colors">
+                  <h3
+                    onClick={() => handleOpenProductDetails(item)}
+                    className="text-lg font-black text-white group-hover:text-amber-300 transition-colors cursor-pointer"
+                  >
                     {item.name}
                   </h3>
-                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                  <p className="text-xs text-slate-300 mt-1 leading-relaxed line-clamp-2">
                     {item.description}
                   </p>
 
@@ -867,18 +1025,28 @@ ${recipientName.trim()}`;
                   </div>
                 </div>
 
-                <div className="mt-5">
+                <div className="mt-5 grid grid-cols-2 gap-2">
                   <button
+                    type="button"
+                    onClick={() => handleOpenProductDetails(item)}
+                    className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Details &amp; Amazon</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => handleOpenPhysicalModal(item)}
                     disabled={buttonDisabled}
-                    className={`w-full py-3 px-4 font-black text-xs rounded-xl transition-all flex items-center justify-center space-x-2 ${
+                    className={`py-2.5 px-3 font-black text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
                       !buttonDisabled
-                        ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-lg shadow-amber-950'
-                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                        ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-lg shadow-amber-950/40'
+                        : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-60'
                     }`}
                   >
-                    <Package className="w-4 h-4" />
-                    <span>{buttonLabel}</span>
+                    <Package className="w-3.5 h-3.5" />
+                    <span className="truncate">{buttonLabel}</span>
                   </button>
                 </div>
               </div>
@@ -1385,6 +1553,188 @@ ${recipientName.trim()}`;
         </div>
       )}
 
+      {/* ======================================================== */}
+      {/* MODAL 2.5: PRODUCT DETAILS & AMAZON DELIVERY POPUP       */}
+      {/* ======================================================== */}
+      {previewProductItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
+          <div className="bg-slate-900 border-2 border-amber-500/50 rounded-3xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl text-slate-100 relative my-6 max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Close Button */}
+            <button
+              onClick={() => setPreviewProductItem(null)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/80 transition-colors z-10 cursor-pointer"
+              aria-label="Close product details"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Modal Body (Scrollable) */}
+            <div className="overflow-y-auto pr-1 space-y-5">
+              {/* Product Header & Category Pill */}
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-slate-950 text-amber-300 border border-slate-800">
+                    Physical Scholar Merchandise
+                  </span>
+                  <span className="text-[10px] font-bold text-amber-400/90">
+                    {previewProductItem.badge}
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
+                  {previewProductItem.name}
+                </h2>
+              </div>
+
+              {/* Product Image & Amazon Badge Showcase */}
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 items-center">
+                <div className="sm:col-span-5 bg-slate-950 rounded-2xl border border-slate-800 p-4 flex flex-col items-center justify-center relative overflow-hidden group">
+                  <img
+                    src={previewProductItem.image}
+                    alt={previewProductItem.name}
+                    className="w-full h-52 sm:h-56 object-contain filter drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute top-2 left-2 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>In Stock</span>
+                  </div>
+                </div>
+
+                <div className="sm:col-span-7 space-y-3">
+                  {/* Coin Price & Value Tag */}
+                  <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] font-mono uppercase font-bold text-slate-400 block">Redemption Cost</span>
+                      <div className="flex items-center space-x-1.5 text-xl sm:text-2xl font-black font-mono text-amber-400">
+                        <StudyCoinIcon className="w-6 h-6" glow />
+                        <span>{previewProductItem.coinsCost.toLocaleString()} Coins</span>
+                      </div>
+                    </div>
+                    {previewProductItem.originalPriceInr && (
+                      <div className="text-right">
+                        <span className="text-[10px] text-slate-500 block">Retail Value</span>
+                        <span className="text-sm font-bold text-slate-300 line-through">₹{previewProductItem.originalPriceInr}</span>
+                        <span className="text-[10px] font-bold text-emerald-400 block">100% Free with Coins</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* OFFICIAL AMAZON DELIVERY BOX */}
+                  <div className="bg-gradient-to-br from-amber-500/10 via-slate-950 to-orange-500/10 border-2 border-amber-500/40 rounded-2xl p-3.5 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black text-amber-300 flex items-center space-x-1.5">
+                        <Truck className="w-4 h-4 text-amber-400" />
+                        <span>Delivered using Amazon</span>
+                      </span>
+                      <span className="text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-md border border-amber-500/30">
+                        Amazon Logistics
+                      </span>
+                    </div>
+
+                    <div className="space-y-1 text-[11px] text-slate-300">
+                      <p className="flex items-center space-x-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        <span><strong>Free Doorstep Delivery</strong> across India • Zero courier fees</span>
+                      </p>
+                      <p className="flex items-center space-x-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        <span><strong>Live Tracking:</strong> Real-time Amazon AWB tracking ID provided</span>
+                      </p>
+                      <p className="flex items-center space-x-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        <span><strong>Dispatched in 24–48 Hours:</strong> Carefully packaged and shipped</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {previewProductItem.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* DETAILED FEATURES & BULLETS */}
+              <div className="bg-slate-950/80 rounded-2xl border border-slate-800 p-4 space-y-2.5">
+                <div className="flex items-center space-x-2 text-xs font-bold text-white uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Key Features &amp; Quality Highlights</span>
+                </div>
+                <div className="grid grid-cols-1 gap-2 text-xs text-slate-200">
+                  {previewProductItem.features.map((feat, idx) => (
+                    <div key={idx} className="flex items-start space-x-2">
+                      <span className="text-amber-400 font-bold mt-0.5">•</span>
+                      <span className="leading-snug">{feat}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* TECHNICAL SPECIFICATIONS */}
+              <div>
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  Technical Specifications
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {previewProductItem.specs.map((sp, idx) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1 bg-slate-950 text-slate-300 border border-slate-800 rounded-xl text-xs font-mono font-medium flex items-center space-x-1.5"
+                    >
+                      <Check className="w-3 h-3 text-emerald-400" />
+                      <span>{sp}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions Footer */}
+            <div className="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+              <div className="text-xs text-slate-400">
+                <span>Your Balance: </span>
+                <strong className={`font-mono ${learner.coinBalance >= previewProductItem.coinsCost ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  {learner.coinBalance.toLocaleString()} Coins
+                </strong>
+                {learner.coinBalance < previewProductItem.coinsCost && (
+                  <span className="text-rose-400 block text-[11px]">
+                    (Need {(previewProductItem.coinsCost - learner.coinBalance).toLocaleString()} more coins)
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setPreviewProductItem(null)}
+                  className="flex-1 sm:flex-initial py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+
+                <button
+                  type="button"
+                  disabled={learner.coinBalance < previewProductItem.coinsCost || !isEnrolledScholar}
+                  onClick={() => handleProceedToAddressForm(previewProductItem)}
+                  className={`flex-1 sm:flex-initial py-2.5 px-5 font-black text-xs rounded-xl transition-all shadow-lg flex items-center justify-center space-x-2 cursor-pointer ${
+                    learner.coinBalance >= previewProductItem.coinsCost && isEnrolledScholar
+                      ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-amber-950/40 hover:scale-[1.02]'
+                      : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-60'
+                  }`}
+                >
+                  <Package className="w-4 h-4" />
+                  <span>
+                    {!isEnrolledScholar
+                      ? 'Requires Lite (₹49) or Plus (₹129)'
+                      : learner.coinBalance < previewProductItem.coinsCost
+                      ? `Need ${(previewProductItem.coinsCost - learner.coinBalance).toLocaleString()} Coins`
+                      : 'Claim & Enter Delivery Address →'}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal: Physical Merchandise Courier Address Input */}
       {selectedPhysicalItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
@@ -1396,17 +1746,43 @@ ${recipientName.trim()}`;
               <X className="w-4 h-4" />
             </button>
 
-            <div className="text-center mb-6">
-              <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
-                Physical Scholar Merchandise
-              </span>
-              <h3 className="text-xl font-extrabold text-white mt-2 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const item = selectedPhysicalItem;
+                setSelectedPhysicalItem(null);
+                setPreviewProductItem(item);
+              }}
+              className="text-[11px] text-slate-400 hover:text-amber-300 font-semibold mb-3 flex items-center space-x-1 cursor-pointer"
+            >
+              <span>← Back to Product Details</span>
+            </button>
+
+            <div className="text-center mb-5">
+              <div className="flex items-center justify-center space-x-2 mb-2">
+                <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
+                  Physical Scholar Merchandise
+                </span>
+                <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-950 px-2.5 py-1 rounded-full border border-amber-800 flex items-center space-x-1 shadow">
+                  <Truck className="w-3 h-3 text-amber-400" />
+                  <span>Delivered using Amazon</span>
+                </span>
+              </div>
+              <h3 className="text-xl font-extrabold text-white mt-1 flex items-center justify-center gap-2">
                 <Package className="w-5 h-5 text-amber-400" />
                 <span>Claim {selectedPhysicalItem.name}</span>
               </h3>
               <p className="text-xs text-slate-400 mt-1">
                 Cost: <strong className="text-amber-400">{selectedPhysicalItem.coinsCost.toLocaleString()} Study Coins</strong> ({selectedPhysicalItem.coinsCostFormatted}) • Free Doorstep Delivery
               </p>
+            </div>
+
+            {/* Amazon Delivery Notice */}
+            <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center space-x-2.5 text-xs text-amber-300 mb-4">
+              <Truck className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <span>
+                <strong>Amazon Doorstep Delivery:</strong> Please provide your complete delivery address below. Your parcel will be dispatched directly via Amazon logistics with live tracking.
+              </span>
             </div>
 
             <form onSubmit={handleConfirmPhysicalRedeem} className="space-y-3.5 text-xs">
@@ -1632,9 +2008,16 @@ ${recipientName.trim()}`;
                 <span className="text-slate-400">WhatsApp / Phone:</span>
                 <span className="text-emerald-400">{submittedPhysicalClaim.phone}</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Delivery Partner:</span>
+                <span className="text-amber-300 font-bold flex items-center gap-1">
+                  <Truck className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Delivered using Amazon</span>
+                </span>
+              </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-slate-400">Shipping Address:</span>
-                <span className="text-amber-300 break-words text-[11px]">{submittedPhysicalClaim.fullAddress.replace('[PHYSICAL DELIVERY]', '').trim()}</span>
+                <span className="text-amber-300 break-words text-[11px]">{submittedPhysicalClaim.fullAddress.replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim()}</span>
               </div>
               <div className="flex justify-between pt-1 border-t border-slate-800">
                 <span className="text-slate-400">Request ID:</span>

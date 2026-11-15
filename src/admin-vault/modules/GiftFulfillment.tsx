@@ -78,7 +78,7 @@ export const GiftFulfillment: React.FC = () => {
     setModalReq(req);
     setModalStatus(targetStatus || (isPhys ? (req.status === 'PENDING_APPROVAL' ? 'ORDERED' : req.status) : (req.status === 'PENDING_APPROVAL' ? 'APPROVED_DISPATCHED' : req.status)));
     setModalCodeInput(req.voucherCode || getExtractedVoucherCode(req) || '');
-    setModalCourierName(req.courierName || 'Delhivery');
+    setModalCourierName(req.courierName || 'Amazon');
     setModalTrackingId(req.trackingId || '');
     setModalAdminNotes('');
     setModalError(null);
@@ -177,7 +177,7 @@ export const GiftFulfillment: React.FC = () => {
 
     if (modalStatus === 'SHIPPED') {
       const tracking = modalTrackingId.trim();
-      const carrier = modalCourierName.trim() || 'Courier';
+      const carrier = modalCourierName.trim() || 'Amazon';
       await handleUpdateStatus(modalReq, 'SHIPPED', {
         trackingId: tracking || undefined,
         courierName: carrier,
@@ -228,7 +228,7 @@ export const GiftFulfillment: React.FC = () => {
 
   const handleCopyAddress = (address: string, id: string) => {
     try {
-      const cleanAddress = address.replace('[PHYSICAL DELIVERY]', '').trim();
+      const cleanAddress = address.replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim();
       navigator.clipboard.writeText(cleanAddress);
       setCopiedAddressId(id);
       setTimeout(() => setCopiedAddressId(null), 2500);
@@ -242,13 +242,13 @@ export const GiftFulfillment: React.FC = () => {
     if (status === 'SHIPPED') {
       messageBody = `🎉 Hello ${req.learnerName}!\n\n` +
         `Great news! Your AcademicLevel scholar reward *"${req.itemTitle}"* has been dispatched via courier!\n\n` +
-        `🚚 *Courier Partner:* ${courierName || 'Courier'}\n` +
-        `📦 *Tracking ID:* ${trackingId || 'Track on portal'}\n\n` +
+        `🚚 *Courier Partner:* ${courierName || 'Amazon Logistics'}\n` +
+        `📦 *Tracking / AWB:* ${trackingId || 'Track on portal'}\n\n` +
         `Track your delivery anytime on your dashboard: https://academiclevel.in/dashboard\n\n` +
         `Keep studying and achieving on AcademicLevel! 🚀`;
     } else if (status === 'ORDERED') {
       messageBody = `🎉 Hello ${req.learnerName}!\n\n` +
-        `Your AcademicLevel scholar reward *"${req.itemTitle}"* has been verified and placed for courier delivery!\n\n` +
+        `Your AcademicLevel scholar reward *"${req.itemTitle}"* has been verified and placed for Amazon delivery!\n\n` +
         `Our fulfillment team is preparing your package. We will share your tracking number shortly.\n\n` +
         `Keep studying on AcademicLevel! 🚀`;
     } else {
@@ -459,7 +459,7 @@ export const GiftFulfillment: React.FC = () => {
           <div className="divide-y divide-slate-800">
             {filteredRequests.map(req => {
               const activeCode = getExtractedVoucherCode(req);
-              const isPhysical = req.isPhysical || (req.shippingAddress && req.shippingAddress.includes('[PHYSICAL DELIVERY]')) || req.itemTitle.toLowerCase().includes('bottle');
+              const isPhysical = req.isPhysical || (req.shippingAddress && (req.shippingAddress.includes('[PHYSICAL DELIVERY]') || req.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]'))) || req.itemTitle.toLowerCase().includes('bottle') || req.itemTitle.toLowerCase().includes('squishy') || req.itemTitle.toLowerCase().includes('blaster') || req.itemTitle.toLowerCase().includes('stationery');
               const isDispatched = req.status === 'APPROVED_DISPATCHED';
               const isOrdered = req.status === 'ORDERED';
               const isShipped = req.status === 'SHIPPED';
@@ -474,7 +474,7 @@ export const GiftFulfillment: React.FC = () => {
                         {isPhysical && (
                           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center space-x-1">
                             <Package className="w-3 h-3 text-amber-400" />
-                            <span>Physical Courier Parcel</span>
+                            <span>Amazon Courier Parcel</span>
                           </span>
                         )}
                         <span className="font-black text-white text-sm sm:text-base">{req.itemTitle}</span>
@@ -563,7 +563,7 @@ export const GiftFulfillment: React.FC = () => {
 
                       {/* FULL UN-TRUNCATED COURIER ADDRESS DISPLAY */}
                       <div className="bg-slate-950 p-3 rounded-xl border border-amber-500/25 text-xs text-white font-mono leading-relaxed select-all">
-                        {req.shippingAddress.replace('[PHYSICAL DELIVERY]', '').trim()}
+                        {req.shippingAddress.replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim()}
                       </div>
 
                       {/* Shipping Tracking Status Strip */}
@@ -779,7 +779,7 @@ export const GiftFulfillment: React.FC = () => {
               </div>
 
               {/* If SHIPPED or ORDERED: Show Courier Carrier & Tracking Number inputs */}
-              {(modalStatus === 'SHIPPED' || modalStatus === 'ORDERED' || modalReq.itemTitle.toLowerCase().includes('bottle')) && (
+              {(modalStatus === 'SHIPPED' || modalStatus === 'ORDERED' || modalReq.isPhysical || (modalReq.shippingAddress && (modalReq.shippingAddress.includes('[PHYSICAL DELIVERY]') || modalReq.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]'))) || modalReq.itemTitle.toLowerCase().includes('bottle') || modalReq.itemTitle.toLowerCase().includes('squishy') || modalReq.itemTitle.toLowerCase().includes('blaster') || modalReq.itemTitle.toLowerCase().includes('stationery')) && (
                 <div className="space-y-3 p-3 bg-slate-950/70 border border-slate-800 rounded-2xl">
                   <div>
                     <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-1">
@@ -789,7 +789,7 @@ export const GiftFulfillment: React.FC = () => {
                       type="text"
                       value={modalCourierName}
                       onChange={e => setModalCourierName(e.target.value)}
-                      placeholder="e.g. Amazon, Delhivery, BlueDart, DTDC, India Post"
+                      placeholder="e.g. Amazon Logistics, BlueDart, Delhivery, DTDC, India Post"
                       className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400 font-medium"
                     />
                   </div>

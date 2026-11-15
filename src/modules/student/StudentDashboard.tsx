@@ -293,7 +293,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
               {dispatchedGifts.map((gift) => {
-                const isPhysical = gift.isPhysical || (gift.shippingAddress && gift.shippingAddress.includes('[PHYSICAL DELIVERY]')) || gift.itemTitle.toLowerCase().includes('bottle');
+                const isPhysical = gift.isPhysical || (gift.shippingAddress && (gift.shippingAddress.includes('[PHYSICAL DELIVERY]') || gift.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]'))) || gift.itemTitle.toLowerCase().includes('bottle') || gift.itemTitle.toLowerCase().includes('squishy') || gift.itemTitle.toLowerCase().includes('blaster') || gift.itemTitle.toLowerCase().includes('stationery');
                 const isShipped = gift.status === 'SHIPPED';
                 const isOrdered = gift.status === 'ORDERED';
                 const isDelivered = gift.status === 'DELIVERED';
@@ -312,7 +312,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                           {isPhysical ? (
                             <>
                               <Package className="w-3.5 h-3.5 text-amber-400" />
-                              <span>Doorstep Delivery</span>
+                              <span>Amazon Doorstep Delivery</span>
                             </>
                           ) : (
                             <>
@@ -391,7 +391,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         )}
 
                         <p className="text-[10px] text-slate-400 border-t border-slate-800 pt-1.5 truncate">
-                          📍 {gift.shippingAddress.replace('[PHYSICAL DELIVERY]', '').trim()}
+                          📍 {gift.shippingAddress.replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim()}
                         </p>
                       </div>
                     ) : (
@@ -783,8 +783,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Award className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-white">Rewards &amp; Bottles</p>
-          <span className="text-[10px] text-slate-400">₹10 - ₹150 &amp; Bottles</span>
+          <p className="text-xs font-bold text-white">Rewards Store</p>
+          <span className="text-[10px] text-slate-400">Toys, Stationery &amp; Bottles</span>
         </button>
       </div>
 
