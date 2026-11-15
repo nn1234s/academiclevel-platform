@@ -470,7 +470,7 @@ export const GiftFulfillment: React.FC = () => {
           <div className="divide-y divide-slate-800">
             {filteredRequests.map(req => {
               const activeCode = getExtractedVoucherCode(req);
-              const isPhysical = req.isPhysical || (req.shippingAddress && (req.shippingAddress.includes('[PHYSICAL DELIVERY]') || req.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]'))) || req.itemTitle.toLowerCase().includes('bottle') || req.itemTitle.toLowerCase().includes('squishy') || req.itemTitle.toLowerCase().includes('blaster') || req.itemTitle.toLowerCase().includes('stationery');
+              const isPhysical = req.isPhysical || (req.shippingAddress && (req.shippingAddress.includes('[PHYSICAL DELIVERY]') || req.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]') || req.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]'))) || req.itemTitle.toLowerCase().includes('bottle') || req.itemTitle.toLowerCase().includes('squishy') || req.itemTitle.toLowerCase().includes('blaster') || req.itemTitle.toLowerCase().includes('stationery') || req.itemTitle.toLowerCase().includes('badge');
               const isDispatched = req.status === 'APPROVED_DISPATCHED';
               const isOrdered = req.status === 'ORDERED';
               const isShipped = req.status === 'SHIPPED';
@@ -808,7 +808,7 @@ export const GiftFulfillment: React.FC = () => {
               </div>
 
               {/* If SHIPPED or ORDERED: Show Courier Carrier & Tracking Number inputs */}
-              {(modalStatus === 'SHIPPED' || modalStatus === 'ORDERED' || modalReq.isPhysical || (modalReq.shippingAddress && (modalReq.shippingAddress.includes('[PHYSICAL DELIVERY]') || modalReq.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]') || modalReq.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]'))) || modalReq.itemTitle.toLowerCase().includes('bottle') || modalReq.itemTitle.toLowerCase().includes('squishy') || modalReq.itemTitle.toLowerCase().includes('blaster') || modalReq.itemTitle.toLowerCase().includes('stationery')) && (
+              {(modalStatus === 'SHIPPED' || modalStatus === 'ORDERED' || modalReq.isPhysical || (modalReq.shippingAddress && (modalReq.shippingAddress.includes('[PHYSICAL DELIVERY]') || modalReq.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]') || modalReq.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]'))) || modalReq.itemTitle.toLowerCase().includes('bottle') || modalReq.itemTitle.toLowerCase().includes('squishy') || modalReq.itemTitle.toLowerCase().includes('blaster') || modalReq.itemTitle.toLowerCase().includes('stationery') || modalReq.itemTitle.toLowerCase().includes('badge')) && (
                 <div className="space-y-3 p-3 bg-slate-950/70 border border-slate-800 rounded-2xl">
                   <div>
                     <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-1">

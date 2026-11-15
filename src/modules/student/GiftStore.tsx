@@ -246,6 +246,32 @@ export const PHYSICAL_REWARDS: PhysicalRewardItem[] = [
       'Healthy Active Fun – Great for target shooting games and coordination between study breaks',
       'Delivered safely in sealed protective packaging using Amazon logistics'
     ]
+  },
+  {
+    id: 'scholar-legend-badge',
+    name: 'Official AcademicLevel Legend Button Pin Badge (58mm)',
+    category: 'PHYSICAL_MERCH',
+    coinsCost: 25000,
+    coinsCostFormatted: '25,000 Coins',
+    image: '/rewards/scholar-pin-badge.png',
+    badge: '🎖️ Collectible Legend Badge (Lite & Plus Eligible)',
+    gradient: 'from-purple-600 via-indigo-600 to-fuchsia-700',
+    description: 'Exclusive glossy round button pin badge featuring the iconic AcademicLevel psychic legend design. Perfect for pinning on school backpacks, pencil pouches, jackets, or study display boards. High-gloss water-resistant finish with safety pin backing.',
+    popular: true,
+    requiredPlan: 'LITE',
+    deliveryPartner: 'Amazon Logistics',
+    deliveryTag: 'Delivered using Amazon',
+    originalPriceInr: 149,
+    estimatedDelivery: '3–5 Business Days',
+    specs: ['58mm High-Gloss Round Button', 'Vibrant HD Art Print', 'Stainless Steel Safety Pin Back', 'Backpack, Pouch & Jacket Pin', 'Amazon Doorstep Delivery'],
+    features: [
+      'High-Gloss Finish – Vibrant, fade-resistant color print with protective clear laminate',
+      'Sturdy Safety Pin Back – Secure stainless steel pin clips firmly onto school bags, pouches, or uniforms',
+      'Official AcademicLevel Legend Edition – Exclusive collectible badge for dedicated scholars',
+      'Water & Scratch Resistant – Built for daily school wear, backpack adventures, and desk display',
+      '58mm Perfect Diameter – Bold, eye-catching size that stands out on any bag or hoodie',
+      '100% Doorstep Delivery – Shipped safely to your home using Amazon fulfillment network'
+    ]
   }
 ];
 

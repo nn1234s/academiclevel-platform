@@ -784,7 +784,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <Award className="w-5 h-5" />
           </div>
           <p className="text-xs font-bold text-white">Rewards Store</p>
-          <span className="text-[10px] text-slate-400">Toys, Stationery &amp; Bottles</span>
+          <span className="text-[10px] text-slate-400">Toys, Badges, Stationery &amp; Bottles</span>
         </button>
       </div>
 

@@ -59,19 +59,25 @@ assert(giftStoreContent.includes('steel-water-bottle'), 'Steel bottle must exist
 assert(giftStoreContent.includes('coinsCost: 37500'), 'Steel bottle must cost 37,500 coins');
 console.log('  ✓ Premium Stainless Steel Water Bottle verified (37,500 Coins)');
 
-// Verify all 6 reward images exist on disk
+// Verify Item 7: AcademicLevel Legend Button Pin Badge (Exact same coins as 100 rs GC = 25,000)
+assert(giftStoreContent.includes('scholar-legend-badge'), 'Legend button badge must exist');
+assert(giftStoreContent.includes('Official AcademicLevel Legend Button Pin Badge'), 'Legend badge title must match');
+console.log('  ✓ Official AcademicLevel Legend Button Pin Badge verified (25,000 Coins, same as 100 rs GC)');
+
+// Verify all 7 reward images exist on disk
 const rewardImages = [
   'pokemon-stationery-set.png',
   'milk-squishy.png',
   'cheese-squishy.png',
   'nerf-blaster-gun.jpg',
   'milton-costa-1000-bottle.png',
-  'steel-water-bottle.jpg'
+  'steel-water-bottle.jpg',
+  'scholar-pin-badge.png'
 ];
 for (const img of rewardImages) {
   assert(fs.existsSync(path.join(ROOT_DIR, 'public/rewards', img)), `Image ${img} must exist on disk`);
 }
-console.log('  ✓ All 6 product reward image assets staged and verified in public/rewards/');
+console.log('  ✓ All 7 product reward image assets staged and verified in public/rewards/');
 
 // Verify Product Details & Amazon Delivery Modal
 assert(giftStoreContent.includes('previewProductItem'), 'GiftStore must track previewProductItem state for product details modal');
@@ -97,7 +103,7 @@ console.log('\nTest 3: Verifying StudentDashboard.tsx...');
 const dashboardContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/student/StudentDashboard.tsx'), 'utf-8');
 
 assert(dashboardContent.includes('Amazon Doorstep Delivery') || dashboardContent.includes('Doorstep Delivery'), 'Dashboard must display Amazon delivery badge');
-assert(dashboardContent.includes('Toys, Stationery &amp; Bottles') || dashboardContent.includes('Toys, Stationery & Bottles'), 'Dashboard teaser must highlight toys, stationery & bottles');
+assert(dashboardContent.includes('Toys, Badges, Stationery') || dashboardContent.includes('Toys, Stationery'), 'Dashboard teaser must highlight toys, stationery, badges & bottles');
 console.log('  ✓ Student dashboard displays real-time courier tracking and updated reward categories');
 
 // 4. Verify AI Credits Limit
