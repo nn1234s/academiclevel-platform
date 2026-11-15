@@ -66,6 +66,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   const handleBuyNow = (tier: 'LITE' | 'PLUS') => {
     const url = PaymentService.getGatewayUrl(tier);
+    try {
+      sessionStorage.setItem('al_landing_pending_tier', tier);
+      sessionStorage.setItem('al_landing_pay_clicked_time', Date.now().toString());
+    } catch {}
     window.open(url, '_blank', 'noopener,noreferrer');
     setActivatePlanTier(tier);
     setActivateError('');
@@ -139,10 +143,39 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   };
 
   useEffect(() => {
-    return SiteConfigService.subscribe(() => {
+    const checkLandingReturn = () => {
+      try {
+        const pendingTier = sessionStorage.getItem('al_landing_pending_tier') as 'LITE' | 'PLUS' | null;
+        const tappedTime = Number(sessionStorage.getItem('al_landing_pay_clicked_time') || 0);
+        const elapsed = Date.now() - tappedTime;
+        if (pendingTier && elapsed < 30 * 60 * 1000) {
+          sessionStorage.removeItem('al_landing_pending_tier');
+          sessionStorage.removeItem('al_landing_pay_clicked_time');
+          setActivatePlanTier(pendingTier);
+        } else if (pendingTier && elapsed >= 30 * 60 * 1000) {
+          sessionStorage.removeItem('al_landing_pending_tier');
+          sessionStorage.removeItem('al_landing_pay_clicked_time');
+        }
+      } catch {}
+    };
+
+    checkLandingReturn();
+    window.addEventListener('pageshow', checkLandingReturn);
+    window.addEventListener('focus', checkLandingReturn);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') checkLandingReturn();
+    });
+
+    const unsubscribe = SiteConfigService.subscribe(() => {
       setHomeConfig(SiteConfigService.getHome());
       setPricingConfig(SiteConfigService.getPricing());
     });
+
+    return () => {
+      window.removeEventListener('pageshow', checkLandingReturn);
+      window.removeEventListener('focus', checkLandingReturn);
+      unsubscribe();
+    };
   }, []);
 
   const handleHallOfFameClick = (e: React.MouseEvent) => {
@@ -966,11 +999,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <span className="px-3 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase">
                     Official UPI PG Activation
                   </span>
-                  <h3 className="text-lg font-black text-white mt-1.5">
-                    Activate Your {activatePlanTier === 'PLUS' ? 'Plus Plan (₹129)' : 'Lite Plan (₹49)'}
+                  <h3 className="text-xl font-black text-white mt-1.5">
+                    Payment OK. Make Student Account:-
                   </h3>
                   <p className="text-[11px] text-slate-400 mt-0.5">
-                    Paid via UPI PG? Enter your details below to create your account and get your subscription instantly.
+                    Paid via UPI PG ({activatePlanTier === 'PLUS' ? 'Plus Plan ₹129' : 'Lite Plan ₹49'})? Enter your details below to create your student account and get your subscription instantly.
                   </p>
                 </div>
 

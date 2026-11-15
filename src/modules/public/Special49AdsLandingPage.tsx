@@ -311,63 +311,54 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const [showPostPaymentPopup, setShowPostPaymentPopup] = useState(false);
   const utrInputRef = useRef<HTMLInputElement>(null);
   const modalUtrInputRef = useRef<HTMLInputElement>(null);
-  const hasTappedPayNowRef = useRef(false);
 
   const handleUpiAppTap = () => {
-    hasTappedPayNowRef.current = true;
     try {
       const nowStr = Date.now().toString();
-      sessionStorage.setItem('al_tapped_upi_app', 'true');
-      sessionStorage.setItem('al_upi_tapped_time', nowStr);
+      sessionStorage.setItem('al_pending_account_after_pay', 'true');
+      sessionStorage.setItem('al_pay_clicked_time', nowStr);
     } catch {}
   };
 
   useEffect(() => {
-    // Fresh visit / site opening must NEVER show post-payment popups!
-    // Purge any stale flags on mount.
-    try {
-      localStorage.removeItem('al_tapped_upi_app');
-      localStorage.removeItem('al_upi_tapped_time');
-      sessionStorage.removeItem('al_tapped_upi_app');
-      sessionStorage.removeItem('al_upi_tapped_time');
-    } catch {}
-    hasTappedPayNowRef.current = false;
-
     const checkAndShowReturnPopup = () => {
       try {
-        // ONLY trigger if the user actually tapped the Pay Now button in this session!
-        if (!hasTappedPayNowRef.current) {
-          const sessionTapped = sessionStorage.getItem('al_tapped_upi_app') === 'true';
-          const tappedTime = Number(sessionStorage.getItem('al_upi_tapped_time') || 0);
-          if (!sessionTapped || Date.now() - tappedTime > 10 * 60 * 1000) {
-            return;
-          }
-        }
+        const isPending = sessionStorage.getItem('al_pending_account_after_pay') === 'true';
+        const tappedTime = Number(sessionStorage.getItem('al_pay_clicked_time') || 0);
+        const elapsed = Date.now() - tappedTime;
 
-        if (!paymentSuccess) {
+        // ONLY trigger if the user actually clicked the Pay Now button and returned within 30 minutes!
+        if (isPending && elapsed < 30 * 60 * 1000) {
+          // Immediately consume the flag so it only triggers this single time upon clicking back
+          sessionStorage.removeItem('al_pending_account_after_pay');
+          sessionStorage.removeItem('al_pay_clicked_time');
           setShowPostPaymentPopup(true);
-          hasTappedPayNowRef.current = false;
-          sessionStorage.removeItem('al_tapped_upi_app');
-          sessionStorage.removeItem('al_upi_tapped_time');
+        } else if (isPending && elapsed >= 30 * 60 * 1000) {
+          sessionStorage.removeItem('al_pending_account_after_pay');
+          sessionStorage.removeItem('al_pay_clicked_time');
         }
       } catch {}
     };
 
+    // Check immediately on mount in case WebView / browser reloaded or restored when clicking back
+    checkAndShowReturnPopup();
+
     const handleReturnToTab = () => {
-      if (document.visibilityState === 'visible' && hasTappedPayNowRef.current) {
+      if (document.visibilityState === 'visible') {
         checkAndShowReturnPopup();
       }
     };
 
-    // NOTE: DO NOT check on mount! Fresh visit / site opening will NEVER show payment done.
     document.addEventListener('visibilitychange', handleReturnToTab);
-    window.addEventListener('focus', handleReturnToTab);
+    window.addEventListener('focus', checkAndShowReturnPopup);
+    window.addEventListener('pageshow', checkAndShowReturnPopup);
 
     return () => {
       document.removeEventListener('visibilitychange', handleReturnToTab);
-      window.removeEventListener('focus', handleReturnToTab);
+      window.removeEventListener('focus', checkAndShowReturnPopup);
+      window.removeEventListener('pageshow', checkAndShowReturnPopup);
     };
-  }, [paymentSuccess]);
+  }, []);
 
   // Cycle live enrollment ticker
   useEffect(() => {
@@ -2164,72 +2155,169 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       )}
 
       {/* ======================================================== */}
-      {/* MODAL 4: POST-PAYMENT RETURN GUIDANCE POPUP               */}
+      {/* MODAL 4: POST-PAYMENT RETURN: "Payment OK. Make Student Account:-" */}
       {/* ======================================================== */}
       {showPostPaymentPopup && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-7 shadow-2xl relative border-2 border-emerald-300 text-center space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 overflow-y-auto">
+          <div className="max-w-lg w-full bg-slate-900 border-2 border-emerald-400 rounded-3xl p-6 sm:p-8 shadow-2xl relative text-slate-100 my-8">
             <button
               onClick={() => setShowPostPaymentPopup(false)}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100 transition-colors"
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full bg-slate-800 transition-colors"
               aria-label="Close dialog"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
 
-            <div className="w-14 h-14 bg-gradient-to-tr from-emerald-500 to-teal-400 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/30">
-              <CheckCircle2 className="w-8 h-8" />
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="inline-block px-3 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider rounded-full">
-                Instant Gateway Activation ⚡
+            <div className="text-center space-y-2 mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border-2 border-emerald-400 text-emerald-400 flex items-center justify-center mx-auto shadow-lg shadow-emerald-950/40">
+                <CheckCircle2 className="w-8 h-8 text-emerald-400" />
               </div>
-              <h3 className="text-xl font-black text-slate-900">
-                Payment Completed on UPI PG?
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed max-w-sm mx-auto">
-                If you completed payment on the official <strong>UPI PG (₹{offerAmount})</strong> gateway, click below to instantly activate your <strong>{selectedPlanTier === 'PLUS' ? 'Term Mastery (180 Days / 6 Months)' : 'Concept Booster (60 Days)'}</strong> pass. No waiting required!
+              <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-400 uppercase bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full inline-block">
+                ⚡ UPI PG Transaction Tracked
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+                Payment OK. Make Student Account:-
+              </h2>
+              <p className="text-xs text-slate-300 max-w-sm mx-auto">
+                Enter your details below to create your student account. Your <strong>{selectedPlanTier === 'PLUS' ? 'Plus Plan (180 Days / ₹129)' : 'Concept Booster (60 Days / ₹49)'}</strong> pass will be activated instantly!
               </p>
             </div>
 
-            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-left text-xs text-emerald-950 space-y-1">
-              <div className="font-bold flex items-center space-x-1.5 text-emerald-950">
-                <span>⚡</span>
-                <span>Automated UPI PG Activation</span>
+            {paymentSuccess ? (
+              <div className="bg-emerald-950/60 border border-emerald-500/50 rounded-2xl p-5 text-center space-y-3">
+                <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
+                <h3 className="text-lg font-black text-emerald-300">
+                  Account Created &amp; Pass Activated!
+                </h3>
+                <p className="text-xs text-slate-200">
+                  Welcome aboard! Your pass is active.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPostPaymentPopup(false);
+                    onSuccessRegistered();
+                  }}
+                  className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm rounded-xl shadow-lg transition-all cursor-pointer"
+                >
+                  Go to Student Dashboard &amp; Start Learning 🚀
+                </button>
               </div>
-              <p className="text-[11px] text-emerald-800 leading-snug">
-                Your payment on <strong>upipg.cit.org.in</strong> is processed directly. No admin verification queue needed!
-              </p>
-            </div>
+            ) : (
+              <form onSubmit={handleDirectPaymentSubmit} className="space-y-4 text-xs">
+                {errorMessage && (
+                  <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs font-semibold flex items-start space-x-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-rose-400" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
 
-            <div className="space-y-2 pt-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowPostPaymentPopup(false);
-                  const el = document.getElementById('instant-pay-qr');
-                  if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }
-                  setTimeout(() => {
-                    utrInputRef.current?.focus();
-                  }, 400);
-                }}
-                className="w-full py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-700 hover:to-indigo-700 text-white font-black text-sm rounded-xl shadow-lg shadow-emerald-600/30 transition-all hover:scale-[1.01] flex items-center justify-center space-x-2 cursor-pointer"
-              >
-                <ShieldCheck className="w-4 h-4" />
-                <span>CONFIRM &amp; ACTIVATE MY PASS INSTANTLY</span>
-              </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-300 font-bold mb-1">Student Full Name *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Aarav Sharma"
+                      value={studentName}
+                      onChange={e => setStudentName(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-bold mb-1">Mobile or Email *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. 9876543210 or name@gmail.com"
+                      value={emailOrPhone}
+                      onChange={e => setEmailOrPhone(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
 
-              <button
-                type="button"
-                onClick={() => setShowPostPaymentPopup(false)}
-                className="w-full py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
-              >
-                I haven&apos;t paid yet • Close
-              </button>
-            </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-300 font-bold mb-1">Create Password *</label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="Minimum 6 characters"
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-bold mb-1">Parent Name (Optional)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Rajesh Sharma"
+                      value={parentName}
+                      onChange={e => setParentName(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-300 font-bold mb-1">Class / Grade</label>
+                    <select
+                      value={selectedClass}
+                      onChange={e => setSelectedClass(Number(e.target.value) as Grade)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-bold focus:outline-none"
+                    >
+                      {[1,2,3,4,5,6,7,8,9,10,11,12].map(c => (
+                        <option key={c} value={c} className="bg-slate-900 text-white">Class {c}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-bold mb-1">Education Board</label>
+                    <select
+                      value={selectedBoard}
+                      onChange={e => setSelectedBoard(e.target.value as Board)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-bold focus:outline-none"
+                    >
+                      {['CBSE', 'ICSE', 'STATE_BOARD'].map(b => (
+                        <option key={b} value={b} className="bg-slate-900 text-white">{b.replace('_', ' ')}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 text-[11px] mb-1">
+                    UPI PG Reference / UTR Number (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    ref={modalUtrInputRef}
+                    placeholder="e.g. 12-digit UTR from payment screen (optional)"
+                    value={utrNumber}
+                    onChange={e => setUtrNumber(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white font-mono placeholder-slate-500 text-xs focus:outline-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-black text-sm rounded-xl shadow-xl shadow-emerald-950/50 transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 transform hover:scale-[1.01]"
+                >
+                  {isSubmitting ? (
+                    <span>Creating Account &amp; Activating Pass...</span>
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4 fill-white" />
+                      <span>CREATE STUDENT ACCOUNT &amp; ACTIVATE PASS ↗</span>
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}

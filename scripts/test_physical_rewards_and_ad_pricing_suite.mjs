@@ -229,13 +229,15 @@ assert(currentCheckoutContent.includes('setNoticeLang'), 'UPIQRCheckout must inc
 assert(currentAd49Content.includes(enKeyPhrase), 'Special49AdsLandingPage must contain English return notice');
 assert(currentAd49Content.includes(hinglishKeyPhrase), 'Special49AdsLandingPage must contain Hinglish return notice');
 assert(currentAd49Content.includes('setNoticeLang'), 'Special49AdsLandingPage must include English/Hinglish toggle state');
-assert(currentAd49Content.includes('hasTappedPayNowRef'), 'Special49AdsLandingPage must gate return popup behind tapping Pay Now button');
-assert(!currentAd49Content.includes('// Check immediately on mount in case WebView reloaded while user was in UPI app\n    checkAndShowReturnPopup();'), 'Special49AdsLandingPage must not trigger payment popup on mount');
+assert(currentAd49Content.includes('Payment OK. Make Student Account:-'), 'Special49AdsLandingPage must feature Payment OK. Make Student Account:- modal');
+assert(currentAd49Content.includes('al_pending_account_after_pay'), 'Special49AdsLandingPage must track pending account after pay in sessionStorage');
 
 // Check LandingPage.tsx
 assert(currentLandingContent.includes(enKeyPhrase), 'LandingPage must contain English return notice');
 assert(currentLandingContent.includes(hinglishKeyPhrase), 'LandingPage must contain Hinglish return notice');
 assert(currentLandingContent.includes('setNoticeLang'), 'LandingPage must include English/Hinglish toggle state');
+assert(currentLandingContent.includes('Payment OK. Make Student Account:-'), 'LandingPage must feature Payment OK. Make Student Account:- modal');
+assert(currentLandingContent.includes('al_landing_pending_tier'), 'LandingPage must track pending account after pay in sessionStorage');
 
 // Check AuthContext.tsx - standard registration does not auto-grant active subscription
 assert(!authContextContent.includes('CONCEPT_BOOSTER_AUTO'), 'AuthContext must not auto-grant CONCEPT_BOOSTER_AUTO on plain registration');

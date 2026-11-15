@@ -247,7 +247,7 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-emerald-300 flex items-center space-x-1.5">
                 <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[11px] font-black">2</span>
-                <span>Step 2: Instant Automated Activation</span>
+                <span>{hasOpenedGateway ? 'Payment OK. Complete Activation:-' : 'Step 2: Instant Automated Activation'}</span>
               </span>
               <span className="text-[10px] font-mono text-slate-400">Zero Wait Time</span>
             </div>
