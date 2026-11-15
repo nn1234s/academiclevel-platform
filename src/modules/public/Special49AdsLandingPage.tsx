@@ -395,10 +395,10 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   });
 
   useEffect(() => {
-    PaymentService.generateQrDataUrl(activeAmount, activeOrderNote).then(url => {
+    PaymentService.generateQrDataUrl(selectedPlanTier, currentLearner?.id).then(url => {
       if (url) setQrDataUrl(url);
     });
-  }, [activeAmount, activeOrderNote, currentLearner?.id]);
+  }, [selectedPlanTier, currentLearner?.id]);
 
   // Pre-fill payer details if student is already logged in
   useEffect(() => {
@@ -633,7 +633,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               className="bg-amber-300 hover:bg-amber-200 text-slate-950 font-black px-3 py-1 rounded-full text-xs shadow transition-all hover:scale-105 cursor-pointer flex items-center space-x-1"
             >
               <QrCode className="w-3.5 h-3.5" />
-              <span>Claim ₹{adsConfig.offerPriceInr || 49} (QR & UTR)</span>
+              <span>Claim ₹{adsConfig.offerPriceInr || 49} (Instant Pass)</span>
             </button>
           </div>
         </div>
@@ -876,7 +876,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 </button>
 
                 <p className="text-[10px] text-center text-slate-500 font-medium">
-                  🔒 Safe 256-bit UPI Payment • Verified within 15–60 Mins (Instant with ACode Voucher)
+                  🔒 Official UPI PG Gateway • Instant Automated Activation (Zero Wait Time)
                 </p>
               </div>
             </div>
@@ -886,20 +886,20 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       </section>
 
       {/* ======================================================== */}
-      {/* 2.25. DIRECT ON-PAGE ₹49 & ₹129 UPI QR & UTR SECTION     */}
+      {/* 2.25. DIRECT ON-PAGE ₹49 & ₹129 UPI PG GATEWAY SECTION   */}
       {/* ======================================================== */}
       <section id="instant-pay-qr" className="py-10 px-3 sm:px-6 bg-gradient-to-b from-orange-100/50 via-white to-slate-100 border-y-2 border-orange-400/50 scroll-mt-14">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-orange-600 text-white shadow-md mb-2">
               <QrCode className="w-3.5 h-3.5" />
-              <span>Official ₹{offerAmount} UPI Payment Gateway</span>
+              <span>Official ₹{offerAmount} UPI PG Gateway</span>
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Select Plan, Scan QR &amp; Enter 12-Digit Transaction ID (UTR)
+              Select Plan &amp; Pay via Official UPI PG Gateway
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-xl mx-auto">
-              Choose your plan below, pay via Google Pay, PhonePe, Paytm, or BHIM, and submit your 12-digit UTR for immediate activation.
+              Choose your plan below, open the official UPI PG gateway link or scan the QR code to pay securely. Your subscription activates automatically with zero human waiting!
             </p>
           </div>
 
@@ -980,7 +980,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
           </div>
 
           <div className="bg-white rounded-3xl shadow-2xl border-2 border-orange-300 overflow-hidden grid grid-cols-1 md:grid-cols-12">
-            {/* Left Col: UPI QR Code & VPA Details */}
+            {/* Left Col: UPI PG QR Code & Direct Gateway Action */}
             <div className="md:col-span-5 bg-gradient-to-b from-orange-50 to-amber-50/50 p-6 flex flex-col items-center justify-between border-b md:border-b-0 md:border-r border-orange-200 text-center">
               <div className="w-full flex flex-col items-center">
                 <div className={`inline-block px-3 py-1 text-white font-black text-[11px] rounded-full uppercase tracking-wider mb-3 shadow ${
@@ -993,35 +993,50 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <div className="p-3 bg-white rounded-2xl shadow-xl border-2 border-orange-400 mb-3 relative group">
                   <img
                     src={qrDataUrl || officialQrImage}
-                    alt={`Official Dynamic ₹${offerAmount} UPI QR Code`}
+                    alt={`Official Dynamic ₹${offerAmount} UPI PG QR Code`}
                     className="w-48 h-48 sm:w-52 sm:h-52 object-contain rounded-xl select-none"
                   />
                   <div className="absolute inset-x-3 bottom-4 text-center">
                     <span className="bg-black/80 backdrop-blur-sm text-white text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full shadow">
-                      Dynamic UPI QR • ₹{offerAmount}.00 Fixed
+                      Official UPI PG QR • ₹{offerAmount}.00 Fixed
                     </span>
                   </div>
                 </div>
 
-                {/* Instant Mobile Deep Link */}
+                {/* Open Official UPI PG Gateway Button */}
                 <a
-                  href={upiUri}
+                  href={PaymentService.getGatewayUrl(selectedPlanTier)}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={handleUpiAppTap}
-                  className="w-full mb-3 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center justify-center space-x-1.5 transition-all hover:scale-[1.01]"
+                  className="w-full mb-2.5 py-3.5 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-all hover:scale-[1.01] cursor-pointer"
                 >
-                  <Zap className="w-3.5 h-3.5 fill-white" />
-                  <span>Tap to Pay via UPI App (₹{offerAmount})</span>
+                  <ExternalLink className="w-4 h-4" />
+                  <span>Open Official UPI Gateway (₹{offerAmount}) ↗</span>
                 </a>
 
-                {/* Payee Verification Badge (UPI ID hidden for clean presentation) */}
-                <div className="w-full bg-white/90 backdrop-blur-sm p-3 rounded-xl border border-orange-200 shadow-sm text-center">
-                  <div className="flex items-center justify-center space-x-1.5 text-xs text-slate-800 font-bold">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                    <span>Payee: <strong className="text-slate-900">{officialPayeeName}</strong></span>
+                {/* Gateway Link Preview & Copy */}
+                <div className="w-full bg-white/95 backdrop-blur-sm p-2.5 rounded-xl border border-orange-200 shadow-sm text-left">
+                  <div className="flex items-center justify-between text-[11px] font-mono text-slate-700 mb-1">
+                    <span className="truncate pr-2">{PaymentService.getGatewayUrl(selectedPlanTier)}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                          navigator.clipboard.writeText(PaymentService.getGatewayUrl(selectedPlanTier));
+                        }
+                        setCopiedVpa(true);
+                        setTimeout(() => setCopiedVpa(false), 2000);
+                      }}
+                      className="text-orange-600 font-bold text-[10px] hover:underline flex-shrink-0 cursor-pointer"
+                    >
+                      {copiedVpa ? 'Copied!' : 'Copy Link'}
+                    </button>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    Scan dynamic QR with any UPI app or tap the button above to pay ₹{offerAmount}
-                  </p>
+                  <div className="flex items-center justify-between text-[10px] text-emerald-700 font-bold">
+                    <span>⚡ Real UPI PG Hosted</span>
+                    <span>Instant Automated Unlock</span>
+                  </div>
                 </div>
               </div>
 
@@ -1031,7 +1046,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               </div>
             </div>
 
-            {/* Right Col: 12-Digit Transaction ID (UTR) Verification Form */}
+            {/* Right Col: Instant Automated Activation Form */}
             <div className="md:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
               {paymentSuccess ? (
                 <div className="bg-emerald-50 border-2 border-emerald-400 rounded-2xl p-6 text-center space-y-4 my-auto">
@@ -1040,10 +1055,10 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-emerald-950">
-                      Payment Queued & Verified!
+                      Pass Activated Successfully! 🎉
                     </h3>
                     <p className="text-xs text-emerald-800 mt-1 font-medium">
-                      Your 12-digit UTR <strong className="font-mono bg-emerald-100 px-2 py-0.5 rounded text-emerald-950">{submittedUtr}</strong> has been logged to the Admin queue for immediate clearance.
+                      Your <strong>₹{offerAmount} {selectedPlanTier === 'PLUS' ? 'Term Mastery (180 Days / 6 Months)' : 'Concept Booster (60 Days)'}</strong> pass has been activated automatically via the official UPI PG gateway.
                     </p>
                   </div>
                   <div className="bg-white border border-emerald-200 rounded-xl p-3 text-left text-xs text-slate-700 space-y-1">
@@ -1051,6 +1066,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     <p>📱 <strong>Payer UPI / Contact:</strong> {payerUpiId || emailOrPhone}</p>
                     <p>📚 <strong>Grade & Board:</strong> Class {selectedClass} • {selectedBoard}</p>
                     <p>⏱️ <strong>Access Status:</strong> {selectedPlanTier === 'PLUS' ? 'Term Mastery Unlocked (180 Days / 6 Months)' : 'Concept Booster Unlocked (60 Days)'}</p>
+                    <p>⚡ <strong>Gateway Status:</strong> ACTIVE (Instant Automated Activation)</p>
                   </div>
                   <button
                     type="button"
@@ -1064,10 +1080,10 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <form onSubmit={handleDirectPaymentSubmit} className="space-y-4 text-xs">
                   <div>
                     <span className="font-bold text-slate-900 text-sm block mb-1">
-                      Step 2: Submit Your Payment Proof (₹{offerAmount})
+                      Step 2: Instant Automated Pass Activation
                     </span>
                     <p className="text-slate-500 text-[11px]">
-                      After sending ₹{offerAmount} via your UPI app, enter your details and the 12-digit UTR reference number from the receipt.
+                      After completing payment on the official UPI PG gateway, confirm your details below for immediate automated access (Zero human verification wait).
                     </p>
                   </div>
 
@@ -1143,38 +1159,34 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
                   <div>
                     <label className="block font-bold text-slate-900 mb-1 text-xs sm:text-sm">
-                      12-Digit Bank Transaction ID (UTR) *
+                      UPI PG Reference / UTR (Optional)
                     </label>
                     <input
                       ref={utrInputRef}
                       id="onpage-utr-input"
                       type="text"
-                      required
-                      maxLength={12}
-                      placeholder="e.g. 431289567812 (12 digits from receipt)"
+                      placeholder="e.g. Transaction Ref from UPI PG receipt (optional)"
                       value={utrNumber}
-                      onChange={e => setUtrNumber(e.target.value.replace(/[^0-9]/g, '').slice(0, 12))}
-                      className="w-full bg-orange-50/50 border-2 border-orange-400 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-600 text-sm font-mono font-bold tracking-wider"
+                      onChange={e => setUtrNumber(e.target.value)}
+                      className="w-full bg-emerald-50/40 border border-emerald-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 text-xs font-mono"
                     />
                     <div className="flex items-center justify-between text-[10px] text-slate-500 mt-1">
-                      <span>Where to find? Check UPI transaction receipt for 12-digit UPI Ref / UTR.</span>
-                      <span className={`font-mono font-bold ${utrNumber.length === 12 ? 'text-emerald-600' : 'text-amber-600'}`}>
-                        {utrNumber.length}/12 Digits
-                      </span>
+                      <span>Self-serve automated activation • Zero manual admin wait</span>
+                      <span className="text-emerald-700 font-bold">Instant Unlock</span>
                     </div>
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-sm rounded-xl shadow-lg shadow-orange-600/30 transition-all hover:scale-[1.01] flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black text-sm rounded-xl shadow-lg shadow-emerald-600/30 transition-all hover:scale-[1.01] flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
                   >
                     <ShieldCheck className="w-5 h-5" />
-                    <span>{isSubmitting ? 'Verifying Transaction...' : `SUBMIT UTR & ACTIVATE ₹${offerAmount} PASS`}</span>
+                    <span>{isSubmitting ? 'Activating Pass...' : `I HAVE PAID ₹${offerAmount} — ACTIVATE PASS INSTANTLY`}</span>
                   </button>
 
                   <p className="text-[10px] text-center text-slate-500 font-medium">
-                    🔒 No payment gateway fees • Instant verification in Admin Queue • Immediate access granted
+                    🔒 Official UPI PG Gateway • Zero Manual Admin Delay • Instant Access Granted
                   </p>
                 </form>
               )}
@@ -1525,12 +1537,12 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 a: 'AcademicLevel is web-based and responsive. It works seamlessly on any Android phone, iPhone, iPad, tablet, Windows laptop, or desktop with Chrome or Safari.'
               },
               {
-                q: 'How do the coins and gift card rewards work?',
-                a: 'Students earn study coins for completing daily quizzes, maintaining study streaks, and answering Question of the Day. Active Lite scholars can redeem their coins for genuine ₹20 digital gift cards (Amazon Pay, Google Play, etc.) in the Gift Store.'
+                q: 'How do coins and physical product rewards work?',
+                a: 'Students earn study coins for completing daily quizzes, maintaining study streaks, and answering Question of the Day. Active scholars can redeem coins for physical merchandise (Pokémon stationery sets, slow-rising squishies, dart blasters, Milton bottles, Pokémon Mewtwo badges, and Mystery Gift Boxes) delivered straight to your doorstep.'
               },
               {
                 q: 'How do I pay and how quickly is my account activated?',
-                a: 'Click "Claim Special 49 Offer (₹49)", register with your parent mobile or email, and pay via any UPI app (GPay, PhonePe, Paytm, BHIM) or QR scan. Submit your 12-digit UTR reference for swift human verification (usually within 15–60 minutes). If you have an authorized institutional ACode voucher, activation is instant.'
+                a: 'Click "Claim Special 49 Offer (₹49)", pay securely via the official UPI PG gateway link or dynamic QR scan, and click activate. Your pass unlocks automatically with zero waiting time!'
               }
             ].map((faq, idx) => (
               <div key={idx} className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs">
@@ -1637,7 +1649,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 {modalMode === 'PAY_QR'
-                  ? 'Scan QR with any UPI app and enter your 12-digit UTR below'
+                  ? 'Pay securely via official UPI PG gateway or QR code for instant activation'
                   : modalMode === 'REGISTER'
                   ? `Special ₹${offerAmount} Pass • 90% Discounted`
                   : 'Enter your credentials to continue your syllabus practice'}
@@ -2119,7 +2131,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       {/* ======================================================== */}
       {showPostPaymentPopup && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-7 shadow-2xl relative border-2 border-orange-300 text-center space-y-4">
+          <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-7 shadow-2xl relative border-2 border-emerald-300 text-center space-y-4">
             <button
               onClick={() => setShowPostPaymentPopup(false)}
               className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100 transition-colors"
@@ -2134,23 +2146,23 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
             <div className="space-y-1.5">
               <div className="inline-block px-3 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider rounded-full">
-                Welcome Back! 🎉
+                Instant Gateway Activation ⚡
               </div>
               <h3 className="text-xl font-black text-slate-900">
-                Payment Completed in UPI App?
+                Payment Completed on UPI PG?
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed max-w-sm mx-auto">
-                To instantly activate your <strong>₹{offerAmount} {selectedPlanTier === 'PLUS' ? 'Term Mastery (180 Days / 6 Months)' : 'Concept Booster (60 Days)'}</strong> pass, please enter your details and the <strong>12-digit UTR reference</strong> from your UPI payment receipt below, then click submit.
+                If you completed payment on the official <strong>UPI PG (₹{offerAmount})</strong> gateway, click below to instantly activate your <strong>{selectedPlanTier === 'PLUS' ? 'Term Mastery (180 Days / 6 Months)' : 'Concept Booster (60 Days)'}</strong> pass. No waiting required!
               </p>
             </div>
 
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-left text-xs text-amber-900 space-y-1">
-              <div className="font-bold flex items-center space-x-1.5 text-amber-950">
-                <span>💡</span>
-                <span>Where to find the 12-digit UTR?</span>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-left text-xs text-emerald-950 space-y-1">
+              <div className="font-bold flex items-center space-x-1.5 text-emerald-950">
+                <span>⚡</span>
+                <span>Automated UPI PG Activation</span>
               </div>
-              <p className="text-[11px] text-amber-800 leading-snug">
-                Open your GPay, PhonePe, or Paytm receipt. Look for <strong>UPI Ref No.</strong>, <strong>UTR</strong>, or <strong>Transaction ID</strong> (12 numbers).
+              <p className="text-[11px] text-emerald-800 leading-snug">
+                Your payment on <strong>upipg.cit.org.in</strong> is processed directly. No admin verification queue needed!
               </p>
             </div>
 
@@ -2167,10 +2179,10 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     utrInputRef.current?.focus();
                   }, 400);
                 }}
-                className="w-full py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-sm rounded-xl shadow-lg shadow-orange-600/30 transition-all hover:scale-[1.01] flex items-center justify-center space-x-2 cursor-pointer"
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-700 hover:to-indigo-700 text-white font-black text-sm rounded-xl shadow-lg shadow-emerald-600/30 transition-all hover:scale-[1.01] flex items-center justify-center space-x-2 cursor-pointer"
               >
                 <ShieldCheck className="w-4 h-4" />
-                <span>ENTER UTR &amp; SUBMIT DETAILS</span>
+                <span>CONFIRM &amp; ACTIVATE MY PASS INSTANTLY</span>
               </button>
 
               <button

@@ -155,6 +155,8 @@ const paymentServiceContent = fs.readFileSync(path.join(ROOT_DIR, 'src/services/
 const checkoutContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/student/UPIQRCheckout.tsx'), 'utf-8');
 const ad49Content = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/public/Special49AdsLandingPage.tsx'), 'utf-8');
 const adminShellContent = fs.readFileSync(path.join(ROOT_DIR, 'src/admin-vault/AdminVaultShell.tsx'), 'utf-8');
+const pricingPageContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/public/PricingPage.tsx'), 'utf-8');
+const pricingManagerContent = fs.readFileSync(path.join(ROOT_DIR, 'src/admin-vault/modules/PricingManager.tsx'), 'utf-8');
 
 assert(paymentServiceContent.includes('https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true'), '49 Plan UPI PG URL must match');
 assert(paymentServiceContent.includes('https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true'), '129 Plan UPI PG URL must match');
@@ -166,9 +168,15 @@ assert(!checkoutContent.includes('1-hour verification queue'), 'UPIQRCheckout mu
 
 assert(ad49Content.includes('PaymentService.getGatewayUrl(selectedPlanTier)'), 'Special49AdsLandingPage must link to UPI PG gateway via PaymentService');
 assert(ad49Content.includes('activateGatewayPayment'), 'Special49AdsLandingPage must activate subscription automatically');
+assert(ad49Content.includes('Open Official UPI Gateway'), 'Special49AdsLandingPage must offer direct button to official UPI gateway');
+assert(!ad49Content.includes('Verified within 15–60 Mins'), 'Special49AdsLandingPage must not advertise 15-60 min human wait');
+
+assert(pricingPageContent.includes('Official UPI PG Gateway'), 'PricingPage must highlight official UPI PG Gateway');
+assert(pricingManagerContent.includes('erNAH4FIOAgE4qMpUDmI'), 'PricingManager must display 49 PG endpoint');
+assert(pricingManagerContent.includes('floCfjhckOsPisvVeVE0'), 'PricingManager must display 129 PG endpoint');
 
 assert(adminShellContent.includes('Official Automated UPI Gateway Live'), 'AdminVaultShell must display automated UPI gateway banner');
 assert(adminShellContent.includes('Manual Payment Queue Retired'), 'AdminVaultShell must mark manual payment queue as retired');
-console.log('  ✓ Real UPI PG Gateway verified: 49 (erNAH4FIOAgE4qMpUDmI) & 129 (floCfjhckOsPisvVeVE0), instant automated activation without admin audit');
+console.log('  ✓ Real UPI PG Gateway verified across all Ad pages, Checkout modals, Pricing page & Admin Vault: 49 (erNAH4FIOAgE4qMpUDmI) & 129 (floCfjhckOsPisvVeVE0), instant automated activation without admin audit');
 
 console.log('\n=== ALL TESTS PASSED WITH 100% SUCCESS! ===');

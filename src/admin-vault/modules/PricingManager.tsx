@@ -304,6 +304,38 @@ export const PricingManager: React.FC = () => {
               />
             </div>
           </div>
+
+          {/* Real Automated Gateway Live Links Display */}
+          <div className="mt-4 p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-200">
+            <div className="font-bold text-emerald-300 flex items-center gap-2 mb-2">
+              <Sparkles className="w-4 h-4 text-emerald-400" />
+              <span>Official Automated UPI PG Gateway Endpoints</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-3 bg-slate-950/80 rounded-xl border border-emerald-500/20">
+                <span className="text-[10px] font-mono text-emerald-400 font-bold block mb-1">Lite Plan (₹49 - 60 Days):</span>
+                <a
+                  href="https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono text-[11px] text-emerald-300 hover:underline break-all"
+                >
+                  https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true ↗
+                </a>
+              </div>
+              <div className="p-3 bg-slate-950/80 rounded-xl border border-indigo-500/20">
+                <span className="text-[10px] font-mono text-indigo-400 font-bold block mb-1">Plus Plan (₹129 - 180 Days):</span>
+                <a
+                  href="https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono text-[11px] text-indigo-300 hover:underline break-all"
+                >
+                  https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true ↗
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Action Bar */}
