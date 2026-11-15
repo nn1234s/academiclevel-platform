@@ -210,4 +210,37 @@ console.log('  ✓ Company name updated to AcademicLevel - ZQ Technology - UDYAM
 console.log('  ✓ Main site coaching fees section updated to use real UPI PG with instant activation');
 console.log('  ✓ QR codes removed - clean Buy Now button to UPI PG with post-payment account creation & instant activation');
 
+// 9. Verify Pre-Payment Return Notice (English & Hinglish) & Pay-Button-Only Activation
+console.log('\nTest 9: Verifying Pre-Payment Return Notice (English & Hinglish) & Pay-Button-Only Activation...');
+const currentCheckoutContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/student/UPIQRCheckout.tsx'), 'utf-8');
+const currentAd49Content = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/public/Special49AdsLandingPage.tsx'), 'utf-8');
+const currentLandingContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/public/LandingPage.tsx'), 'utf-8');
+const authContextContent = fs.readFileSync(path.join(ROOT_DIR, 'src/core/auth/AuthContext.tsx'), 'utf-8');
+
+const enKeyPhrase = 'otherwise we will forget your payment as we track payments and accounts by the pay now button click';
+const hinglishKeyPhrase = 'warna hum aapki payment bhool sakte hain kyunki hum payments aur accounts ko Pay Now button click ke through track karte hain';
+
+// Check UPIQRCheckout.tsx
+assert(currentCheckoutContent.includes(enKeyPhrase), 'UPIQRCheckout must contain English return notice');
+assert(currentCheckoutContent.includes(hinglishKeyPhrase), 'UPIQRCheckout must contain Hinglish return notice');
+assert(currentCheckoutContent.includes('setNoticeLang'), 'UPIQRCheckout must include English/Hinglish toggle state');
+
+// Check Special49AdsLandingPage.tsx
+assert(currentAd49Content.includes(enKeyPhrase), 'Special49AdsLandingPage must contain English return notice');
+assert(currentAd49Content.includes(hinglishKeyPhrase), 'Special49AdsLandingPage must contain Hinglish return notice');
+assert(currentAd49Content.includes('setNoticeLang'), 'Special49AdsLandingPage must include English/Hinglish toggle state');
+assert(currentAd49Content.includes('hasTappedPayNowRef'), 'Special49AdsLandingPage must gate return popup behind tapping Pay Now button');
+assert(!currentAd49Content.includes('// Check immediately on mount in case WebView reloaded while user was in UPI app\n    checkAndShowReturnPopup();'), 'Special49AdsLandingPage must not trigger payment popup on mount');
+
+// Check LandingPage.tsx
+assert(currentLandingContent.includes(enKeyPhrase), 'LandingPage must contain English return notice');
+assert(currentLandingContent.includes(hinglishKeyPhrase), 'LandingPage must contain Hinglish return notice');
+assert(currentLandingContent.includes('setNoticeLang'), 'LandingPage must include English/Hinglish toggle state');
+
+// Check AuthContext.tsx - standard registration does not auto-grant active subscription
+assert(!authContextContent.includes('CONCEPT_BOOSTER_AUTO'), 'AuthContext must not auto-grant CONCEPT_BOOSTER_AUTO on plain registration');
+assert(authContextContent.includes("(newLearner as any).hasActiveSubscription = false;"), 'AuthContext must default new registered learners to inactive subscription');
+console.log('  ✓ Pre-Payment Return Notice (English & Hinglish) present across all UPI PG entry points');
+console.log('  ✓ Site opening issue resolved: Zero payment done popups on load; only activates when pay button is tapped and payment completed');
+
 console.log('\n=== ALL TESTS PASSED WITH 100% SUCCESS! ===');

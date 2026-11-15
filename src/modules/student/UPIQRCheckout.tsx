@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PlanPricing, PLAN_PRICING, PaymentService } from '../../services/paymentService';
-import { CheckCircle2, ShieldCheck, AlertCircle, Copy, Check, ArrowLeft, Zap, ExternalLink, QrCode } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, AlertCircle, Copy, Check, ArrowLeft, Zap, ExternalLink, QrCode, AlertTriangle } from 'lucide-react';
 
 interface UPIQRCheckoutProps {
   planTier: 'LITE' | 'PLUS';
@@ -25,6 +25,7 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isActivatedSuccess, setIsActivatedSuccess] = useState<boolean>(false);
   const [activatedInvoice, setActivatedInvoice] = useState<string>('');
+  const [noticeLang, setNoticeLang] = useState<'EN' | 'HINGLISH'>('EN');
 
   const handleOpenGateway = () => {
     setHasOpenedGateway(true);
@@ -172,6 +173,41 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
               <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
                 Official upipg.cit.org.in/pay Gateway
               </span>
+            </div>
+
+            {/* Payment Return Notice with English & Hinglish Toggle */}
+            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-2 text-left">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center space-x-1.5 font-bold text-amber-300">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Payment Return Notice</span>
+                </div>
+                <div className="flex bg-slate-900 rounded-lg p-0.5 text-[10px] font-bold border border-slate-700 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setNoticeLang('EN')}
+                    className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'EN' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    English
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNoticeLang('HINGLISH')}
+                    className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'HINGLISH' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    Hinglish
+                  </button>
+                </div>
+              </div>
+              {noticeLang === 'EN' ? (
+                <p className="text-[11px] leading-relaxed text-amber-200/90 font-medium">
+                  ⚠️ <strong>AFTER you have paid in UPI PG</strong>, instead of being stuck on that page, <strong>CLICK back and return here</strong>, otherwise we will forget your payment as we track payments and accounts by the pay now button click.
+                </p>
+              ) : (
+                <p className="text-[11px] leading-relaxed text-amber-200/90 font-medium">
+                  ⚠️ <strong>UPI PG mein payment complete karne ke baad</strong>, wahan page par ruke rehne ke bajaye <strong>CLICK back karke yahan wapas aaiye</strong>, warna hum aapki payment bhool sakte hain kyunki hum payments aur accounts ko Pay Now button click ke through track karte hain.
+                </p>
+              )}
             </div>
 
             <button

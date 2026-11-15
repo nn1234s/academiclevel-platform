@@ -29,7 +29,8 @@ import {
   TrendingUp,
   Brain,
   Video,
-  Bot
+  Bot,
+  AlertTriangle
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -61,6 +62,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [isActivatingPlan, setIsActivatingPlan] = useState(false);
   const [activateError, setActivateError] = useState('');
   const [activateSuccess, setActivateSuccess] = useState(false);
+  const [noticeLang, setNoticeLang] = useState<'EN' | 'HINGLISH'>('EN');
 
   const handleBuyNow = (tier: 'LITE' | 'PLUS') => {
     const url = PaymentService.getGatewayUrl(tier);
@@ -793,6 +795,41 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </p>
         </div>
 
+        {/* Payment Return Notice Banner with English & Hinglish Toggle */}
+        <div className="max-w-2xl mx-auto mb-8 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-2 text-left">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center space-x-2 font-bold text-amber-300">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Payment Return Notice</span>
+            </div>
+            <div className="flex bg-slate-900 rounded-lg p-0.5 text-[10px] font-bold border border-slate-700 shrink-0">
+              <button
+                type="button"
+                onClick={() => setNoticeLang('EN')}
+                className={`px-2.5 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'EN' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+              >
+                English
+              </button>
+              <button
+                type="button"
+                onClick={() => setNoticeLang('HINGLISH')}
+                className={`px-2.5 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'HINGLISH' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+              >
+                Hinglish
+              </button>
+            </div>
+          </div>
+          {noticeLang === 'EN' ? (
+            <p className="text-xs leading-relaxed text-amber-200/90 font-medium">
+              ⚠️ <strong>AFTER you have paid in UPI PG</strong>, instead of being stuck on that page, <strong>CLICK back and return here</strong>, otherwise we will forget your payment as we track payments and accounts by the pay now button click.
+            </p>
+          ) : (
+            <p className="text-xs leading-relaxed text-amber-200/90 font-medium">
+              ⚠️ <strong>UPI PG mein payment complete karne ke baad</strong>, wahan page par ruke rehne ke bajaye <strong>CLICK back karke yahan wapas aaiye</strong>, warna hum aapki payment bhool sakte hain kyunki hum payments aur accounts ko Pay Now button click ke through track karte hain.
+            </p>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-xl">
             <div>
@@ -942,6 +979,41 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     {activateError}
                   </div>
                 )}
+
+                {/* Payment Return Notice with English & Hinglish Toggle */}
+                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-1.5 text-left">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center space-x-1.5 font-bold text-amber-300">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span className="text-[11px]">Payment Return Notice</span>
+                    </div>
+                    <div className="flex bg-slate-900 rounded-lg p-0.5 text-[9px] font-bold border border-slate-700 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setNoticeLang('EN')}
+                        className={`px-1.5 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'EN' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+                      >
+                        English
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setNoticeLang('HINGLISH')}
+                        className={`px-1.5 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'HINGLISH' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+                      >
+                        Hinglish
+                      </button>
+                    </div>
+                  </div>
+                  {noticeLang === 'EN' ? (
+                    <p className="text-[10px] leading-relaxed text-amber-200/90 font-medium">
+                      ⚠️ <strong>AFTER you have paid in UPI PG</strong>, instead of being stuck on that page, <strong>CLICK back and return here</strong>, otherwise we will forget your payment as we track payments and accounts by the pay now button click.
+                    </p>
+                  ) : (
+                    <p className="text-[10px] leading-relaxed text-amber-200/90 font-medium">
+                      ⚠️ <strong>UPI PG mein payment complete karne ke baad</strong>, wahan page par ruke rehne ke bajaye <strong>CLICK back karke yahan wapas aaiye</strong>, warna hum aapki payment bhool sakte hain kyunki hum payments aur accounts ko Pay Now button click ke through track karte hain.
+                    </p>
+                  )}
+                </div>
 
                 <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-xs font-mono">
                   <span className="text-slate-400">Gateway Link:</span>

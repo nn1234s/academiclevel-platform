@@ -34,7 +34,8 @@ import {
   EyeOff,
   QrCode,
   Copy,
-  AlertCircle
+  AlertCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
@@ -279,6 +280,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [adsConfig, setAdsConfig] = useState(() => SiteConfigService.getAds());
   const [selectedPlanTier, setSelectedPlanTier] = useState<'LITE' | 'PLUS'>('LITE');
+  const [noticeLang, setNoticeLang] = useState<'EN' | 'HINGLISH'>('EN');
 
   useEffect(() => {
     return SiteConfigService.subscribe(() => {
@@ -309,52 +311,61 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const [showPostPaymentPopup, setShowPostPaymentPopup] = useState(false);
   const utrInputRef = useRef<HTMLInputElement>(null);
   const modalUtrInputRef = useRef<HTMLInputElement>(null);
+  const hasTappedPayNowRef = useRef(false);
 
   const handleUpiAppTap = () => {
+    hasTappedPayNowRef.current = true;
     try {
       const nowStr = Date.now().toString();
       sessionStorage.setItem('al_tapped_upi_app', 'true');
       sessionStorage.setItem('al_upi_tapped_time', nowStr);
-      localStorage.setItem('al_tapped_upi_app', 'true');
-      localStorage.setItem('al_upi_tapped_time', nowStr);
     } catch {}
   };
 
   useEffect(() => {
+    // Fresh visit / site opening must NEVER show post-payment popups!
+    // Purge any stale flags on mount.
+    try {
+      localStorage.removeItem('al_tapped_upi_app');
+      localStorage.removeItem('al_upi_tapped_time');
+      sessionStorage.removeItem('al_tapped_upi_app');
+      sessionStorage.removeItem('al_upi_tapped_time');
+    } catch {}
+    hasTappedPayNowRef.current = false;
+
     const checkAndShowReturnPopup = () => {
       try {
-        const wasTapped = sessionStorage.getItem('al_tapped_upi_app') === 'true' ||
-                          localStorage.getItem('al_tapped_upi_app') === 'true';
-        const tappedTime = Number(
-          sessionStorage.getItem('al_upi_tapped_time') ||
-          localStorage.getItem('al_upi_tapped_time') ||
-          0
-        );
-        if (wasTapped && !paymentSuccess && Date.now() - tappedTime < 20 * 60 * 1000) {
+        // ONLY trigger if the user actually tapped the Pay Now button in this session!
+        if (!hasTappedPayNowRef.current) {
+          const sessionTapped = sessionStorage.getItem('al_tapped_upi_app') === 'true';
+          const tappedTime = Number(sessionStorage.getItem('al_upi_tapped_time') || 0);
+          if (!sessionTapped || Date.now() - tappedTime > 10 * 60 * 1000) {
+            return;
+          }
+        }
+
+        if (!paymentSuccess) {
           setShowPostPaymentPopup(true);
+          hasTappedPayNowRef.current = false;
           sessionStorage.removeItem('al_tapped_upi_app');
-          localStorage.removeItem('al_tapped_upi_app');
+          sessionStorage.removeItem('al_upi_tapped_time');
         }
       } catch {}
     };
 
     const handleReturnToTab = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === 'visible' && hasTappedPayNowRef.current) {
         checkAndShowReturnPopup();
       }
     };
 
-    // Check immediately on mount in case WebView reloaded while user was in UPI app
-    checkAndShowReturnPopup();
-
+    // NOTE: DO NOT check on mount! Fresh visit / site opening will NEVER show payment done.
     document.addEventListener('visibilitychange', handleReturnToTab);
-    window.addEventListener('focus', checkAndShowReturnPopup);
-    window.addEventListener('pageshow', checkAndShowReturnPopup);
+    window.addEventListener('focus', handleReturnToTab);
 
     return () => {
       document.removeEventListener('visibilitychange', handleReturnToTab);
-      window.removeEventListener('focus', checkAndShowReturnPopup);
-      window.removeEventListener('pageshow', checkAndShowReturnPopup);
+      window.removeEventListener('focus', handleReturnToTab);
     };
   }, [paymentSuccess]);
 
@@ -982,6 +993,41 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
                   cit.org.in UPI PG
                 </span>
+              </div>
+
+              {/* Payment Return Notice with English & Hinglish Toggle */}
+              <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-900 space-y-2 text-left">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center space-x-1.5 font-bold text-amber-800">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Payment Return Notice</span>
+                  </div>
+                  <div className="flex bg-amber-100/80 rounded-lg p-0.5 text-[10px] font-bold border border-amber-300 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setNoticeLang('EN')}
+                      className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'EN' ? 'bg-amber-600 text-white font-black' : 'text-amber-800 hover:text-black'}`}
+                    >
+                      English
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNoticeLang('HINGLISH')}
+                      className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'HINGLISH' ? 'bg-amber-600 text-white font-black' : 'text-amber-800 hover:text-black'}`}
+                    >
+                      Hinglish
+                    </button>
+                  </div>
+                </div>
+                {noticeLang === 'EN' ? (
+                  <p className="text-[11px] leading-relaxed text-amber-900 font-medium">
+                    ⚠️ <strong>AFTER you have paid in UPI PG</strong>, instead of being stuck on that page, <strong>CLICK back and return here</strong>, otherwise we will forget your payment as we track payments and accounts by the pay now button click.
+                  </p>
+                ) : (
+                  <p className="text-[11px] leading-relaxed text-amber-900 font-medium">
+                    ⚠️ <strong>UPI PG mein payment complete karne ke baad</strong>, wahan page par ruke rehne ke bajaye <strong>CLICK back karke yahan wapas aaiye</strong>, warna hum aapki payment bhool sakte hain kyunki hum payments aur accounts ko Pay Now button click ke through track karte hain.
+                  </p>
+                )}
               </div>
 
               <a
@@ -1748,10 +1794,46 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
                   {/* Direct UPI PG Gateway Action (No QR) */}
                   <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 text-center space-y-2">
+                    {/* Payment Return Notice with English & Hinglish Toggle */}
+                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-900 space-y-1.5 text-left mb-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center space-x-1.5 font-bold text-amber-800">
+                          <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                          <span className="text-[11px]">Payment Return Notice</span>
+                        </div>
+                        <div className="flex bg-amber-100/80 rounded-lg p-0.5 text-[9px] font-bold border border-amber-300 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => setNoticeLang('EN')}
+                            className={`px-1.5 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'EN' ? 'bg-amber-600 text-white font-black' : 'text-amber-800 hover:text-black'}`}
+                          >
+                            English
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setNoticeLang('HINGLISH')}
+                            className={`px-1.5 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'HINGLISH' ? 'bg-amber-600 text-white font-black' : 'text-amber-800 hover:text-black'}`}
+                          >
+                            Hinglish
+                          </button>
+                        </div>
+                      </div>
+                      {noticeLang === 'EN' ? (
+                        <p className="text-[10px] leading-relaxed text-amber-900 font-medium">
+                          ⚠️ <strong>AFTER you have paid in UPI PG</strong>, instead of being stuck on that page, <strong>CLICK back and return here</strong>, otherwise we will forget your payment as we track payments and accounts by the pay now button click.
+                        </p>
+                      ) : (
+                        <p className="text-[10px] leading-relaxed text-amber-900 font-medium">
+                          ⚠️ <strong>UPI PG mein payment complete karne ke baad</strong>, wahan page par ruke rehne ke bajaye <strong>CLICK back karke yahan wapas aaiye</strong>, warna hum aapki payment bhool sakte hain kyunki hum payments aur accounts ko Pay Now button click ke through track karte hain.
+                        </p>
+                      )}
+                    </div>
+
                     <a
                       href={PaymentService.getGatewayUrl(selectedPlanTier)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={handleUpiAppTap}
                       className="w-full py-3.5 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black text-xs sm:text-sm rounded-xl shadow flex items-center justify-center space-x-2 transition-all cursor-pointer"
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -1763,6 +1845,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                         href={PaymentService.getGatewayUrl(selectedPlanTier)}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={handleUpiAppTap}
                         className="text-orange-600 font-bold hover:underline flex-shrink-0"
                       >
                         Open PG
