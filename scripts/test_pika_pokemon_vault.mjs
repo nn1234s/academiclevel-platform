@@ -75,4 +75,27 @@ assert(pikachuMp3Buf.length > 1000, 'pikachu.mp3 must be non-empty valid audio')
 assert(hubContent.includes('voiceMode'), 'PokemonVaultHub must support voiceMode switcher');
 console.log('✓ TEST 6 PASSED: Real Anime Voice Engine & Pikachu MP3 audio verified.');
 
-console.log('🎉 ALL 6 POKÉMON VAULT, VOICE & COIN REWARD TESTS PASSED PERFECTLY!');
+// 7. Verify Ash's Pikachu Form & Ability
+assert(serviceContent.includes('ASH_PIKACHU_DETAIL'), "Must export ASH_PIKACHU_DETAIL");
+assert(serviceContent.includes('10094'), "Must reference PokeAPI ID 10094 for Ash's Cap Pikachu");
+assert(serviceContent.includes("Ash's Bond / 10,000,000 Volt Power"), "Must include Ash's signature ability");
+assert(serviceContent.includes('10,000,000 Volt Thunderbolt'), "Must include signature Z-Move 10,000,000 Volt Thunderbolt");
+assert(serviceContent.includes('Volt Tackle'), "Must include signature Volt Tackle move");
+
+import { ASH_PIKACHU_DETAIL, PokeApiService } from '../src/services/pokeApiService.ts';
+assert.strictEqual(ASH_PIKACHU_DETAIL.id, 10094, "Ash's Pikachu ID must be 10094");
+const ashMoves = PokeApiService.getMovesForPokemon("ash's pikachu");
+assert(ashMoves.some(m => m.name === '10,000,000 Volt Thunderbolt' && m.power === 195), "Ash's Pikachu must have 10,000,000 Volt Thunderbolt with power 195");
+const ashAbility = ASH_PIKACHU_DETAIL.abilities.find(a => a.name.includes("Ash's Bond"));
+assert(ashAbility, "Ash's Pikachu must possess Ash's Bond ability");
+console.log("✓ TEST 7 PASSED: Ash's Pikachu form (ID 10094), signature ability & 10,000,000 Volt move verified.");
+
+// 8. Verify Mode Switcher & Ability Display in PokemonVaultHub
+assert(hubContent.includes('pikachuMode'), "Must support pikachuMode state");
+assert(hubContent.includes('ASH_CAP'), "Must have ASH_CAP mode state");
+assert(hubContent.includes('togglePikachuMode'), "Must implement togglePikachuMode function");
+assert(hubContent.includes("Ash's Pikachu Active"), "Must display active Ash's Pikachu indicator");
+assert(hubContent.includes("ASH'S SIGNATURE ABILITY"), "Must render Ash's signature ability badge");
+console.log("✓ TEST 8 PASSED: Mode switcher UI and Ash's ability rendering in PokemonVaultHub verified.");
+
+console.log('🎉 ALL 8 POKÉMON VAULT, ASH PIKACHU MODE & COIN REWARD TESTS PASSED PERFECTLY!');

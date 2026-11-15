@@ -9,6 +9,8 @@ export interface PokemonListItem {
   id: number;
 }
 
+import { PIKACHU_VOICE_DATA_URI, EEVEE_VOICE_DATA_URI } from './pokemonVoiceAssets.ts';
+
 export interface PokemonStat {
   name: string;
   baseStat: number;
@@ -63,15 +65,25 @@ export const ANIME_VOICE_REGISTRY: Record<string, AnimeVoiceConfig> = {
     speechText: 'Pika... chuuu!',
     pitch: 1.7,
     rate: 1.15,
-    audioClipUrl: '/audio/pikachu.mp3',
-    fallbackAudioClipUrl: 'https://play.pokemonshowdown.com/audio/cries/pikachu.mp3'
+    audioClipUrl: PIKACHU_VOICE_DATA_URI
+  },
+  "ash's pikachu": {
+    speechText: 'Pika... pika... chuuu!',
+    pitch: 1.75,
+    rate: 1.2,
+    audioClipUrl: PIKACHU_VOICE_DATA_URI
+  },
+  'ash-pikachu': {
+    speechText: 'Pika... pika... chuuu!',
+    pitch: 1.75,
+    rate: 1.2,
+    audioClipUrl: PIKACHU_VOICE_DATA_URI
   },
   eevee: {
     speechText: 'Ee... vee!',
     pitch: 1.6,
     rate: 1.1,
-    audioClipUrl: '/audio/eevee.mp3',
-    fallbackAudioClipUrl: 'https://play.pokemonshowdown.com/audio/cries/eevee.mp3'
+    audioClipUrl: EEVEE_VOICE_DATA_URI
   },
   charizard: {
     speechText: 'Char... izaaard!',
@@ -340,8 +352,51 @@ export function getTypeMultiplier(attackType: string, defenseTypes: string[]): n
   return multiplier;
 }
 
+// Ash's Iconic Partner Pikachu (Cap Form with 10,000,000 Volt Z-Power)
+export const ASH_PIKACHU_DETAIL: PokemonDetail = {
+  id: 10094,
+  name: "Ash's Pikachu",
+  height: 4,
+  weight: 60,
+  types: ['electric'],
+  genus: "Mouse Pokémon (Ash Ketchum's Partner)",
+  flavorText: "This Pikachu wears its trainer Ash Ketchum's cap. Through the unbreakable bond forged across Kanto to the World Coronation Series, it unleashes extraordinary power.",
+  generation: 'World Championship',
+  artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/10094.png',
+  shinyArtworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/10094.png',
+  spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/10094.png',
+  animatedSpriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/10094.gif',
+  cryUrl: 'https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/25.ogg',
+  abilities: [
+    {
+      name: "Ash's Bond / 10,000,000 Volt Power",
+      isHidden: false,
+      flavorText: "Special Ash-Pikachu Ability: Synchronized with Ash Ketchum. Boosts Electric attacks by 50% and unlocks the legendary 10,000,000 Volt Thunderbolt Z-Move."
+    },
+    {
+      name: 'Static',
+      isHidden: false,
+      flavorText: 'Contact with the Pokémon may cause paralysis in the foe.'
+    },
+    {
+      name: 'Lightning Rod',
+      isHidden: true,
+      flavorText: 'Draws in all Electric-type moves to power up its Special Attack.'
+    }
+  ],
+  stats: [
+    { name: 'hp', baseStat: 65 },
+    { name: 'attack', baseStat: 95 },
+    { name: 'defense', baseStat: 60 },
+    { name: 'special-attack', baseStat: 110 },
+    { name: 'special-defense', baseStat: 75 },
+    { name: 'speed', baseStat: 125 }
+  ]
+};
+
 // Curated Roster of Iconic Pokémon for instant zero-latency loading and battle
 export const ICONIC_POKEMON_ROSTER: PokemonDetail[] = [
+  ASH_PIKACHU_DETAIL,
   {
     id: 25,
     name: 'pikachu',
@@ -668,6 +723,24 @@ export const ICONIC_POKEMON_ROSTER: PokemonDetail[] = [
 
 // Curated Battle Moves for Iconic Pokémon
 export const POKEMON_MOVES: Record<string, PokemonMove[]> = {
+  'ash-pikachu': [
+    { name: '10,000,000 Volt Thunderbolt', type: 'electric', power: 195, accuracy: 100, pp: 5, damageClass: 'special', description: "Ash and Pikachu's ultimate Z-Move with Pikachu wearing Ash's cap! Strikes with 7 rainbow bolts of 10,000,000-volt electricity." },
+    { name: 'Volt Tackle', type: 'electric', power: 120, accuracy: 100, pp: 10, damageClass: 'physical', description: 'Surrounds itself with extreme high-voltage electricity and charges with immense power.' },
+    { name: 'Iron Tail', type: 'steel', power: 100, accuracy: 85, pp: 15, damageClass: 'physical', description: 'Hardens its tail into impenetrable steel and slams the target.' },
+    { name: 'Electro Ball', type: 'electric', power: 95, accuracy: 100, pp: 10, damageClass: 'special', description: 'Hurls an electric orb that inflicts devastating damage based on Pikachu’s superior speed.' }
+  ],
+  "ash's pikachu": [
+    { name: '10,000,000 Volt Thunderbolt', type: 'electric', power: 195, accuracy: 100, pp: 5, damageClass: 'special', description: "Ash and Pikachu's ultimate Z-Move with Pikachu wearing Ash's cap! Strikes with 7 rainbow bolts of 10,000,000-volt electricity." },
+    { name: 'Volt Tackle', type: 'electric', power: 120, accuracy: 100, pp: 10, damageClass: 'physical', description: 'Surrounds itself with extreme high-voltage electricity and charges with immense power.' },
+    { name: 'Iron Tail', type: 'steel', power: 100, accuracy: 85, pp: 15, damageClass: 'physical', description: 'Hardens its tail into impenetrable steel and slams the target.' },
+    { name: 'Electro Ball', type: 'electric', power: 95, accuracy: 100, pp: 10, damageClass: 'special', description: 'Hurls an electric orb that inflicts devastating damage based on Pikachu’s superior speed.' }
+  ],
+  'pikachu-original-cap': [
+    { name: '10,000,000 Volt Thunderbolt', type: 'electric', power: 195, accuracy: 100, pp: 5, damageClass: 'special', description: "Ash and Pikachu's ultimate Z-Move with Pikachu wearing Ash's cap! Strikes with 7 rainbow bolts of 10,000,000-volt electricity." },
+    { name: 'Volt Tackle', type: 'electric', power: 120, accuracy: 100, pp: 10, damageClass: 'physical', description: 'Surrounds itself with extreme high-voltage electricity and charges with immense power.' },
+    { name: 'Iron Tail', type: 'steel', power: 100, accuracy: 85, pp: 15, damageClass: 'physical', description: 'Hardens its tail into impenetrable steel and slams the target.' },
+    { name: 'Electro Ball', type: 'electric', power: 95, accuracy: 100, pp: 10, damageClass: 'special', description: 'Hurls an electric orb that inflicts devastating damage based on Pikachu’s superior speed.' }
+  ],
   pikachu: [
     { name: 'Thunderbolt', type: 'electric', power: 90, accuracy: 100, pp: 15, damageClass: 'special', description: 'A strong electric attack that may paralyze the foe.' },
     { name: 'Iron Tail', type: 'steel', power: 100, accuracy: 75, pp: 15, damageClass: 'physical', description: 'Slams the target with a steel-hard tail.' },
@@ -785,6 +858,18 @@ export class PokeApiService {
     const key = String(idOrName).toLowerCase().trim();
     if (this.cache.has(key)) return this.cache.get(key);
 
+    // Special instant handling for Ash's Pikachu
+    if (
+      key === 'ash-pikachu' ||
+      key === "ash's pikachu" ||
+      key === 'pikachu-cap' ||
+      key === 'pikachu-original-cap' ||
+      key === '10094'
+    ) {
+      this.cache.set(key, ASH_PIKACHU_DETAIL);
+      return ASH_PIKACHU_DETAIL;
+    }
+
     // Check pre-baked iconic roster
     const iconic = ICONIC_POKEMON_ROSTER.find(
       p => p.id === Number(key) || p.name.toLowerCase() === key
@@ -858,11 +943,10 @@ export class PokeApiService {
     detail?: Partial<PokemonDetail>
   ): void {
     try {
-      const savedMode = (typeof window !== 'undefined' ? localStorage.getItem('al_poke_voice_mode') : null) as VoiceMode | null;
-      const activeMode: VoiceMode = modeOverride || savedMode || 'anime';
+      // Force real anime voice by default; only play 8-bit cry if explicitly requested
+      const activeMode: VoiceMode = modeOverride === 'retro' ? 'retro' : 'anime';
 
       if (activeMode === 'retro') {
-        // Play 8-bit game cry squawk
         const audioUrl = `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${id}.ogg`;
         const audio = new Audio(audioUrl);
         audio.volume = 0.55;
@@ -870,42 +954,86 @@ export class PokeApiService {
         return;
       }
 
-      // Anime Voice Mode (Real voice like "Pika...chu!")
+      // Real Anime Voice Mode (Iconic voices & anime pronunciation)
       const cleanName = (name || (id === 25 ? 'pikachu' : id === 133 ? 'eevee' : '')).toLowerCase().trim();
       const config = getAnimeVoiceForPokemon(cleanName || `pokemon-${id}`, detail);
 
-      // If dedicated audio clip exists (e.g., Pikachu, Eevee)
+      // 1. If embedded Base64 audio clip exists (Pikachu, Eevee)
       if (config.audioClipUrl) {
-        const audio = new Audio(config.audioClipUrl);
-        audio.volume = 0.9;
-        audio.play().catch(() => {
-          if (config.fallbackAudioClipUrl) {
-            const fallbackAudio = new Audio(config.fallbackAudioClipUrl);
-            fallbackAudio.volume = 0.9;
-            fallbackAudio.play().catch(() => {
+        try {
+          const audio = new Audio(config.audioClipUrl);
+          audio.volume = 1.0;
+          const p = audio.play();
+          if (p !== undefined) {
+            p.catch(err => {
+              console.warn('Audio clip play blocked, falling back to synthesizer:', err);
+              this.playAnimeChime(config);
               this.speakAnimeUtterance(config);
             });
-          } else {
-            this.speakAnimeUtterance(config);
           }
-        });
-        return;
+          return;
+        } catch {
+          this.playAnimeChime(config);
+          this.speakAnimeUtterance(config);
+          return;
+        }
       }
 
-      // Speak anime name with Web Speech API
+      // 2. Play Web Audio synth chime + Web Speech anime name
+      this.playAnimeChime(config);
       this.speakAnimeUtterance(config);
     } catch (err) {
-      console.warn('Audio playback error:', err);
+      console.warn('Voice engine anomaly:', err);
     }
   }
 
   /**
-   * Speaks anime phonetic phrase with Web Speech API
+   * Generates a melodic anime synthesizer formant pulse via Web Audio API.
+   * Guarantees an immediate audible feedback tone even if OS TTS is unconfigured.
    */
-  private static speakAnimeUtterance(config: AnimeVoiceConfig): void {
+  public static playAnimeChime(config: AnimeVoiceConfig): void {
+    if (typeof window === 'undefined') return;
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      const baseFreq = Math.max(160, Math.min(800, config.pitch * 350));
+      osc.type = config.pitch < 0.8 ? 'sawtooth' : 'triangle';
+
+      osc.frequency.setValueAtTime(baseFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.35, now + 0.12);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.6, now + 0.26);
+
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.36);
+    } catch {}
+  }
+
+  /**
+   * Speaks anime phonetic phrase with Web Speech API.
+   * Avoids the Chromium cancel() race bug so speech reliably fires.
+   */
+  public static speakAnimeUtterance(config: AnimeVoiceConfig): void {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
     try {
-      window.speechSynthesis.cancel();
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+
       const utter = new SpeechSynthesisUtterance(config.speechText);
       utter.pitch = config.pitch;
       utter.rate = config.rate;
@@ -924,7 +1052,9 @@ export class PokeApiService {
       }
 
       window.speechSynthesis.speak(utter);
-    } catch {}
+    } catch (err) {
+      console.warn('Speech synthesis error:', err);
+    }
   }
 
   /**
@@ -939,6 +1069,9 @@ export class PokeApiService {
    */
   public static getMovesForPokemon(pokemonName: string): PokemonMove[] {
     const key = pokemonName.toLowerCase().trim();
+    if (key.includes('ash') || key === '10094' || key.includes('cap')) {
+      return POKEMON_MOVES['ash-pikachu'];
+    }
     if (POKEMON_MOVES[key]) {
       return POKEMON_MOVES[key];
     }

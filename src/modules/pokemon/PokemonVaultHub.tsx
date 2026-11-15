@@ -4,6 +4,7 @@ import {
   PokemonDetail,
   PokemonListItem,
   ICONIC_POKEMON_ROSTER,
+  ASH_PIKACHU_DETAIL,
   TYPE_COLORS,
   TYPE_CHART,
   getTypeMultiplier,
@@ -49,17 +50,42 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<VaultTab>('pokedex');
 
-  // Voice mode: 'anime' (default real voice like "Pika...chu!") or 'retro' (8-bit squawk)
-  const [voiceMode, setVoiceMode] = useState<'anime' | 'retro'>(() => {
-    return (localStorage.getItem('al_poke_voice_mode') as 'anime' | 'retro') || 'anime';
-  });
+  // Active Speech Bubble Visual
+  const [activeVoiceBubble, setActiveVoiceBubble] = useState<{ pokemon: string; phrase: string } | null>(null);
+
+  const triggerVoiceWithVisual = (id: number, name: string, detail?: Partial<PokemonDetail>) => {
+    PokeApiService.playVoice(id, name, 'anime', detail);
+    const cleanName = (name || (id === 25 ? 'pikachu' : '')).toLowerCase();
+    let phrase = `${cleanName.toUpperCase()}!`;
+    if (cleanName === 'pikachu') phrase = 'PIKA... CHUUU! ⚡';
+    else if (cleanName === 'eevee') phrase = 'EE... VEE! ✨';
+    else if (cleanName === 'charizard') phrase = 'CHAR... IZAAARD! 🔥';
+    else if (cleanName === 'bulbasaur') phrase = 'BULBA... SAUR! 🍃';
+    else if (cleanName === 'squirtle') phrase = 'SQUIRTLE... SQUIRTLE! 💧';
+    else if (cleanName === 'snorlax') phrase = 'SNOOOOR... LAAAX! 💤';
+    else if (cleanName === 'mewtwo') phrase = 'MEW... TWO! 🔮';
+    else if (cleanName === 'mew') phrase = 'MEEEW! 🌸';
+
+    setActiveVoiceBubble({ pokemon: cleanName, phrase });
+    setTimeout(() => {
+      setActiveVoiceBubble(null);
+    }, 2800);
+  };
+
+  // Voice mode: strictly 'anime' (default real voice like "Pika...chu!")
+  const [voiceMode, setVoiceMode] = useState<'anime' | 'retro'>('anime');
 
   const toggleVoiceMode = () => {
     const next: 'anime' | 'retro' = voiceMode === 'anime' ? 'retro' : 'anime';
     setVoiceMode(next);
     localStorage.setItem('al_poke_voice_mode', next);
-    PokeApiService.playVoice(25, 'pikachu', next);
+    triggerVoiceWithVisual(25, 'pikachu');
   };
+
+  // ==========================================
+  // PIKACHU MODE SWITCHER: STANDARD VS ASH'S PIKACHU
+  // ==========================================
+  const [pikachuMode, setPikachuMode] = useState<'STANDARD' | 'ASH_CAP'>('STANDARD');
 
   // ==========================================
   // POKÉDEX STATE
@@ -67,10 +93,31 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
   const [pokemonList, setPokemonList] = useState<PokemonListItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
-  const [selectedPokemon, setSelectedPokemon] = useState<PokemonDetail | null>(ICONIC_POKEMON_ROSTER[0]);
+  const [selectedPokemon, setSelectedPokemon] = useState<PokemonDetail | null>(ICONIC_POKEMON_ROSTER[1] || ICONIC_POKEMON_ROSTER[0]);
   const [isShiny, setIsShiny] = useState(false);
   const [isLoadingList, setIsLoadingList] = useState(false);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+
+  const handleSetPikachuMode = (mode: 'STANDARD' | 'ASH_CAP') => {
+    setPikachuMode(mode);
+    const standardPikachu = ICONIC_POKEMON_ROSTER.find(p => p.id === 25) || ICONIC_POKEMON_ROSTER[1];
+    const target = mode === 'ASH_CAP' ? ASH_PIKACHU_DETAIL : standardPikachu;
+
+    // If currently inspecting Pikachu or Ash's Pikachu in Pokédex, immediately swap form view
+    if (selectedPokemon && (selectedPokemon.id === 25 || selectedPokemon.id === 10094)) {
+      setSelectedPokemon(target);
+      triggerVoiceWithVisual(target.id, target.name, target);
+    }
+
+    // If player in battle arena is Pikachu or Ash's Pikachu, update battle arena
+    if (playerPokemon && (playerPokemon.id === 25 || playerPokemon.id === 10094)) {
+      startNewBattle(target, enemyPokemon);
+    }
+  };
+
+  const togglePikachuMode = () => {
+    handleSetPikachuMode(pikachuMode === 'STANDARD' ? 'ASH_CAP' : 'STANDARD');
+  };
 
   // ==========================================
   // "WHO'S THAT POKÉMON?" GAME STATE
@@ -285,14 +332,18 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
     setIsPlayerTurn(false);
     setIsAttacking('player');
 
-    // Calculate player damage
+    // Calculate player damage (with Ash's Pikachu Z-Power & Ability boost)
+    const isAshZMove = move.name.includes('10,000,000');
+    const isAshBond = (playerPokemon.id === 10094 || pikachuMode === 'ASH_CAP') && move.type === 'electric';
+    const ashMultiplier = (isAshZMove || isAshBond) ? 1.5 : 1.0;
+
     const pAtk = playerPokemon.stats.find(s => s.name === (move.damageClass === 'special' ? 'special-attack' : 'attack'))?.baseStat || 80;
     const eDef = enemyPokemon.stats.find(s => s.name === (move.damageClass === 'special' ? 'special-defense' : 'defense'))?.baseStat || 75;
     const mult = getTypeMultiplier(move.type, enemyPokemon.types);
-    const crit = Math.random() < 0.12 ? 1.5 : 1.0;
+    const crit = isAshZMove ? 1.8 : (Math.random() < 0.12 ? 1.5 : 1.0);
 
-    const baseDmg = Math.floor(((((2 * 50) / 5 + 2) * move.power * (pAtk / eDef)) / 50 + 2) * mult * crit * (0.85 + Math.random() * 0.15));
-    const finalDamage = Math.max(12, baseDmg);
+    const baseDmg = Math.floor(((((2 * 50) / 5 + 2) * move.power * (pAtk / eDef)) / 50 + 2) * mult * crit * ashMultiplier * (0.85 + Math.random() * 0.15));
+    const finalDamage = Math.max(14, baseDmg);
 
     setTimeout(() => {
       setIsAttacking(null);
@@ -305,7 +356,10 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
       else if (mult < 1) effectivenessNotice = " 🍃 It's not very effective...";
       if (crit > 1) effectivenessNotice += ' ⚡ Critical hit!';
 
-      const logMsg = `${playerPokemon.name.toUpperCase()} used ${move.name}! Dealt ${finalDamage} damage.${effectivenessNotice}`;
+      let logMsg = `${playerPokemon.name.toUpperCase()} used ${move.name}! Dealt ${finalDamage} damage.${effectivenessNotice}`;
+      if (isAshZMove) {
+        logMsg = `⚡ 10,000,000 VOLT THUNDERBOLT! Ash's Pikachu unleashed the ultimate 7-colored Z-Power! Dealt ${finalDamage} devastating damage!`;
+      }
       setBattleLog(prev => [logMsg, ...prev.slice(0, 4)]);
 
       if (nextEnemyHp <= 0) {
@@ -449,6 +503,25 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
               )
             )}
 
+            {/* Mode Switcher: Standard Pikachu ⇄ Ash's Pikachu */}
+            <button
+              onClick={togglePikachuMode}
+              className={`px-2.5 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center space-x-1.5 cursor-pointer border ${
+                pikachuMode === 'ASH_CAP'
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 border-amber-200 shadow-md shadow-amber-400/30 font-black ring-1 ring-amber-300'
+                  : 'bg-black/50 text-slate-300 border-white/20 hover:bg-black/80'
+              }`}
+              title="Switch Mode: Standard Pikachu vs Ash's Pikachu (Cap Form with 10,000,000 Volt Power)"
+            >
+              <span className="text-sm">🧢</span>
+              <span className="hidden sm:inline">
+                {pikachuMode === 'ASH_CAP' ? "Ash's Pikachu Active ⚡" : "Mode: Ash's Pikachu"}
+              </span>
+              <span className="sm:hidden">
+                {pikachuMode === 'ASH_CAP' ? "Ash's Mode" : "Ash Mode"}
+              </span>
+            </button>
+
             {/* Real Voice / Retro Cry Toggle */}
             <button
               onClick={toggleVoiceMode}
@@ -563,20 +636,35 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
                   🌟 Quick Select Iconic Pokémon
                 </span>
                 <div className="flex flex-wrap gap-1.5">
-                  {ICONIC_POKEMON_ROSTER.map(p => (
-                    <button
-                      key={p.id}
-                      onClick={() => handleSelectPokemon(p.id)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer ${
-                        selectedPokemon?.id === p.id
-                          ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
-                          : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800'
-                      }`}
-                    >
-                      <span className="capitalize">{p.name}</span>
-                      <span className="text-[10px] font-mono text-slate-400">#{p.id}</span>
-                    </button>
-                  ))}
+                  {ICONIC_POKEMON_ROSTER.map(p => {
+                    const isAsh = p.id === 10094;
+                    const isCurrent = selectedPokemon?.id === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => {
+                          if (isAsh) setPikachuMode('ASH_CAP');
+                          else if (p.id === 25) setPikachuMode('STANDARD');
+                          handleSelectPokemon(p.id);
+                        }}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer ${
+                          isAsh
+                            ? isCurrent
+                              ? 'bg-amber-400 text-slate-950 font-black shadow-md shadow-amber-400/40 ring-1 ring-amber-300'
+                              : 'bg-amber-950/60 hover:bg-amber-900/60 text-amber-300 border border-amber-500/40'
+                            : isCurrent
+                            ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                            : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800'
+                        }`}
+                      >
+                        {isAsh && <span>🧢</span>}
+                        <span className="capitalize">{p.name}</span>
+                        <span className={`text-[10px] font-mono ${isAsh ? 'text-amber-300/80 font-bold' : 'text-slate-400'}`}>
+                          #{p.id}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -675,6 +763,45 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
                     </div>
                   </div>
 
+                  {/* Pikachu Form / Mode Switcher Banner (Interactive) */}
+                  {(selectedPokemon.id === 25 || selectedPokemon.id === 10094) && (
+                    <div className="bg-gradient-to-r from-amber-500/20 via-yellow-500/25 to-red-500/20 border-2 border-amber-400/60 rounded-2xl p-3.5 shadow-xl space-y-2.5">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center space-x-2.5">
+                          <span className="text-2xl">🧢</span>
+                          <div>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs font-black text-white uppercase tracking-wider">
+                                {pikachuMode === 'ASH_CAP' ? "Ash's Pikachu (Cap Form Active)" : "Standard Pikachu (Gen 1 Active)"}
+                              </span>
+                              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                                pikachuMode === 'ASH_CAP' ? 'bg-amber-400 text-slate-950 font-black' : 'bg-slate-800 text-slate-300'
+                              }`}>
+                                {pikachuMode === 'ASH_CAP' ? 'WORLD CHAMPION FORM' : 'STANDARD FORM'}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-amber-200/90 font-medium mt-0.5">
+                              {pikachuMode === 'ASH_CAP'
+                                ? "Ash's Ability: Ash's Bond / 10,000,000 Volt Z-Power + High-Power Stats!"
+                                : "Switch mode to unlock Ash's Cap Pikachu and signature Z-Power ability."}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={togglePikachuMode}
+                          className={`px-3 py-2 rounded-xl text-xs font-black shadow-lg transition-all flex items-center space-x-1.5 cursor-pointer flex-shrink-0 ${
+                            pikachuMode === 'ASH_CAP'
+                              ? 'bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-400/40'
+                              : 'bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 shadow-amber-400/30'
+                          }`}
+                        >
+                          <Zap className="w-3.5 h-3.5 fill-current" />
+                          <span>{pikachuMode === 'ASH_CAP' ? 'Switch to Standard' : "Switch to Ash's Pikachu"}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Artwork Showcase Display */}
                   <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center relative group shadow-inner">
                     <img
@@ -745,6 +872,58 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
                                 style={{ width: `${pct}%` }}
                               />
                             </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Abilities & Special Powers */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">
+                        ⚡ Abilities &amp; Passive Powers
+                      </span>
+                      {selectedPokemon.id === 10094 && (
+                        <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-400/20 border border-amber-400/40 px-2 py-0.5 rounded-full">
+                          👑 ASH KETCHUM SIGNATURE
+                        </span>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      {selectedPokemon.abilities.map(a => {
+                        const isAshAbility = a.name.includes("Ash's Bond") || a.name.includes("10,000,000");
+                        return (
+                          <div
+                            key={a.name}
+                            className={`p-3 rounded-xl border text-xs transition-all ${
+                              isAshAbility
+                                ? 'bg-gradient-to-r from-amber-950/80 via-yellow-950/60 to-slate-900 border-amber-400/80 shadow-lg shadow-amber-500/20'
+                                : 'bg-slate-950 border-slate-800'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className={`font-black uppercase tracking-wide flex items-center space-x-1.5 ${
+                                isAshAbility ? 'text-amber-300' : 'text-white'
+                              }`}>
+                                {isAshAbility && <span>👑🧢</span>}
+                                <span>{a.name}</span>
+                              </span>
+                              <span className={`text-[9px] px-2 py-0.5 rounded font-mono font-bold uppercase ${
+                                isAshAbility
+                                  ? 'bg-amber-400 text-slate-950'
+                                  : a.isHidden
+                                  ? 'bg-purple-900/60 text-purple-300 border border-purple-500/40'
+                                  : 'bg-slate-800 text-slate-300'
+                              }`}>
+                                {isAshAbility ? "ASH'S SIGNATURE ABILITY" : a.isHidden ? 'HIDDEN ABILITY' : 'STANDARD'}
+                              </span>
+                            </div>
+                            {a.flavorText && (
+                              <p className={`text-[11px] leading-relaxed ${isAshAbility ? 'text-amber-100/90 font-medium' : 'text-slate-400'}`}>
+                                {a.flavorText}
+                              </p>
+                            )}
                           </div>
                         );
                       })}
@@ -941,13 +1120,32 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
                 </span>
                 <h2 className="text-lg font-black text-white">Retro Turn-Based Battle Arena</h2>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                {/* Ash's Pikachu Mode Toggle for Battle */}
+                <button
+                  onClick={togglePikachuMode}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center space-x-1.5 cursor-pointer border ${
+                    pikachuMode === 'ASH_CAP'
+                      ? 'bg-amber-400 hover:bg-amber-300 text-slate-950 border-amber-200 shadow-md shadow-amber-400/20'
+                      : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700'
+                  }`}
+                  title="Switch between Standard Pikachu and Ash's Cap Pikachu in Battle"
+                >
+                  <span>🧢</span>
+                  <span className="hidden sm:inline">
+                    {pikachuMode === 'ASH_CAP' ? "Ash's Pikachu (Z-Power Active)" : "Switch to Ash's Pikachu"}
+                  </span>
+                  <span className="sm:hidden">
+                    {pikachuMode === 'ASH_CAP' ? "Ash's Form" : "Ash Mode"}
+                  </span>
+                </button>
+
                 <span className="text-xs bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1 rounded-full font-mono font-bold">
                   Wins: {battleWins}
                 </span>
                 <button
                   onClick={() => startNewBattle(playerPokemon)}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl border border-slate-700 transition-colors"
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl border border-slate-700 transition-colors cursor-pointer"
                 >
                   Restart Battle
                 </button>
