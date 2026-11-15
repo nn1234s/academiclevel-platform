@@ -146,8 +146,8 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
     return { route: 'ADMIN_VAULT' };
   }
 
-  // 1.1 Secret Pokemon & Pokedex Vault (/pika, /pikachu, /pokemon, /pokedex)
-  if (p === '/pika' || p === '/pikachu' || p === '/pokemon' || p === '/pokedex') {
+  // 1.1 Secret Arcade Vault (/arcade, /vault, /pika, /pikachu, /pokemon, /pokedex)
+  if (p === '/arcade' || p === '/vault' || p === '/pika' || p === '/pikachu' || p === '/pokemon' || p === '/pokedex') {
     return { route: 'POKEMON_VAULT' };
   }
 
@@ -378,7 +378,7 @@ export const App: React.FC = () => {
     );
   }
 
-  // Secret Pokemon & Pokedex Arcade (/pika, /pikachu, /pokemon, /pokedex)
+  // Secret Arcade Vault (/arcade, /vault, /pika, /pikachu, /pokemon, /pokedex)
   if (currentRoute === 'POKEMON_VAULT') {
     return (
       <>

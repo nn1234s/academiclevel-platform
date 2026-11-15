@@ -267,7 +267,7 @@ export const NotFoundPika: React.FC<NotFoundPikaProps> = ({
       setCheatFeedback('⚡ Pika-pi! Unlimited lightning power granted to your study session!');
     } else if (code === 'ASH') {
       playSoundEffect('shiny');
-      setCheatFeedback('🧢 "I wanna be the very best, like no one ever was!" — +100 Pokédex Master points!');
+      setCheatFeedback('🧢 "I wanna be the very best, like no one ever was!" — +100 Arcade Master points!');
     } else if (code === 'BORED') {
       playSoundEffect('fanfare');
       setCheatFeedback('🎮 Boredom eradicated! You just unlocked the Academic Level Explorer Badge!');

@@ -40,7 +40,7 @@ export interface PokemonVaultHubProps {
   onOpenAuth?: (mode: 'LOGIN' | 'REGISTER') => void;
 }
 
-type VaultTab = 'pokedex' | 'whos_that' | 'battle' | 'type_master';
+type VaultTab = 'arcade' | 'pokedex' | 'whos_that' | 'battle' | 'type_master';
 
 export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
   onBackToApp,
@@ -48,7 +48,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
   onRefreshLearner,
   onOpenAuth
 }) => {
-  const [activeTab, setActiveTab] = useState<VaultTab>('pokedex');
+  const [activeTab, setActiveTab] = useState<VaultTab>('arcade');
 
   // Active Speech Bubble Visual
   const [activeVoiceBubble, setActiveVoiceBubble] = useState<{ pokemon: string; phrase: string } | null>(null);
@@ -88,7 +88,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
   const [pikachuMode, setPikachuMode] = useState<'STANDARD' | 'ASH_CAP'>('STANDARD');
 
   // ==========================================
-  // POKÉDEX STATE
+  // ARCADE EXPLORER STATE
   // ==========================================
   const [pokemonList, setPokemonList] = useState<PokemonListItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -103,7 +103,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
     const standardPikachu = ICONIC_POKEMON_ROSTER.find(p => p.id === 25) || ICONIC_POKEMON_ROSTER[1];
     const target = mode === 'ASH_CAP' ? ASH_PIKACHU_DETAIL : standardPikachu;
 
-    // If currently inspecting Pikachu or Ash's Pikachu in Pokédex, immediately swap form view
+    // If currently inspecting Pikachu or Ash's Pikachu in Arcade Explorer, immediately swap form view
     if (selectedPokemon && (selectedPokemon.id === 25 || selectedPokemon.id === 10094)) {
       setSelectedPokemon(target);
       triggerVoiceWithVisual(target.id, target.name, target);
@@ -444,11 +444,11 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-red-500 selection:text-white pb-16">
       {/* ======================================================== */}
-      {/* RETRO POKÉDEX HEADER SHELL                               */}
+      {/* RETRO ARCADE HEADER SHELL                                */}
       {/* ======================================================== */}
       <header className="bg-gradient-to-r from-red-700 via-red-600 to-rose-700 border-b-4 border-red-900 shadow-2xl relative sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
-          {/* Authentic Pokédex Sensor Lights */}
+          {/* Authentic Arcade Sensor Lights */}
           <div className="flex items-center space-x-3">
             {/* Big Blue Pulsing Sensor Lens */}
             <div className="relative">
@@ -467,14 +467,14 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
             <div className="pl-2">
               <div className="flex items-center space-x-2">
                 <span className="text-[10px] font-black tracking-widest uppercase bg-black/40 px-2 py-0.5 rounded text-amber-300 border border-amber-300/30 font-mono">
-                  SECRET /PIKA VAULT
+                  SECRET ARCADE VAULT
                 </span>
                 <span className="text-[10px] bg-red-900/80 text-white font-mono px-1.5 py-0.5 rounded border border-red-400/40">
-                  PokeAPI v2
+                  Arcade Engine v2
                 </span>
               </div>
               <h1 className="text-lg sm:text-xl font-black text-white tracking-tight flex items-center space-x-1.5 drop-shadow">
-                <span>AcademicLevel Pokédex &amp; Arcade</span>
+                <span>AcademicLevel Secret Arcade</span>
               </h1>
             </div>
           </div>
@@ -494,7 +494,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
                 <button
                   onClick={() => onOpenAuth('LOGIN')}
                   className="px-2.5 py-1.5 bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 font-bold text-xs rounded-xl border border-amber-400/30 transition-all flex items-center space-x-1.5 cursor-pointer"
-                  title="Sign In to Save PokéCoins to your AcademicLevel Account"
+                  title="Sign In to Save Study Coins to your AcademicLevel Account"
                 >
                   <StudyCoinIcon className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Sign In to Save Coins</span>
@@ -555,15 +555,15 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
         <div className="bg-red-900/60 backdrop-blur-md px-4 border-t border-red-500/30">
           <div className="max-w-7xl mx-auto flex items-center space-x-2 py-2 overflow-x-auto">
             <button
-              onClick={() => setActiveTab('pokedex')}
+              onClick={() => setActiveTab('arcade')}
               className={`px-3.5 py-1.5 rounded-xl font-black text-xs transition-all flex items-center space-x-1.5 cursor-pointer whitespace-nowrap ${
-                activeTab === 'pokedex'
+                activeTab === 'arcade' || activeTab === 'pokedex'
                   ? 'bg-amber-400 text-slate-950 shadow-lg shadow-amber-400/30'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Pokédex Explorer</span>
+              <span>Arcade Explorer</span>
             </button>
 
             <button
@@ -575,7 +575,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
               }`}
             >
               <HelpCircle className="w-3.5 h-3.5" />
-              <span>Who&apos;s That Pokémon?</span>
+              <span>Who&apos;s That Fighter?</span>
             </button>
 
             <button
@@ -610,9 +610,9 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
       {/* ======================================================== */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full">
         {/* ==================================================== */}
-        {/* TAB 1: POKÉDEX EXPLORER                              */}
+        {/* TAB 1: ARCADE EXPLORER                              */}
         {/* ==================================================== */}
-        {activeTab === 'pokedex' && (
+        {(activeTab === 'arcade' || activeTab === 'pokedex') && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Col: Roster Grid & Search Filter (7 Cols) */}
             <div className="lg:col-span-7 space-y-4">
@@ -630,10 +630,10 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
                 </div>
               </div>
 
-              {/* Quick Iconic Pokémon Shortcuts */}
+              {/* Quick Iconic Fighters Shortcuts */}
               <div className="space-y-1.5">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                  🌟 Quick Select Iconic Pokémon
+                  🌟 Quick Select Iconic Fighters
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {ICONIC_POKEMON_ROSTER.map(p => {
@@ -668,11 +668,11 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
                 </div>
               </div>
 
-              {/* Pokémon Grid */}
+              {/* Fighters Grid */}
               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-xl">
                 <div className="flex items-center justify-between mb-3 text-xs text-slate-400">
-                  <span>Found <strong>{filteredList.length}</strong> Pokémon entries</span>
-                  <span className="font-mono text-[10px] text-amber-400">PokeAPI v2 Live Feed</span>
+                  <span>Found <strong>{filteredList.length}</strong> arcade fighters</span>
+                  <span className="font-mono text-[10px] text-amber-400">Arcade Live Feed</span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 max-h-[560px] overflow-y-auto pr-1">
@@ -711,7 +711,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
               </div>
             </div>
 
-            {/* Right Col: High-Definition Pokédex Screen & Lore (5 Cols) */}
+            {/* Right Col: High-Definition Arcade Screen & Lore (5 Cols) */}
             <div className="lg:col-span-5">
               {selectedPokemon ? (
                 <div className="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-red-600/70 rounded-3xl p-6 shadow-2xl space-y-5 sticky top-24">
@@ -730,7 +730,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
                         {selectedPokemon.name}
                       </h2>
                       <span className="text-xs text-slate-400 italic">
-                        {selectedPokemon.genus || 'Curriculum Pokémon'}
+                        {selectedPokemon.genus || 'Arcade Fighter'}
                       </span>
                     </div>
 
@@ -840,7 +840,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
                     </span>
                   </div>
 
-                  {/* Lore / Pokédex Description */}
+                  {/* Lore & Species Bio */}
                   {selectedPokemon.flavorText && (
                     <div className="p-3.5 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-slate-300 leading-relaxed font-sans">
                       <p>&ldquo;{selectedPokemon.flavorText}&rdquo;</p>
@@ -948,7 +948,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
         )}
 
         {/* ==================================================== */}
-        {/* TAB 2: "WHO'S THAT POKÉMON?" GUESSING GAME           */}
+        {/* TAB 2: "WHO'S THAT FIGHTER?" GUESSING GAME           */}
         {/* ==================================================== */}
         {activeTab === 'whos_that' && (
           <div className="max-w-2xl mx-auto space-y-6">
@@ -957,9 +957,9 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <span className="text-[10px] font-black uppercase tracking-widest text-amber-400 font-mono">
-                    ANIME CLASSIC GAME
+                    ARCADE CLASSIC GAME
                   </span>
-                  <h2 className="text-xl font-black text-white">Who&apos;s That Pokémon?!</h2>
+                  <h2 className="text-xl font-black text-white">Who&apos;s That Mystery Fighter?!</h2>
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="text-right">
@@ -990,7 +990,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
               <div className="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-slate-800/80 text-xs">
                 <div className="flex items-center space-x-1.5 text-amber-300 font-semibold">
                   <StudyCoinIcon className="w-3.5 h-3.5" glow />
-                  <span>Win <strong>+1 Study Coin</strong> for every correct Pokémon identified!</span>
+                  <span>Win <strong>+1 Study Coin</strong> for every correct creature identified!</span>
                 </div>
                 {learner && (
                   <span className="text-[11px] font-mono text-slate-400">
@@ -1101,14 +1101,14 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
                 className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm rounded-2xl shadow-xl transition-all flex items-center justify-center space-x-2 cursor-pointer"
               >
                 <RefreshCw className="w-4 h-4" />
-                <span>NEXT POKÉMON CHALLENGE</span>
+                <span>NEXT ARCADE CHALLENGE</span>
               </button>
             )}
           </div>
         )}
 
         {/* ==================================================== */}
-        {/* TAB 3: BATTLE ARENA (TURN-BASED POKÉMON COMBAT)      */}
+        {/* TAB 3: BATTLE ARENA (TURN-BASED RETRO COMBAT)        */}
         {/* ==================================================== */}
         {activeTab === 'battle' && (
           <div className="max-w-3xl mx-auto space-y-6">

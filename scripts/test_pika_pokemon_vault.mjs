@@ -7,16 +7,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const platformDir = path.resolve(__dirname, '..');
 
-console.log('⚡ Running Secret Pokémon & Pokédex (/pika, /pikachu) Test Suite...');
+console.log('⚡ Running Secret Arcade & Vault (/arcade, /pika, /pikachu) Test Suite...');
 
 // 1. Verify App.tsx route resolutions
 const appContent = fs.readFileSync(path.join(platformDir, 'src', 'App.tsx'), 'utf-8');
 
+assert(appContent.includes("p === '/arcade'"), "Must resolve /arcade route in App.tsx");
 assert(appContent.includes("p === '/pika'"), "Must resolve /pika route in App.tsx");
 assert(appContent.includes("p === '/pikachu'"), "Must resolve /pikachu route in App.tsx");
 assert(appContent.includes("route: 'POKEMON_VAULT'"), "Must map to POKEMON_VAULT route");
 assert(appContent.includes("<PokemonVaultHub"), "Must render PokemonVaultHub component");
-console.log('✓ TEST 1 PASSED: /pika and /pikachu routes mapped in App.tsx without redirects.');
+console.log('✓ TEST 1 PASSED: /arcade, /pika and /pikachu routes mapped in App.tsx without redirects.');
 
 // 2. Verify PokeApiService
 const serviceContent = fs.readFileSync(path.join(platformDir, 'src', 'services', 'pokeApiService.ts'), 'utf-8');
@@ -46,15 +47,16 @@ console.log('✓ TEST 3 PASSED: Type effectiveness matrix accurately mirrors off
 // 4. Verify PokemonVaultHub features & Coin Award Integration
 const hubContent = fs.readFileSync(path.join(platformDir, 'src', 'modules', 'pokemon', 'PokemonVaultHub.tsx'), 'utf-8');
 
-assert(hubContent.includes('Pokédex Explorer'), 'Must contain Pokédex Explorer');
-assert(hubContent.includes('That Pokémon'), "Must contain Who's That Pokémon? anime game");
+assert(hubContent.includes('Arcade Explorer'), 'Must name module Arcade Explorer instead of Pokedex');
+assert(hubContent.includes('AcademicLevel Secret Arcade'), 'Must name arcade header AcademicLevel Secret Arcade');
+assert(!hubContent.includes('Pokédex Explorer'), 'Must not display Pokédex Explorer to avoid trademark trouble');
 assert(hubContent.includes('Battle Arena'), 'Must contain Battle Arena turn-based combat');
 assert(hubContent.includes('Type Matchup Master'), 'Must contain Type Matchup quiz');
 assert(hubContent.includes('playCry') || hubContent.includes('playVoice'), 'Must support audio voice playback');
 assert(hubContent.includes('CoinLedgerService.appendTransaction'), 'Must append coin transaction to cryptographic ledger');
 assert(hubContent.includes('POKEMON_GUESS_REWARD'), 'Must use reasonCode POKEMON_GUESS_REWARD');
 assert(hubContent.includes('+1 Study Coin Awarded!'), 'Must display coin award message');
-console.log('✓ TEST 4 PASSED: PokemonVaultHub contains all 4 arcade modules & +1 Coin reward integration.');
+console.log('✓ TEST 4 PASSED: PokemonVaultHub branded as Arcade instead of Pokedex & all 4 modules verified.');
 
 // 5. Verify Core Types and Server Coin Reason Codes
 const typesContent = fs.readFileSync(path.join(platformDir, 'src', 'core', 'types', 'index.ts'), 'utf-8');
