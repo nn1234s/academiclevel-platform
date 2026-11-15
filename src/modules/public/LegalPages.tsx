@@ -338,6 +338,9 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
+            <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-500 font-mono">
+              AcademicLevel - ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385
+            </div>
           </div>
         </div>
       </main>

@@ -3,6 +3,9 @@ import { Board, Grade } from '../../core/types';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { KidFounderGlazeShowcase } from '../shared/KidFounderGlazeShowcase';
 import { SiteConfigService } from '../../services/siteConfigService';
+import { PaymentService } from '../../services/paymentService';
+import { useAuth } from '../../core/auth/AuthContext';
+import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import {
   Sparkles,
   Zap,
@@ -40,11 +43,98 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onExploreCourse,
   onNavigate,
 }) => {
+  const { registerStudent, loginStudent, currentLearner, refreshCurrentLearner } = useAuth();
   const [selectedBoard, setSelectedBoard] = useState<Board>('CBSE');
   const [selectedGrade, setSelectedGrade] = useState<Grade>(10);
   const [activeTab, setActiveTab] = useState<'ALL' | 'PARENTS' | 'STUDENTS'>('ALL');
   const [homeConfig, setHomeConfig] = useState(() => SiteConfigService.getHome());
   const [pricingConfig, setPricingConfig] = useState(() => SiteConfigService.getPricing());
+
+  // Direct UPI PG & Instant Pass Activation State
+  const [activatePlanTier, setActivatePlanTier] = useState<'LITE' | 'PLUS' | null>(null);
+  const [studentFullName, setStudentFullName] = useState('');
+  const [studentContact, setStudentContact] = useState('');
+  const [studentPassword, setStudentPassword] = useState('');
+  const [regBoard, setRegBoard] = useState<Board>('CBSE');
+  const [regGrade, setRegGrade] = useState<Grade>(10);
+  const [receiptRef, setReceiptRef] = useState('');
+  const [isActivatingPlan, setIsActivatingPlan] = useState(false);
+  const [activateError, setActivateError] = useState('');
+  const [activateSuccess, setActivateSuccess] = useState(false);
+
+  const handleBuyNow = (tier: 'LITE' | 'PLUS') => {
+    const url = PaymentService.getGatewayUrl(tier);
+    window.open(url, '_blank', 'noopener,noreferrer');
+    setActivatePlanTier(tier);
+    setActivateError('');
+  };
+
+  const handleCreateAccountAndActivate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setActivateError('');
+    if (!activatePlanTier) return;
+    setIsActivatingPlan(true);
+
+    try {
+      let learnerId = currentLearner?.id;
+      if (!learnerId) {
+        const cleanInput = studentContact.trim().toLowerCase();
+        const targetEmail = cleanInput.includes('@') && !cleanInput.endsWith('@upi')
+          ? cleanInput
+          : `${cleanInput.replace(/[^0-9]/g, '') || 'scholar'}@special49.academiclevel.in`;
+
+        const existing = StorageRLSLayer.getLearnerByEmail(targetEmail);
+        if (existing) {
+          learnerId = existing.id;
+          if (studentPassword.trim()) {
+            await loginStudent(targetEmail, studentPassword.trim()).catch(() => {});
+          }
+        } else {
+          const regRes = await registerStudent({
+            fullName: studentFullName.trim() || 'Scholar',
+            email: targetEmail,
+            password: studentPassword.trim(),
+            board: regBoard,
+            grade: regGrade,
+            parentName: 'Parent'
+          });
+          if (regRes.success) {
+            const session = StorageRLSLayer.getCurrentSession();
+            learnerId = session?.learnerId;
+          } else {
+            setActivateError(regRes.error || 'Failed to create student account.');
+            setIsActivatingPlan(false);
+            return;
+          }
+        }
+      }
+
+      const finalLearnerId = learnerId || `lrn_${Date.now()}`;
+      const actRes = await PaymentService.activateGatewayPayment(
+        finalLearnerId,
+        activatePlanTier,
+        receiptRef.trim() || undefined
+      );
+
+      if (actRes.success) {
+        refreshCurrentLearner();
+        setActivateSuccess(true);
+        setTimeout(() => {
+          if (onNavigate) {
+            onNavigate('DASHBOARD');
+          } else {
+            window.location.href = '/dashboard';
+          }
+        }, 1200);
+      } else {
+        setActivateError(actRes.error || 'Failed to activate plan.');
+      }
+    } catch (err: any) {
+      setActivateError(err.message || 'Error completing account setup.');
+    } finally {
+      setIsActivatingPlan(false);
+    }
+  };
 
   useEffect(() => {
     return SiteConfigService.subscribe(() => {
@@ -731,12 +821,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
               </ul>
             </div>
-            <button
-              onClick={() => onOpenAuth('REGISTER')}
-              className="mt-6 w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all cursor-pointer"
-            >
-              Get Started with Lite (₹{pricingConfig.litePriceInr || 49})
-            </button>
+            <div className="mt-6 space-y-2">
+              <button
+                type="button"
+                onClick={() => handleBuyNow('LITE')}
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>BUY NOW (₹{pricingConfig.litePriceInr || 49}) — UPI PG ↗</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActivatePlanTier('LITE');
+                  setActivateError('');
+                }}
+                className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-xs rounded-xl border border-slate-700 transition-all cursor-pointer"
+              >
+                Paid on UPI PG? Create Account &amp; Activate Pass
+              </button>
+            </div>
           </div>
 
           <div className="bg-gradient-to-b from-indigo-950/40 via-slate-900 to-slate-900 border-2 border-indigo-500 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative">
@@ -769,15 +873,185 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
               </ul>
             </div>
-            <button
-              onClick={() => onOpenAuth('REGISTER')}
-              className="mt-6 w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all cursor-pointer"
-            >
-              Unlock Plus Plan (₹{pricingConfig.plusPriceInr || 129})
-            </button>
+            <div className="mt-6 space-y-2">
+              <button
+                type="button"
+                onClick={() => handleBuyNow('PLUS')}
+                className="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-400 hover:to-blue-400 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>BUY NOW (₹{pricingConfig.plusPriceInr || 129}) — UPI PG ↗</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActivatePlanTier('PLUS');
+                  setActivateError('');
+                }}
+                className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-xs rounded-xl border border-slate-700 transition-all cursor-pointer"
+              >
+                Paid on UPI PG? Create Account &amp; Activate Pass
+              </button>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* UPI PG INSTANT ACTIVATION MODAL */}
+      {activatePlanTier && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="max-w-md w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl relative text-slate-100">
+            <button
+              onClick={() => {
+                setActivatePlanTier(null);
+                setActivateSuccess(false);
+                setActivateError('');
+              }}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full bg-slate-800 transition-colors"
+              aria-label="Close dialog"
+            >
+              ✕
+            </button>
+
+            {activateSuccess ? (
+              <div className="text-center space-y-4 py-4">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-2xl">
+                  ✓
+                </div>
+                <h3 className="text-xl font-black text-white">Membership Activated! 🎉</h3>
+                <p className="text-xs text-slate-300">
+                  Your <strong>{activatePlanTier === 'PLUS' ? 'Plus Plan (180 Days)' : 'Lite Plan (60 Days)'}</strong> has been activated automatically via UPI PG. Redirecting to your dashboard...
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleCreateAccountAndActivate} className="space-y-4 text-xs">
+                <div className="text-center">
+                  <span className="px-3 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase">
+                    Official UPI PG Activation
+                  </span>
+                  <h3 className="text-lg font-black text-white mt-1.5">
+                    Activate Your {activatePlanTier === 'PLUS' ? 'Plus Plan (₹129)' : 'Lite Plan (₹49)'}
+                  </h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Paid via UPI PG? Enter your details below to create your account and get your subscription instantly.
+                  </p>
+                </div>
+
+                {activateError && (
+                  <div className="p-3 rounded-xl bg-red-950/50 border border-red-800 text-red-300 text-xs">
+                    {activateError}
+                  </div>
+                )}
+
+                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-xs font-mono">
+                  <span className="text-slate-400">Gateway Link:</span>
+                  <a
+                    href={PaymentService.getGatewayUrl(activatePlanTier)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-emerald-400 hover:underline font-bold"
+                  >
+                    Open UPI PG ↗
+                  </a>
+                </div>
+
+                {!currentLearner ? (
+                  <>
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Student Full Name *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Aarav Sharma"
+                        value={studentFullName}
+                        onChange={e => setStudentFullName(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Parent Mobile / Email *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="9861439460 or parent@gmail.com"
+                        value={studentContact}
+                        onChange={e => setStudentContact(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-xs"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-slate-300 font-bold mb-1">Class / Grade *</label>
+                        <select
+                          value={regGrade}
+                          onChange={e => setRegGrade(Number(e.target.value) as Grade)}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-white text-xs focus:outline-none focus:border-indigo-500"
+                        >
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
+                            <option key={g} value={g}>Class {g}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-bold mb-1">Board *</label>
+                        <select
+                          value={regBoard}
+                          onChange={e => setRegBoard(e.target.value as Board)}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-2 text-white text-xs focus:outline-none focus:border-indigo-500"
+                        >
+                          <option value="CBSE">CBSE</option>
+                          <option value="ICSE">ICSE</option>
+                          <option value="CAMBRIDGE">Cambridge</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Create Account Password *</label>
+                      <input
+                        type="password"
+                        required
+                        minLength={6}
+                        placeholder="Minimum 6 characters"
+                        value={studentPassword}
+                        onChange={e => setStudentPassword(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-xs"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="p-3 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-xs text-emerald-200">
+                    Logged in as: <strong>{currentLearner.fullName} ({currentLearner.email})</strong>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-slate-400 mb-1">UPI PG Receipt Reference (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Transaction Ref from UPI PG receipt (optional)"
+                    value={receiptRef}
+                    onChange={e => setReceiptRef(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-600 font-mono text-xs focus:outline-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isActivatingPlan}
+                  className="w-full py-3.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>{isActivatingPlan ? 'Activating Pass...' : 'CREATE ACCOUNT & ACTIVATE PASS NOW'}</span>
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

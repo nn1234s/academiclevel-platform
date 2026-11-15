@@ -168,7 +168,7 @@ assert(!checkoutContent.includes('1-hour verification queue'), 'UPIQRCheckout mu
 
 assert(ad49Content.includes('PaymentService.getGatewayUrl(selectedPlanTier)'), 'Special49AdsLandingPage must link to UPI PG gateway via PaymentService');
 assert(ad49Content.includes('activateGatewayPayment'), 'Special49AdsLandingPage must activate subscription automatically');
-assert(ad49Content.includes('Open Official UPI Gateway'), 'Special49AdsLandingPage must offer direct button to official UPI gateway');
+assert(ad49Content.includes('BUY NOW') && ad49Content.includes('UPI PG'), 'Special49AdsLandingPage must offer direct BUY NOW button to official UPI gateway');
 assert(!ad49Content.includes('Verified within 15–60 Mins'), 'Special49AdsLandingPage must not advertise 15-60 min human wait');
 
 assert(pricingPageContent.includes('Official UPI PG Gateway'), 'PricingPage must highlight official UPI PG Gateway');
@@ -178,5 +178,36 @@ assert(pricingManagerContent.includes('floCfjhckOsPisvVeVE0'), 'PricingManager m
 assert(adminShellContent.includes('Official Automated UPI Gateway Live'), 'AdminVaultShell must display automated UPI gateway banner');
 assert(adminShellContent.includes('Manual Payment Queue Retired'), 'AdminVaultShell must mark manual payment queue as retired');
 console.log('  ✓ Real UPI PG Gateway verified across all Ad pages, Checkout modals, Pricing page & Admin Vault: 49 (erNAH4FIOAgE4qMpUDmI) & 129 (floCfjhckOsPisvVeVE0), instant automated activation without admin audit');
+
+// 8. Verify Removal of PVT LTD, UDYAM Reg Branding & Main Site No Coaching Fees UPI PG Integration
+console.log('\nTest 8: Verifying Removal of PVT LTD, Official UDYAM Registration & Main Site Coaching Fees UPI PG...');
+const appContent2 = fs.readFileSync(path.join(ROOT_DIR, 'src/App.tsx'), 'utf-8');
+const hallOfFameContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/public/HallOfFamePage.tsx'), 'utf-8');
+const landingPageContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/public/LandingPage.tsx'), 'utf-8');
+const legalPagesContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/public/LegalPages.tsx'), 'utf-8');
+
+// Verify UDYAM entity name and no PVT LTD
+assert(appContent2.includes('AcademicLevel - ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385'), 'App.tsx must feature official UDYAM registration');
+assert(!appContent2.includes('PVT LTD'), 'App.tsx must not contain PVT LTD');
+
+assert(hallOfFameContent.includes('AcademicLevel - ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385'), 'HallOfFamePage must feature official UDYAM registration');
+assert(!hallOfFameContent.includes('PVT LTD'), 'HallOfFamePage must not contain PVT LTD');
+
+assert(legalPagesContent.includes('AcademicLevel - ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385'), 'LegalPages must feature official UDYAM registration');
+assert(!legalPagesContent.includes('PVT LTD'), 'LegalPages must not contain PVT LTD');
+
+// Verify Landing Page Section "No Exploitative Coaching Fees" uses UPI PG (not granting for free)
+assert(landingPageContent.includes('No Exploitative Coaching Fees'), 'LandingPage must contain No Exploitative Coaching Fees section');
+assert(landingPageContent.includes("handleBuyNow('LITE')"), 'LandingPage Lite Plan must route to UPI PG buy now');
+assert(landingPageContent.includes("handleBuyNow('PLUS')"), 'LandingPage Plus Plan must route to UPI PG buy now');
+assert(landingPageContent.includes('activateGatewayPayment'), 'LandingPage must activate subscription via gateway payment');
+
+// Verify QR code is removed from checkout views - keeping only BUY NOW button to UPI PG
+assert(!checkoutContent.includes('UPI PG Payment QR Code'), 'UPIQRCheckout must have removed QR code image');
+assert(!ad49Content.includes('Official Dynamic ₹'), 'Special49AdsLandingPage must have removed dynamic QR image');
+assert(checkoutContent.includes('BUY NOW VIA UPI PG'), 'UPIQRCheckout must feature BUY NOW VIA UPI PG button');
+console.log('  ✓ Company name updated to AcademicLevel - ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385 (PVT LTD removed)');
+console.log('  ✓ Main site coaching fees section updated to use real UPI PG with instant activation');
+console.log('  ✓ QR codes removed - clean Buy Now button to UPI PG with post-payment account creation & instant activation');
 
 console.log('\n=== ALL TESTS PASSED WITH 100% SUCCESS! ===');
