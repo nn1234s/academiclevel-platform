@@ -325,7 +325,7 @@ export const GiftFulfillment: React.FC = () => {
             <span>Scholar Rewards Fulfillment &amp; Courier Dispatch Console</span>
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Manage physical scholar bottles (Milton Costa 1000 &amp; Stainless Steel) and digital vouchers. Enter courier tracking or voucher codes live to students.
+            Manage 100% physical scholar merchandise (Pokémon Stationery, Mewtwo Badges, Milton Costa 1000, Squishies, Steel Bottles, Blasters). Enter courier tracking live to students worldwide.
           </p>
         </div>
 

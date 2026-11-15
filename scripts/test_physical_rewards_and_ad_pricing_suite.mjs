@@ -10,20 +10,18 @@ console.log('=== RUNNING PHYSICAL REWARDS, PRODUCT DETAILS & AMAZON DELIVERY AUD
 console.log('Test 1: Verifying GiftStore.tsx physical rewards & product details configuration...');
 const giftStoreContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/student/GiftStore.tsx'), 'utf-8');
 
-// Ensure 200, 250, and 500 gift cards are deleted
-assert(!giftStoreContent.includes('rsAmount: 250'), 'Gift card 250 must be deleted');
-assert(!giftStoreContent.includes('rsAmount: 500'), 'Gift card 500 must be deleted');
-assert(!giftStoreContent.includes('rsAmount: 200'), 'Gift card 200 must be deleted');
-console.log('  ✓ Deleted 200, 250, and 500 gift cards from GIFT_CARD_LEVELS');
-
-// Ensure ₹10, ₹20, ₹30, ₹50, ₹100, ₹150 exist
-assert(giftStoreContent.includes('rsAmount: 10'), 'Gift card 10 must exist');
-assert(giftStoreContent.includes('rsAmount: 20'), 'Gift card 20 must exist');
-assert(giftStoreContent.includes('rsAmount: 30'), 'Gift card 30 must exist');
-assert(giftStoreContent.includes('rsAmount: 50'), 'Gift card 50 must exist');
-assert(giftStoreContent.includes('rsAmount: 100'), 'Gift card 100 must exist');
-assert(giftStoreContent.includes('rsAmount: 150'), 'Gift card 150 must exist');
-console.log('  ✓ Preserved digital tiers ₹10, ₹20, ₹30, ₹50, ₹100, ₹150');
+// Ensure ALL digital gift cards are completely deleted (Store is 100% physical merchandise)
+assert(!giftStoreContent.includes('GIFT_CARD_LEVELS'), 'GIFT_CARD_LEVELS must be completely deleted');
+assert(!giftStoreContent.includes('GiftCardLevel'), 'GiftCardLevel interface must be completely deleted');
+assert(!giftStoreContent.includes('GIFT_CARD_BRANDS'), 'GIFT_CARD_BRANDS must be completely deleted');
+assert(!giftStoreContent.includes('rsAmount: 10'), '10 rs voucher must be deleted');
+assert(!giftStoreContent.includes('rsAmount: 20'), '20 rs voucher must be deleted');
+assert(!giftStoreContent.includes('rsAmount: 50'), '50 rs voucher must be deleted');
+assert(!giftStoreContent.includes('rsAmount: 100'), '100 rs voucher must be deleted');
+assert(!giftStoreContent.includes('rsAmount: 150'), '150 rs voucher must be deleted');
+assert(!giftStoreContent.includes('handleOpenRedeemModal'), 'handleOpenRedeemModal must be deleted');
+assert(!giftStoreContent.includes('SubmittedClaimInfo'), 'SubmittedClaimInfo must be deleted');
+console.log('  ✓ Completely deleted all digital gift cards (Amazon, Google Play, Flipkart, Swiggy, UPI) - Store is 100% Physical!');
 
 // Verify Item 1: Pokémon Licensed 11-Piece Stationery Set (Exact same coins as 100 rs GC = 25,000)
 assert(giftStoreContent.includes('pokemon-stationery-set'), 'Pokemon stationery set must exist');

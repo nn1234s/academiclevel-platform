@@ -275,10 +275,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   </span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-white mt-1.5 flex items-center space-x-2">
-                  <span>🎁 Your Dispatched Gift Cards & Rewards</span>
+                  <span>🎁 Your Dispatched Physical Rewards</span>
                 </h2>
                 <p className="text-xs text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
-                  Congratulations! Your academic milestone redemption has been verified and fulfilled by the admin team. Use the real voucher codes below to redeem your balance immediately.
+                  Congratulations! Your academic milestone physical merchandise redemption has been verified and dispatched by the admin team. Track your courier parcel details below.
                 </p>
               </div>
 
@@ -286,7 +286,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 onClick={() => onNavigate('GIFT_STORE')}
                 className="px-3.5 py-2 bg-slate-950/80 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs font-bold text-emerald-300 flex items-center space-x-1.5 transition-all self-start sm:self-auto flex-shrink-0"
               >
-                <span>Gift Card Arena</span>
+                <span>Physical Rewards Store</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
