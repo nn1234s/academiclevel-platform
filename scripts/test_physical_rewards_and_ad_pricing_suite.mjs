@@ -62,7 +62,16 @@ assert(giftStoreContent.includes('scholar-legend-badge'), 'Legend button badge m
 assert(giftStoreContent.includes('Official Pokémon Mewtwo Legend Button Pin Badge'), 'Legend badge title must match');
 console.log('  ✓ Official Pokémon Mewtwo Legend Button Pin Badge verified (25,000 Coins, same as 100 rs GC)');
 
-// Verify all 7 reward images exist on disk
+// Verify Item 8: Mystery Scholar Surprise Gift Box (30,000 Coins)
+assert(giftStoreContent.includes('mystery-gift-box'), 'Mystery gift box must exist');
+assert(giftStoreContent.includes('Mystery Scholar Surprise Gift Box'), 'Mystery box title must exist');
+assert(giftStoreContent.includes('coinsCost: 30000'), 'Mystery box must cost 30,000 coins');
+assert(giftStoreContent.includes('Amazon • Flipkart • Meesho Logistics'), 'Mystery box delivery partner must include Amazon, Flipkart, Meesho');
+assert(giftStoreContent.includes('Delivered via Amazon / Flipkart / Meesho'), 'Mystery box delivery tag must match');
+assert(giftStoreContent.includes('1 Guaranteed Surprise Physical Item') || giftStoreContent.includes('1 Guaranteed Real Physical Item'), 'Mystery box specs must guarantee 1 real item');
+console.log('  ✓ Mystery Scholar Surprise Gift Box verified (30,000 Coins, 1 physical item, Amazon/Flipkart/Meesho delivery)');
+
+// Verify all 8 reward images exist on disk
 const rewardImages = [
   'pokemon-stationery-set.png',
   'milk-squishy.png',
@@ -70,12 +79,13 @@ const rewardImages = [
   'nerf-blaster-gun.jpg',
   'milton-costa-1000-bottle.png',
   'steel-water-bottle.jpg',
-  'scholar-pin-badge.png'
+  'scholar-pin-badge.png',
+  'mystery-gift-box.png'
 ];
 for (const img of rewardImages) {
   assert(fs.existsSync(path.join(ROOT_DIR, 'public/rewards', img)), `Image ${img} must exist on disk`);
 }
-console.log('  ✓ All 7 product reward image assets staged and verified in public/rewards/');
+console.log('  ✓ All 8 product reward image assets staged and verified in public/rewards/');
 
 // Verify Product Details & Amazon Delivery Modal
 assert(giftStoreContent.includes('previewProductItem'), 'GiftStore must track previewProductItem state for product details modal');
@@ -101,7 +111,7 @@ console.log('\nTest 3: Verifying StudentDashboard.tsx...');
 const dashboardContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/student/StudentDashboard.tsx'), 'utf-8');
 
 assert(dashboardContent.includes('Amazon Doorstep Delivery') || dashboardContent.includes('Doorstep Delivery'), 'Dashboard must display Amazon delivery badge');
-assert(dashboardContent.includes('Toys, Badges, Stationery') || dashboardContent.includes('Toys, Stationery'), 'Dashboard teaser must highlight toys, stationery, badges & bottles');
+assert(dashboardContent.includes('Mystery Boxes') || dashboardContent.includes('Toys, Badges, Stationery') || dashboardContent.includes('Toys, Stationery'), 'Dashboard teaser must highlight physical rewards categories');
 console.log('  ✓ Student dashboard displays real-time courier tracking and updated reward categories');
 
 // 4. Verify AI Credits Limit

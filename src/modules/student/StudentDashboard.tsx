@@ -293,7 +293,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
               {dispatchedGifts.map((gift) => {
-                const isPhysical = gift.isPhysical || (gift.shippingAddress && (gift.shippingAddress.includes('[PHYSICAL DELIVERY]') || gift.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]'))) || gift.itemTitle.toLowerCase().includes('bottle') || gift.itemTitle.toLowerCase().includes('squishy') || gift.itemTitle.toLowerCase().includes('blaster') || gift.itemTitle.toLowerCase().includes('stationery');
+                const isPhysical = gift.isPhysical || (gift.shippingAddress && (gift.shippingAddress.includes('[PHYSICAL DELIVERY]') || gift.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]'))) || gift.itemTitle.toLowerCase().includes('bottle') || gift.itemTitle.toLowerCase().includes('squishy') || gift.itemTitle.toLowerCase().includes('blaster') || gift.itemTitle.toLowerCase().includes('stationery') || gift.itemTitle.toLowerCase().includes('badge') || gift.itemTitle.toLowerCase().includes('mystery') || gift.itemTitle.toLowerCase().includes('box');
                 const isShipped = gift.status === 'SHIPPED';
                 const isOrdered = gift.status === 'ORDERED';
                 const isDelivered = gift.status === 'DELIVERED';
@@ -784,7 +784,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <Award className="w-5 h-5" />
           </div>
           <p className="text-xs font-bold text-white">Rewards Store</p>
-          <span className="text-[10px] text-slate-400">Toys, Badges, Stationery &amp; Bottles</span>
+          <span className="text-[10px] text-slate-400">Mystery Boxes, Toys, Badges &amp; Bottles</span>
         </button>
       </div>
 

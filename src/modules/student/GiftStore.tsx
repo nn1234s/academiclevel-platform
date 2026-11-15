@@ -258,6 +258,38 @@ export const PHYSICAL_REWARDS: PhysicalRewardItem[] = [
       '58mm Perfect Diameter – Bold, eye-catching size that stands out on any bag or hoodie',
       '100% Doorstep Delivery – Shipped safely to your home using Amazon fulfillment network'
     ]
+  },
+  {
+    id: 'mystery-gift-box',
+    name: 'Mystery Scholar Surprise Gift Box (1 Physical Item)',
+    category: 'PHYSICAL_MERCH',
+    coinsCost: 30000,
+    coinsCostFormatted: '30,000 Coins',
+    image: '/rewards/mystery-gift-box.png',
+    badge: '🎁 Mystery Surprise Crate (Lite & Plus Eligible)',
+    gradient: 'from-amber-500 via-rose-500 to-indigo-600',
+    description: 'The ultimate scholar unboxing surprise! Each Mystery Gift Box contains 1 guaranteed real physical reward chosen at random: Pokémon Trading Cards, Milton Hydration Bottles, Pokémon Stationery Set, Slow-Rising Squishies, Foam Blasters, or secret study gadgets. Note: There is 1 physical item per box, delivered directly to your doorstep via Amazon, Flipkart, or Meesho!',
+    popular: true,
+    requiredPlan: 'LITE',
+    deliveryPartner: 'Amazon • Flipkart • Meesho Logistics',
+    deliveryTag: 'Delivered via Amazon / Flipkart / Meesho',
+    originalPriceInr: 499,
+    estimatedDelivery: '3–5 Business Days',
+    specs: [
+      '1 Guaranteed Surprise Physical Item',
+      'Potential: Pokémon Cards, Bottles, Squishies & Toys',
+      'Doorstep Delivery via Amazon / Flipkart / Meesho',
+      'Sealed Protective Unboxing Packaging',
+      'Worldwide Home Address Eligible'
+    ],
+    features: [
+      '1 Guaranteed Real Physical Item – Every mystery box contains 1 physical reward delivered straight to your door',
+      'Exciting Unboxing Potential – You can get Pokémon cards, Milton water bottles, squishies, stationery, or action toys',
+      'Multichannel Fast Delivery – Sourced and shipped quickly via Amazon, Flipkart, or Meesho courier networks',
+      'Child-Safe & Tested Merchandise – High-quality study toys, hydration gear, and collectible school items',
+      'Worldwide Doorstep Courier – Delivered directly to your verified residential address anywhere in the world',
+      'Fair-Play Ledger Verified – Instant transaction receipt and live courier tracking from the admin team'
+    ]
   }
 ];
 
@@ -829,7 +861,7 @@ ${recipientName.trim()}`;
                     />
                     <div className="absolute bottom-2 left-2 bg-slate-950/90 backdrop-blur-sm border border-slate-800 px-2.5 py-1 rounded-xl text-[10px] text-amber-300 flex items-center space-x-1.5 font-mono shadow">
                       <Truck className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Delivered using Amazon</span>
+                      <span>{item.deliveryTag || 'Delivered using Amazon'}</span>
                     </div>
                     <div className="absolute top-2 right-2 bg-slate-950/80 backdrop-blur-sm px-2 py-0.5 rounded-lg border border-slate-800 text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1">
                       <Eye className="w-3 h-3 text-amber-400" />
@@ -1040,7 +1072,7 @@ ${recipientName.trim()}`;
 
           <div className="divide-y divide-slate-800">
             {existingRequests.map(req => {
-              const isPhysical = req.isPhysical || (req.shippingAddress && (req.shippingAddress.includes('[PHYSICAL DELIVERY]') || req.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]'))) || req.itemTitle.toLowerCase().includes('bottle') || req.itemTitle.toLowerCase().includes('squishy') || req.itemTitle.toLowerCase().includes('blaster') || req.itemTitle.toLowerCase().includes('stationery');
+              const isPhysical = req.isPhysical || (req.shippingAddress && (req.shippingAddress.includes('[PHYSICAL DELIVERY]') || req.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]'))) || req.itemTitle.toLowerCase().includes('bottle') || req.itemTitle.toLowerCase().includes('squishy') || req.itemTitle.toLowerCase().includes('blaster') || req.itemTitle.toLowerCase().includes('stationery') || req.itemTitle.toLowerCase().includes('badge') || req.itemTitle.toLowerCase().includes('box') || req.itemTitle.toLowerCase().includes('mystery');
               const code = getVoucherDetails(req);
               const help = getRedemptionHelp(req.itemTitle);
               const isDispatched = req.status === 'APPROVED_DISPATCHED';
@@ -1269,26 +1301,26 @@ ${recipientName.trim()}`;
                     )}
                   </div>
 
-                  {/* OFFICIAL AMAZON DELIVERY BOX */}
+                  {/* OFFICIAL AMAZON / FLIPKART / MEESHO DELIVERY BOX */}
                   <div className="bg-gradient-to-br from-amber-500/10 via-slate-950 to-orange-500/10 border-2 border-amber-500/40 rounded-2xl p-3.5 space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black text-amber-300 flex items-center space-x-1.5">
                         <Truck className="w-4 h-4 text-amber-400" />
-                        <span>Delivered using Amazon</span>
+                        <span>{previewProductItem.deliveryTag || 'Delivered using Amazon'}</span>
                       </span>
                       <span className="text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-md border border-amber-500/30">
-                        Amazon Logistics
+                        {previewProductItem.deliveryPartner || 'Amazon Logistics'}
                       </span>
                     </div>
 
                     <div className="space-y-1 text-[11px] text-slate-300">
                       <p className="flex items-center space-x-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                        <span><strong>Free Doorstep Delivery</strong> across India • Zero courier fees</span>
+                        <span><strong>Free Doorstep Delivery</strong> worldwide • Zero courier fees</span>
                       </p>
                       <p className="flex items-center space-x-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                        <span><strong>Live Tracking:</strong> Real-time Amazon AWB tracking ID provided</span>
+                        <span><strong>Live Tracking:</strong> Real-time courier AWB tracking ID provided</span>
                       </p>
                       <p className="flex items-center space-x-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
@@ -1416,7 +1448,7 @@ ${recipientName.trim()}`;
                 </span>
                 <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-950 px-2.5 py-1 rounded-full border border-amber-800 flex items-center space-x-1 shadow">
                   <Truck className="w-3 h-3 text-amber-400" />
-                  <span>Delivered using Amazon</span>
+                  <span>{selectedPhysicalItem.deliveryTag || 'Delivered using Amazon'}</span>
                 </span>
               </div>
               <h3 className="text-xl font-extrabold text-white mt-1 flex items-center justify-center gap-2">

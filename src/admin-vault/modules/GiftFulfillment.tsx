@@ -325,7 +325,7 @@ export const GiftFulfillment: React.FC = () => {
             <span>Scholar Rewards Fulfillment &amp; Courier Dispatch Console</span>
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Manage 100% physical scholar merchandise (Pokémon Stationery, Mewtwo Badges, Milton Costa 1000, Squishies, Steel Bottles, Blasters). Enter courier tracking live to students worldwide.
+            Manage 100% physical scholar merchandise (Mystery Gift Boxes, Pokémon Stationery, Mewtwo Badges, Milton Costa 1000, Squishies, Steel Bottles, Blasters). Enter courier tracking (Amazon / Flipkart / Meesho) live to students worldwide.
           </p>
         </div>
 
@@ -470,7 +470,7 @@ export const GiftFulfillment: React.FC = () => {
           <div className="divide-y divide-slate-800">
             {filteredRequests.map(req => {
               const activeCode = getExtractedVoucherCode(req);
-              const isPhysical = req.isPhysical || (req.shippingAddress && (req.shippingAddress.includes('[PHYSICAL DELIVERY]') || req.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]') || req.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]'))) || req.itemTitle.toLowerCase().includes('bottle') || req.itemTitle.toLowerCase().includes('squishy') || req.itemTitle.toLowerCase().includes('blaster') || req.itemTitle.toLowerCase().includes('stationery') || req.itemTitle.toLowerCase().includes('badge');
+              const isPhysical = req.isPhysical || (req.shippingAddress && (req.shippingAddress.includes('[PHYSICAL DELIVERY]') || req.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]') || req.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]'))) || req.itemTitle.toLowerCase().includes('bottle') || req.itemTitle.toLowerCase().includes('squishy') || req.itemTitle.toLowerCase().includes('blaster') || req.itemTitle.toLowerCase().includes('stationery') || req.itemTitle.toLowerCase().includes('badge') || req.itemTitle.toLowerCase().includes('mystery') || req.itemTitle.toLowerCase().includes('box');
               const isDispatched = req.status === 'APPROVED_DISPATCHED';
               const isOrdered = req.status === 'ORDERED';
               const isShipped = req.status === 'SHIPPED';
@@ -808,7 +808,7 @@ export const GiftFulfillment: React.FC = () => {
               </div>
 
               {/* If SHIPPED or ORDERED: Show Courier Carrier & Tracking Number inputs */}
-              {(modalStatus === 'SHIPPED' || modalStatus === 'ORDERED' || modalReq.isPhysical || (modalReq.shippingAddress && (modalReq.shippingAddress.includes('[PHYSICAL DELIVERY]') || modalReq.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]') || modalReq.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]'))) || modalReq.itemTitle.toLowerCase().includes('bottle') || modalReq.itemTitle.toLowerCase().includes('squishy') || modalReq.itemTitle.toLowerCase().includes('blaster') || modalReq.itemTitle.toLowerCase().includes('stationery') || modalReq.itemTitle.toLowerCase().includes('badge')) && (
+              {(modalStatus === 'SHIPPED' || modalStatus === 'ORDERED' || modalReq.isPhysical || (modalReq.shippingAddress && (modalReq.shippingAddress.includes('[PHYSICAL DELIVERY]') || modalReq.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]') || modalReq.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]'))) || modalReq.itemTitle.toLowerCase().includes('bottle') || modalReq.itemTitle.toLowerCase().includes('squishy') || modalReq.itemTitle.toLowerCase().includes('blaster') || modalReq.itemTitle.toLowerCase().includes('stationery') || modalReq.itemTitle.toLowerCase().includes('badge') || modalReq.itemTitle.toLowerCase().includes('mystery') || modalReq.itemTitle.toLowerCase().includes('box')) && (
                 <div className="space-y-3 p-3 bg-slate-950/70 border border-slate-800 rounded-2xl">
                   <div>
                     <label className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block mb-1">
@@ -818,12 +818,12 @@ export const GiftFulfillment: React.FC = () => {
                       type="text"
                       value={modalCourierName}
                       onChange={e => setModalCourierName(e.target.value)}
-                      placeholder="e.g. Amazon Logistics, BlueDart, Delhivery, DTDC, India Post"
+                      placeholder="e.g. Amazon Logistics, Flipkart, Meesho, BlueDart, Delhivery, DTDC, India Post"
                       className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400 font-medium"
                     />
                     {/* Global Courier Carrier Presets */}
                     <div className="flex flex-wrap gap-1 mt-1.5">
-                      {['Amazon Global', 'Amazon Logistics', 'DHL Express', 'FedEx', 'UPS', 'Aramex', 'BlueDart', 'Delhivery', 'India Post'].map(c => (
+                      {['Amazon Logistics', 'Flipkart', 'Meesho', 'Amazon Global', 'Delhivery', 'BlueDart', 'India Post', 'DHL Express', 'FedEx', 'Aramex'].map(c => (
                         <button
                           key={c}
                           type="button"
