@@ -67,7 +67,7 @@ interface AdminVaultShellProps {
 
 const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault }) => {
   const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<AdminTab>('PAYMENTS');
+  const [activeTab, setActiveTab] = useState<AdminTab>('STUDENTS');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   let pendingCount = 0;
@@ -79,19 +79,13 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
   }
 
   const navItems: { id: AdminTab; label: string; icon: React.ReactNode; badge?: string }[] = [
-    {
-      id: 'PAYMENTS',
-      label: 'PAID PAYMENT people',
-      icon: <CreditCard className="w-4 h-4" />,
-      badge: pendingCount > 0 ? `${pendingCount} NEW` : undefined
-    },
     { id: 'STUDENTS', label: 'Kid Control & Delete', icon: <Users className="w-4 h-4" /> },
     { id: 'PRICING', label: 'Modify Prices & UPI', icon: <Coins className="w-4 h-4 text-emerald-400" /> },
     { id: 'CONTENT', label: 'Modify Home & Privacy', icon: <FileText className="w-4 h-4 text-indigo-400" /> },
     { id: 'ADS', label: 'Modify Ad Pages & Funnels', icon: <Megaphone className="w-4 h-4 text-orange-400" /> },
     { id: 'SCHOLARSHIPS', label: 'Worldwide Scholarships', icon: <Award className="w-4 h-4" /> },
     { id: 'ENTITLEMENTS', label: 'Entitlement & Trials', icon: <Zap className="w-4 h-4" /> },
-    { id: 'GIFTS', label: 'Gift & Amazon GC Dispatch', icon: <Truck className="w-4 h-4" /> },
+    { id: 'GIFTS', label: 'Gift & Physical Product Dispatch', icon: <Truck className="w-4 h-4 text-amber-400" /> },
     { id: 'ACODES', label: 'ACode Vouchers', icon: <KeyRound className="w-4 h-4" /> },
     { id: 'CURRICULUM', label: 'Curriculum & Boards', icon: <BookOpen className="w-4 h-4" /> },
     { id: 'QUESTIONS', label: 'Question Bank CRUD', icon: <Database className="w-4 h-4" /> },
@@ -100,6 +94,12 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
     { id: 'MODERATION', label: 'Safety & Moderation', icon: <ShieldAlert className="w-4 h-4" /> },
     { id: 'AUDIT', label: 'Immutable Audit Logs', icon: <ShieldCheck className="w-4 h-4" /> },
     { id: 'HEALTH', label: 'System Telemetry', icon: <BarChart3 className="w-4 h-4" /> },
+    {
+      id: 'PAYMENTS',
+      label: 'Manual Payments (Retired)',
+      icon: <CreditCard className="w-4 h-4 text-slate-500" />,
+      badge: 'AUTO PG'
+    },
   ];
 
   return (
@@ -203,7 +203,52 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
 
           {/* Main Module Content Canvas */}
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-950">
-            {activeTab === 'PAYMENTS' && <PaymentVerificationQueue />}
+            {/* Live Automated UPI Gateway Notification Banner */}
+            <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/60 to-indigo-950/40 border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+              <div className="flex items-start space-x-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs sm:text-sm font-extrabold text-white flex items-center gap-2">
+                    Official Automated UPI Gateway Live
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      ZERO MANUAL AUDIT
+                    </span>
+                  </h4>
+                  <p className="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
+                    Student passes activate automatically via real UPI PG: ₹49 Lite (60 Days) and ₹129 Plus (180 Days). Manual human payment verification is no longer required.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2 shrink-0">
+                <a
+                  href="https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2.5 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 text-[10px] font-bold text-emerald-300 transition-colors"
+                >
+                  ₹49 Gateway ↗
+                </a>
+                <a
+                  href="https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2.5 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-[10px] font-bold text-indigo-300 transition-colors"
+                >
+                  ₹129 Gateway ↗
+                </a>
+              </div>
+            </div>
+
+            {activeTab === 'PAYMENTS' && (
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-slate-900 border border-amber-500/30 flex items-center justify-between text-xs text-amber-200">
+                  <span>ℹ️ <strong>Manual Payment Queue Retired:</strong> Real UPI PG handles all transactions instantly and automatically. This view is maintained strictly for legacy audit logs.</span>
+                </div>
+                <PaymentVerificationQueue />
+              </div>
+            )}
             {activeTab === 'STUDENTS' && <StudentManagement />}
             {activeTab === 'PRICING' && <PricingManager />}
             {activeTab === 'CONTENT' && <SiteContentManager />}

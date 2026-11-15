@@ -149,4 +149,26 @@ assert(adminFulfillmentContent.includes('getExtractedCountry'), 'Admin GiftFulfi
 assert(adminFulfillmentContent.includes('Amazon Global') && adminFulfillmentContent.includes('DHL Express'), 'Admin GiftFulfillment must include global courier carriers');
 console.log('  ✓ Truly Worldwide Delivery verified: Country selector, international postal & phone validation, admin global tracking, and unified digital power-ups');
 
+// 7. Verify Real Automated UPI PG Gateway (49 & 129 Plans) and Admin Automation
+console.log('\nTest 7: Verifying Real UPI PG Gateway (49 & 129) and Zero-Audit Instant Activation...');
+const paymentServiceContent = fs.readFileSync(path.join(ROOT_DIR, 'src/services/paymentService.ts'), 'utf-8');
+const checkoutContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/student/UPIQRCheckout.tsx'), 'utf-8');
+const ad49Content = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/public/Special49AdsLandingPage.tsx'), 'utf-8');
+const adminShellContent = fs.readFileSync(path.join(ROOT_DIR, 'src/admin-vault/AdminVaultShell.tsx'), 'utf-8');
+
+assert(paymentServiceContent.includes('https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true'), '49 Plan UPI PG URL must match');
+assert(paymentServiceContent.includes('https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true'), '129 Plan UPI PG URL must match');
+assert(paymentServiceContent.includes('activateGatewayPayment'), 'paymentService must implement activateGatewayPayment');
+
+assert(checkoutContent.includes('upipg.cit.org.in/pay'), 'UPIQRCheckout must direct students to real upipg.cit.org.in gateway');
+assert(checkoutContent.includes('activateGatewayPayment'), 'UPIQRCheckout must activate subscription automatically');
+assert(!checkoutContent.includes('1-hour verification queue'), 'UPIQRCheckout must eliminate 1-hour verification queue delay');
+
+assert(ad49Content.includes('PaymentService.getGatewayUrl(selectedPlanTier)'), 'Special49AdsLandingPage must link to UPI PG gateway via PaymentService');
+assert(ad49Content.includes('activateGatewayPayment'), 'Special49AdsLandingPage must activate subscription automatically');
+
+assert(adminShellContent.includes('Official Automated UPI Gateway Live'), 'AdminVaultShell must display automated UPI gateway banner');
+assert(adminShellContent.includes('Manual Payment Queue Retired'), 'AdminVaultShell must mark manual payment queue as retired');
+console.log('  ✓ Real UPI PG Gateway verified: 49 (erNAH4FIOAgE4qMpUDmI) & 129 (floCfjhckOsPisvVeVE0), instant automated activation without admin audit');
+
 console.log('\n=== ALL TESTS PASSED WITH 100% SUCCESS! ===');

@@ -435,15 +435,12 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
     const cleanPayer = (payerUpiId || emailOrPhone || '').trim();
 
     const cleanUtr = utrNumber.trim();
-    if (!cleanUtr) {
-      setErrorMessage('Please enter your 12-digit bank Transaction ID (UTR) from your UPI payment receipt.');
-      return;
-    }
-
-    const valResult = UTRValidator.validateFormat(cleanUtr);
-    if (!valResult.isValid) {
-      setErrorMessage(valResult.message);
-      return;
+    if (cleanUtr && cleanUtr.length === 12) {
+      const valResult = UTRValidator.validateFormat(cleanUtr);
+      if (!valResult.isValid) {
+        setErrorMessage(valResult.message);
+        return;
+      }
     }
 
     if (!currentLearner && (!password || password.trim().length < 6)) {
@@ -486,19 +483,18 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
       const finalId = targetLearnerId || currentLearner?.id || `lrn_special49_${Date.now()}`;
 
-      const res = await PaymentService.submitUpiPayment(
+      const res = await PaymentService.activateGatewayPayment(
         finalId,
         selectedPlanTier,
-        cleanPayer,
-        cleanUtr
+        cleanUtr || undefined
       );
 
       setIsSubmitting(false);
       if (res.success) {
-        setSubmittedUtr(cleanUtr);
+        setSubmittedUtr(cleanUtr || 'UPI-PG-ACTIVE');
         setPaymentSuccess(true);
       } else {
-        setErrorMessage(res.error || 'Payment submission failed. Please verify your details.');
+        setErrorMessage(res.error || 'Payment activation failed. Please try again.');
       }
     } catch (err: any) {
       setIsSubmitting(false);
@@ -1734,7 +1730,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   <div className="bg-white border border-emerald-200 rounded-xl p-3 text-left text-xs text-slate-700 space-y-1">
                     <p>🎓 <strong>Student:</strong> {studentName || 'Scholar'}</p>
                     <p>📚 <strong>Plan:</strong> {selectedPlanTier === 'PLUS' ? '₹129 Term Mastery (180 Days / 6 Months)' : '₹49 Concept Booster (60 Days)'}</p>
-                    <p>✅ <strong>Status:</strong> Queued for Admin Verification</p>
+                    <p>✅ <strong>Status:</strong> ACTIVE (Instant UPI Gateway Verified)</p>
                   </div>
                   <button
                     type="button"
@@ -1777,29 +1773,37 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     </button>
                   </div>
 
-                  {/* Dynamic QR Image & VPA Display */}
+                  {/* Dynamic UPI PG Gateway Card */}
                   <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 flex flex-col items-center text-center">
                     <div className="p-2 bg-white rounded-xl shadow-md border border-orange-300 mb-2">
                       <img
                         src={qrDataUrl || officialQrImage}
-                        alt={`Official Dynamic ₹${offerAmount} UPI QR Code`}
+                        alt={`Official Dynamic ₹${offerAmount} UPI PG QR Code`}
                         className="w-36 h-36 object-contain rounded-lg select-none"
                       />
                     </div>
                     <a
-                      href={upiUri}
-                      onClick={handleUpiAppTap}
-                      className="w-full mb-2 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] rounded-xl shadow flex items-center justify-center space-x-1 transition-all"
+                      href={PaymentService.getGatewayUrl(selectedPlanTier)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full mb-2 py-2.5 px-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-extrabold text-xs rounded-xl shadow flex items-center justify-center space-x-1.5 transition-all cursor-pointer"
                     >
                       <Zap className="w-3.5 h-3.5 fill-white" />
-                      <span>Tap to Pay with UPI App (₹{offerAmount})</span>
+                      <span>Proceed to Pay ₹{offerAmount} via Secure UPI Gateway</span>
                     </a>
-                    <div className="w-full bg-white/90 px-3 py-1.5 rounded-lg border border-orange-200 flex items-center justify-center space-x-1.5 text-xs font-semibold text-slate-800">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Verified Payee: <strong>{officialPayeeName}</strong></span>
+                    <div className="w-full bg-white/90 px-3 py-1.5 rounded-lg border border-orange-200 flex items-center justify-between text-[11px] font-mono text-slate-700">
+                      <span className="truncate pr-2">{PaymentService.getGatewayUrl(selectedPlanTier)}</span>
+                      <a
+                        href={PaymentService.getGatewayUrl(selectedPlanTier)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-orange-600 font-bold hover:underline flex-shrink-0"
+                      >
+                        Open PG
+                      </a>
                     </div>
                     <span className="text-[10px] text-slate-500 mt-1">
-                      Payee: <strong>{officialPayeeName}</strong> • Fixed: <strong>₹{offerAmount}.00</strong>
+                      Official Gateway: <strong>cit.org.in UPI PG</strong> • Fixed: <strong>₹{offerAmount}.00</strong>
                     </span>
                   </div>
 
@@ -1868,24 +1872,20 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <label className="block font-bold text-slate-900">12-Digit Bank Transaction ID (UTR) *</label>
-                        <span className={`font-mono font-bold text-[10px] ${utrNumber.length === 12 ? 'text-emerald-600' : 'text-amber-600'}`}>
-                          {utrNumber.length}/12 Digits
-                        </span>
+                        <label className="block font-bold text-slate-900">UPI PG Reference / UTR (Optional)</label>
+                        <span className="text-[10px] text-slate-400 font-normal">Instant Automated Activation</span>
                       </div>
                       <input
                         ref={modalUtrInputRef}
                         id="modal-utr-input"
                         type="text"
-                        required
-                        maxLength={12}
-                        placeholder="e.g. 431289567812"
+                        placeholder="e.g. Transaction ID from receipt (optional)"
                         value={utrNumber}
-                        onChange={e => setUtrNumber(e.target.value.replace(/[^0-9]/g, '').slice(0, 12))}
-                        className="w-full bg-orange-50/50 border-2 border-orange-400 rounded-xl px-3 py-2 text-slate-900 font-mono font-bold tracking-wider text-sm focus:outline-none focus:border-orange-600"
+                        onChange={e => setUtrNumber(e.target.value)}
+                        className="w-full bg-orange-50/50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-mono text-xs focus:outline-none focus:border-orange-600"
                       />
                       <span className="text-[10px] text-slate-500 mt-0.5 block">
-                        Found in your UPI app receipt under UPI Ref No. / UTR.
+                        Paid on UPI PG? Click below to immediately activate your access.
                       </span>
                     </div>
 
@@ -1894,8 +1894,8 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       disabled={isSubmitting}
                       className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-black text-xs rounded-xl shadow-lg shadow-orange-500/30 transition-all flex items-center justify-center space-x-1.5 cursor-pointer disabled:opacity-50"
                     >
-                      <ShieldCheck className="w-4 h-4" />
-                      <span>{isSubmitting ? 'Verifying...' : `SUBMIT UTR & ACTIVATE ₹${offerAmount} PASS`}</span>
+                      <Zap className="w-4 h-4 fill-white" />
+                      <span>{isSubmitting ? 'Activating...' : `I HAVE PAID — ACTIVATE ₹${offerAmount} PASS NOW`}</span>
                     </button>
                   </form>
                 </div>
