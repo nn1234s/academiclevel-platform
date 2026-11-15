@@ -1106,13 +1106,13 @@
   "al_prod_system_settings_v1": [
     {
       "key": "cfg_pricing",
-      "value": "{\"litePriceInr\":49,\"liteDurationDays\":60,\"plusPriceInr\":129,\"plusDurationDays\":180,\"upiVpa\":\"theattirebbsr@okicici\",\"merchantName\":\"17 Pratyusha Nanda\",\"discountBadge\":\"Special Launch Offer (95% Off)\"}",
-      "updatedAt": "2026-11-14T11:01:11.737Z"
+      "value": "{\"litePriceInr\":49,\"liteDurationDays\":60,\"plusPriceInr\":129,\"plusDurationDays\":180,\"upiVpa\":\"theattirebbsr@okicici\",\"merchantName\":\"Pratyusha Nanda\",\"discountBadge\":\"Special Launch Offer (95% Off)\"}",
+      "updatedAt": "2026-11-15T04:30:00.000Z"
     },
     {
       "key": "cfg_home",
-      "value": "{\"heroTitle\":\"Master All Classes 1 to 12 With India Top Adaptive AI\",\"heroSubtitle\":\"Personalized Socratic Quizzes, CBSE/ICSE curriculum mastery, and real digital gift cards.\",\"announcementActive\":true,\"announcementText\":\"🔥 New AI Olympiad Track Live across all grades!\",\"statsStudents\":\"25,000+\",\"statsQuizzes\":\"750,000+\",\"statsPassRate\":\"99.8%\",\"bannerCtaText\":\"Claim Your Scholarship Now\",\"updatedAt\":\"2026-11-14T11:01:20.960Z\"}",
-      "updatedAt": "2026-11-14T11:01:20.960Z"
+      "value": "{\"heroTitle\":\"Master All Classes 1 to 12 With India Top Adaptive AI\",\"heroSubtitle\":\"Personalized Socratic Quizzes, CBSE/ICSE curriculum mastery, and real digital gift cards.\",\"announcementActive\":true,\"announcementText\":\"🔥 New AI Olympiad Track Live across all grades!\",\"featureAiQuiz\":\"Nova AI Socratic Tutor\",\"statsQuizzes\":\"12,000+ Questions\",\"statsPassRate\":\"CBSE • ICSE • IGCSE\",\"bannerCtaText\":\"Start Free Practice Now\",\"updatedAt\":\"2026-11-15T04:30:00.000Z\"}",
+      "updatedAt": "2026-11-15T04:30:00.000Z"
     },
     {
       "key": "cfg_legal",

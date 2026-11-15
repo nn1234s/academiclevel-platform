@@ -291,14 +291,14 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             </div>
 
             <div className="p-3 bg-slate-800/40 border border-slate-800 rounded-xl text-[11px] text-slate-400 space-y-1">
-              <p className="font-semibold text-slate-300">Audit & Verification Notice:</p>
-              <p>• We match your Payer UPI ID with our merchant statement.</p>
+              <p className="font-semibold text-slate-300">Audit &amp; Verification Notice:</p>
+              <p>• We match your 12-digit bank UTR reference with our merchant settlement statement.</p>
               <p>• Status is marked PENDING_VERIFICATION and audited before activation.</p>
             </div>
 
             <button
               type="submit"
-              disabled={isSubmitting || !payerUpiId.trim() || !payerUpiId.includes('@')}
+              disabled={isSubmitting || utrNumber.length !== 12}
               className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-2"
             >
               {isSubmitting ? (

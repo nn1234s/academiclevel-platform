@@ -216,14 +216,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </p>
         </div>
 
-        {/* Social Proof Counter */}
+        {/* Feature Highlight Pill */}
         <div className="mt-6 inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs font-semibold text-slate-300">
           <div className="flex -space-x-2">
             <div className="w-6 h-6 rounded-full bg-indigo-500 border border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">AI</div>
             <div className="w-6 h-6 rounded-full bg-amber-500 border border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">12K</div>
             <div className="w-6 h-6 rounded-full bg-emerald-500 border border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">★</div>
           </div>
-          <span>Trusted by <strong className="text-white">{homeConfig.statsStudents || '10,000+ Students'}</strong> across India</span>
+          <span>Interactive <strong className="text-white">AI Quizzes &amp; Socratic Tutor</strong> for Classes 1–12</span>
         </div>
 
         {/* Action CTAs */}
@@ -617,25 +617,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             Widely Praised by Parents &amp; Students
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-            Hear from our community of over 4,000 students and parents thriving with AcademicLevel&apos;s autonomous AI platform.
+            Hear from students and parents mastering their school curriculum with AcademicLevel&apos;s interactive AI quiz platform.
           </p>
 
-          {/* Rating Cards Bar */}
+          {/* Feature Highlights Bar (Real Platform Features) */}
           <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
             <div className="px-5 py-3 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-              <div className="text-2xl font-black text-emerald-400">98.6%</div>
-              <div className="text-[11px] text-slate-400">Overall Satisfaction</div>
+              <div className="text-2xl font-black text-emerald-400">24/7</div>
+              <div className="text-[11px] text-slate-400">Nova AI Socratic Tutor</div>
             </div>
             <div className="px-5 py-3 rounded-2xl bg-slate-900 border border-slate-800 text-center">
               <div className="text-2xl font-black text-amber-400 flex items-center justify-center gap-1">
                 <span>4.8</span>
                 <Star className="w-4 h-4 fill-amber-400" />
               </div>
-              <div className="text-[11px] text-slate-400">Learner Feedback Rating</div>
+              <div className="text-[11px] text-slate-400">Verified Learner Rating</div>
             </div>
             <div className="px-5 py-3 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-              <div className="text-2xl font-black text-indigo-400">4,000+</div>
-              <div className="text-[11px] text-slate-400">Active Students</div>
+              <div className="text-2xl font-black text-indigo-400">12,000+</div>
+              <div className="text-[11px] text-slate-400">Curriculum AI Quizzes</div>
             </div>
           </div>
 

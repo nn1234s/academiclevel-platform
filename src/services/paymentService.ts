@@ -75,7 +75,7 @@ export function getDynamicPlanPricing(tier: 'LITE' | 'PLUS'): PlanPricing {
 
 export class PaymentService {
   public static OFFICIAL_UPI_VPA = 'theattirebbsr@okicici';
-  public static OFFICIAL_MERCHANT_NAME = 'Academic Level';
+  public static OFFICIAL_MERCHANT_NAME = 'Pratyusha Nanda';
 
   /**
    * Retrieves official merchant QR code image path.

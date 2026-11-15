@@ -49,6 +49,18 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<VaultTab>('pokedex');
 
+  // Voice mode: 'anime' (default real voice like "Pika...chu!") or 'retro' (8-bit squawk)
+  const [voiceMode, setVoiceMode] = useState<'anime' | 'retro'>(() => {
+    return (localStorage.getItem('al_poke_voice_mode') as 'anime' | 'retro') || 'anime';
+  });
+
+  const toggleVoiceMode = () => {
+    const next: 'anime' | 'retro' = voiceMode === 'anime' ? 'retro' : 'anime';
+    setVoiceMode(next);
+    localStorage.setItem('al_poke_voice_mode', next);
+    PokeApiService.playVoice(25, 'pikachu', next);
+  };
+
   // ==========================================
   // POKÉDEX STATE
   // ==========================================
@@ -124,7 +136,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
     try {
       const detail = await PokeApiService.getPokemon(idOrName);
       setSelectedPokemon(detail);
-      PokeApiService.playCry(detail.id);
+      PokeApiService.playVoice(detail.id, detail.name, voiceMode, detail);
     } finally {
       setIsLoadingDetail(false);
     }
@@ -173,7 +185,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
     setIsCorrectGuess(correct);
 
     if (correct) {
-      PokeApiService.playCry(quizPokemon.id);
+      PokeApiService.playVoice(quizPokemon.id, quizPokemon.name, voiceMode, quizPokemon);
       const newStreak = streak + 1;
       setStreak(newStreak);
       if (newStreak > bestStreak) {
@@ -250,7 +262,7 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
     ]);
     setIsPlayerTurn(true);
     setBattleStatus('ongoing');
-    PokeApiService.playCry(pPokemon.id);
+    PokeApiService.playVoice(pPokemon.id, pPokemon.name, voiceMode, pPokemon);
   };
 
   useEffect(() => {
@@ -437,6 +449,25 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
               )
             )}
 
+            {/* Real Voice / Retro Cry Toggle */}
+            <button
+              onClick={toggleVoiceMode}
+              className={`px-2.5 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center space-x-1.5 cursor-pointer border ${
+                voiceMode === 'anime'
+                  ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-md shadow-amber-400/20'
+                  : 'bg-black/50 text-slate-300 border-white/20 hover:bg-black/80'
+              }`}
+              title="Switch between Real Anime Voice (Pikachu!) and Retro 8-Bit Cry"
+            >
+              <Volume2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">
+                {voiceMode === 'anime' ? 'Voice: Real (Pika...chu!)' : 'Cry: 8-Bit Retro'}
+              </span>
+              <span className="sm:hidden">
+                {voiceMode === 'anime' ? 'Real Voice' : '8-Bit'}
+              </span>
+            </button>
+
             <button
               onClick={onBackToApp}
               className="px-3 py-1.5 bg-black/50 hover:bg-black/80 text-white font-bold text-xs rounded-xl border border-white/20 shadow transition-all flex items-center space-x-1.5 cursor-pointer"
@@ -615,14 +646,19 @@ export const PokemonVaultHub: React.FC<PokemonVaultHubProps> = ({
                       </span>
                     </div>
 
-                    {/* Audio Cry Button & Shiny Toggle */}
+                    {/* Audio Voice Button (Real Anime Voice by Default) & Shiny Toggle */}
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => PokeApiService.playCry(selectedPokemon.id)}
-                        className="p-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl shadow-lg shadow-red-600/30 transition-all cursor-pointer"
-                        title="Play Pokémon Cry"
+                        onClick={() => PokeApiService.playVoice(selectedPokemon.id, selectedPokemon.name, voiceMode, selectedPokemon)}
+                        className={`px-3 py-2 rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer flex items-center space-x-1.5 ${
+                          voiceMode === 'anime'
+                            ? 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 shadow-amber-500/20'
+                            : 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/30'
+                        }`}
+                        title={voiceMode === 'anime' ? `Hear ${selectedPokemon.name.toUpperCase()} Real Anime Voice` : 'Play 8-Bit Cry'}
                       >
-                        <Volume2 className="w-4 h-4" />
+                        <Volume2 className="w-3.5 h-3.5 animate-pulse" />
+                        <span>{voiceMode === 'anime' ? 'Hear Real Voice' : 'Play 8-Bit Cry'}</span>
                       </button>
 
                       <button

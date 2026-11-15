@@ -707,7 +707,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   <div className="mt-6 -mb-8 mx-auto w-fit">
                     <div className="bg-white text-[#f95a00] font-black text-xs px-6 py-2 rounded-full shadow-lg border border-orange-100 tracking-wider flex items-center gap-1.5">
                       <span className="text-amber-500 font-bold">★</span>
-                      <span>4.8 Positive Review (4,000+ Students)</span>
+                      <span>4.8 Star Rated by Parents &amp; Students</span>
                     </div>
                   </div>
                 </div>
@@ -722,7 +722,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       onClick={() => setShowAllReviewsModal(true)}
                       className="text-xs text-indigo-600 font-bold hover:underline"
                     >
-                      Read All 2,400+ →
+                      Read Verified Reviews →
                     </button>
                   </div>
 

@@ -48,6 +48,241 @@ export interface PokemonMove {
   description?: string;
 }
 
+export type VoiceMode = 'anime' | 'retro';
+
+export interface AnimeVoiceConfig {
+  speechText: string;
+  pitch: number;
+  rate: number;
+  audioClipUrl?: string;
+  fallbackAudioClipUrl?: string;
+}
+
+export const ANIME_VOICE_REGISTRY: Record<string, AnimeVoiceConfig> = {
+  pikachu: {
+    speechText: 'Pika... chuuu!',
+    pitch: 1.7,
+    rate: 1.15,
+    audioClipUrl: '/audio/pikachu.mp3',
+    fallbackAudioClipUrl: 'https://play.pokemonshowdown.com/audio/cries/pikachu.mp3'
+  },
+  eevee: {
+    speechText: 'Ee... vee!',
+    pitch: 1.6,
+    rate: 1.1,
+    audioClipUrl: '/audio/eevee.mp3',
+    fallbackAudioClipUrl: 'https://play.pokemonshowdown.com/audio/cries/eevee.mp3'
+  },
+  charizard: {
+    speechText: 'Char... izaaard!',
+    pitch: 0.7,
+    rate: 0.95
+  },
+  charmander: {
+    speechText: 'Char... mander!',
+    pitch: 1.45,
+    rate: 1.15
+  },
+  charmeleon: {
+    speechText: 'Char... meleon!',
+    pitch: 1.1,
+    rate: 1.05
+  },
+  bulbasaur: {
+    speechText: 'Bulba... saur!',
+    pitch: 1.4,
+    rate: 1.1
+  },
+  ivysaur: {
+    speechText: 'Ivy... saur!',
+    pitch: 1.15,
+    rate: 1.05
+  },
+  venusaur: {
+    speechText: 'Venu... saur!',
+    pitch: 0.65,
+    rate: 0.85
+  },
+  squirtle: {
+    speechText: 'Squirtle... squirtle!',
+    pitch: 1.5,
+    rate: 1.2
+  },
+  wartortle: {
+    speechText: 'War... tortle!',
+    pitch: 1.2,
+    rate: 1.05
+  },
+  blastoise: {
+    speechText: 'Blas... toise!',
+    pitch: 0.7,
+    rate: 0.85
+  },
+  caterpie: {
+    speechText: 'Cater... pie!',
+    pitch: 1.65,
+    rate: 1.2
+  },
+  butterfree: {
+    speechText: 'Freeee... butterfree!',
+    pitch: 1.6,
+    rate: 1.1
+  },
+  pidgey: {
+    speechText: 'Pidgey... pidgey!',
+    pitch: 1.45,
+    rate: 1.2
+  },
+  pidgeot: {
+    speechText: 'Pidge... ooot!',
+    pitch: 1.15,
+    rate: 1.05
+  },
+  raichu: {
+    speechText: 'Rai... chuuu!',
+    pitch: 1.25,
+    rate: 1.1
+  },
+  vulpix: {
+    speechText: 'Vul... pix!',
+    pitch: 1.65,
+    rate: 1.15
+  },
+  ninetales: {
+    speechText: 'Nine... tales!',
+    pitch: 1.1,
+    rate: 0.95
+  },
+  jigglypuff: {
+    speechText: 'Jiggly... puff... jiggly!',
+    pitch: 1.85,
+    rate: 1.05
+  },
+  meowth: {
+    speechText: 'Meowth... that is right!',
+    pitch: 1.35,
+    rate: 1.15
+  },
+  psyduck: {
+    speechText: 'Psy... ya-ya-duck!',
+    pitch: 1.5,
+    rate: 1.1
+  },
+  arcanine: {
+    speechText: 'Arca... nine!',
+    pitch: 0.75,
+    rate: 0.95
+  },
+  alakazam: {
+    speechText: 'Ala... kazam!',
+    pitch: 0.9,
+    rate: 1.0
+  },
+  machamp: {
+    speechText: 'Ma... champ!',
+    pitch: 0.7,
+    rate: 1.0
+  },
+  gengar: {
+    speechText: 'Gen... gaaar!',
+    pitch: 0.85,
+    rate: 0.95
+  },
+  onix: {
+    speechText: 'O... nix!',
+    pitch: 0.6,
+    rate: 0.8
+  },
+  snorlax: {
+    speechText: 'Snoooor... laaax!',
+    pitch: 0.55,
+    rate: 0.75
+  },
+  gyarados: {
+    speechText: 'Gyara... dooos!',
+    pitch: 0.6,
+    rate: 0.85
+  },
+  lapras: {
+    speechText: 'La... praaas!',
+    pitch: 1.3,
+    rate: 0.95
+  },
+  ditto: {
+    speechText: 'Dit... to!',
+    pitch: 1.55,
+    rate: 1.2
+  },
+  dragonite: {
+    speechText: 'Dragon... iite!',
+    pitch: 0.9,
+    rate: 1.0
+  },
+  mewtwo: {
+    speechText: 'Mew... two!',
+    pitch: 0.75,
+    rate: 0.95
+  },
+  mew: {
+    speechText: 'Meeew!',
+    pitch: 1.9,
+    rate: 1.25
+  },
+  lucario: {
+    speechText: 'Lu-car-i-o!',
+    pitch: 0.9,
+    rate: 1.05
+  },
+  greninja: {
+    speechText: 'Gre-nin-ja!',
+    pitch: 0.95,
+    rate: 1.15
+  },
+  rayquaza: {
+    speechText: 'Ray... qua... za!',
+    pitch: 0.65,
+    rate: 0.85
+  }
+};
+
+export function getAnimeVoiceForPokemon(name: string, detail?: Partial<PokemonDetail>): AnimeVoiceConfig {
+  const cleanName = (name || 'pikachu').toLowerCase().trim();
+  if (ANIME_VOICE_REGISTRY[cleanName]) {
+    return ANIME_VOICE_REGISTRY[cleanName];
+  }
+
+  // Dynamic Syllabifier for any Generation Pokémon
+  let spoken = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+  if (cleanName.length > 5) {
+    const mid = Math.floor(cleanName.length / 2);
+    const match = cleanName.slice(2, -2).search(/[aeiou]/);
+    const splitIdx = match !== -1 ? match + 2 + 1 : mid;
+    const part1 = cleanName.slice(0, splitIdx);
+    const part2 = cleanName.slice(splitIdx);
+    spoken = `${part1.charAt(0).toUpperCase() + part1.slice(1)}... ${part2}!`;
+  } else {
+    spoken = `${spoken}... ${spoken}!`;
+  }
+
+  const weight = detail?.weight ?? 400;
+  let pitch = 1.2;
+  let rate = 1.1;
+
+  if (weight > 800) {
+    pitch = 0.7;
+    rate = 0.9;
+  } else if (weight < 150) {
+    pitch = 1.55;
+    rate = 1.15;
+  }
+
+  return {
+    speechText: spoken,
+    pitch,
+    rate
+  };
+}
+
 // Official Type Colors
 export const TYPE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   normal: { bg: 'bg-stone-500', text: 'text-stone-100', border: 'border-stone-400' },
@@ -612,15 +847,91 @@ export class PokeApiService {
   }
 
   /**
-   * Plays the official Pokémon cry audio
+   * Plays the Pokémon voice:
+   * Defaults to 'anime' mode (real spoken anime voice like "Pika...chu!").
+   * Can also play 'retro' mode (8-bit Game Boy squawk).
    */
-  public static playCry(id: number): void {
+  public static playVoice(
+    id: number,
+    name?: string,
+    modeOverride?: VoiceMode,
+    detail?: Partial<PokemonDetail>
+  ): void {
     try {
-      const audioUrl = `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${id}.ogg`;
-      const audio = new Audio(audioUrl);
-      audio.volume = 0.55;
-      audio.play().catch(() => {});
+      const savedMode = (typeof window !== 'undefined' ? localStorage.getItem('al_poke_voice_mode') : null) as VoiceMode | null;
+      const activeMode: VoiceMode = modeOverride || savedMode || 'anime';
+
+      if (activeMode === 'retro') {
+        // Play 8-bit game cry squawk
+        const audioUrl = `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${id}.ogg`;
+        const audio = new Audio(audioUrl);
+        audio.volume = 0.55;
+        audio.play().catch(() => {});
+        return;
+      }
+
+      // Anime Voice Mode (Real voice like "Pika...chu!")
+      const cleanName = (name || (id === 25 ? 'pikachu' : id === 133 ? 'eevee' : '')).toLowerCase().trim();
+      const config = getAnimeVoiceForPokemon(cleanName || `pokemon-${id}`, detail);
+
+      // If dedicated audio clip exists (e.g., Pikachu, Eevee)
+      if (config.audioClipUrl) {
+        const audio = new Audio(config.audioClipUrl);
+        audio.volume = 0.9;
+        audio.play().catch(() => {
+          if (config.fallbackAudioClipUrl) {
+            const fallbackAudio = new Audio(config.fallbackAudioClipUrl);
+            fallbackAudio.volume = 0.9;
+            fallbackAudio.play().catch(() => {
+              this.speakAnimeUtterance(config);
+            });
+          } else {
+            this.speakAnimeUtterance(config);
+          }
+        });
+        return;
+      }
+
+      // Speak anime name with Web Speech API
+      this.speakAnimeUtterance(config);
+    } catch (err) {
+      console.warn('Audio playback error:', err);
+    }
+  }
+
+  /**
+   * Speaks anime phonetic phrase with Web Speech API
+   */
+  private static speakAnimeUtterance(config: AnimeVoiceConfig): void {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(config.speechText);
+      utter.pitch = config.pitch;
+      utter.rate = config.rate;
+      utter.volume = 1.0;
+
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        const preferred = voices.find(v =>
+          v.lang.startsWith('en') &&
+          (v.name.includes('Natural') || v.name.includes('Online') || v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('Google'))
+        ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+
+        if (preferred) {
+          utter.voice = preferred;
+        }
+      }
+
+      window.speechSynthesis.speak(utter);
     } catch {}
+  }
+
+  /**
+   * Backward-compatible alias for playVoice
+   */
+  public static playCry(id: number, name?: string): void {
+    this.playVoice(id, name);
   }
 
   /**

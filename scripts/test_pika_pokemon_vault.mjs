@@ -50,7 +50,7 @@ assert(hubContent.includes('Pokédex Explorer'), 'Must contain Pokédex Explorer
 assert(hubContent.includes('That Pokémon'), "Must contain Who's That Pokémon? anime game");
 assert(hubContent.includes('Battle Arena'), 'Must contain Battle Arena turn-based combat');
 assert(hubContent.includes('Type Matchup Master'), 'Must contain Type Matchup quiz');
-assert(hubContent.includes('playCry'), 'Must support audio cry playback');
+assert(hubContent.includes('playCry') || hubContent.includes('playVoice'), 'Must support audio voice playback');
 assert(hubContent.includes('CoinLedgerService.appendTransaction'), 'Must append coin transaction to cryptographic ledger');
 assert(hubContent.includes('POKEMON_GUESS_REWARD'), 'Must use reasonCode POKEMON_GUESS_REWARD');
 assert(hubContent.includes('+1 Study Coin Awarded!'), 'Must display coin award message');
@@ -65,4 +65,14 @@ assert(serverApiContent.includes("'POKEMON_GUESS_REWARD'"), "Must permit POKEMON
 assert(serverApiContent.includes("reasonCode === 'POKEMON_GUESS_REWARD' && numAmount > 1"), "Must cap POKEMON_GUESS_REWARD at 1 coin on server");
 console.log('✓ TEST 5 PASSED: CoinReasonCode and server-side 1-coin safety guard verified.');
 
-console.log('🎉 ALL 5 POKÉMON VAULT & COIN REWARD TESTS PASSED PERFECTLY!');
+// 6. Verify Real Anime Voice Engine & Pikachu MP3 Asset
+assert(serviceContent.includes('playVoice'), 'Must have playVoice function');
+assert(serviceContent.includes('ANIME_VOICE_REGISTRY'), 'Must have ANIME_VOICE_REGISTRY');
+assert(serviceContent.includes('getAnimeVoiceForPokemon'), 'Must have dynamic anime syllabifier');
+assert(fs.existsSync(path.join(platformDir, 'public', 'audio', 'pikachu.mp3')), 'Must bundle pikachu.mp3 voice clip');
+const pikachuMp3Buf = fs.readFileSync(path.join(platformDir, 'public', 'audio', 'pikachu.mp3'));
+assert(pikachuMp3Buf.length > 1000, 'pikachu.mp3 must be non-empty valid audio');
+assert(hubContent.includes('voiceMode'), 'PokemonVaultHub must support voiceMode switcher');
+console.log('✓ TEST 6 PASSED: Real Anime Voice Engine & Pikachu MP3 audio verified.');
+
+console.log('🎉 ALL 6 POKÉMON VAULT, VOICE & COIN REWARD TESTS PASSED PERFECTLY!');

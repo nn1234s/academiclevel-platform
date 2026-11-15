@@ -63,7 +63,7 @@ const DEFAULT_CONFIG: SiteConfig = {
     plusPriceInr: 129,
     plusDurationDays: 180,
     upiVpa: 'theattirebbsr@okicici',
-    merchantName: 'Academic Level',
+    merchantName: 'Pratyusha Nanda',
     discountBadge: 'Special Launch Offer (95% Off)',
     liteFeatures: [
       'Unlimited Quizzes & Adaptive Assessments',
@@ -86,9 +86,9 @@ const DEFAULT_CONFIG: SiteConfig = {
     heroSubtitle: 'CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant Socratic guidance, verifiable certificates, and an earnable Study Coin economy.',
     announcementActive: true,
     announcementText: '🚀 12,000 Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
-    statsStudents: '10,000+',
-    statsQuizzes: '500,000+',
-    statsPassRate: '99.4%',
+    statsStudents: 'Nova AI Socratic Tutor',
+    statsQuizzes: '12,000+ Questions',
+    statsPassRate: 'CBSE • ICSE • IGCSE',
     bannerCtaText: 'Start Free Practice Now'
   },
   legal: {
