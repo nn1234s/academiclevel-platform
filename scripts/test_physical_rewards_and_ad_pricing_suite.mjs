@@ -59,10 +59,10 @@ assert(giftStoreContent.includes('steel-water-bottle'), 'Steel bottle must exist
 assert(giftStoreContent.includes('coinsCost: 37500'), 'Steel bottle must cost 37,500 coins');
 console.log('  ✓ Premium Stainless Steel Water Bottle verified (37,500 Coins)');
 
-// Verify Item 7: AcademicLevel Legend Button Pin Badge (Exact same coins as 100 rs GC = 25,000)
+// Verify Item 7: Pokémon Mewtwo Legend Button Pin Badge (Exact same coins as 100 rs GC = 25,000)
 assert(giftStoreContent.includes('scholar-legend-badge'), 'Legend button badge must exist');
-assert(giftStoreContent.includes('Official AcademicLevel Legend Button Pin Badge'), 'Legend badge title must match');
-console.log('  ✓ Official AcademicLevel Legend Button Pin Badge verified (25,000 Coins, same as 100 rs GC)');
+assert(giftStoreContent.includes('Official Pokémon Mewtwo Legend Button Pin Badge'), 'Legend badge title must match');
+console.log('  ✓ Official Pokémon Mewtwo Legend Button Pin Badge verified (25,000 Coins, same as 100 rs GC)');
 
 // Verify all 7 reward images exist on disk
 const rewardImages = [
