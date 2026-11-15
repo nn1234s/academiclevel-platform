@@ -64,7 +64,7 @@ const REVIEWS_POOL: ReviewItem[] = [
   {
     id: 'prabir-1',
     name: 'Prabir',
-    role: 'Parent of Class 5 Student (Bhubaneswar)',
+    role: 'Parent of Student (Bhubaneswar)',
     date: '08 Nov 2026',
     stars: 5,
     avatarBg: 'bg-amber-600',
@@ -73,7 +73,7 @@ const REVIEWS_POOL: ReviewItem[] = [
   {
     id: 'preetish-1',
     name: 'Preetish',
-    role: 'Parent of Class 5 Student (Bhubaneswar)',
+    role: 'Parent of Student (Bhubaneswar)',
     date: '05 Nov 2026',
     stars: 5,
     avatarBg: 'bg-emerald-600',
@@ -82,7 +82,7 @@ const REVIEWS_POOL: ReviewItem[] = [
   {
     id: 'shaymin-1',
     name: 'Shaymin',
-    role: 'Class 5 Scholar',
+    role: 'Student Scholar',
     date: '02 Nov 2026',
     stars: 5,
     avatarBg: 'bg-indigo-600',
@@ -119,7 +119,7 @@ const REVIEWS_POOL: ReviewItem[] = [
 
 const LIVE_ENROLLMENTS = [
   'Aarav from Delhi enrolled in Class 10 (Special 49 Offer)',
-  'Sneha from Mumbai enrolled in Class 5 (Special 49 Offer)',
+  'Sneha from Mumbai enrolled in Foundation Course (Special 49 Offer)',
   'Bhavya from Patna enrolled in Class 8 (Special 49 Offer)',
   'Rohan from Bengaluru enrolled in Class 12 (Special 49 Offer)',
   'Ananya from Hyderabad enrolled in Class 6 (Special 49 Offer)',
@@ -1105,7 +1105,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       </section>
 
       {/* ======================================================== */}
-      {/* 2.5. IIT BOMBAY & 8X CODING CERTIFIED KID FOUNDER GLAZE   */}
+      {/* 2.5. IIT BOMBAY & 9X CERTIFIED STUDENT DEVELOPER GLAZE    */}
       {/* ======================================================== */}
       <section className="py-10 px-3 sm:px-6 bg-slate-100/60">
         <div className="max-w-6xl mx-auto">

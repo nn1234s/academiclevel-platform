@@ -131,13 +131,13 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
         <div className="inline-flex flex-wrap items-center justify-center gap-2">
           <span className="px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md flex items-center space-x-1.5">
             <Award className="w-3.5 h-3.5 text-slate-950" />
-            <span>Literal IIT Bombay Certified Kid Founder</span>
+            <span>IIT Bombay Certified • Developed by Student</span>
           </span>
 
           <span className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider border ${
             isDark ? 'bg-indigo-950/80 border-indigo-700/80 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-800'
           }`}>
-            🛡️ STEM.org Accredited • Grade 5 Prodigy
+            🛡️ STEM.org Accredited • Developed by Student
           </span>
 
           <span className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider border ${
@@ -150,7 +150,7 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
         <h2 className={`text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight ${
           isDark ? 'text-white' : 'text-slate-950'
         }`}>
-          Built by a Kid for Kids.{' '}
+          Developed by a Student for Students.{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-amber-300">
             Certified by IIT Bombay.
           </span>
@@ -160,7 +160,7 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
           isDark ? 'text-slate-300' : 'text-slate-700'
         }`}>
           Most education platforms are created by corporate executives who never sat in your child’s classroom.
-          <strong> AcademicLevel is completely different:</strong> it was coded, designed, and architected by a <strong>Grade 5 student prodigy</strong> with 9 formal software engineering certifications in Python, Data Structures &amp; Algorithms, Game Engines, and Full-Stack Development — verified by <strong>IIT Bombay Mood Indigo</strong> and <strong>STEM.org</strong>.
+          <strong> AcademicLevel is completely different:</strong> it was developed by a <strong>student developer</strong> with 9 formal software engineering certifications in Python, Data Structures &amp; Algorithms, Game Engines, and Full-Stack Development — verified by <strong>IIT Bombay Mood Indigo</strong> and <strong>STEM.org</strong>.
         </p>
 
         <div className={`p-4 rounded-2xl border text-xs italic max-w-2xl mx-auto ${
