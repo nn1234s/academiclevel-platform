@@ -22,6 +22,7 @@ import { CertificateVerificationView } from './modules/public/CertificateVerific
 import { HallOfFamePage } from './modules/public/HallOfFamePage';
 import { InnovativeEdtechPage } from './modules/public/InnovativeEdtechPage';
 import { NotFoundPika } from './modules/public/NotFoundPika';
+import { AccountDeletionPage } from './modules/public/AccountDeletionPage';
 
 // Student Modules
 import { StudentDashboard } from './modules/student/StudentDashboard';
@@ -163,6 +164,7 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
   if (p === '/privacy' || p === '/policies' || p === '/policies.html' || p === '/policy' || p === '/privacy.html') return { route: 'PRIVACY' };
   if (p === '/terms' || p === '/terms.html' || p === '/terms-of-use') return { route: 'TERMS' };
   if (p === '/safety' || p === '/children' || p === '/student-safety') return { route: 'SAFETY' };
+  if (p === '/delacc' || p === '/delete-account' || p === '/deleteaccount' || p === '/account-deletion') return { route: 'ACCOUNT_DELETION' };
   if (p === '/halloffame' || p === '/hall-of-fame' || p === '/security' || p === '/security/hall-of-fame') return { route: 'HALL_OF_FAME' };
   if (
     p === '/innovative-edtech' ||
@@ -210,6 +212,7 @@ function getPathForRoute(route: string): string {
     case 'PRIVACY': return '/privacy';
     case 'TERMS': return '/terms';
     case 'SAFETY': return '/safety';
+    case 'ACCOUNT_DELETION': return '/delacc';
     case 'HALL_OF_FAME': return '/halloffame';
     case 'INNOVATIVE_EDTECH': return '/most-innovative-edtech';
     case 'VERIFY_CERTIFICATE': return '/verify';
@@ -821,6 +824,16 @@ export const App: React.FC = () => {
           {currentRoute === 'PRIVACY' && <LegalPages pageType="PRIVACY" />}
           {currentRoute === 'TERMS' && <LegalPages pageType="TERMS" />}
           {currentRoute === 'SAFETY' && <LegalPages pageType="SAFETY" />}
+          {currentRoute === 'ACCOUNT_DELETION' && (
+            <AccountDeletionPage
+              learner={currentLearner}
+              onDeleted={() => {
+                logout();
+                navigateTo('HOME');
+              }}
+              onBackToApp={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
+            />
+          )}
           {currentRoute === 'HALL_OF_FAME' && (
             <HallOfFamePage onNavigateHome={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')} />
           )}
@@ -1054,6 +1067,13 @@ export const App: React.FC = () => {
               </button>
               <button onClick={() => navigateTo('FAQ')} className="hover:text-slate-300">
                 FAQ
+              </button>
+              <button
+                onClick={() => navigateTo('ACCOUNT_DELETION')}
+                className="hover:text-red-300 text-slate-400 transition-colors"
+                title="Google Play Mandated Account & Data Deletion Portal (/delacc)"
+              >
+                Delete Account
               </button>
               <button
                 onClick={() => navigateTo('HALL_OF_FAME')}

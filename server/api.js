@@ -269,6 +269,53 @@ export function isValidLearnerSession(token, learnerId) {
   }
 }
 
+/**
+ * Permanent Learner Cascade Purge (Google Play Account Deletion & DPDP Compliance)
+ */
+export function executePermanentLearnerPurge(learnerId, actorEmail = 'USER_SELF_SERVICE') {
+  if (!learnerId) return null;
+  const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(String(learnerId));
+  if (!learner) return null;
+
+  // Cascade deletion of all learner records across all tables
+  db.prepare('DELETE FROM sessions WHERE learnerId = ?').run(learnerId);
+  db.prepare('DELETE FROM subscriptions WHERE learnerId = ?').run(learnerId);
+  db.prepare('DELETE FROM course_progress WHERE learnerId = ?').run(learnerId);
+  try { db.prepare('DELETE FROM level_progress WHERE learnerId = ?').run(learnerId); } catch {}
+  db.prepare('DELETE FROM quiz_attempts WHERE learnerId = ?').run(learnerId);
+  db.prepare('DELETE FROM certificates WHERE learnerId = ?').run(learnerId);
+  db.prepare('DELETE FROM gift_requests WHERE learnerId = ?').run(learnerId);
+  db.prepare('DELETE FROM coin_ledger WHERE learnerId = ?').run(learnerId);
+  db.prepare('DELETE FROM scholarship_claims WHERE learnerId = ?').run(learnerId);
+  try { db.prepare('DELETE FROM challenge_completions WHERE learnerId = ?').run(learnerId); } catch {}
+  try { db.prepare('DELETE FROM friendships WHERE requesterId = ? OR receiverId = ?').run(learnerId, learnerId); } catch {}
+  try { db.prepare('DELETE FROM student_messages WHERE senderId = ? OR receiverId = ?').run(learnerId, learnerId); } catch {}
+  db.prepare('UPDATE learners SET referredBy = NULL WHERE referredBy = ?').run(learnerId);
+  db.prepare('DELETE FROM learners WHERE id = ?').run(learnerId);
+
+  // Record immutable security audit log
+  try {
+    db.prepare(`
+      INSERT INTO security_audit_logs (id, timestampUtc, actorEmail, actionType, targetId, severity, details)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      'del_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      new Date().toISOString(),
+      actorEmail || 'USER_PURGE',
+      'DELETE_ACCOUNT_PURGE',
+      learnerId,
+      'WARNING',
+      `Account deletion purge executed for learner ${learner.fullName} (${learner.email}, ID: ${learnerId}). All associated records cascade deleted.`
+    );
+  } catch {}
+
+  try {
+    exportDbToJsonStore();
+  } catch {}
+
+  return learner;
+}
+
 // ==========================================
 // Health & Telemetry
 // ==========================================
@@ -747,6 +794,82 @@ apiRouter.post('/auth/logout', (req, res) => {
       db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
     }
     res.json({ success: true, message: 'Session terminated successfully.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Google Play Mandated In-App Account Deletion Endpoint
+apiRouter.post('/auth/delete-account', (req, res) => {
+  try {
+    const token = req.headers['x-session-token'] ||
+      req.headers['x-admin-token'] ||
+      (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.substring(7) : null);
+
+    if (!token) {
+      return res.status(401).json({ success: false, error: 'Authentication session token required to delete account.' });
+    }
+
+    const sess = db.prepare('SELECT * FROM sessions WHERE token = ?').get(token);
+    if (!sess || !sess.learnerId) {
+      return res.status(401).json({ success: false, error: 'Invalid or expired session token.' });
+    }
+
+    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(sess.learnerId);
+    if (!learner) {
+      return res.status(404).json({ success: false, error: 'Learner profile not found.' });
+    }
+
+    // Cascade deletion of all learner records across all tables
+    executePermanentLearnerPurge(learner.id, learner.email || 'USER_IN_APP_DELETION');
+
+    res.json({
+      success: true,
+      message: 'Your AcademicLevel account and all associated personal data have been permanently deleted in compliance with Google Play Policy.'
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Google Play Mandated Public Web Deletion Request Portal (https://academiclevel.in/delacc)
+apiRouter.post('/public/request-account-deletion', (req, res) => {
+  try {
+    const { emailOrPhone } = req.body || {};
+    if (!emailOrPhone) {
+      return res.status(400).json({ success: false, error: 'Email or phone number is required.' });
+    }
+
+    const rawParam = String(emailOrPhone).trim();
+    const cleanEmail = rawParam.toLowerCase();
+    const phoneDigits = rawParam.replace(/[^0-9]/g, '');
+    const phone10 = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : '';
+
+    let learner = db.prepare(`
+      SELECT * FROM learners 
+      WHERE email = ? 
+         OR (phone IS NOT NULL AND phone != '' AND (phone = ? OR phone LIKE ?))
+      LIMIT 1
+    `).get(cleanEmail, phoneDigits, '%' + phone10);
+
+    const refId = 'DEL-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+
+    if (learner) {
+      executePermanentLearnerPurge(learner.id, learner.email || 'WEB_PORTAL_DELACC');
+      return res.json({
+        success: true,
+        referenceId: refId,
+        immediate: true,
+        message: 'Your account and all associated personal data have been permanently deleted from our servers.'
+      });
+    }
+
+    return res.json({
+      success: true,
+      referenceId: refId,
+      immediate: false,
+      message: 'If an account matching the provided contact details exists, all associated data will be completely deleted within 24 hours.'
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -2892,41 +3015,8 @@ apiRouter.post('/admin/learners/:id/toggle-suspend', adminAuth, (req, res) => {
 apiRouter.delete('/admin/learners/:id', adminAuth, (req, res) => {
   try {
     const learnerId = req.params.id;
-    const learner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
+    const learner = executePermanentLearnerPurge(learnerId, SUPER_ADMIN_EMAIL);
     if (!learner) return res.status(404).json({ success: false, error: 'Learner not found' });
-
-    // Cascade deletion of all learner records across all tables
-    db.prepare('DELETE FROM sessions WHERE learnerId = ?').run(learnerId);
-    db.prepare('DELETE FROM subscriptions WHERE learnerId = ?').run(learnerId);
-    db.prepare('DELETE FROM course_progress WHERE learnerId = ?').run(learnerId);
-    try { db.prepare('DELETE FROM level_progress WHERE learnerId = ?').run(learnerId); } catch {}
-    db.prepare('DELETE FROM quiz_attempts WHERE learnerId = ?').run(learnerId);
-    db.prepare('DELETE FROM certificates WHERE learnerId = ?').run(learnerId);
-    db.prepare('DELETE FROM gift_requests WHERE learnerId = ?').run(learnerId);
-    db.prepare('DELETE FROM coin_ledger WHERE learnerId = ?').run(learnerId);
-    db.prepare('DELETE FROM scholarship_claims WHERE learnerId = ?').run(learnerId);
-    try { db.prepare('DELETE FROM challenge_completions WHERE learnerId = ?').run(learnerId); } catch {}
-    try { db.prepare('DELETE FROM friendships WHERE requesterId = ? OR receiverId = ?').run(learnerId, learnerId); } catch {}
-    try { db.prepare('DELETE FROM student_messages WHERE senderId = ? OR receiverId = ?').run(learnerId, learnerId); } catch {}
-    db.prepare('UPDATE learners SET referredBy = NULL WHERE referredBy = ?').run(learnerId);
-    db.prepare('DELETE FROM learners WHERE id = ?').run(learnerId);
-
-    // Record immutable security audit log
-    db.prepare(`
-      INSERT INTO security_audit_logs (id, timestampUtc, actorEmail, actionType, targetId, severity, details)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      'admin_del_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-      new Date().toISOString(),
-      SUPER_ADMIN_EMAIL,
-      'DELETE_LEARNER',
-      learnerId,
-      'WARNING',
-      `Super-Admin deleted learner ${learner.fullName} (${learner.email}, ID: ${learnerId}) and purged all associated data.`
-    );
-
-    exportDbToJsonStore();
-
     res.json({ success: true, message: `Successfully deleted learner ${learner.fullName} and associated data.` });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

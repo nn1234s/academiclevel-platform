@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Learner, Grade } from '../../core/types';
 import { useAuth } from '../../core/auth/AuthContext';
+import { ApiClient } from '../../core/api/apiClient';
 import {
   User,
   Shield,
@@ -14,7 +15,8 @@ import {
   Unlock,
   Eye,
   EyeOff,
-  LogOut
+  LogOut,
+  Trash2
 } from 'lucide-react';
 
 interface StudentProfileProps {
@@ -33,6 +35,41 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
   const [isParentUnlocked, setIsParentUnlocked] = useState(false);
   const [parentPinError, setParentPinError] = useState('');
   const [showPin, setShowPin] = useState(false);
+
+  // Danger Zone / Google Play Account Deletion controls
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmInput, setDeleteConfirmInput] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
+  const handleConfirmDelete = async () => {
+    const input = deleteConfirmInput.trim();
+    const isPinMatch = input === (learner.parentPin || '1234');
+    const isDeleteWord = input.toUpperCase() === 'DELETE';
+
+    if (!isPinMatch && !isDeleteWord) {
+      setDeleteError('Please type DELETE or enter your 4-digit Parent PIN to confirm.');
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError('');
+
+    try {
+      const res = await ApiClient.deleteMyAccount(input);
+      if (res.success) {
+        alert('Your AcademicLevel account and all associated personal data have been permanently deleted.');
+        logout();
+      } else {
+        setDeleteError(res.message || 'Failed to delete account. Please try again.');
+      }
+    } catch {
+      // Local fallback
+      logout();
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const handleClassChange = (e: React.FormEvent) => {
     e.preventDefault();
@@ -232,6 +269,73 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
                 <span className="text-slate-500 block">Active Streak:</span>
                 <span className="font-semibold text-amber-400">{learner.currentStreakDays} Consecutive Days</span>
               </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Danger Zone: Google Play Mandated In-App Account Deletion */}
+      <div className="bg-red-950/20 border border-red-900/40 rounded-3xl p-6 shadow-xl space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Trash2 className="w-4 h-4 text-red-400" />
+            <h3 className="text-sm font-bold text-red-300">Danger Zone: Delete Account</h3>
+          </div>
+          <span className="text-[10px] text-red-400/80 font-mono">Google Play &amp; DPDP Policy</span>
+        </div>
+
+        <p className="text-xs text-slate-400 leading-relaxed">
+          Permanently delete your AcademicLevel account, learning streaks, certificates, quiz records, and earned Study Coins. This action is irreversible and immediately wipes all records.
+        </p>
+
+        {!showDeleteConfirm ? (
+          <button
+            type="button"
+            onClick={() => setShowDeleteConfirm(true)}
+            className="px-4 py-2.5 bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/40 font-bold text-xs rounded-xl transition-all flex items-center space-x-2 cursor-pointer"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-red-400" />
+            <span>Delete Account</span>
+          </button>
+        ) : (
+          <div className="p-4 bg-slate-950 border border-red-800/60 rounded-2xl space-y-3">
+            <div className="text-xs text-red-200">
+              <strong className="block font-bold mb-1">Confirm Account &amp; Data Deletion</strong>
+              Please confirm by typing <span className="font-mono bg-red-950 text-red-300 px-1 py-0.5 rounded font-bold">DELETE</span> or entering your 4-digit Parent PIN.
+            </div>
+
+            <input
+              type="text"
+              placeholder="Type DELETE or 4-digit Parent PIN"
+              value={deleteConfirmInput}
+              onChange={e => setDeleteConfirmInput(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-700 focus:border-red-500 rounded-xl px-4 py-2 text-xs text-white focus:outline-none font-mono"
+            />
+
+            {deleteError && (
+              <p className="text-xs text-red-400">{deleteError}</p>
+            )}
+
+            <div className="flex items-center space-x-2 pt-1">
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl transition-all shadow cursor-pointer disabled:opacity-50"
+              >
+                {isDeleting ? 'Deleting Account...' : 'Permanently Delete Account'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setDeleteConfirmInput('');
+                  setDeleteError('');
+                }}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         )}

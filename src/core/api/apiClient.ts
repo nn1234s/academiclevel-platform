@@ -97,6 +97,26 @@ export class ApiClient {
     }
   }
 
+  public static async deleteMyAccount(confirmation?: string): Promise<{ success: boolean; message: string }> {
+    return this.request('/auth/delete-account', {
+      method: 'POST',
+      body: JSON.stringify({ confirmation })
+    });
+  }
+
+  public static async requestPublicAccountDeletion(payload: {
+    emailOrPhone: string;
+    learnerName?: string;
+    parentPin?: string;
+    password?: string;
+    reason?: string;
+  }): Promise<{ success: boolean; referenceId?: string; message: string; immediate?: boolean }> {
+    return this.request('/public/request-account-deletion', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  }
+
   // ==========================================
   // Student Actions & Quotas
   // ==========================================

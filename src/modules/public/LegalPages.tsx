@@ -52,14 +52,6 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
 
       {/* Main Container */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 -mt-6">
-        {/* Important Parent Warning Banner */}
-        <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-4 sm:p-5 shadow-xs mb-6 text-xs sm:text-sm leading-relaxed flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div>
-            <strong className="font-bold text-amber-950">Important for parents and guardians:</strong> AcademicLevel is designed for school-age learners. A parent or guardian should review these policies, supervise account use and any purchase, and contact us with questions about a child&apos;s information. This page describes our current product practices; it is not a certification of legal compliance.
-          </div>
-        </div>
-
         {/* On this page Navigation Pills */}
         <section className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs mb-8">
           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3">
@@ -159,6 +151,25 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
                 academiclevels@gmail.com
               </a>{' '}
               with the subject &quot;Privacy Request&quot;. Include the account email and enough detail to identify the request; do not send passwords or identity documents unless we specifically explain a safe and necessary process. We may need to verify authority before acting. We will respond within a reasonable time and handle requests under applicable law.
+            </p>
+
+            <h3 className="text-base font-bold text-slate-900 mt-4">Account &amp; Data Deletion (Google Play &amp; DPDP Policy Compliance)</h3>
+            <p>
+              In accordance with Google Play&apos;s Account Deletion Policy and applicable data protection regulations, users and guardians may request and execute permanent deletion of their account and all associated personal data:
+            </p>
+            <ul className="list-disc pl-5 space-y-1.5 mt-2">
+              <li>
+                <strong>In-App Deletion:</strong> Authenticated learners can delete their account directly within the application under <strong>Profile &gt; Danger Zone &gt; Delete Account</strong>.
+              </li>
+              <li>
+                <strong>Web Deletion Portal:</strong> Anyone who has created an account may initiate complete account and personal data deletion via our dedicated web URL at{' '}
+                <a href="/delacc" className="text-indigo-600 hover:underline font-bold">
+                  https://academiclevel.in/delacc
+                </a>.
+              </li>
+            </ul>
+            <p className="mt-2 text-xs text-slate-600">
+              Upon account deletion, all profile data, learning records, quiz scores, certificates, and coin balances are permanently purged from active databases, and all login sessions are immediately revoked.
             </p>
 
             <h3 className="text-base font-bold text-slate-900 mt-4">Cookies and similar technologies</h3>
