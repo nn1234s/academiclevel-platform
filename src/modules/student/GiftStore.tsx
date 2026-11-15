@@ -60,9 +60,9 @@ export interface GiftCardLevel {
 export const GIFT_CARD_LEVELS: GiftCardLevel[] = [
   {
     level: 1,
-    rsAmount: 20,
-    coinsCost: 1200,
-    coinsCostFormatted: '1,200 Coins',
+    rsAmount: 10,
+    coinsCost: 2500,
+    coinsCostFormatted: '2,500 Coins',
     badge: 'Starter Milestone (Lite Plan Eligible)',
     gradient: 'from-amber-500 to-orange-500',
     popular: true,
@@ -70,55 +70,65 @@ export const GIFT_CARD_LEVELS: GiftCardLevel[] = [
   },
   {
     level: 2,
-    rsAmount: 30,
-    coinsCost: 2000,
-    coinsCostFormatted: '2,000 Coins',
-    badge: 'Bronze Scholar (Plus Plan)',
+    rsAmount: 20,
+    coinsCost: 5000,
+    coinsCostFormatted: '5,000 Coins',
+    badge: 'Bronze Milestone (Lite Plan Eligible)',
     gradient: 'from-orange-500 to-rose-500',
-    requiredPlan: 'PLUS'
+    popular: true,
+    requiredPlan: 'LITE'
   },
   {
     level: 3,
-    rsAmount: 50,
-    coinsCost: 3500,
-    coinsCostFormatted: '3,500 Coins',
+    rsAmount: 30,
+    coinsCost: 7500,
+    coinsCostFormatted: '7,500 Coins',
     badge: 'Silver Scholar (Plus Plan)',
     gradient: 'from-rose-500 to-pink-500',
-    popular: true,
     requiredPlan: 'PLUS'
   },
   {
     level: 4,
-    rsAmount: 100,
-    coinsCost: 7000,
-    coinsCostFormatted: '7,000 Coins',
+    rsAmount: 50,
+    coinsCost: 12500,
+    coinsCostFormatted: '12,500 Coins',
     badge: 'Gold Scholar (Plus Plan)',
-    gradient: 'from-indigo-600 to-violet-600',
+    gradient: 'from-pink-500 to-purple-600',
+    popular: true,
     requiredPlan: 'PLUS'
   },
   {
     level: 5,
-    rsAmount: 150,
-    coinsCost: 10000,
-    coinsCostFormatted: '10,000 Coins',
+    rsAmount: 100,
+    coinsCost: 25000,
+    coinsCostFormatted: '25,000 Coins',
     badge: 'Platinum Scholar (Plus Plan)',
-    gradient: 'from-violet-600 to-purple-600',
+    gradient: 'from-indigo-600 to-violet-600',
     requiredPlan: 'PLUS'
   },
   {
     level: 6,
-    rsAmount: 250,
-    coinsCost: 16000,
-    coinsCostFormatted: '16,000 Coins',
+    rsAmount: 150,
+    coinsCost: 37500,
+    coinsCostFormatted: '37,500 Coins',
     badge: 'Diamond Scholar (Plus Plan)',
-    gradient: 'from-cyan-500 to-blue-600',
+    gradient: 'from-violet-600 to-purple-600',
     requiredPlan: 'PLUS'
   },
   {
     level: 7,
+    rsAmount: 250,
+    coinsCost: 60000,
+    coinsCostFormatted: '60,000 Coins',
+    badge: 'Master Scholar (Plus Plan)',
+    gradient: 'from-cyan-500 to-blue-600',
+    requiredPlan: 'PLUS'
+  },
+  {
+    level: 8,
     rsAmount: 500,
-    coinsCost: 30000,
-    coinsCostFormatted: '30,000 Coins',
+    coinsCost: 120000,
+    coinsCostFormatted: '120,000 Coins',
     badge: 'Olympiad Champion (Plus Plan)',
     gradient: 'from-amber-400 via-yellow-500 to-amber-600',
     requiredPlan: 'PLUS'
@@ -267,10 +277,10 @@ export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner,
     const nonRejectedClaims = existingRequests.filter(r => r.status !== 'REJECTED');
 
     // 2. Strict Plan Tier Access (Lite cannot redeem Plus rewards)
-    if (activePlan === 'LITE' && selectedLevel.level > 1 && !isSuperAdmin) {
+    if (activePlan === 'LITE' && selectedLevel.requiredPlan === 'PLUS' && !isSuperAdmin) {
       setMessage({
         type: 'error',
-        text: '🔒 Plan Tier Limit: The Lite Plan (₹49) is eligible for Level 1 (₹20 Gift Cards). To claim ₹30, ₹50, ₹100, or higher gift cards, please upgrade to the Plus Plan (₹129)!'
+        text: '🔒 Plan Tier Limit: The Lite Plan (₹49) is eligible for Level 1 & 2 (₹10 & ₹20 Gift Cards). To claim ₹30, ₹50, ₹100, or higher gift cards, please upgrade to the Plus Plan (₹129)!'
       });
       return;
     }
@@ -432,7 +442,7 @@ ${learner.fullName}`;
             <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
               Convert your academic consistency into real-world rewards!
               <br />
-              <strong className="text-amber-400">Level 1 starts at 500 Coins (₹20 Gift Card)</strong>, scaling up across 9 milestones to <strong className="text-amber-400">15,000 Coins (₹500 Gift Card)</strong>!
+              <strong className="text-amber-400">Level 1 starts at 2,500 Coins (₹10 Gift Card)</strong>, scaling up across 8 milestones to <strong className="text-amber-400">120,000 Coins (₹500 Gift Card)</strong>!
             </p>
           </div>
 
@@ -533,13 +543,13 @@ ${learner.fullName}`;
         </div>
       )}
 
-      {/* Gift Card Grid (9 Levels) */}
+      {/* Gift Card Grid (8 Levels) */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-white flex items-center space-x-2">
               <Gift className="w-5 h-5 text-indigo-400" />
-              <span>Available Gift Card Tiers (Levels 1 to 9)</span>
+              <span>Available Gift Card Tiers (Levels 1 to 8)</span>
             </h2>
             <p className="text-xs text-slate-400">
               Redeemable for Amazon Pay, Google Play, Flipkart, Swiggy, or Direct UPI.
@@ -555,7 +565,7 @@ ${learner.fullName}`;
             const isLite = activePlan === 'LITE' && !isSuperAdmin;
             const existingClaims = existingRequests.filter(r => r.status !== 'REJECTED');
             const hasUsedLiteLimit = isLite && existingClaims.length >= 1;
-            const isTierLockedForLite = isLite && tier.level > 1;
+            const isTierLockedForLite = isLite && tier.requiredPlan === 'PLUS';
 
             let buttonDisabled = !canAfford || !isEnrolledScholar;
             let buttonLabel = canAfford

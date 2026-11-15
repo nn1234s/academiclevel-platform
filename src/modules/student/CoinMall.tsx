@@ -105,13 +105,13 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-400 bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">
                 Real Cash & Voucher Rewards
               </span>
-              <span className="text-[10px] font-bold text-rose-300">Level 1 to 9</span>
+              <span className="text-[10px] font-bold text-rose-300">Level 1 to 8</span>
             </div>
             <h3 className="text-xl font-black text-white mt-1">
-              ₹20 to ₹500 Real Gift Cards & UPI Cash
+              ₹10 to ₹500 Real Gift Cards & UPI Cash
             </h3>
             <p className="text-xs text-slate-300 mt-1 max-w-lg">
-              Unlock Amazon Pay, Google Play, Flipkart, Swiggy, or Direct UPI Cash. Starting at <strong className="text-amber-400">500 Coins (₹20 GC)</strong>, scaling up across 9 milestones to <strong className="text-amber-400">15,000 Coins (₹500 GC)</strong>!
+              Unlock Amazon Pay, Google Play, Flipkart, Swiggy, or Direct UPI Cash. Starting at <strong className="text-amber-400">2,500 Coins (₹10 GC)</strong>, scaling up across milestones to <strong className="text-amber-400">120,000 Coins (₹500 GC)</strong>!
             </p>
           </div>
         </div>
