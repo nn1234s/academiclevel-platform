@@ -5,11 +5,14 @@ export interface PricingConfig {
   liteDurationDays: number;
   plusPriceInr: number;
   plusDurationDays: number;
+  goldPriceInr: number;
+  goldDurationDays: number;
   upiVpa: string;
   merchantName: string;
   discountBadge: string;
   liteFeatures: string[];
   plusFeatures: string[];
+  goldFeatures: string[];
   updatedAt?: string;
 }
 
@@ -79,6 +82,18 @@ const DEFAULT_CONFIG: SiteConfig = {
       'Offline Question Bank Full Synchronization',
       'Bonus 40-Coin Referral Jackpot eligibility',
       'Max 1 Class Change during active cycle'
+    ],
+    goldPriceInr: 205,
+    goldDurationDays: 365,
+    goldFeatures: [
+      'Full 365-Day Academic Year Unrestricted Syllabus Coverage',
+      'Both Terms, Midterms, Pre-Boards & Board Final Exams Covered',
+      'VIP Priority Physical Store Rewards Eligibility (Pokémon Sets, Milton & Mystery Box)',
+      'Exclusive Gold Scholar Profile Badge & Frame',
+      'Olympiad, NTSE & National Foundation Track',
+      'Annual Master Certificate of Academic Excellence',
+      '24/7 Nova AI Socratic Tutor with Priority Pool',
+      'Max 2 Class Changes during active cycle'
     ]
   },
   home: {

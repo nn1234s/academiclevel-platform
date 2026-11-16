@@ -13,7 +13,7 @@ export interface QuotaStatus {
   levelsCompleted: number;
   maxLevels: number;
   hasActiveSubscription: boolean;
-  activePlan?: 'LITE' | 'PLUS' | 'TRIAL';
+  activePlan?: 'LITE' | 'PLUS' | 'GOLD' | 'TRIAL';
   expiresAt?: string;
   daysRemaining?: number;
 }

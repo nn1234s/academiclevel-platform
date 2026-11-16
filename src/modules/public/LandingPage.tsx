@@ -52,7 +52,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [pricingConfig, setPricingConfig] = useState(() => SiteConfigService.getPricing());
 
   // Direct UPI PG & Instant Pass Activation State
-  const [activatePlanTier, setActivatePlanTier] = useState<'LITE' | 'PLUS' | null>(null);
+  const [activatePlanTier, setActivatePlanTier] = useState<'LITE' | 'PLUS' | 'GOLD' | null>(null);
   const [studentFullName, setStudentFullName] = useState('');
   const [studentContact, setStudentContact] = useState('');
   const [studentPassword, setStudentPassword] = useState('');
@@ -64,7 +64,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [activateSuccess, setActivateSuccess] = useState(false);
   const [noticeLang, setNoticeLang] = useState<'EN' | 'HINGLISH'>('EN');
 
-  const handleBuyNow = (tier: 'LITE' | 'PLUS') => {
+  const handleBuyNow = (tier: 'LITE' | 'PLUS' | 'GOLD') => {
     const url = PaymentService.getGatewayUrl(tier);
     try {
       sessionStorage.setItem('al_landing_pending_tier', tier);
@@ -863,7 +863,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Lite Plan */}
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-xl">
             <div>
               <div className="flex justify-between items-center mb-2">
@@ -874,7 +875,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <div className="flex items-baseline space-x-1 mb-4">
                 <span className="text-4xl font-black text-white">₹{pricingConfig.litePriceInr || 49}</span>
-                <span className="text-xs text-slate-400">/ {pricingConfig.liteDurationDays || 60} days</span>
+                <span className="text-xs text-slate-400">/ {pricingConfig.liteDurationDays || 60} days (~₹24.50/mo)</span>
               </div>
               <ul className="space-y-2 text-xs text-slate-300">
                 <li className="flex items-center space-x-2">
@@ -913,34 +914,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
           </div>
 
-          <div className="bg-gradient-to-b from-emerald-950/60 via-slate-900 to-slate-900 border-2 border-emerald-400 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative ring-4 ring-emerald-500/20">
-            <span className="absolute -top-3 right-6 px-3.5 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-red-600 via-orange-600 to-amber-500 text-white tracking-widest uppercase shadow-md animate-pulse">
-              🔥 3X DURATION • 6 MONTHS BEST VALUE
-            </span>
+          {/* Plus Plan (180 Days) */}
+          <div className="bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-xl">
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-black text-emerald-400">PLUS PLAN (180 DAYS)</span>
-                <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
-                  {pricingConfig.plusDurationDays || 180} Days (Half a Year)
+                <span className="text-xs font-bold text-emerald-400">PLUS PLAN (180 DAYS)</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
+                  {pricingConfig.plusDurationDays || 180} Days (Half Year)
                 </span>
               </div>
               <div className="flex items-baseline space-x-1.5 mb-2">
                 <span className="text-4xl font-black text-white">₹{pricingConfig.plusPriceInr || 129}</span>
                 <span className="text-xs text-slate-400">/ 180 days</span>
                 <span className="text-xs text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
-                  ~₹21.50/mo (Cheaper per day!)
+                  ~₹21.50/mo
                 </span>
               </div>
 
               {/* Value Comparison Pill */}
               <div className="mb-4 p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[11px] text-emerald-200">
-                ⭐ <strong>Pay just ₹80 more</strong> to get <strong>120 extra days (4 full months free!)</strong>. Covers your complete semester &amp; final exams!
+                ⭐ <strong>Pay just ₹80 more</strong> than Lite to get <strong>120 extra days (4 full months free!)</strong>.
               </div>
 
               <ul className="space-y-2 text-xs text-slate-200">
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span className="font-bold text-white">Full {pricingConfig.plusDurationDays || 180}-Day Unrestricted Syllabus Coverage</span>
+                  <span className="font-bold text-white">Full {pricingConfig.plusDurationDays || 180}-Day Syllabus Coverage</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
@@ -948,15 +947,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span>Olympiad &amp; National Competitive Foundation Track</span>
+                  <span>Olympiad &amp; National Foundation Track</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span>Priority Physical Rewards Eligibility (Pokémon Sets, Milton &amp; Mystery Box)</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span>Annual Master Certificate of Academic Excellence</span>
+                  <span>Physical Rewards Eligible (Pokémon &amp; Bottles)</span>
                 </li>
               </ul>
             </div>
@@ -964,15 +959,88 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="button"
                 onClick={() => handleBuyNow('PLUS')}
-                className="w-full py-3.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer transform hover:scale-[1.01]"
+                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
               >
                 <ExternalLink className="w-4 h-4" />
-                <span>BUY NOW (₹{pricingConfig.plusPriceInr || 129}) — 180-DAY BEST VALUE ↗</span>
+                <span>BUY NOW (₹{pricingConfig.plusPriceInr || 129}) — 180-DAY ↗</span>
               </button>
               <button
                 type="button"
                 onClick={() => {
                   setActivatePlanTier('PLUS');
+                  setActivateError('');
+                }}
+                className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-xs rounded-xl border border-slate-700 transition-all cursor-pointer"
+              >
+                Paid on UPI PG? Create Account &amp; Activate Pass
+              </button>
+            </div>
+          </div>
+
+          {/* Gold Plan (Crown Best Value - 365 Days) */}
+          <div className="bg-gradient-to-b from-amber-950/70 via-slate-900 to-slate-900 border-2 border-amber-400 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative ring-4 ring-amber-500/30">
+            <span className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 tracking-widest uppercase shadow-md animate-pulse">
+              👑 1-YEAR GOLD • UNBEATABLE BEST VALUE
+            </span>
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-black text-amber-400 flex items-center space-x-1">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span>GOLD PLAN (365 DAYS)</span>
+                </span>
+                <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300">
+                  {pricingConfig.goldDurationDays || 365} Days (1 Full Year)
+                </span>
+              </div>
+              <div className="flex items-baseline space-x-1.5 mb-2">
+                <span className="text-4xl font-black text-amber-300">₹{pricingConfig.goldPriceInr || 205}</span>
+                <span className="text-xs text-slate-400">/ 365 days</span>
+                <span className="text-xs text-amber-300 font-bold bg-amber-950 px-2 py-0.5 rounded border border-amber-800">
+                  ~₹17.08/mo (Only ~56 paise/day!)
+                </span>
+              </div>
+
+              {/* Value Comparison Pill */}
+              <div className="mb-4 p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-200">
+                ⭐ <strong>Pay just ₹76 more</strong> than 6-month plan to get <strong>185 EXTRA DAYS (Double your duration to 365 Days!)</strong>. Covers the entire school year!
+              </div>
+
+              <ul className="space-y-2 text-xs text-slate-200">
+                <li className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <span className="font-bold text-white">Full 365-Day Complete Academic Year Coverage</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <span>Both Terms, Midterms &amp; Board Final Exams Covered</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <span>VIP Priority Store Rewards (Pokémon, Milton &amp; Mystery Box)</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <span>Exclusive Gold Scholar Profile Badge &amp; Frame</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <span>Annual Master Certificate of Academic Excellence</span>
+                </li>
+              </ul>
+            </div>
+            <div className="mt-6 space-y-2">
+              <button
+                type="button"
+                onClick={() => handleBuyNow('GOLD')}
+                className="w-full py-3.5 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-amber-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer transform hover:scale-[1.01]"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>BUY NOW (₹{pricingConfig.goldPriceInr || 205}) — 365-DAY GOLD ↗</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActivatePlanTier('GOLD');
                   setActivateError('');
                 }}
                 className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-xs rounded-xl border border-slate-700 transition-all cursor-pointer"
@@ -1007,7 +1075,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <h3 className="text-xl font-black text-white">Membership Activated! 🎉</h3>
                 <p className="text-xs text-slate-300">
-                  Your <strong>{activatePlanTier === 'PLUS' ? 'Plus Plan (180 Days)' : 'Lite Plan (60 Days)'}</strong> has been activated automatically via UPI PG. Redirecting to your dashboard...
+                  Your <strong>{activatePlanTier === 'GOLD' ? 'Gold Pass (365 Days / 1 Year)' : (activatePlanTier === 'PLUS' ? 'Plus Plan (180 Days)' : 'Lite Plan (60 Days)')}</strong> has been activated automatically via UPI PG. Redirecting to your dashboard...
                 </p>
               </div>
             ) : (
@@ -1020,7 +1088,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     Payment OK. Make Student Account:-
                   </h3>
                   <p className="text-[11px] text-slate-400 mt-0.5">
-                    Paid via UPI PG ({activatePlanTier === 'PLUS' ? 'Plus Plan ₹129' : 'Lite Plan ₹49'})? Enter your details below to create your student account and get your subscription instantly.
+                    Paid via UPI PG ({activatePlanTier === 'GOLD' ? 'Gold Plan ₹205' : (activatePlanTier === 'PLUS' ? 'Plus Plan ₹129' : 'Lite Plan ₹49')})? Enter your details below to create your student account and get your subscription instantly.
                   </p>
                 </div>
 

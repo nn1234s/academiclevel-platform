@@ -160,6 +160,7 @@ const pricingManagerContent = fs.readFileSync(path.join(ROOT_DIR, 'src/admin-vau
 
 assert(paymentServiceContent.includes('https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true'), '49 Plan UPI PG URL must match');
 assert(paymentServiceContent.includes('https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true'), '129 Plan UPI PG URL must match');
+assert(paymentServiceContent.includes('https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true'), '205 Gold Plan UPI PG URL must match');
 assert(paymentServiceContent.includes('activateGatewayPayment'), 'paymentService must implement activateGatewayPayment');
 
 assert(checkoutContent.includes('upipg.cit.org.in/pay'), 'UPIQRCheckout must direct students to real upipg.cit.org.in gateway');
@@ -174,10 +175,11 @@ assert(!ad49Content.includes('Verified within 15–60 Mins'), 'Special49AdsLandi
 assert(pricingPageContent.includes('Official UPI PG Gateway'), 'PricingPage must highlight official UPI PG Gateway');
 assert(pricingManagerContent.includes('erNAH4FIOAgE4qMpUDmI'), 'PricingManager must display 49 PG endpoint');
 assert(pricingManagerContent.includes('floCfjhckOsPisvVeVE0'), 'PricingManager must display 129 PG endpoint');
+assert(pricingManagerContent.includes('YGTGmsXuO4SIz1onOC6o'), 'PricingManager must display 205 Gold PG endpoint');
 
 assert(adminShellContent.includes('Official Automated UPI Gateway Live'), 'AdminVaultShell must display automated UPI gateway banner');
 assert(adminShellContent.includes('Manual Payment Queue Retired'), 'AdminVaultShell must mark manual payment queue as retired');
-console.log('  ✓ Real UPI PG Gateway verified across all Ad pages, Checkout modals, Pricing page & Admin Vault: 49 (erNAH4FIOAgE4qMpUDmI) & 129 (floCfjhckOsPisvVeVE0), instant automated activation without admin audit');
+console.log('  ✓ Real UPI PG Gateway verified across all Ad pages, Checkout modals, Pricing page & Admin Vault: 49 (erNAH4FIOAgE4qMpUDmI), 129 (floCfjhckOsPisvVeVE0) & 205 (YGTGmsXuO4SIz1onOC6o), instant automated activation without admin audit');
 
 // 8. Verify Removal of PVT LTD, UDYAM Reg Branding & Main Site No Coaching Fees UPI PG Integration
 console.log('\nTest 8: Verifying Removal of PVT LTD, Official UDYAM Registration & Main Site Coaching Fees UPI PG...');
@@ -245,31 +247,33 @@ assert(authContextContent.includes("(newLearner as any).hasActiveSubscription = 
 console.log('  ✓ Pre-Payment Return Notice (English & Hinglish) present across all UPI PG entry points');
 console.log('  ✓ Site opening issue resolved: Zero payment done popups on load; only activates when pay button is tapped and payment completed');
 
-// 10. Verify ₹129 Plan Promotion & 3X More Value Across Platform...
-console.log('\nTest 10: Verifying ₹129 Plan Promotion & 3X More Value Across Platform...');
+// 10. Verify 1-Year Gold Plan (₹205 / 365 Days) Promotion & Maximum Value Screaming Strategy
+console.log('\nTest 10: Verifying 1-Year Gold Plan (₹205 / 365 Days) Promotion & Screaming Value Strategy...');
 const freshPricingContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/public/PricingPage.tsx'), 'utf-8');
 const freshAd49Content = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/public/Special49AdsLandingPage.tsx'), 'utf-8');
 const freshLandingContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/public/LandingPage.tsx'), 'utf-8');
 const freshCheckoutContent = fs.readFileSync(path.join(ROOT_DIR, 'src/modules/student/UPIQRCheckout.tsx'), 'utf-8');
 
-// Special49AdsLandingPage: 129 pre-selected and screaming value
-assert(freshAd49Content.includes("useState<'LITE' | 'PLUS'>('PLUS')"), 'Special49AdsLandingPage must preselect PLUS (₹129) by default');
-assert(freshAd49Content.includes('₹129 IS 3X MORE VALUE') || freshAd49Content.includes('3X DURATION (180 DAYS) FOR JUST ₹80 EXTRA!'), 'Hero must scream 129 is 3x more value');
-assert(freshAd49Content.includes('Why buy 60 Days for ₹49 when ₹129 gives 180 Days (Half a Year)?'), 'Section 2.25 must feature direct comparison callout screaming 129 value');
-assert(freshAd49Content.includes('180D • 3X Value 🔥'), 'Sticky bottom bar must highlight 129 with 3X Value callout');
-assert(freshAd49Content.includes('Only ~₹21.50/mo'), 'Must feature per-month breakdown highlighting that 129 is cheaper per day than 49');
+// Special49AdsLandingPage: Gold (₹205) pre-selected and screaming maximum 1-year value
+assert(freshAd49Content.includes("useState<'LITE' | 'PLUS' | 'GOLD'>('GOLD')"), 'Special49AdsLandingPage must preselect GOLD (₹205) by default');
+assert(freshAd49Content.includes('👑 ₹205 IS 1-YEAR BEST VALUE') || freshAd49Content.includes('WHY 89% OF TOPPERS PICK THE ₹205 GOLD PLAN'), 'Hero must scream Gold is 1-year best value');
+assert(freshAd49Content.includes('Why buy 60 Days for ₹49 or 180 Days for ₹129 when ₹205 gives 365 Full Days'), 'Section 2.25 must feature direct comparison callout screaming Gold value');
+assert(freshAd49Content.includes('👑 ₹205 (365D Gold 🔥)'), 'Sticky bottom bar must highlight Gold with 365D Gold callout');
+assert(freshAd49Content.includes('56 paise') || freshAd49Content.includes('56p/day') || freshAd49Content.includes('~₹17.08/mo'), 'Must feature per-day/per-month breakdown highlighting that Gold is only ~56 paise/day');
 
-// LandingPage: 129 Plus Plan highlighted as 3X duration & 6 months best value
-assert(freshLandingContent.includes('3X DURATION • 6 MONTHS BEST VALUE'), 'LandingPage Plus Plan must scream 3x duration and 6 months best value');
-assert(freshLandingContent.includes('Pay just ₹80 more') && freshLandingContent.includes('120 extra days'), 'LandingPage must feature ₹80 for 120 extra days comparison');
+// LandingPage: Gold Plan highlighted as 1-Year Unbeatable Best Value
+assert(freshLandingContent.includes('👑 1-YEAR GOLD • UNBEATABLE BEST VALUE'), 'LandingPage Gold Plan must scream 1-Year Gold unbeatable best value');
+assert(freshLandingContent.includes('Pay just ₹76 more') && freshLandingContent.includes('185 EXTRA DAYS'), 'LandingPage must feature ₹76 for 185 extra days comparison');
 
-// PricingPage: 129 Plus Plan highlighted as 3x duration best academic value
-assert(freshPricingContent.includes('3X DURATION • 6 MONTHS BEST VALUE'), 'PricingPage must scream 3x duration best value for Plus Plan');
+// PricingPage: Gold Plan highlighted as 1-Year Best Value
+assert(freshPricingContent.includes('👑 1-YEAR GOLD • BEST VALUE'), 'PricingPage must scream 1-Year Gold best value');
+assert(freshPricingContent.includes('Claim 365-Day Gold Pass (₹205)'), 'PricingPage must have Claim 365-Day Gold Pass CTA');
 
-// UPIQRCheckout: Upgrade to 129 banner present when Lite is selected
-assert(freshCheckoutContent.includes('3X Duration Deal Available: ₹129 (180 Days)'), 'UPIQRCheckout must offer 1-click upgrade to 129 for Lite users');
+// UPIQRCheckout: Upgrade to Gold banners present for Lite and Plus users
+assert(freshCheckoutContent.includes('👑 1-Year Gold Deal Available: ₹205 (365 Days)'), 'UPIQRCheckout must offer 1-click upgrade to Gold for Lite users');
+assert(freshCheckoutContent.includes('👑 Upgrade to 1-Year Gold Pass: ₹205 (365 Days)'), 'UPIQRCheckout must offer 1-click upgrade to Gold for Plus users');
 
-console.log('  ✓ ₹129 Plus Plan promoted with high-visibility 3X Duration & ~₹21.50/mo value screaming callouts');
-console.log('  ✓ Both ₹49 and ₹129 plans available with ₹129 preselected as the recommended smart choice');
+console.log('  ✓ 1-Year Gold Plan (₹205 / 365 Days) promoted as primary hero with ~56 paise/day value screaming callouts');
+console.log('  ✓ All 3 plans (₹49, ₹129, ₹205) active with Gold (₹205) preselected as the irresistible high-value trap');
 
 console.log('\n=== ALL TESTS PASSED WITH 100% SUCCESS! ===');

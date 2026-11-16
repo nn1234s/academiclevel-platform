@@ -27,7 +27,7 @@ export const PremiumCenter: React.FC<PremiumCenterProps> = ({
   onRefreshLearner,
   onOpenACodeModal,
 }) => {
-  const [selectedTier, setSelectedTier] = useState<'LITE' | 'PLUS' | null>(null);
+  const [selectedTier, setSelectedTier] = useState<'LITE' | 'PLUS' | 'GOLD' | null>(null);
   const [submissionSuccessUtr, setSubmissionSuccessUtr] = useState<string | null>(null);
 
   useEffect(() => {
@@ -161,7 +161,7 @@ export const PremiumCenter: React.FC<PremiumCenterProps> = ({
       )}
 
       {/* Pricing Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Lite Plan */}
         <div className="bg-slate-900 border border-slate-800 hover:border-indigo-500/50 rounded-3xl p-6 flex flex-col justify-between shadow-xl transition-all">
           <div>
@@ -173,7 +173,7 @@ export const PremiumCenter: React.FC<PremiumCenterProps> = ({
             </div>
             <div className="flex items-baseline space-x-1 mb-4">
               <span className="text-4xl font-black text-white">₹49</span>
-              <span className="text-xs text-slate-400">/ 60 days</span>
+              <span className="text-xs text-slate-400">/ 60 days (~₹24.50/mo)</span>
             </div>
             <p className="text-xs text-slate-400 mb-6 leading-relaxed">
               Complete full syllabus coverage for an entire academic term across your chosen class.
@@ -190,7 +190,7 @@ export const PremiumCenter: React.FC<PremiumCenterProps> = ({
 
           <button
             onClick={() => setSelectedTier('LITE')}
-            className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-2"
+            className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-2 cursor-pointer"
           >
             <span>Choose Lite Plan (₹49)</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -198,14 +198,10 @@ export const PremiumCenter: React.FC<PremiumCenterProps> = ({
         </div>
 
         {/* Plus Plan */}
-        <div className="bg-gradient-to-b from-indigo-950/40 via-slate-900 to-slate-900 border-2 border-indigo-500 rounded-3xl p-6 flex flex-col justify-between shadow-2xl relative">
-          <span className="absolute -top-3.5 right-6 px-3 py-1 rounded-full text-[10px] font-black bg-indigo-500 text-white tracking-widest uppercase shadow-md">
-            Most Popular Choice
-          </span>
+        <div className="bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-3xl p-6 flex flex-col justify-between shadow-xl transition-all">
           <div>
             <div className="flex justify-between items-center mb-3">
               <span className="text-xs font-bold text-indigo-300 flex items-center space-x-1">
-                <Sparkles className="w-3.5 h-3.5" />
                 <span>PLUS PLAN</span>
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
@@ -214,12 +210,12 @@ export const PremiumCenter: React.FC<PremiumCenterProps> = ({
             </div>
             <div className="flex items-baseline space-x-1 mb-4">
               <span className="text-4xl font-black text-white">₹129</span>
-              <span className="text-xs text-slate-400">/ 180 days (~₹21/mo)</span>
+              <span className="text-xs text-slate-400">/ 180 days (~₹21.50/mo)</span>
             </div>
             <p className="text-xs text-slate-400 mb-6 leading-relaxed">
               6 full months of advanced training, Olympiad reasoning, and Annual Master Certificate eligibility.
             </p>
-            <ul className="space-y-2.5 text-xs text-slate-200 mb-6">
+            <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
               {PLAN_PRICING.PLUS.features.map((f, i) => (
                 <li key={i} className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
@@ -231,10 +227,54 @@ export const PremiumCenter: React.FC<PremiumCenterProps> = ({
 
           <button
             onClick={() => setSelectedTier('PLUS')}
-            className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-2"
+            className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer"
           >
             <span>Choose Plus Plan (₹129)</span>
             <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Gold Plan (Crown Best Value) */}
+        <div className="bg-gradient-to-b from-amber-950/60 via-slate-900 to-slate-900 border-2 border-amber-400 rounded-3xl p-6 flex flex-col justify-between shadow-2xl relative ring-4 ring-amber-500/20">
+          <span className="absolute -top-3.5 right-6 px-3 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 tracking-widest uppercase shadow-md animate-pulse">
+            👑 1-YEAR BEST VALUE
+          </span>
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-xs font-black text-amber-400 flex items-center space-x-1">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>GOLD PLAN</span>
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300">
+                365 Days (1 Year)
+              </span>
+            </div>
+            <div className="flex items-baseline space-x-1 mb-2">
+              <span className="text-4xl font-black text-amber-300">₹205</span>
+              <span className="text-xs text-slate-400">/ 365 days</span>
+            </div>
+            <div className="text-[11px] font-bold text-amber-200 bg-amber-950/80 px-2.5 py-1 rounded-lg border border-amber-800/80 mb-4">
+              ~₹17.08/mo (Only ~56 paise/day!) • Complete School Year
+            </div>
+            <p className="text-xs text-slate-300 mb-6 leading-relaxed">
+              Full 365-day master access, covering both terms, pre-boards, board exams, and VIP store rewards.
+            </p>
+            <ul className="space-y-2.5 text-xs text-slate-200 mb-6">
+              {PLAN_PRICING.GOLD.features.map((f, i) => (
+                <li key={i} className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <button
+            onClick={() => setSelectedTier('GOLD')}
+            className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-950 transition-all flex items-center justify-center space-x-2 cursor-pointer transform hover:scale-[1.02]"
+          >
+            <span>Choose Gold Plan (₹205) — 1 Year ↗</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>

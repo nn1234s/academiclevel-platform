@@ -59,6 +59,18 @@ export const PricingManager: React.FC = () => {
         'Offline Question Bank Full Synchronization',
         'Bonus 40-Coin Referral Jackpot eligibility',
         'Max 1 Class Change during active cycle'
+      ],
+      goldPriceInr: 205,
+      goldDurationDays: 365,
+      goldFeatures: [
+        'Full 365-Day Academic Year Unrestricted Syllabus Coverage',
+        'Both Terms, Midterms, Pre-Boards & Board Final Exams Covered',
+        'VIP Priority Physical Store Rewards Eligibility',
+        'Exclusive Gold Scholar Profile Badge & Frame',
+        'Olympiad, NTSE & National Foundation Track',
+        'Annual Master Certificate of Academic Excellence',
+        '24/7 Nova AI Socratic Tutor with Priority Pool',
+        'Max 2 Class Changes during active cycle'
       ]
     };
     setConfig(defaults);
@@ -116,7 +128,7 @@ export const PricingManager: React.FC = () => {
 
       {/* Pricing Form */}
       <form onSubmit={handleSave} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* LITE PLAN CARD */}
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col justify-between">
             <div className="space-y-4">
@@ -248,6 +260,72 @@ export const PricingManager: React.FC = () => {
               <span className="font-mono text-white font-bold">₹{(config.plusPriceInr / (config.plusDurationDays || 1)).toFixed(2)} / day</span>
             </div>
           </div>
+
+          {/* GOLD PLAN CARD */}
+          <div className="bg-slate-900 border-2 border-amber-500/60 rounded-3xl p-6 shadow-xl flex flex-col justify-between relative ring-2 ring-amber-500/20">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
+                    👑 1-Year Master Pass
+                  </span>
+                  <h3 className="text-lg font-black text-white">AcademicLevel Gold</h3>
+                </div>
+                <span className="text-2xl font-black text-amber-400">₹{config.goldPriceInr || 205}</span>
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1">
+                    Gold Plan Price (INR ₹)
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={30000}
+                    value={config.goldPriceInr || 205}
+                    onChange={e => setConfig({ ...config, goldPriceInr: Number(e.target.value) })}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-mono font-bold focus:outline-none focus:border-amber-500"
+                    required
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">Default: ₹205. Complete 365-day annual pass (~56 paise/day).</p>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1">
+                    Validity Duration (Days)
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={1000}
+                    value={config.goldDurationDays || 365}
+                    onChange={e => setConfig({ ...config, goldDurationDays: Number(e.target.value) })}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500"
+                    required
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">Default: 365 days (1 full year access).</p>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1">
+                    Features Included (1 per line)
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={(config.goldFeatures || []).join('\n')}
+                    onChange={e => setConfig({ ...config, goldFeatures: e.target.value.split('\n').filter(s => s.trim()) })}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-sans"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Student Rate:</span>
+              <span className="font-mono text-amber-300 font-bold">₹{((config.goldPriceInr || 205) / (config.goldDurationDays || 365)).toFixed(2)} / day</span>
+            </div>
+          </div>
         </div>
 
         {/* UPI GATEWAY & MERCHANT SETTINGS */}
@@ -311,7 +389,7 @@ export const PricingManager: React.FC = () => {
               <Sparkles className="w-4 h-4 text-emerald-400" />
               <span>Official Automated UPI PG Gateway Endpoints</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="p-3 bg-slate-950/80 rounded-xl border border-emerald-500/20">
                 <span className="text-[10px] font-mono text-emerald-400 font-bold block mb-1">Lite Plan (₹49 - 60 Days):</span>
                 <a
@@ -332,6 +410,17 @@ export const PricingManager: React.FC = () => {
                   className="font-mono text-[11px] text-indigo-300 hover:underline break-all"
                 >
                   https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true ↗
+                </a>
+              </div>
+              <div className="p-3 bg-slate-950/80 rounded-xl border border-amber-500/30">
+                <span className="text-[10px] font-mono text-amber-400 font-bold block mb-1">👑 Gold Plan (₹205 - 365 Days):</span>
+                <a
+                  href="https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono text-[11px] text-amber-300 hover:underline break-all"
+                >
+                  https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true ↗
                 </a>
               </div>
             </div>

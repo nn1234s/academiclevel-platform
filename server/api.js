@@ -1186,8 +1186,8 @@ apiRouter.post('/payments/submit', paymentLimiter, (req, res) => {
       finalUtr = `UPI-REF-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
     }
 
-    const price = tier === 'PLUS' ? 129 : 49;
-    const durationDays = tier === 'PLUS' ? 180 : 60;
+    const price = tier === 'GOLD' ? 205 : (tier === 'PLUS' ? 129 : 49);
+    const durationDays = tier === 'GOLD' ? 365 : (tier === 'PLUS' ? 180 : 60);
 
     // Check if there is already a pending subscription for this student
     const existingPending = db.prepare(`

@@ -251,7 +251,7 @@ export class ApiClient {
   // ==========================================
   public static async submitPayment(
     learnerId: string,
-    tier: 'LITE' | 'PLUS',
+    tier: 'LITE' | 'PLUS' | 'GOLD',
     payerUpiId: string,
     utrReference?: string
   ): Promise<{ success: boolean; message: string; subscription: Subscription }> {
@@ -370,7 +370,7 @@ export class ApiClient {
   public static async adminGrantPremium(
     adminEmail: string,
     learnerId: string,
-    tier: 'LITE' | 'PLUS',
+    tier: 'LITE' | 'PLUS' | 'GOLD',
     durationDays: number,
     note?: string
   ): Promise<{ success: boolean; message: string }> {
@@ -642,7 +642,7 @@ export class ApiClient {
 
   public static async generateLearnerACode(
     learnerId: string,
-    planTier: 'LITE' | 'PLUS' = 'LITE',
+    planTier: 'LITE' | 'PLUS' | 'GOLD' = 'LITE',
     durationDays: number = 7
   ): Promise<{ success: boolean; message: string; acode: any }> {
     return this.request(`/learners/${learnerId}/acodes/generate`, {

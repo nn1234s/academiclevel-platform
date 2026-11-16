@@ -6,7 +6,7 @@ import { SiteConfigService } from './siteConfigService';
 import QRCode from 'qrcode';
 
 export interface PlanPricing {
-  tier: 'LITE' | 'PLUS';
+  tier: 'LITE' | 'PLUS' | 'GOLD';
   name: string;
   priceInr: number;
   durationDays: number;
@@ -14,7 +14,7 @@ export interface PlanPricing {
   features: string[];
 }
 
-export const PLAN_PRICING: Record<'LITE' | 'PLUS', PlanPricing> = {
+export const PLAN_PRICING: Record<'LITE' | 'PLUS' | 'GOLD', PlanPricing> = {
   LITE: {
     tier: 'LITE',
     name: 'AcademicLevel Lite',
@@ -43,10 +43,27 @@ export const PLAN_PRICING: Record<'LITE' | 'PLUS', PlanPricing> = {
       'Bonus 40-Coin Referral Jackpot eligibility',
       'Max 1 Class Change during active cycle'
     ]
+  },
+  GOLD: {
+    tier: 'GOLD',
+    name: 'AcademicLevel Gold Pass',
+    priceInr: 205,
+    durationDays: 365,
+    description: '365 days (1 Full Year) complete mastery, VIP Rewards eligibility & all-access pass.',
+    features: [
+      'Full 365-Day Complete Academic Year Coverage',
+      'Both Terms, Midterms & Final Board Exams Covered',
+      'VIP Priority Physical Store Rewards Eligibility',
+      'Exclusive Gold Scholar Profile Badge & Frame',
+      'Olympiad, NTSE & National Foundation Track',
+      'Annual Master Certificate of Academic Excellence',
+      '24/7 Nova AI Socratic Tutor with Priority Pool',
+      'Max 2 Class Changes during active cycle'
+    ]
   }
 };
 
-export function getDynamicPlanPricing(tier: 'LITE' | 'PLUS'): PlanPricing {
+export function getDynamicPlanPricing(tier: 'LITE' | 'PLUS' | 'GOLD'): PlanPricing {
   try {
     const cfg = SiteConfigService.getPricing();
     if (tier === 'LITE') {
@@ -58,7 +75,7 @@ export function getDynamicPlanPricing(tier: 'LITE' | 'PLUS'): PlanPricing {
         description: `${cfg.liteDurationDays || 60} days of unlimited access across your chosen Board and Class.`,
         features: cfg.liteFeatures && cfg.liteFeatures.length > 0 ? cfg.liteFeatures : PLAN_PRICING.LITE.features
       };
-    } else {
+    } else if (tier === 'PLUS') {
       return {
         tier: 'PLUS',
         name: 'AcademicLevel Plus',
@@ -67,15 +84,25 @@ export function getDynamicPlanPricing(tier: 'LITE' | 'PLUS'): PlanPricing {
         description: `${cfg.plusDurationDays || 180} days complete mastery with Olympiad prep & priority support.`,
         features: cfg.plusFeatures && cfg.plusFeatures.length > 0 ? cfg.plusFeatures : PLAN_PRICING.PLUS.features
       };
+    } else {
+      return {
+        tier: 'GOLD',
+        name: 'AcademicLevel Gold Pass',
+        priceInr: cfg.goldPriceInr || 205,
+        durationDays: cfg.goldDurationDays || 365,
+        description: `${cfg.goldDurationDays || 365} days (1 Full Year) complete mastery, VIP rewards & all-access pass.`,
+        features: cfg.goldFeatures && cfg.goldFeatures.length > 0 ? cfg.goldFeatures : PLAN_PRICING.GOLD.features
+      };
     }
   } catch {
     return PLAN_PRICING[tier];
   }
 }
 
-export const UPI_GATEWAY_URLS: Record<'LITE' | 'PLUS', string> = {
+export const UPI_GATEWAY_URLS: Record<'LITE' | 'PLUS' | 'GOLD', string> = {
   LITE: 'https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true',
-  PLUS: 'https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true'
+  PLUS: 'https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true',
+  GOLD: 'https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true'
 };
 
 export class PaymentService {
@@ -86,16 +113,17 @@ export class PaymentService {
    * Retrieves official real UPI PG payment gateway URL.
    * ₹49 (Lite) = https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true
    * ₹129 (Plus) = https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true
+   * ₹205 (Gold) = https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true
    */
-  public static getGatewayUrl(tier: 'LITE' | 'PLUS'): string {
+  public static getGatewayUrl(tier: 'LITE' | 'PLUS' | 'GOLD'): string {
     return UPI_GATEWAY_URLS[tier];
   }
 
   /**
    * Retrieves official merchant QR code image path.
    */
-  public static getOfficialQrImageUrl(tier: 'LITE' | 'PLUS'): string {
-    return tier === 'LITE' ? '/qr-lite-49.jpg' : '/qr-plus-129.jpg';
+  public static getOfficialQrImageUrl(tier: 'LITE' | 'PLUS' | 'GOLD'): string {
+    return tier === 'GOLD' ? '/qr-gold-205.jpg' : (tier === 'LITE' ? '/qr-lite-49.jpg' : '/qr-plus-129.jpg');
   }
 
   /**
@@ -120,7 +148,7 @@ export class PaymentService {
   /**
    * Generates a standard NPCI UPI URI string for a plan tier or learner.
    */
-  public static generateUpiPaymentString(tier: 'LITE' | 'PLUS', learnerId?: string): string {
+  public static generateUpiPaymentString(tier: 'LITE' | 'PLUS' | 'GOLD', learnerId?: string): string {
     const plan = getDynamicPlanPricing(tier);
     const cleanId = (learnerId || '49').replace(/[^a-zA-Z0-9]/g, '').slice(0, 8);
     return this.buildStandardUpiUri({
@@ -133,14 +161,14 @@ export class PaymentService {
    * Generates a data URL for dynamic QR code rendering pointing directly to the official UPI PG gateway.
    */
   public static async generateQrDataUrl(
-    tierOrAmount: 'LITE' | 'PLUS' | number,
+    tierOrAmount: 'LITE' | 'PLUS' | 'GOLD' | number,
     learnerIdOrNote?: string
   ): Promise<string> {
     let targetUri: string;
-    if (tierOrAmount === 'LITE' || tierOrAmount === 'PLUS') {
+    if (tierOrAmount === 'LITE' || tierOrAmount === 'PLUS' || tierOrAmount === 'GOLD') {
       targetUri = UPI_GATEWAY_URLS[tierOrAmount];
     } else if (typeof tierOrAmount === 'number') {
-      targetUri = tierOrAmount > 50 ? UPI_GATEWAY_URLS.PLUS : UPI_GATEWAY_URLS.LITE;
+      targetUri = tierOrAmount > 150 ? UPI_GATEWAY_URLS.GOLD : (tierOrAmount > 50 ? UPI_GATEWAY_URLS.PLUS : UPI_GATEWAY_URLS.LITE);
     } else {
       targetUri = this.generateUpiPaymentString(tierOrAmount, learnerIdOrNote);
     }
@@ -166,7 +194,7 @@ export class PaymentService {
    */
   public static async activateGatewayPayment(
     learnerId: string,
-    tier: 'LITE' | 'PLUS',
+    tier: 'LITE' | 'PLUS' | 'GOLD',
     gatewayReference?: string
   ): Promise<{ success: boolean; subscription: Subscription; error?: string }> {
     const plan = getDynamicPlanPricing(tier);
@@ -226,7 +254,7 @@ export class PaymentService {
    */
   public static async submitUpiPayment(
     learnerId: string,
-    tier: 'LITE' | 'PLUS',
+    tier: 'LITE' | 'PLUS' | 'GOLD',
     payerUpiId?: string,
     utrReference?: string
   ): Promise<{ success: boolean; subscription?: Subscription; error?: string }> {
@@ -396,7 +424,7 @@ export class PaymentService {
     adminEmail: string,
     learnerId: string,
     days: number,
-    tier: 'LITE' | 'PLUS' = 'PLUS'
+    tier: 'LITE' | 'PLUS' | 'GOLD' = 'GOLD'
   ): Promise<{ success: boolean; error?: string }> {
     if (!StorageRLSLayer.isAdminAuthorized(adminEmail)) {
       throw new Error('403 Forbidden');
@@ -481,7 +509,7 @@ export class PaymentService {
   public static async grantPremiumDirect(
     adminEmail: string,
     learnerId: string,
-    tier: 'LITE' | 'PLUS',
+    tier: 'LITE' | 'PLUS' | 'GOLD',
     durationDays: number,
     note?: string
   ): Promise<{ success: boolean; subscription?: Subscription; error?: string }> {

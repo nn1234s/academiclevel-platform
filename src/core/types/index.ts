@@ -2,7 +2,7 @@ export type Board = 'CBSE' | 'ICSE' | 'IGCSE';
 export type Grade = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 export type UserRole = 'STUDENT' | 'SUPER_ADMIN';
 
-export type PlanTier = 'FREE' | 'LITE' | 'PLUS' | 'TRIAL';
+export type PlanTier = 'FREE' | 'LITE' | 'PLUS' | 'GOLD' | 'TRIAL';
 export type SubscriptionStatus = 'NONE' | 'PENDING_VERIFICATION' | 'ACTIVE' | 'EXPIRED' | 'REVOKED';
 
 export type LevelNode = 'FOUNDATION' | 'CONCEPT' | 'EXAM_READY' | 'OLYMPIAD';
@@ -25,7 +25,7 @@ export interface Learner {
   quizzesCompletedCount: number;
   levelsCompletedCount: number;
   hasActiveSubscription?: boolean;
-  activePlan?: 'LITE' | 'PLUS' | 'TRIAL' | null;
+  activePlan?: 'LITE' | 'PLUS' | 'GOLD' | 'TRIAL' | null;
   subscriptionExpiresAt?: string | null;
   subscriptionId?: string | null;
   activeSub?: any;
@@ -62,7 +62,7 @@ export interface Learner {
 export interface Subscription {
   id: string;
   learnerId: string;
-  planTier: 'LITE' | 'PLUS' | 'TRIAL';
+  planTier: 'LITE' | 'PLUS' | 'GOLD' | 'TRIAL';
   status: SubscriptionStatus;
   paymentMethod: 'UPI_QR' | 'ACODE_SCHOLARSHIP' | 'ADMIN_TRIAL' | 'CONCEPT_BOOSTER_AUTO';
   utrReference?: string;
@@ -186,7 +186,7 @@ export interface Certificate {
 
 export interface ACode {
   code: string; // 'AL-XXXX-XXXX'
-  planTier: 'LITE' | 'PLUS';
+  planTier: 'LITE' | 'PLUS' | 'GOLD';
   durationDays: number;
   isRedeemed: boolean;
   redeemedBy?: string;

@@ -3,7 +3,7 @@ import { PlanPricing, PLAN_PRICING, PaymentService } from '../../services/paymen
 import { CheckCircle2, ShieldCheck, AlertCircle, Copy, Check, ArrowLeft, Zap, ExternalLink, QrCode, AlertTriangle, Sparkles } from 'lucide-react';
 
 interface UPIQRCheckoutProps {
-  planTier: 'LITE' | 'PLUS';
+  planTier: 'LITE' | 'PLUS' | 'GOLD';
   learnerId: string;
   onBack: () => void;
   onSuccess: (utr: string) => void;
@@ -163,25 +163,62 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
 
         {/* Streamlined Direct Gateway Action (No QR) */}
         <div className="space-y-4">
-          {/* 129 Screaming More Value Upgrade Banner for Lite */}
+          {/* Screaming Gold Upgrade Banners */}
           {planTier === 'LITE' && (
-            <div className="p-3.5 bg-gradient-to-r from-emerald-950/80 via-slate-900 to-indigo-950/80 border-2 border-emerald-500/40 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-lg">
+            <div className="p-3.5 bg-gradient-to-r from-amber-950/90 via-slate-900 to-yellow-950/80 border-2 border-amber-500/60 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-xl ring-2 ring-amber-500/20">
               <div className="space-y-0.5">
-                <span className="text-[10px] font-mono font-black uppercase text-emerald-400 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 fill-emerald-400" />
-                  <span>3X Duration Deal Available: ₹129 (180 Days)</span>
+                <span className="text-[10px] font-mono font-black uppercase text-amber-400 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 fill-amber-400" />
+                  <span>👑 1-Year Gold Deal Available: ₹205 (365 Days)</span>
                 </span>
                 <p className="text-slate-200 text-[11px] leading-relaxed">
-                  Pay just <strong>₹80 more</strong> to get <strong>120 extra days (4 full months free!)</strong>. Covers both semesters for only <strong>~₹21.50/month</strong>!
+                  Pay just <strong>₹156 more</strong> to get <strong>305 EXTRA DAYS (10 full months free!)</strong>. That is only <strong>~₹17.08/month (~56 paise/day!)</strong> covering both terms &amp; final board exams!
                 </p>
               </div>
               <button
                 type="button"
                 onClick={onBack}
-                className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs rounded-xl shadow transition-all shrink-0 cursor-pointer"
+                className="px-3.5 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all shrink-0 cursor-pointer"
               >
-                Switch to ₹129 ↗
+                Upgrade to Gold (₹205) ↗
               </button>
+            </div>
+          )}
+
+          {planTier === 'PLUS' && (
+            <div className="p-3.5 bg-gradient-to-r from-amber-950/90 via-slate-900 to-yellow-950/80 border-2 border-amber-500/60 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-xl ring-2 ring-amber-500/20">
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-mono font-black uppercase text-amber-400 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 fill-amber-400" />
+                  <span>👑 Upgrade to 1-Year Gold Pass: ₹205 (365 Days)</span>
+                </span>
+                <p className="text-slate-200 text-[11px] leading-relaxed">
+                  Pay just <strong>₹76 MORE</strong> than Plus to get <strong>185 EXTRA DAYS (Double your duration to 365 Days!)</strong>. Only <strong>~56 paise/day</strong>!
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onBack}
+                className="px-3.5 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all shrink-0 cursor-pointer"
+              >
+                Upgrade to Gold (₹205) ↗
+              </button>
+            </div>
+          )}
+
+          {planTier === 'GOLD' && (
+            <div className="p-3.5 bg-gradient-to-r from-amber-950/90 via-slate-900 to-yellow-950/80 border-2 border-amber-500/80 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-xl ring-4 ring-amber-500/30">
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-mono font-black uppercase text-amber-400 flex items-center gap-1.5">
+                  <span>👑 1-YEAR GOLD PASS SELECTED • 365 DAYS COMPLETE ACCESS</span>
+                </span>
+                <p className="text-slate-200 text-[11px] leading-relaxed font-semibold">
+                  Full academic year coverage • Only <strong>~₹17.08/month (~56 paise/day)</strong> • VIP Store Rewards &amp; Master Certificate
+                </p>
+              </div>
+              <span className="px-3 py-1 bg-amber-400 text-slate-950 font-black text-[10px] rounded-lg shrink-0 uppercase tracking-widest">
+                BEST VALUE
+              </span>
             </div>
           )}
 

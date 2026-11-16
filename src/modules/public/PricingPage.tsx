@@ -3,7 +3,7 @@ import { PLAN_PRICING } from '../../services/paymentService';
 import { Check, Sparkles, Zap, ArrowRight, ShieldCheck } from 'lucide-react';
 
 interface PricingPageProps {
-  onSelectPlan: (tier: 'LITE' | 'PLUS') => void;
+  onSelectPlan: (tier: 'LITE' | 'PLUS' | 'GOLD') => void;
   onOpenRegister: () => void;
 }
 
@@ -26,11 +26,11 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, onOpenRe
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
         {/* Lite Plan (Special ₹49 Advert1 Offer) */}
-        <div className="bg-slate-900 border-2 border-amber-500/50 hover:border-amber-400 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl transition-all relative">
+        <div className="bg-slate-900 border-2 border-amber-500/50 hover:border-amber-400 rounded-3xl p-6 flex flex-col justify-between shadow-2xl transition-all relative">
           <span className="absolute -top-3 left-6 px-3 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 tracking-widest uppercase">
-            Special Advert Offer
+            Entry Offer
           </span>
           <div>
             <div className="flex justify-between items-center mb-2">
@@ -41,12 +41,12 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, onOpenRe
             </div>
             <div className="flex items-baseline space-x-1 mb-4">
               <span className="text-4xl font-black text-white">₹49</span>
-              <span className="text-xs text-slate-400">/ 60 days (Save 90%)</span>
+              <span className="text-xs text-slate-400">/ 60 days (~₹24.50/mo)</span>
             </div>
             <p className="text-xs text-slate-300 mb-6 leading-relaxed">
               60-day concept booster pass with uninterrupted CBSE, ICSE, and IGCSE syllabus coverage.
             </p>
-            <ul className="space-y-2.5 text-xs text-slate-300">
+            <ul className="space-y-2 text-xs text-slate-300">
               {PLAN_PRICING.LITE.features.map((f, i) => (
                 <li key={i} className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
@@ -59,42 +59,34 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, onOpenRe
             onClick={handleGoToAdPage}
             className="mt-8 w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-orange-950 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            <span>Claim Special Offer (₹49)</span>
+            <span>Claim Lite Offer (₹49)</span>
             <ArrowRight className="w-4 h-4 text-slate-950" />
           </button>
         </div>
 
-        {/* Plus Plan (Best Value - 3x Duration) */}
-        <div className="bg-gradient-to-b from-emerald-950/50 via-slate-900 to-slate-900 border-2 border-emerald-400 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative ring-4 ring-emerald-500/20">
-          <span className="absolute -top-3 right-6 px-3.5 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-red-600 via-orange-600 to-amber-500 text-white tracking-widest uppercase shadow-md animate-pulse">
-            🔥 3X DURATION • 6 MONTHS BEST VALUE
+        {/* Plus Plan (180 Days) */}
+        <div className="bg-slate-900 border-2 border-emerald-500/60 hover:border-emerald-400 rounded-3xl p-6 flex flex-col justify-between shadow-2xl relative">
+          <span className="absolute -top-3 right-6 px-3 py-0.5 rounded-full text-[10px] font-black bg-emerald-600 text-white tracking-widest uppercase">
+            3X Duration
           </span>
           <div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-black text-emerald-400 flex items-center space-x-1">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
-                <span>ACADEMICLEVEL PLUS (180 DAYS)</span>
+              <span className="text-xs font-bold text-emerald-400 flex items-center space-x-1">
+                <span>PLUS PLAN (180 DAYS)</span>
               </span>
-              <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
-                180 Days (Half a Year)
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
+                180 Days
               </span>
             </div>
             <div className="flex items-baseline space-x-1.5 mb-2">
               <span className="text-4xl font-black text-white">₹129</span>
-              <span className="text-xs text-slate-400">/ 180 days</span>
-              <span className="text-xs text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
-                ~₹21.50/mo (Cheaper per day!)
-              </span>
-            </div>
-
-            <div className="mb-4 p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[11px] text-emerald-200">
-              ⭐ <strong>Pay just ₹80 more</strong> to get <strong>120 extra days (4 full months free!)</strong>. Covers your entire semester + board exam season!
+              <span className="text-xs text-slate-400">/ 180 days (~₹21.50/mo)</span>
             </div>
 
             <p className="text-xs text-slate-300 mb-6 leading-relaxed">
               Complete semester mastery, competitive Olympiad foundation &amp; Master Certificate of Excellence.
             </p>
-            <ul className="space-y-2.5 text-xs text-slate-200 font-medium">
+            <ul className="space-y-2 text-xs text-slate-200 font-medium">
               {PLAN_PRICING.PLUS.features.map((f, i) => (
                 <li key={i} className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
@@ -105,9 +97,54 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, onOpenRe
           </div>
           <button
             onClick={handleGoToAdPage}
-            className="mt-8 w-full py-3.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer transform hover:scale-[1.01]"
+            className="mt-8 w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-lg transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
           >
-            <span>Claim 180-Day Plus Pass (₹129) — Best Value ↗</span>
+            <span>Claim Plus Pass (₹129) ↗</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Gold Plan (Crown Best Value - 365 Days) */}
+        <div className="bg-gradient-to-b from-amber-950/60 via-slate-900 to-slate-900 border-2 border-amber-400 rounded-3xl p-6 flex flex-col justify-between shadow-2xl relative ring-4 ring-amber-500/20">
+          <span className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 tracking-widest uppercase shadow-md animate-pulse">
+            👑 1-YEAR GOLD • BEST VALUE
+          </span>
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-xs font-black text-amber-400 flex items-center space-x-1">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>GOLD PASS (365 DAYS)</span>
+              </span>
+              <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300">
+                1 Full Year
+              </span>
+            </div>
+            <div className="flex items-baseline space-x-1.5 mb-2">
+              <span className="text-4xl font-black text-amber-300">₹205</span>
+              <span className="text-xs text-slate-400">/ 365 days</span>
+            </div>
+
+            <div className="mb-4 p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-200">
+              ⭐ <strong>Pay just ₹76 more</strong> than 6-month plan to get <strong>185 EXTRA DAYS (Double your duration to 365 Days!)</strong>. Only <strong>~56 paise/day</strong>!
+            </div>
+
+            <p className="text-xs text-slate-300 mb-6 leading-relaxed">
+              Complete full-year academic mastery, both terms &amp; final board exams, VIP reward priority.
+            </p>
+            <ul className="space-y-2 text-xs text-slate-200 font-medium">
+              {PLAN_PRICING.GOLD.features.map((f, i) => (
+                <li key={i} className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <button
+            onClick={handleGoToAdPage}
+            className="mt-8 w-full py-3.5 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-amber-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer transform hover:scale-[1.01]"
+          >
+            <span>Claim 365-Day Gold Pass (₹205) — Best Value ↗</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
