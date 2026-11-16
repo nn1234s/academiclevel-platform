@@ -279,7 +279,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const [secondsRemaining, setSecondsRemaining] = useState(847);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [adsConfig, setAdsConfig] = useState(() => SiteConfigService.getAds());
-  const [selectedPlanTier, setSelectedPlanTier] = useState<'LITE' | 'PLUS'>('LITE');
+  const [selectedPlanTier, setSelectedPlanTier] = useState<'LITE' | 'PLUS'>('PLUS');
   const [noticeLang, setNoticeLang] = useState<'EN' | 'HINGLISH'>('EN');
 
   useEffect(() => {
@@ -599,20 +599,20 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       )}
 
       {/* ======================================================== */}
-      {/* 1. TOP STICKY SPECIAL 49 OFFER PROMO BAR                 */}
+      {/* 1. TOP STICKY SPECIAL 49 & 129 OFFER PROMO BAR           */}
       {/* ======================================================== */}
-      <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-red-600 text-white px-3 sm:px-6 py-2.5 shadow-md sticky top-0 z-40">
+      <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-emerald-700 text-white px-3 sm:px-6 py-2.5 shadow-md sticky top-0 z-40">
         <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
           <div className="flex items-center space-x-2">
-            <span className="bg-white text-orange-600 px-2 py-0.5 rounded font-black text-[11px] tracking-wide uppercase flex items-center space-x-1 shadow-sm">
-              <Zap className="w-3 h-3 fill-orange-600" />
-              <span>Special Offer</span>
+            <span className="bg-emerald-400 text-slate-950 px-2 py-0.5 rounded font-black text-[11px] tracking-wide uppercase flex items-center space-x-1 shadow-sm">
+              <Zap className="w-3 h-3 fill-slate-950" />
+              <span>3X Value Deal</span>
             </span>
-            <span className="font-extrabold hidden sm:inline">
-              {adsConfig.urgentNotice || `Special ${adsConfig.offerPriceInr || 49} Offer • Original Price ₹${adsConfig.originalPriceInr || 999} (${adsConfig.discountPercent || 95}% OFF)`}
+            <span className="font-extrabold hidden md:inline">
+              ⚡ ₹49 Lite (60 Days) OR 🔥 ₹129 Term Mastery (180 Days / 6 Months — 3X DURATION FOR JUST ₹129!)
             </span>
-            <span className="font-bold sm:hidden">
-              Special ₹{adsConfig.offerPriceInr || 49} (Orig. ₹{adsConfig.originalPriceInr || 999})
+            <span className="font-bold md:hidden">
+              ₹129 (180 Days / 6 Months) • 3X More Value!
             </span>
           </div>
 
@@ -624,10 +624,10 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
             <button
               onClick={handleScrollToQr}
-              className="bg-amber-300 hover:bg-amber-200 text-slate-950 font-black px-3 py-1 rounded-full text-xs shadow transition-all hover:scale-105 cursor-pointer flex items-center space-x-1"
+              className="bg-emerald-300 hover:bg-emerald-200 text-slate-950 font-black px-3 py-1 rounded-full text-xs shadow transition-all hover:scale-105 cursor-pointer flex items-center space-x-1"
             >
-              <QrCode className="w-3.5 h-3.5" />
-              <span>Claim ₹{adsConfig.offerPriceInr || 49} (Instant Pass)</span>
+              <Sparkles className="w-3.5 h-3.5 fill-slate-950" />
+              <span>Claim ₹129 Pass (Best Value ↗)</span>
             </button>
           </div>
         </div>
@@ -758,33 +758,82 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             {/* RIGHT COLUMN (5 Cols): Class 1 to 12 Interactive Selector & Quick Enroll */}
             <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between bg-white">
               <div>
-                {/* Special Price Box */}
-                <div className="bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-red-500/10 border-2 border-orange-500/40 rounded-3xl p-5 mb-6 text-center relative overflow-hidden">
-                  <div className="absolute top-2 right-2">
-                    <span className="px-2 py-0.5 bg-red-600 text-white font-black text-[9px] uppercase tracking-wider rounded-md animate-pulse">
-                      Save {adsConfig.discountPercent || 95}%
+                {/* DUAL PLAN SELECTOR IN HERO: ₹49 vs ₹129 (SCREAMING 129 IS 3X MORE VALUE) */}
+                <div className="mb-6 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wide text-slate-800 flex items-center gap-1.5">
+                      <span>Choose Scholar Pass</span>
+                    </span>
+                    <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-emerald-600 text-white animate-pulse">
+                      🔥 ₹129 IS 3X MORE VALUE
                     </span>
                   </div>
 
-                  <span className="text-[11px] font-black uppercase tracking-wider text-orange-600 block">
-                    Special {adsConfig.offerPriceInr || 49} Scholar Pricing
-                  </span>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {/* Option 1: ₹49 Lite */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedPlanTier('LITE')}
+                      className={`p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer relative ${
+                        selectedPlanTier === 'LITE'
+                          ? 'border-orange-500 bg-orange-50/80 ring-2 ring-orange-400 shadow-md scale-[1.01]'
+                          : 'border-slate-200 bg-slate-50 hover:bg-white text-slate-600'
+                      }`}
+                    >
+                      <div className="text-[10px] font-black uppercase tracking-wider text-orange-800">
+                        60 Days (Lite)
+                      </div>
+                      <div className="flex items-baseline space-x-1.5 mt-0.5">
+                        <span className="text-2xl font-black text-slate-900">₹49</span>
+                        <span className="text-xs text-slate-400 line-through">₹499</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-medium mt-1 leading-tight">
+                        ~₹24.50/mo • Basic pass
+                      </p>
+                    </button>
 
-                  <div className="mt-2 flex items-baseline justify-center space-x-3">
-                    <span className="text-sm font-bold text-slate-400 line-through">
-                      ₹{adsConfig.originalPriceInr || 999}
-                    </span>
-                    <span className="text-4xl sm:text-5xl font-black text-[#f95a00]">
-                      ₹{adsConfig.offerPriceInr || 49}
-                    </span>
-                    <span className="text-xs font-bold text-slate-600">
-                      / {adsConfig.guaranteeDays || 60} Days
-                    </span>
+                    {/* Option 2: ₹129 Plus (HEAVY SPOTLIGHT & VALUE CALLOUT) */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedPlanTier('PLUS')}
+                      className={`p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer relative overflow-hidden ${
+                        selectedPlanTier === 'PLUS'
+                          ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100 ring-2 ring-emerald-500 shadow-xl scale-[1.02]'
+                          : 'border-emerald-300 bg-emerald-50/50 hover:bg-emerald-50 text-slate-700'
+                      }`}
+                    >
+                      <div className="absolute top-0 right-0 bg-gradient-to-r from-red-600 via-orange-600 to-amber-500 text-white font-black text-[8px] px-2 py-0.5 rounded-bl-lg uppercase tracking-widest shadow animate-pulse">
+                        ⭐ 3X VALUE!
+                      </div>
+                      <div className="text-[10px] font-black uppercase tracking-wider text-emerald-800">
+                        180 Days (Plus)
+                      </div>
+                      <div className="flex items-baseline space-x-1.5 mt-0.5">
+                        <span className="text-2xl font-black text-emerald-950">₹129</span>
+                        <span className="text-xs text-slate-400 line-through">₹1,299</span>
+                        <span className="text-[9px] font-black text-emerald-700 bg-emerald-200/80 px-1 rounded">90% OFF</span>
+                      </div>
+                      <p className="text-[10px] text-emerald-900 font-black mt-1 leading-tight">
+                        Only ~₹21.50/mo • 6 Full Months!
+                      </p>
+                    </button>
                   </div>
 
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    Just ₹{((adsConfig.offerPriceInr || 49) / (adsConfig.guaranteeDays || 60)).toFixed(2)} per day. Unlimited practice quizzes across all subjects.
-                  </p>
+                  {/* Value Callout Box: Why 129 Screams More Value */}
+                  <div className="p-3 bg-gradient-to-r from-emerald-50 via-teal-50 to-indigo-50 border-2 border-emerald-400/60 rounded-2xl text-[11px] text-slate-800 space-y-1">
+                    <div className="flex items-center justify-between font-black text-emerald-950">
+                      <span className="flex items-center gap-1">
+                        <span>🔥</span>
+                        <span>WHY 85% OF TOPPERS PICK ₹129:</span>
+                      </span>
+                      <span className="text-[10px] font-mono bg-emerald-600 text-white px-2 py-0.5 rounded-full font-black">
+                        3X DURATION
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-emerald-950 leading-snug">
+                      Pay just <strong>₹80 more</strong> to get <strong>120 EXTRA DAYS (4 Months Extra Free!)</strong>. That is <strong>half a year of unlimited learning</strong>, covering both <strong>midterms and final exams</strong> without renewal stress!
+                    </p>
+                  </div>
                 </div>
 
                 {/* 1 to 12 Class Selector Tabs */}
@@ -862,10 +911,18 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               <div className="space-y-2">
                 <button
                   onClick={handleScrollToQr}
-                  className="w-full py-4 bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] text-white font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-orange-500/30 transition-all hover:scale-[1.02] flex items-center justify-center space-x-2 cursor-pointer"
+                  className={`w-full py-4 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl transition-all hover:scale-[1.02] flex items-center justify-center space-x-2 cursor-pointer ${
+                    selectedPlanTier === 'PLUS'
+                      ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 shadow-emerald-600/30'
+                      : 'bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] shadow-orange-500/30'
+                  }`}
                 >
                   <Zap className="w-5 h-5 fill-white" />
-                  <span>{adsConfig.ctaText ? adsConfig.ctaText.toUpperCase() : `BUY NOW (₹${adsConfig.offerPriceInr || 49}) — INSTANT PASS`}</span>
+                  <span>
+                    {selectedPlanTier === 'PLUS'
+                      ? 'CLAIM 180-DAY PASS (₹129) — BEST VALUE ↗'
+                      : `BUY NOW (₹${adsConfig.offerPriceInr || 49}) — 60-DAY PASS ↗`}
+                  </span>
                   <ArrowRight className="w-5 h-5" />
                 </button>
 
@@ -897,6 +954,34 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             </p>
           </div>
 
+          {/* Screaming Value Comparison Banner: 129 vs 49 */}
+          <div className="mb-6 p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-700 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="space-y-1.5 text-center md:text-left">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-slate-950">
+                  🔥 85% OF TOPPERS CHOOSE ₹129
+                </span>
+                <span className="text-[11px] font-bold text-emerald-200">
+                  3X DURATION (180 DAYS) FOR JUST ₹80 EXTRA!
+                </span>
+              </div>
+              <h3 className="text-lg sm:text-2xl font-black">
+                Why buy 60 Days for ₹49 when ₹129 gives 180 Days (Half a Year)?
+              </h3>
+              <p className="text-xs text-emerald-100 font-medium max-w-xl">
+                Pay just <strong>₹80 more</strong> to unlock <strong>120 extra days (4 full months free!)</strong>. That breaks down to just <strong>~₹21.50/month</strong> vs ₹24.50/month on the 60-day plan. Covers both your <strong>midterm &amp; annual final exams</strong>!
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedPlanTier('PLUS')}
+              className="px-6 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm shadow-xl transition-all hover:scale-105 cursor-pointer flex-shrink-0 flex items-center space-x-1.5"
+            >
+              <Sparkles className="w-4 h-4 fill-slate-950" />
+              <span>Select ₹129 (Best Value)</span>
+            </button>
+          </div>
+
           {/* BIG 2-OPTION PLAN SELECTOR: ₹49 vs ₹129 */}
           <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Option 1: ₹49 Concept Booster */}
@@ -926,7 +1011,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   ✓
                 </div>
               </div>
-              <p className="text-xs font-bold text-slate-800 mt-2">60 Days Full Syllabus Access</p>
+              <p className="text-xs font-bold text-slate-800 mt-2">60 Days Full Syllabus Access (~₹24.50/mo)</p>
               <ul className="text-[11px] text-slate-600 mt-2 space-y-1 font-medium">
                 <li>✓ Full syllabus adaptive AI quiz for Classes 1–12</li>
                 <li>✓ Nova AI interactive homework &amp; doubt solver</li>
@@ -934,41 +1019,45 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               </ul>
             </button>
 
-            {/* Option 2: ₹129 Term Mastery (BIG & HIGHLIGHTED) */}
+            {/* Option 2: ₹129 Term Mastery (SCREAMING 3X MORE VALUE) */}
             <button
               type="button"
               onClick={() => setSelectedPlanTier('PLUS')}
               className={`p-5 rounded-3xl border-2 text-left transition-all cursor-pointer relative overflow-hidden ${
                 selectedPlanTier === 'PLUS'
-                  ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50/60 shadow-xl ring-2 ring-emerald-400 scale-[1.01]'
-                  : 'border-slate-200 bg-white hover:border-slate-300 opacity-90'
+                  ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 via-teal-50/70 to-emerald-100/60 shadow-2xl ring-4 ring-emerald-400/50 scale-[1.02]'
+                  : 'border-emerald-300 bg-emerald-50/40 hover:border-emerald-400'
               }`}
             >
-              <div className="absolute top-2.5 right-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow">
-                ⭐ BEST VALUE • 6 MONTHS
+              <div className="absolute top-0 right-0 bg-gradient-to-r from-red-600 via-orange-600 to-amber-500 text-white text-[9px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest shadow-md animate-pulse">
+                🔥 3X DURATION • 6 MONTHS
               </div>
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 mb-1.5">
-                    Term Mastery (Plus)
+                  <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-200 text-emerald-900 mb-1.5">
+                    Term Mastery (Plus) • 180 Days
                   </span>
                   <div className="flex items-baseline space-x-2">
-                    <span className="text-2xl sm:text-3xl font-black text-slate-900">₹129</span>
+                    <span className="text-3xl sm:text-4xl font-black text-emerald-950">₹129</span>
                     <span className="text-xs text-slate-400 line-through font-bold">₹1,299</span>
-                    <span className="text-[11px] font-black text-emerald-600 uppercase tracking-wide">90% OFF</span>
+                    <span className="text-[10px] font-black text-white bg-emerald-700 px-1.5 py-0.5 rounded uppercase tracking-wide">90% OFF</span>
                   </div>
                 </div>
-                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center font-bold text-xs mt-3 ${
-                  selectedPlanTier === 'PLUS' ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300 text-transparent'
+                <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center font-bold text-sm mt-3 ${
+                  selectedPlanTier === 'PLUS' ? 'border-emerald-600 bg-emerald-600 text-white shadow' : 'border-slate-300 text-transparent'
                 }`}>
                   ✓
                 </div>
               </div>
-              <p className="text-xs font-bold text-emerald-950 mt-2">180 Days (Full Semester / Term Exam Prep)</p>
-              <ul className="text-[11px] text-slate-600 mt-2 space-y-1 font-medium">
-                <li>✓ Full semester access: midterms + finals preparation</li>
+              <p className="text-xs font-black text-emerald-900 mt-2">
+                180 Days (Half Year Access) • <span className="underline decoration-emerald-500 font-extrabold text-emerald-700">Only ~₹21.50/Month</span> (~₹0.71/day)
+              </p>
+              <ul className="text-[11px] text-slate-700 mt-2 space-y-1 font-semibold">
+                <li className="text-emerald-950 font-black">⭐ 300% More Days (180d vs 60d) for just ₹80 more!</li>
+                <li>✓ Covers both midterm &amp; annual board exam preparation</li>
                 <li>✓ 8,500 AI credits limit with priority response speeds</li>
-                <li>✓ Priority gift card &amp; courier reward dispatch tracking</li>
+                <li>✓ Priority VIP access for Pokémon sets, Milton &amp; Mystery Gift Box</li>
+                <li>✓ Olympiad foundation + Official Master Certificate</li>
               </ul>
             </button>
           </div>
@@ -1584,22 +1673,24 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               <button
                 type="button"
                 onClick={() => setSelectedPlanTier('PLUS')}
-                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer relative ${
                   selectedPlanTier === 'PLUS'
                     ? 'bg-emerald-600 text-white shadow-sm font-black'
-                    : 'text-slate-600 hover:text-slate-900'
+                    : 'text-emerald-700 hover:text-emerald-900'
                 }`}
               >
-                ₹129 (180D)
+                <span>₹129 (180D • 3X Value 🔥)</span>
               </button>
             </div>
 
             <div className="hidden sm:block">
-              <span className="text-[10px] font-mono text-slate-500 font-bold block uppercase">
-                {selectedPlanTier === 'PLUS' ? 'Plus Term Mastery' : 'Concept Booster'}
+              <span className={`text-[10px] font-mono font-bold block uppercase ${
+                selectedPlanTier === 'PLUS' ? 'text-emerald-600' : 'text-slate-500'
+              }`}>
+                {selectedPlanTier === 'PLUS' ? '⭐ 180 Days (6 Months) • Best Academic Value' : 'Concept Booster'}
               </span>
               <span className="text-xs font-black text-slate-900">
-                {selectedPlanTier === 'PLUS' ? 'Classes 1–12 • Full 6 Months' : 'Classes 1–12 • Full 60 Days'}
+                {selectedPlanTier === 'PLUS' ? 'Classes 1–12 • Full 6 Months (~₹21.50/mo)' : 'Classes 1–12 • Full 60 Days'}
               </span>
             </div>
           </div>
@@ -1612,8 +1703,12 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 : 'bg-gradient-to-r from-[#f95a00] to-[#ff7300] hover:from-[#e05000] hover:to-[#f95a00] shadow-orange-500/30'
             }`}
           >
-            <QrCode className="w-4 h-4" />
-            <span>SCAN QR &amp; PAY ₹{offerAmount}</span>
+            <Zap className="w-4 h-4 fill-white" />
+            <span>
+              {selectedPlanTier === 'PLUS'
+                ? 'BUY 180-DAY PASS (₹129) — BEST VALUE ↗'
+                : `BUY 60-DAY PASS (₹${offerAmount}) ↗`}
+            </span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -1772,14 +1867,18 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     <button
                       type="button"
                       onClick={() => setSelectedPlanTier('PLUS')}
-                      className={`p-2.5 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                      className={`p-2.5 rounded-xl border-2 text-left transition-all cursor-pointer relative overflow-hidden ${
                         selectedPlanTier === 'PLUS'
-                          ? 'border-emerald-500 bg-emerald-50 text-emerald-950 font-bold shadow-sm'
-                          : 'border-slate-200 bg-white text-slate-600'
+                          ? 'border-emerald-500 bg-emerald-50 text-emerald-950 font-bold shadow-md ring-2 ring-emerald-400'
+                          : 'border-emerald-300 bg-emerald-50/50 text-slate-700'
                       }`}
                     >
-                      <div className="text-[10px] uppercase font-black tracking-wider text-emerald-700">180 Days (Plus)</div>
-                      <div className="text-sm font-black">₹129 <span className="text-[10px] text-slate-400 line-through font-normal">₹1,299</span></div>
+                      <div className="absolute top-1 right-1 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full uppercase tracking-wider animate-pulse">
+                        🔥 3X VALUE
+                      </div>
+                      <div className="text-[10px] uppercase font-black tracking-wider text-emerald-800">180 Days (Plus)</div>
+                      <div className="text-sm font-black text-emerald-950">₹129 <span className="text-[10px] text-slate-400 line-through font-normal">₹1,299</span></div>
+                      <div className="text-[9px] text-emerald-800 font-bold">Only ~₹21.50/mo • 6 Months</div>
                     </button>
                   </div>
 

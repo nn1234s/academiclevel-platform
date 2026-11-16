@@ -64,29 +64,37 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, onOpenRe
           </button>
         </div>
 
-        {/* Plus Plan (Best Value) */}
-        <div className="bg-gradient-to-b from-indigo-950/40 via-slate-900 to-slate-900 border-2 border-indigo-500 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative">
-          <span className="absolute -top-3 right-6 px-3 py-0.5 rounded-full text-[10px] font-black bg-indigo-500 text-white tracking-widest uppercase">
-            Best Academic Value
+        {/* Plus Plan (Best Value - 3x Duration) */}
+        <div className="bg-gradient-to-b from-emerald-950/50 via-slate-900 to-slate-900 border-2 border-emerald-400 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative ring-4 ring-emerald-500/20">
+          <span className="absolute -top-3 right-6 px-3.5 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-red-600 via-orange-600 to-amber-500 text-white tracking-widest uppercase shadow-md animate-pulse">
+            🔥 3X DURATION • 6 MONTHS BEST VALUE
           </span>
           <div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-bold text-indigo-300 flex items-center space-x-1">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                <span>ACADEMICLEVEL PLUS</span>
+              <span className="text-xs font-black text-emerald-400 flex items-center space-x-1">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+                <span>ACADEMICLEVEL PLUS (180 DAYS)</span>
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
-                180 Days
+              <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
+                180 Days (Half a Year)
               </span>
             </div>
-            <div className="flex items-baseline space-x-1 mb-4">
+            <div className="flex items-baseline space-x-1.5 mb-2">
               <span className="text-4xl font-black text-white">₹129</span>
-              <span className="text-xs text-slate-400">/ 180 days (~₹21/mo)</span>
+              <span className="text-xs text-slate-400">/ 180 days</span>
+              <span className="text-xs text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+                ~₹21.50/mo (Cheaper per day!)
+              </span>
             </div>
-            <p className="text-xs text-slate-400 mb-6 leading-relaxed">
-              Complete semester mastery, competitive Olympiad track & Master Certificate.
+
+            <div className="mb-4 p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[11px] text-emerald-200">
+              ⭐ <strong>Pay just ₹80 more</strong> to get <strong>120 extra days (4 full months free!)</strong>. Covers your entire semester + board exam season!
+            </div>
+
+            <p className="text-xs text-slate-300 mb-6 leading-relaxed">
+              Complete semester mastery, competitive Olympiad foundation &amp; Master Certificate of Excellence.
             </p>
-            <ul className="space-y-2.5 text-xs text-slate-200">
+            <ul className="space-y-2.5 text-xs text-slate-200 font-medium">
               {PLAN_PRICING.PLUS.features.map((f, i) => (
                 <li key={i} className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
@@ -97,10 +105,10 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, onOpenRe
           </div>
           <button
             onClick={handleGoToAdPage}
-            className="mt-8 w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+            className="mt-8 w-full py-3.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer transform hover:scale-[1.01]"
           >
-            <span>Unlock Plus Plan (₹129)</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span>Claim 180-Day Plus Pass (₹129) — Best Value ↗</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>

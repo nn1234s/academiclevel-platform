@@ -913,33 +913,50 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
           </div>
 
-          <div className="bg-gradient-to-b from-indigo-950/40 via-slate-900 to-slate-900 border-2 border-indigo-500 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative">
-            <span className="absolute -top-3 right-6 px-3 py-0.5 rounded-full text-[10px] font-black bg-indigo-500 text-white tracking-widest uppercase">
-              Best Value
+          <div className="bg-gradient-to-b from-emerald-950/60 via-slate-900 to-slate-900 border-2 border-emerald-400 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative ring-4 ring-emerald-500/20">
+            <span className="absolute -top-3 right-6 px-3.5 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-red-600 via-orange-600 to-amber-500 text-white tracking-widest uppercase shadow-md animate-pulse">
+              🔥 3X DURATION • 6 MONTHS BEST VALUE
             </span>
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold text-indigo-300">PLUS PLAN</span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
-                  {pricingConfig.plusDurationDays || 180} Days
+                <span className="text-xs font-black text-emerald-400">PLUS PLAN (180 DAYS)</span>
+                <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
+                  {pricingConfig.plusDurationDays || 180} Days (Half a Year)
                 </span>
               </div>
-              <div className="flex items-baseline space-x-1 mb-4">
+              <div className="flex items-baseline space-x-1.5 mb-2">
                 <span className="text-4xl font-black text-white">₹{pricingConfig.plusPriceInr || 129}</span>
-                <span className="text-xs text-slate-400">/ {pricingConfig.plusDurationDays || 180} days (~₹{Math.round((pricingConfig.plusPriceInr || 129) / ((pricingConfig.plusDurationDays || 180) / 30))}/mo)</span>
+                <span className="text-xs text-slate-400">/ 180 days</span>
+                <span className="text-xs text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+                  ~₹21.50/mo (Cheaper per day!)
+                </span>
               </div>
+
+              {/* Value Comparison Pill */}
+              <div className="mb-4 p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[11px] text-emerald-200">
+                ⭐ <strong>Pay just ₹80 more</strong> to get <strong>120 extra days (4 full months free!)</strong>. Covers your complete semester &amp; final exams!
+              </div>
+
               <ul className="space-y-2 text-xs text-slate-200">
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span>Full {pricingConfig.plusDurationDays || 180}-Day Unlimited Access</span>
+                  <span className="font-bold text-white">Full {pricingConfig.plusDurationDays || 180}-Day Unrestricted Syllabus Coverage</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span>Olympiad &amp; Competitive Track</span>
+                  <span>Both Midterms &amp; Board Final Exams Covered</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span>Annual Master Certificate Eligible</span>
+                  <span>Olympiad &amp; National Competitive Foundation Track</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <span>Priority Physical Rewards Eligibility (Pokémon Sets, Milton &amp; Mystery Box)</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <span>Annual Master Certificate of Academic Excellence</span>
                 </li>
               </ul>
             </div>
@@ -947,10 +964,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <button
                 type="button"
                 onClick={() => handleBuyNow('PLUS')}
-                className="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-400 hover:to-blue-400 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer transform hover:scale-[1.01]"
               >
                 <ExternalLink className="w-4 h-4" />
-                <span>BUY NOW (₹{pricingConfig.plusPriceInr || 129}) — UPI PG ↗</span>
+                <span>BUY NOW (₹{pricingConfig.plusPriceInr || 129}) — 180-DAY BEST VALUE ↗</span>
               </button>
               <button
                 type="button"
