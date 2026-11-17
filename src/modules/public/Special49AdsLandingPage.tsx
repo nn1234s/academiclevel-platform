@@ -72,8 +72,8 @@ const REVIEWS_POOL: ReviewItem[] = [
     text: 'It is really good because the adaptive AI quizzes explain every maths and science concept so nicely and energetic!!! Best Choice ever to join ACADEMIC LEVEL!! My son used to struggle with fractions and problem sums, but the 50+ solving skills and AI practice tests made him score 98% in his school exams!'
   },
   {
-    id: 'preetish-1',
-    name: 'Preetish',
+    id: 'nibedita-1',
+    name: 'Nibedita',
     role: 'Parent of Student (Bhubaneswar)',
     date: '05 Nov 2026',
     stars: 5,
