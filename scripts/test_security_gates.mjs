@@ -1,27 +1,46 @@
 import { app } from '../server/server.js';
 import { db } from '../server/db.js';
 import { EventEmitter } from 'events';
+import assert from 'assert';
 
 function mockRequest(method, url, body = {}, headers = {}) {
   const req = new EventEmitter();
   req.method = method;
   req.url = url;
+  req.originalUrl = url;
   req.headers = { 'content-type': 'application/json', ...headers };
   req.body = body;
   req.query = {};
+  req.socket = { remoteAddress: '127.0.0.1' };
+  req.connection = req.socket;
+  req.ip = '127.0.0.1';
   return req;
 }
 
 function mockResponse(callback) {
+  let done = false;
+  const finish = (code, data) => {
+    if (done) return;
+    done = true;
+    callback(code, data);
+  };
   return {
     statusCode: 200,
     headers: {},
     status(c) { this.statusCode = c; return this; },
-    setHeader(k, v) { this.headers[k.toLowerCase()] = v; },
+    setHeader(k, v) { this.headers[k.toLowerCase()] = v; return this; },
     getHeader(k) { return this.headers[k.toLowerCase()]; },
-    json(d) { callback(this.statusCode, d); },
-    send(d) { callback(this.statusCode, d); },
-    end() { callback(this.statusCode); }
+    writeHead(code, headers = {}) {
+      this.statusCode = code;
+      Object.assign(this.headers, headers);
+      return this;
+    },
+    write() { return true; },
+    json(d) { finish(this.statusCode, d); return this; },
+    send(d) { finish(this.statusCode, d); return this; },
+    end(d) { finish(this.statusCode, d); return this; },
+    on() { return this; },
+    emit() { return true; }
   };
 }
 
@@ -47,12 +66,12 @@ async function testSecurityGates() {
 
   db.prepare(`
     INSERT OR REPLACE INTO learners (id, email, fullName, board, grade, role, isActive, coinBalance, currentStreakDays, longestStreakDays, quizzesCompletedCount, levelsCompletedCount, classChangesUsedPremium, classChangesUsedPostExpiry, referralCode, referralQualified, createdAt, updatedAt)
-    VALUES (?, ?, ?, 'CBSE', 10, 'STUDENT', 1, 100, 1, 1, 0, 0, 0, 0, 'AL-U1', 0, ?, ?)
+    VALUES (?, ?, ?, 'CBSE', 10, 'STUDENT', 1, 100, 1, 1, 0, 0, 0, 0, 'AL-SEC-U1', 0, ?, ?)
   `).run(l1Id, 'sec_u1@test.com', 'Security User One', now, now);
 
   db.prepare(`
     INSERT OR REPLACE INTO learners (id, email, fullName, board, grade, role, isActive, coinBalance, currentStreakDays, longestStreakDays, quizzesCompletedCount, levelsCompletedCount, classChangesUsedPremium, classChangesUsedPostExpiry, referralCode, referralQualified, createdAt, updatedAt)
-    VALUES (?, ?, ?, 'CBSE', 10, 'STUDENT', 1, 100, 1, 1, 0, 0, 0, 0, 'AL-U2', 0, ?, ?)
+    VALUES (?, ?, ?, 'CBSE', 10, 'STUDENT', 1, 100, 1, 1, 0, 0, 0, 0, 'AL-SEC-U2', 0, ?, ?)
   `).run(l2Id, 'sec_u2@test.com', 'Security User Two', now, now);
 
   db.prepare('INSERT OR REPLACE INTO sessions (token, learnerId, email, role, createdAt, expiresAt) VALUES (?, ?, ?, ?, ?, ?)').run(tok1, l1Id, 'sec_u1@test.com', 'STUDENT', now, future);
@@ -61,30 +80,37 @@ async function testSecurityGates() {
   // 1. Positive Coin Minting without Admin (Must Fail with 403)
   const mintRes = await dispatch('POST', '/api/coins/transact', { learnerId: l1Id, amount: 50 }, { 'x-session-token': tok1 });
   console.log('1. Positive coin minting by student:', mintRes.code, mintRes.code === 403 ? 'PASS (Blocked)' : 'FAIL');
+  assert.strictEqual(mintRes.code, 403, 'Positive coin minting must fail with 403');
 
   // 2. Negative Coin Debit without Session (Must Fail with 401)
   const debitNoAuth = await dispatch('POST', '/api/coins/transact', { learnerId: l1Id, amount: -10 });
   console.log('2. Negative coin debit without session:', debitNoAuth.code, debitNoAuth.code === 401 ? 'PASS (Blocked)' : 'FAIL');
+  assert.strictEqual(debitNoAuth.code, 401, 'Negative coin debit without session must fail with 401');
 
   // 3. Negative Coin Debit with WRONG student's session (IDOR Attempt - Must Fail with 401)
   const debitIdor = await dispatch('POST', '/api/coins/transact', { learnerId: l1Id, amount: -10 }, { 'x-session-token': tok2 });
   console.log('3. Negative coin debit by other student (IDOR):', debitIdor.code, debitIdor.code === 401 ? 'PASS (Blocked)' : 'FAIL');
+  assert.strictEqual(debitIdor.code, 401, 'Negative coin debit by other student must fail with 401');
 
   // 4. Negative Coin Debit with VALID student's own session (Must Succeed 200)
   const debitValid = await dispatch('POST', '/api/coins/transact', { learnerId: l1Id, amount: -10 }, { 'x-session-token': tok1 });
   console.log('4. Negative coin debit with own session:', debitValid.code, debitValid.code === 200 ? 'PASS (Success, new balance: ' + debitValid.data?.newBalance + ')' : 'FAIL');
+  assert.strictEqual(debitValid.code, 200, 'Negative coin debit with own session must succeed with 200');
 
   // 5. Student Profile PATCH without Session (Must Fail with 401)
   const patchNoAuth = await dispatch('PATCH', '/api/students/' + l1Id, { phone: '9876543210' });
   console.log('5. Student profile PATCH without session:', patchNoAuth.code, patchNoAuth.code === 401 ? 'PASS (Blocked)' : 'FAIL');
+  assert.strictEqual(patchNoAuth.code, 401, 'Student profile PATCH without session must fail with 401');
 
   // 6. Student Profile PATCH by another student (IDOR - Must Fail with 401)
   const patchIdor = await dispatch('PATCH', '/api/students/' + l1Id, { phone: '9876543210' }, { 'x-session-token': tok2 });
   console.log('6. Student profile PATCH by other student (IDOR):', patchIdor.code, patchIdor.code === 401 ? 'PASS (Blocked)' : 'FAIL');
+  assert.strictEqual(patchIdor.code, 401, 'Student profile PATCH by other student must fail with 401');
 
   // 7. Student Profile PATCH with own session (Must Succeed 200)
   const patchValid = await dispatch('PATCH', '/api/students/' + l1Id, { phone: '9876543210' }, { 'x-session-token': tok1 });
   console.log('7. Student profile PATCH with own session:', patchValid.code, patchValid.code === 200 ? 'PASS (Updated phone: ' + patchValid.data?.learner?.phone + ')' : 'FAIL');
+  assert.strictEqual(patchValid.code, 200, 'Student profile PATCH with own session must succeed with 200');
 
   // Clean up test records
   db.prepare('DELETE FROM sessions WHERE token IN (?, ?)').run(tok1, tok2);
@@ -95,4 +121,9 @@ async function testSecurityGates() {
   console.log('=== ALL GATE 1 & GATE 2 TESTS PASSED! ===');
 }
 
-testSecurityGates();
+testSecurityGates().then(() => {
+  process.exit(0);
+}).catch(err => {
+  console.error('Security test failed:', err);
+  process.exit(1);
+});

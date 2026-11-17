@@ -33,5 +33,11 @@ jobs:
       - name: Security & RLS Authorization Regression Test
         run: node scripts/test_security_gates.mjs
 
+      - name: School Pack & A-Codes Verification
+        run: node scripts/test_school_pack_and_acode_flow.mjs
+
+      - name: Gold Plan & Days Adder Verification
+        run: node scripts/test_gold_plan_branding_and_days_adder.mjs
+
       - name: Database Backup & Hot Snapshot Verification
         run: node scripts/backup_database.mjs
