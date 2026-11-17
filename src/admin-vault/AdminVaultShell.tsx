@@ -221,7 +221,7 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-2 shrink-0">
+              <div className="flex items-center space-x-2 shrink-0 flex-wrap gap-y-1">
                 <a
                   href="https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true"
                   target="_blank"
@@ -237,6 +237,22 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
                   className="px-2.5 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-[10px] font-bold text-indigo-300 transition-colors"
                 >
                   ₹129 Gateway ↗
+                </a>
+                <a
+                  href="https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2.5 py-1.5 rounded-lg bg-amber-600/30 hover:bg-amber-600/50 border border-amber-500/40 text-[10px] font-bold text-amber-300 transition-colors"
+                >
+                  ₹205 Gold ↗
+                </a>
+                <a
+                  href="https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2.5 py-1.5 rounded-lg bg-yellow-600/30 hover:bg-yellow-600/50 border border-yellow-500/40 text-[10px] font-bold text-yellow-300 transition-colors"
+                >
+                  ₹2,499 School ↗
                 </a>
               </div>
             </div>

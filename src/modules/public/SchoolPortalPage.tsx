@@ -262,7 +262,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
               ← Back to {isAuthenticated ? 'Dashboard' : 'Home'}
             </button>
             <a
-              href="https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true"
+              href={PaymentService.getSchoolGatewayUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black transition-all flex items-center space-x-1 shadow-md shadow-amber-950/40"
@@ -493,7 +493,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   </span>
 
                   <a
-                    href="https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true"
+                    href={PaymentService.getSchoolGatewayUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer"

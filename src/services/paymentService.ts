@@ -99,10 +99,11 @@ export function getDynamicPlanPricing(tier: 'LITE' | 'PLUS' | 'GOLD'): PlanPrici
   }
 }
 
-export const UPI_GATEWAY_URLS: Record<'LITE' | 'PLUS' | 'GOLD', string> = {
+export const UPI_GATEWAY_URLS: Record<'LITE' | 'PLUS' | 'GOLD' | 'SCHOOL', string> = {
   LITE: 'https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true',
   PLUS: 'https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true',
-  GOLD: 'https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true'
+  GOLD: 'https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true',
+  SCHOOL: 'https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true'
 };
 
 export class PaymentService {
@@ -114,9 +115,17 @@ export class PaymentService {
    * ₹49 (Lite) = https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true
    * ₹129 (Plus) = https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true
    * ₹205 (Gold) = https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true
+   * ₹2,499 (School) = https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true
    */
-  public static getGatewayUrl(tier: 'LITE' | 'PLUS' | 'GOLD'): string {
+  public static getGatewayUrl(tier: 'LITE' | 'PLUS' | 'GOLD' | 'SCHOOL'): string {
     return UPI_GATEWAY_URLS[tier];
+  }
+
+  /**
+   * Retrieves official School Institutional Pack UPI PG gateway URL (₹2,499).
+   */
+  public static getSchoolGatewayUrl(): string {
+    return UPI_GATEWAY_URLS.SCHOOL;
   }
 
   /**

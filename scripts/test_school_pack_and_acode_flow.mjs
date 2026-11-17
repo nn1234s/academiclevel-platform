@@ -44,6 +44,14 @@ runTest('SchoolPortalPage.tsx contains 2499 offer, 20 Plus / 40 Lite codes, Quiz
   assert(content.includes('sampleScores') || content.includes('Live Classroom Quiz Tracker'), 'Missing Quiz tracker data/table');
   assert(content.includes('weakPointTopics') || content.includes('Conceptual Weak Points'), 'Missing Weak Points diagnostic');
   assert(content.includes('handleEnableTeacherMode') || content.includes('handleTeacherRegister'), 'Missing Teacher account activation');
+  assert(content.includes('PaymentService.getSchoolGatewayUrl()'), 'SchoolPortalPage must link directly to PaymentService.getSchoolGatewayUrl()');
+});
+
+// 2.1 Verify PaymentService UPI_GATEWAY_URLS contains SCHOOL pack url
+runTest('PaymentService.ts contains official ₹2,499 School gateway URL', () => {
+  const content = fs.readFileSync(path.join(rootDir, 'src/services/paymentService.ts'), 'utf8');
+  assert(content.includes('https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true'), 'Missing VucCVS8VRxJC9iQWEjVv school payment url in paymentService');
+  assert(content.includes('getSchoolGatewayUrl'), 'Missing getSchoolGatewayUrl method in PaymentService');
 });
 
 // 3. Verify App.tsx route resolution for /school

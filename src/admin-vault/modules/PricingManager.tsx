@@ -389,7 +389,7 @@ export const PricingManager: React.FC = () => {
               <Sparkles className="w-4 h-4 text-emerald-400" />
               <span>Official Automated UPI PG Gateway Endpoints</span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="p-3 bg-slate-950/80 rounded-xl border border-emerald-500/20">
                 <span className="text-[10px] font-mono text-emerald-400 font-bold block mb-1">Lite Plan (₹49 - 60 Days):</span>
                 <a
@@ -421,6 +421,17 @@ export const PricingManager: React.FC = () => {
                   className="font-mono text-[11px] text-amber-300 hover:underline break-all"
                 >
                   https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true ↗
+                </a>
+              </div>
+              <div className="p-3 bg-slate-950/80 rounded-xl border border-yellow-500/30">
+                <span className="text-[10px] font-mono text-yellow-400 font-bold block mb-1">🏫 School Pack (₹2,499 - 20/40 Codes):</span>
+                <a
+                  href="https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-mono text-[11px] text-yellow-300 hover:underline break-all"
+                >
+                  https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true ↗
                 </a>
               </div>
             </div>

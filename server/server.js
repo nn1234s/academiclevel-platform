@@ -75,9 +75,9 @@ app.get(['/policies', '/policies/', '/policies.html'], (req, res) => {
 if (fs.existsSync(DIST_PATH)) {
   app.use(express.static(DIST_PATH));
 
-  // SPA fallback for all GET requests outside /api
+  // SPA fallback for all GET & HEAD requests outside /api
   app.use((req, res, next) => {
-    if (req.method === 'GET' && !req.url.startsWith('/api')) {
+    if ((req.method === 'GET' || req.method === 'HEAD') && !req.url.startsWith('/api')) {
       return res.sendFile(path.join(DIST_PATH, 'index.html'));
     }
     next();
