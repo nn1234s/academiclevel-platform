@@ -16,7 +16,8 @@ import {
   Eye,
   EyeOff,
   LogOut,
-  Trash2
+  Trash2,
+  Crown
 } from 'lucide-react';
 
 interface StudentProfileProps {
@@ -132,6 +133,67 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
             <LogOut className="w-3.5 h-3.5 text-rose-400" />
             <span>Sign Out</span>
           </button>
+        </div>
+      </div>
+
+      {/* Active Subscription & Entitlement Branding Card */}
+      <div className={`p-6 rounded-3xl border shadow-xl transition-all ${
+        learner.activePlan === 'GOLD'
+          ? 'bg-gradient-to-br from-amber-950/40 via-slate-900 to-amber-950/20 border-amber-500/50 ring-1 ring-amber-500/30'
+          : (learner.hasActiveSubscription ? 'bg-slate-900 border-indigo-900/50' : 'bg-slate-900 border-slate-800')
+      }`}>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center space-x-3.5">
+            {learner.activePlan === 'GOLD' ? (
+              <div className="p-3 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-lg shadow-amber-950/50 flex-shrink-0">
+                <Crown className="w-6 h-6 text-amber-300" />
+              </div>
+            ) : (
+              <div className="p-3 rounded-2xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex-shrink-0">
+                <Shield className="w-6 h-6 text-indigo-400" />
+              </div>
+            )}
+            <div>
+              <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                <h3 className="text-base font-black text-white">
+                  {learner.activePlan === 'GOLD' 
+                    ? '👑 1-Year AcademicLevel Gold Pass' 
+                    : (learner.activePlan === 'PLUS' 
+                        ? 'AcademicLevel Plus (180 Days)' 
+                        : (learner.activePlan === 'LITE' 
+                            ? 'Concept Booster Pass (60 Days)' 
+                            : 'Free Starter Account'))}
+                </h3>
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
+                  learner.hasActiveSubscription
+                    ? (learner.activePlan === 'GOLD' 
+                        ? 'bg-amber-400 text-slate-950 font-black' 
+                        : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30')
+                    : 'bg-slate-800 text-slate-400'
+                }`}>
+                  {learner.hasActiveSubscription ? 'ACTIVE' : 'FREE TIER'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-1 max-w-lg">
+                {learner.activePlan === 'GOLD'
+                  ? '365 Days (1 Full Academic Year) complete coverage: Terms 1 & 2, Midterms, Final Board Exams, VIP Store Rewards, & Nova AI 24/7.'
+                  : (learner.activePlan === 'PLUS'
+                      ? '180 Days Semester Pass: Unlimited Quizzes, Olympiad & Foundation reasoning track.'
+                      : (learner.activePlan === 'LITE'
+                          ? '60 Days Concept Booster: Unlimited Quizzes & Nova AI Socratic tutor.'
+                          : 'Upgrade to Gold (₹205 / 365 Days) to lift all daily study quotas.'))}
+              </p>
+            </div>
+          </div>
+
+          {learner.subscriptionExpiresAt && learner.hasActiveSubscription && (
+            <div className="text-left sm:text-right bg-black/40 border border-white/10 px-4 py-2.5 rounded-2xl flex-shrink-0">
+              <span className="text-[10px] text-slate-400 uppercase font-mono block">Validity Status</span>
+              <span className="text-xs font-bold text-amber-300 font-mono">
+                Valid till {new Date(learner.subscriptionExpiresAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

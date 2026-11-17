@@ -38,7 +38,8 @@ import {
   ExternalLink,
   Package,
   Truck,
-  MapPin
+  MapPin,
+  Crown
 } from 'lucide-react';
 
 interface StudentDashboardProps {
@@ -207,10 +208,17 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </span>
 
               {quota.hasActiveSubscription && (
-                <span className="px-2.5 py-1 bg-emerald-500/30 backdrop-blur-md rounded-full text-[10px] font-bold text-white flex items-center space-x-1">
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span>{quota.activePlan === 'LITE' ? 'Concept Booster (60d)' : `${quota.activePlan} Scholar`} Active</span>
-                </span>
+                quota.activePlan === 'GOLD' ? (
+                  <span className="px-3 py-1 bg-gradient-to-r from-amber-500/30 via-yellow-500/20 to-amber-500/30 border border-amber-400/40 backdrop-blur-md rounded-full text-[10px] font-black tracking-wider text-amber-200 flex items-center space-x-1.5 shadow-lg shadow-amber-950/40">
+                    <Crown className="w-3.5 h-3.5 text-amber-300 flex-shrink-0" />
+                    <span>👑 1-YEAR GOLD VIP PASS (365d) ACTIVE</span>
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-1 bg-emerald-500/30 backdrop-blur-md rounded-full text-[10px] font-bold text-white flex items-center space-x-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    <span>{quota.activePlan === 'LITE' ? 'Concept Booster (60d)' : `${quota.activePlan} Scholar`} Active</span>
+                  </span>
+                )
               )}
             </div>
 
@@ -661,13 +669,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div>
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
               <Zap className="w-4 h-4 text-amber-400" />
-              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'LITE' ? 'Concept Booster Status' : `${quota.activePlan} Scholar Status`) : 'Subscription & Quota Engine'}</span>
+              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'GOLD' ? '👑 1-Year Gold VIP Status' : (quota.activePlan === 'LITE' ? 'Concept Booster Status' : `${quota.activePlan} Scholar Status`)) : 'Subscription & Quota Engine'}</span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
               {quota.hasActiveSubscription
-                ? (quota.activePlan === 'LITE'
-                    ? `Concept Booster Active • 60 Days Unlimited Quizzes (${quota.daysRemaining} days remaining)`
-                    : `${quota.activePlan} Plan Active • Unlimited Access (${quota.daysRemaining} days remaining)`)
+                ? (quota.activePlan === 'GOLD'
+                    ? `👑 1-Year Gold Pass Active • Full 365 Days All-Access Pass • All Quotas Lifted (${quota.daysRemaining} days remaining)`
+                    : (quota.activePlan === 'LITE'
+                        ? `Concept Booster Active • 60 Days Unlimited Quizzes (${quota.daysRemaining} days remaining)`
+                        : `${quota.activePlan} Plan Active • Unlimited Access (${quota.daysRemaining} days remaining)`))
                 : '60-Day Concept Booster pass expired. Upgrade to continue unlimited quizzes.'}
             </p>
           </div>

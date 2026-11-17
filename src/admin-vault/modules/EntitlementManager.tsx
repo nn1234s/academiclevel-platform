@@ -13,8 +13,8 @@ export const EntitlementManager: React.FC = () => {
   );
 
   const [selectedLearnerId, setSelectedLearnerId] = useState<string>(learners[0]?.id || '');
-  const [trialDays, setTrialDays] = useState<number>(30);
-  const [trialTier, setTrialTier] = useState<'LITE' | 'PLUS'>('PLUS');
+  const [trialDays, setTrialDays] = useState<number>(365);
+  const [trialTier, setTrialTier] = useState<'LITE' | 'PLUS' | 'GOLD'>('GOLD');
   const [notice, setNotice] = useState<string>('');
 
   const refreshSubs = async () => {
@@ -87,8 +87,9 @@ export const EntitlementManager: React.FC = () => {
               onChange={e => setTrialTier(e.target.value as any)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
             >
-              <option value="LITE">Lite Plan (Basic)</option>
-              <option value="PLUS">Plus Plan (Full + Olympiad)</option>
+              <option value="GOLD">👑 Gold Plan (365 Days - 1-Year Pass)</option>
+              <option value="PLUS">Plus Plan (180 Days)</option>
+              <option value="LITE">Lite Plan (60 Days)</option>
             </select>
           </div>
 

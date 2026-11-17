@@ -2885,8 +2885,23 @@ apiRouter.post('/admin/learners/:id/grant-premium', adminAuth, (req, res) => {
 
     const targetLearnerIds = Array.from(new Set([learner.id, ...linkedLearners.map(l => l.id)]));
 
+    // Days Adder Engine: Check for existing active subscription to extend days cumulatively
+    const existingActiveSub = db.prepare(`
+      SELECT * FROM subscriptions 
+      WHERE learnerId = ? AND status = 'ACTIVE' AND expiresAt IS NOT NULL
+      ORDER BY expiresAt DESC LIMIT 1
+    `).get(learner.id);
+
     const now = new Date();
-    const expiry = new Date(now.getTime() + Number(durationDays || 60) * 24 * 60 * 60 * 1000);
+    let baseTime = now.getTime();
+    if (existingActiveSub && existingActiveSub.expiresAt) {
+      const expTime = new Date(existingActiveSub.expiresAt).getTime();
+      if (expTime > baseTime) {
+        baseTime = expTime; // Extend seamlessly from existing expiration date (Days Adder)
+      }
+    }
+    const daysToAdd = Number(durationDays) || (tier === 'GOLD' ? 365 : (tier === 'PLUS' ? 180 : 60));
+    const expiry = new Date(baseTime + daysToAdd * 24 * 60 * 60 * 1000);
 
     // Apply active subscription across all linked accounts
     for (const lid of targetLearnerIds) {
@@ -2902,11 +2917,11 @@ apiRouter.post('/admin/learners/:id/grant-premium', adminAuth, (req, res) => {
       `).run(
         subId,
         lid,
-        tier || 'PLUS',
+        tier || (daysToAdd >= 365 ? 'GOLD' : 'PLUS'),
         'ACTIVE',
         'ADMIN_TRIAL',
         0,
-        Number(durationDays || 60),
+        daysToAdd,
         now.toISOString(),
         expiry.toISOString(),
         SUPER_ADMIN_EMAIL,
@@ -3073,13 +3088,32 @@ apiRouter.post('/admin/payments/:id/approve', adminAuth, (req, res) => {
     if (!sub) return res.status(404).json({ success: false, error: 'Subscription not found' });
 
     const now = new Date();
-    const expiry = new Date(now.getTime() + sub.durationDays * 24 * 60 * 60 * 1000);
+    // Days Adder Engine: Check if learner has an existing active subscription to add days cumulatively
+    const existingActive = db.prepare(`
+      SELECT * FROM subscriptions 
+      WHERE learnerId = ? AND id != ? AND status = 'ACTIVE' AND expiresAt IS NOT NULL
+      ORDER BY expiresAt DESC LIMIT 1
+    `).get(sub.learnerId, sub.id);
+
+    let baseTime = now.getTime();
+    if (existingActive && existingActive.expiresAt) {
+      const expTime = new Date(existingActive.expiresAt).getTime();
+      if (expTime > baseTime) {
+        baseTime = expTime; // Extend days from existing active expiry!
+      }
+      // Mark old subscription as superseded so only the latest is active
+      try {
+        db.prepare(`UPDATE subscriptions SET status = 'SUPERSEDED' WHERE id = ?`).run(existingActive.id);
+      } catch {}
+    }
+    const daysToAdd = Number(sub.durationDays) || (sub.planTier === 'GOLD' ? 365 : (sub.planTier === 'PLUS' ? 180 : 60));
+    const expiry = new Date(baseTime + daysToAdd * 24 * 60 * 60 * 1000);
 
     db.prepare(`
       UPDATE subscriptions
-      SET status = 'ACTIVE', startsAt = ?, expiresAt = ?, verifiedByAdmin = ?, verifiedAt = ?
+      SET status = 'ACTIVE', startsAt = ?, expiresAt = ?, durationDays = ?, verifiedByAdmin = ?, verifiedAt = ?
       WHERE id = ?
-    `).run(now.toISOString(), expiry.toISOString(), SUPER_ADMIN_EMAIL, now.toISOString(), sub.id);
+    `).run(now.toISOString(), expiry.toISOString(), daysToAdd, SUPER_ADMIN_EMAIL, now.toISOString(), sub.id);
 
     db.prepare(`
       INSERT INTO security_audit_logs (id, timestampUtc, actorEmail, actionType, targetId, severity, details)
@@ -4578,6 +4612,18 @@ const DEFAULT_CONFIG = {
       'Offline Question Bank Full Synchronization',
       'Bonus 40-Coin Referral Jackpot eligibility',
       'Max 1 Class Change during active cycle'
+    ],
+    goldPriceInr: 205,
+    goldDurationDays: 365,
+    goldFeatures: [
+      'Full 365-Day Complete Academic Year Coverage',
+      'Both Terms, Midterms & Final Board Exams Covered',
+      'VIP Priority Physical Store Rewards Eligibility',
+      'Exclusive Gold Scholar Profile Badge & Frame',
+      'Olympiad, NTSE & National Foundation Track',
+      'Annual Master Certificate of Academic Excellence',
+      '24/7 Nova AI Socratic Tutor with Priority Pool',
+      'Max 2 Class Changes during active cycle'
     ]
   },
   home: {

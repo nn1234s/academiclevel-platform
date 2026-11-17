@@ -45,8 +45,8 @@ export const StudentManagement: React.FC = () => {
 
   // Quick Grant Premium dropdown/modal state
   const [grantingForLearner, setGrantingForLearner] = useState<Learner | null>(null);
-  const [grantTier, setGrantTier] = useState<'LITE' | 'PLUS'>('PLUS');
-  const [grantDays, setGrantDays] = useState<number>(180);
+  const [grantTier, setGrantTier] = useState<'LITE' | 'PLUS' | 'GOLD'>('GOLD');
+  const [grantDays, setGrantDays] = useState<number>(365);
   const [grantNote, setGrantNote] = useState<string>('');
 
   // Kid Control Modal internal state
@@ -152,7 +152,7 @@ export const StudentManagement: React.FC = () => {
   };
 
   // One-Click Quick Grant
-  const handleQuickGrant = async (learner: Learner, tier: 'LITE' | 'PLUS', days: number) => {
+  const handleQuickGrant = async (learner: Learner, tier: 'LITE' | 'PLUS' | 'GOLD', days: number) => {
     try {
       const res = await PaymentService.grantPremiumDirect(SUPER_ADMIN_EMAIL, learner.id, tier, days, `Quick grant: ${days} days`);
       if (res.success) {
@@ -523,13 +523,15 @@ export const StudentManagement: React.FC = () => {
                           <div>
                             <span
                               className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold inline-flex items-center space-x-1 ${
-                                subInfo.tier === 'PLUS'
-                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                                  : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                                subInfo.tier === 'GOLD'
+                                  ? 'bg-gradient-to-r from-amber-400 to-yellow-400 text-slate-950 font-black border border-amber-300 shadow-sm'
+                                  : (subInfo.tier === 'PLUS'
+                                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                                      : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40')
                               }`}
                             >
                               <Zap className="w-3 h-3 text-amber-400" />
-                              <span>{subInfo.tier} Active ({subInfo.daysLeft}d left)</span>
+                              <span>{subInfo.tier === 'GOLD' ? '👑 1-Year Gold' : subInfo.tier} Active ({subInfo.daysLeft}d left)</span>
                             </span>
                             <p className="text-[10px] text-slate-500 font-mono mt-0.5">
                               Exp: {new Date(subInfo.expiresAt!).toLocaleDateString()}
@@ -676,21 +678,37 @@ export const StudentManagement: React.FC = () => {
 
             <div className="space-y-3">
               <label className="block text-xs font-semibold text-slate-300">Choose Plan Tier</label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGrantTier('GOLD');
+                    setGrantDays(365);
+                  }}
+                  className={`p-3 rounded-2xl border text-left transition-all ${
+                    grantTier === 'GOLD'
+                      ? 'bg-amber-500/20 border-amber-400 text-amber-300 ring-2 ring-amber-500/30'
+                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  <p className="font-extrabold text-xs text-amber-400">👑 Gold (365d)</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">1-Year All-Access VIP</p>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => {
                     setGrantTier('PLUS');
                     setGrantDays(180);
                   }}
-                  className={`p-3.5 rounded-2xl border text-left transition-all ${
+                  className={`p-3 rounded-2xl border text-left transition-all ${
                     grantTier === 'PLUS'
                       ? 'bg-amber-500/10 border-amber-500 text-amber-300'
-                      : 'bg-slate-950 border-slate-800 text-slate-400'
+                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  <p className="font-extrabold text-sm text-white">Plus Plan (180 Days)</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Olympiad + Full Mastery</p>
+                  <p className="font-extrabold text-xs text-white">Plus (180d)</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Olympiad + Mastery</p>
                 </button>
 
                 <button
@@ -699,61 +717,78 @@ export const StudentManagement: React.FC = () => {
                     setGrantTier('LITE');
                     setGrantDays(60);
                   }}
-                  className={`p-3.5 rounded-2xl border text-left transition-all ${
+                  className={`p-3 rounded-2xl border text-left transition-all ${
                     grantTier === 'LITE'
                       ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300'
-                      : 'bg-slate-950 border-slate-800 text-slate-400'
+                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  <p className="font-extrabold text-sm text-white">Lite Plan (60 Days)</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Standard Unlimited Quota</p>
+                  <p className="font-extrabold text-xs text-white">Lite (60d)</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Standard Unlimited</p>
                 </button>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Duration (Days)</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Duration (Days)
+                </label>
                 <input
                   type="number"
                   min={1}
-                  max={730}
+                  max={1460}
                   value={grantDays}
                   onChange={e => setGrantDays(Number(e.target.value))}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                 />
+                <span className="text-[10px] text-emerald-400 mt-1 block">
+                  ⚡ Cumulative Days Adder: Extends existing active days
+                </span>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Quick Presets</label>
-                <div className="flex gap-1.5">
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Days Adder Presets</label>
+                <div className="grid grid-cols-5 gap-1">
                   <button
                     type="button"
                     onClick={() => setGrantDays(30)}
-                    className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded-lg"
+                    className="py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded-lg text-center"
+                    title="Set to 30 days"
                   >
                     30d
                   </button>
                   <button
                     type="button"
                     onClick={() => setGrantDays(60)}
-                    className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded-lg"
+                    className="py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded-lg text-center"
+                    title="Set to 60 days"
                   >
                     60d
                   </button>
                   <button
                     type="button"
                     onClick={() => setGrantDays(180)}
-                    className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded-lg"
+                    className="py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded-lg text-center"
+                    title="Set to 180 days"
                   >
                     180d
                   </button>
                   <button
                     type="button"
                     onClick={() => setGrantDays(365)}
-                    className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold rounded-lg"
+                    className="py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold rounded-lg text-center border border-amber-500/30"
+                    title="1 Full Year (365 days)"
                   >
-                    1 Year
+                    1 Yr
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGrantDays(prev => prev + 365)}
+                    className="py-2 bg-amber-600 hover:bg-amber-500 text-white text-[10px] font-black rounded-lg text-center shadow"
+                    title="Add +365 days (Days Adder)"
+                  >
+                    +365
                   </button>
                 </div>
               </div>

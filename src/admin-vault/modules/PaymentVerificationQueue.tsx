@@ -39,7 +39,7 @@ export const PaymentVerificationQueue: React.FC = () => {
   // Quick manual grant modal state
   const [showGrantModal, setShowGrantModal] = useState<boolean>(false);
   const [grantTargetId, setGrantTargetId] = useState<string>('');
-  const [grantTier, setGrantTier] = useState<'LITE' | 'PLUS'>('PLUS');
+  const [grantTier, setGrantTier] = useState<'LITE' | 'PLUS' | 'GOLD'>('GOLD');
   const [grantDays, setGrantDays] = useState<number>(365);
   const [isGranting, setIsGranting] = useState<boolean>(false);
 
@@ -621,8 +621,9 @@ export const PaymentVerificationQueue: React.FC = () => {
                     onChange={e => setGrantTier(e.target.value as any)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-bold"
                   >
-                    <option value="PLUS">PLUS Plan (Unlimited)</option>
-                    <option value="LITE">LITE Plan</option>
+                    <option value="GOLD">👑 GOLD Pass (365d / ₹205 - 1 Year)</option>
+                    <option value="PLUS">PLUS Plan (180d / ₹129)</option>
+                    <option value="LITE">LITE Plan (60d / ₹49)</option>
                   </select>
                 </div>
                 <div>

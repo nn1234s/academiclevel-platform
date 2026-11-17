@@ -532,6 +532,17 @@ export class PaymentService {
     }
 
     const allSubs = StorageRLSLayer.getAllSubscriptionsAdmin(adminEmail);
+    // Days Adder Engine: Check existing active subscription expiry to add days cumulatively
+    let existingActiveExpiry = 0;
+    allSubs.forEach(s => {
+      if (s.learnerId === learnerId && s.status === 'ACTIVE' && s.expiresAt) {
+        const expTime = new Date(s.expiresAt).getTime();
+        if (expTime > existingActiveExpiry) {
+          existingActiveExpiry = expTime;
+        }
+      }
+    });
+
     // Mark previous active/pending subscriptions as superseded
     allSubs.forEach(s => {
       if (s.learnerId === learnerId && (s.status === 'ACTIVE' || s.status === 'PENDING_VERIFICATION')) {
@@ -541,7 +552,8 @@ export class PaymentService {
     });
 
     const now = new Date();
-    const expiry = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
+    const baseTime = existingActiveExpiry > now.getTime() ? existingActiveExpiry : now.getTime();
+    const expiry = new Date(baseTime + durationDays * 24 * 60 * 60 * 1000);
     const subId = 'admin_grant_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
 
     const subscription: Subscription = serverSub || {

@@ -66,7 +66,8 @@ import {
   Trophy,
   ShieldCheck,
   ChevronDown,
-  ExternalLink
+  ExternalLink,
+  Crown
 } from 'lucide-react';
 
 // Code-split Super-Admin Vault Shell (unlinked from public navigation)
@@ -583,6 +584,18 @@ export const App: React.FC = () => {
                 </>
               ) : (
                 <div className="flex items-center space-x-2 sm:space-x-3">
+                  {/* 1-Year Gold VIP Pass Badge */}
+                  {currentLearner?.activePlan === 'GOLD' && (
+                    <button
+                      onClick={() => navigateTo('PROFILE')}
+                      className="hidden sm:inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-400/50 text-amber-300 text-xs font-black shadow-sm cursor-pointer hover:border-amber-300 transition-all"
+                      title="1-Year Gold VIP Pass Active (365 Days Access)"
+                    >
+                      <Crown className="w-3.5 h-3.5 text-amber-300 flex-shrink-0" />
+                      <span>GOLD PASS</span>
+                    </button>
+                  )}
+
                   {/* Coin Badge */}
                   <button
                     onClick={() => navigateTo('GIFT_STORE')}
