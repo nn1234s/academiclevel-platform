@@ -1,9 +1,12 @@
 import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { db } from '../server/db.js';
 
-const ROOT_DIR = 'C:/Users/NEWADMIN/.gemini/antigravity/scratch/academiclevel-platform';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT_DIR = path.resolve(__dirname, '..');
 
 console.log('====================================================');
 console.log('1-YEAR GOLD PLAN: BRANDING, DAYS ADDER & OPTIMIZATION SUITE');
@@ -149,6 +152,12 @@ check('Admin Vault (Student Management, Payment Queue & Entitlement Manager) has
 console.log('\n====================================================');
 console.log(`RESULTS: ${passedTests} / ${totalTests} TESTS PASSED`);
 console.log('====================================================');
+
+if (passedTests === totalTests) {
+  process.exit(0);
+} else {
+  process.exit(1);
+}
 
 if (passedTests !== totalTests) {
   process.exit(1);
