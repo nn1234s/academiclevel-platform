@@ -233,7 +233,6 @@ export function initDatabaseSchema() {
     CREATE INDEX IF NOT EXISTS idx_messages_receiver ON student_messages(receiverId);
     CREATE INDEX IF NOT EXISTS idx_sessions_learner ON sessions(learnerId);
     CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expiresAt);
-    CREATE INDEX IF NOT EXISTS idx_claims_scholarship ON scholarship_claims(scholarshipId, learnerId);
 
     CREATE TABLE IF NOT EXISTS scholarships (
       id TEXT PRIMARY KEY,
@@ -264,6 +263,7 @@ export function initDatabaseSchema() {
       UNIQUE(scholarshipId, learnerId)
     );
 
+    CREATE INDEX IF NOT EXISTS idx_claims_scholarship ON scholarship_claims(scholarshipId, learnerId);
     CREATE INDEX IF NOT EXISTS idx_scholarship_claims_learner ON scholarship_claims(learnerId);
     CREATE INDEX IF NOT EXISTS idx_scholarship_claims_sch ON scholarship_claims(scholarshipId);
 
