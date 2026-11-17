@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PlanPricing, PLAN_PRICING, PaymentService } from '../../services/paymentService';
-import { CheckCircle2, ShieldCheck, AlertCircle, Copy, Check, ArrowLeft, Zap, ExternalLink, QrCode, AlertTriangle, Sparkles } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, AlertCircle, Copy, Check, ArrowLeft, Zap, ExternalLink, QrCode, AlertTriangle, Sparkles, KeyRound } from 'lucide-react';
 
 interface UPIQRCheckoutProps {
   planTier: 'LITE' | 'PLUS' | 'GOLD';
@@ -26,6 +26,36 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
   const [isActivatedSuccess, setIsActivatedSuccess] = useState<boolean>(false);
   const [activatedInvoice, setActivatedInvoice] = useState<string>('');
   const [noticeLang, setNoticeLang] = useState<'EN' | 'HINGLISH'>('EN');
+
+  // A-CODE voucher redemption state
+  const [acodeInput, setAcodeInput] = useState<string>('');
+  const [isRedeemingAcode, setIsRedeemingAcode] = useState<boolean>(false);
+  const [acodeMessage, setAcodeMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const handleRedeemAcode = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const cleanCode = acodeInput.trim().toUpperCase();
+    if (!cleanCode) return;
+
+    setIsRedeemingAcode(true);
+    setAcodeMessage(null);
+
+    try {
+      const res = await PaymentService.redeemACode(learnerId, cleanCode);
+      if (res.success) {
+        setAcodeMessage({ type: 'success', text: res.message });
+        setActivatedInvoice(`ACODE-${cleanCode}`);
+        setIsActivatedSuccess(true);
+        onSuccess(cleanCode);
+      } else {
+        setAcodeMessage({ type: 'error', text: res.message || 'Invalid or expired A-CODE.' });
+      }
+    } catch (err: any) {
+      setAcodeMessage({ type: 'error', text: err.message || 'Failed to redeem A-CODE.' });
+    } finally {
+      setIsRedeemingAcode(false);
+    }
+  };
 
   const handleOpenGateway = () => {
     setHasOpenedGateway(true);
@@ -221,6 +251,49 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
               </span>
             </div>
           )}
+
+          {/* A-CODE VOUCHER REDEMPTION SECTION */}
+          <div className="p-4 bg-gradient-to-r from-indigo-950/80 via-slate-900 to-indigo-950/80 rounded-2xl border border-indigo-500/40 text-left space-y-2.5 shadow-lg shadow-indigo-950/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-indigo-300 font-bold text-xs">
+                <KeyRound className="w-4 h-4 text-indigo-400 shrink-0" />
+                <span>Bought from an online store or School?</span>
+              </div>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                A-CODE Voucher
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-relaxed">
+              You will have gotten an <strong>A-CODE</strong>. Enter your A-CODE below to activate your plan instantly without paying again!
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Enter A-CODE (e.g. AL-PLUS-XXXX)"
+                value={acodeInput}
+                onChange={e => setAcodeInput(e.target.value.toUpperCase())}
+                className="flex-1 bg-slate-950 border border-slate-800 focus:border-indigo-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 font-mono tracking-wider focus:outline-none uppercase"
+              />
+              <button
+                type="button"
+                onClick={handleRedeemAcode}
+                disabled={isRedeemingAcode || !acodeInput.trim()}
+                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs rounded-xl shadow-md transition-all shrink-0 cursor-pointer disabled:opacity-50"
+              >
+                {isRedeemingAcode ? 'Activating...' : 'Apply A-CODE'}
+              </button>
+            </div>
+            {acodeMessage && (
+              <div className={`p-2.5 rounded-xl text-xs flex items-center space-x-1.5 ${
+                acodeMessage.type === 'success' 
+                  ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-300' 
+                  : 'bg-rose-950/60 border border-rose-500/40 text-rose-300'
+              }`}>
+                {acodeMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> : <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />}
+                <span>{acodeMessage.text}</span>
+              </div>
+            )}
+          </div>
 
           {/* Step 1: BUY NOW VIA UPI PG */}
           <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">

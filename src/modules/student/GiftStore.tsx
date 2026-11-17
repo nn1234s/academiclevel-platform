@@ -1496,6 +1496,7 @@ ${recipientName.trim()}`;
                   <option value="Malaysia">🇲🇾 Malaysia</option>
                   <option value="New Zealand">🇳🇿 New Zealand</option>
                   <option value="South Africa">🇿🇦 South Africa</option>
+                  <option value="Antarctica">🇦🇶 Antarctica (Polar Research Station / Base / Scientific Camp)</option>
                   <option value="Worldwide / Other Country">🌍 Worldwide / Other Country</option>
                 </select>
                 {recipientCountry === 'Worldwide / Other Country' && (

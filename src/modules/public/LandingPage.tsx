@@ -30,7 +30,10 @@ import {
   Brain,
   Video,
   Bot,
-  AlertTriangle
+  AlertTriangle,
+  School,
+  BarChart3,
+  KeyRound
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -1048,6 +1051,176 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 Paid on UPI PG? Create Account &amp; Activate Pass
               </button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 9. FOR SCHOOLS, EDUCATORS & INSTITUTIONS: CLASSROOM PACK & INTELLIGENCE */}
+      <section className="max-w-6xl mx-auto px-4 mt-16">
+        <div className="bg-gradient-to-b from-indigo-950/70 via-slate-900 to-slate-900 border-2 border-indigo-500/50 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+          {/* Subtle glow background */}
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Header */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-8 border-b border-slate-800">
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold shadow-sm">
+                <School className="w-4 h-4 text-amber-400" />
+                <span>FOR SCHOOLS, COACHINGS &amp; TUTORS</span>
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+                Institutional Classroom Pack • <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-300">₹2,499 Flat</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Empower your batch with <strong className="text-white">20 Plus (180 Days)</strong> or <strong className="text-white">40 Lite (60 Days)</strong> A-Codes, live quiz tracking, and automated conceptual weak point diagnostics.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => onNavigate ? onNavigate('SCHOOL_PORTAL') : (window.location.href = '/school')}
+                className="px-6 py-3.5 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-amber-950 transition-all flex items-center justify-center space-x-2 cursor-pointer transform hover:scale-[1.02]"
+              >
+                <School className="w-4 h-4 text-slate-950" />
+                <span>Open School Portal (₹2,499) ↗</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 3 Core Highlights Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
+            {/* 1. Bulk A-Codes Voucher Pack */}
+            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 space-y-3">
+              <div className="flex items-center space-x-2.5 text-amber-400 font-bold text-sm">
+                <KeyRound className="w-5 h-5 text-amber-400" />
+                <span>Bulk A-Codes Included</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Get <strong className="text-white">20 Plus A-Codes (180 Days each)</strong> or <strong className="text-white">40 Lite A-Codes (60 Days each)</strong> instantly in your teacher dashboard. Students activate in 1 tap without personal cards.
+              </p>
+              <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] font-mono text-emerald-400">
+                ✓ Cost per student: as low as ₹62.47
+              </div>
+            </div>
+
+            {/* 2. Live Classroom Quiz Tracking */}
+            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 space-y-3">
+              <div className="flex items-center space-x-2.5 text-indigo-400 font-bold text-sm">
+                <BarChart3 className="w-5 h-5 text-indigo-400" />
+                <span>Live Quiz Tracker</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Monitor student test submissions in real time. Filter by Class (1–12), Board (CBSE/ICSE/IGCSE), and see instant accuracy percentages without manual grading.
+              </p>
+              <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] font-mono text-indigo-300">
+                ✓ Live submission feed &amp; auto-grading
+              </div>
+            </div>
+
+            {/* 3. AI Conceptual Weak Points */}
+            <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 space-y-3">
+              <div className="flex items-center space-x-2.5 text-rose-400 font-bold text-sm">
+                <AlertTriangle className="w-5 h-5 text-rose-400" />
+                <span>Student Weak Points Heatmap</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                AI diagnostic scanner highlights sub-topics where students scored &lt;60% (e.g. Snell&apos;s law, quadratic word problems) so teachers can run targeted remedial quizzes.
+              </p>
+              <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-[11px] font-mono text-amber-300">
+                ✓ Pinpoints exact knowledge gaps
+              </div>
+            </div>
+          </div>
+
+          {/* Interactive Live Classroom Tracker & Weak Points Diagnostic Preview */}
+          <div className="mt-8 pt-8 border-t border-slate-800 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Live Quiz Activity Feed Mockup */}
+            <div className="bg-slate-950 rounded-2xl border border-slate-800/80 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-200 flex items-center space-x-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span>Classroom Quiz Activity Feed</span>
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">Class 10 CBSE Demo Batch</span>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+                  <div>
+                    <span className="font-bold text-white block">Aarav Patel • Science</span>
+                    <span className="text-[11px] text-slate-400">Light: Reflection &amp; Refraction</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                    60% Review
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+                  <div>
+                    <span className="font-bold text-white block">Priya Sharma • Mathematics</span>
+                    <span className="text-[11px] text-slate-400">Quadratic Equations &amp; Roots</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">
+                    40% Critical
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+                  <div>
+                    <span className="font-bold text-white block">Rohan Das • Science</span>
+                    <span className="text-[11px] text-slate-400">Acids, Bases &amp; Salts</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                    100% Passed
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Conceptual Weak Points Preview */}
+            <div className="bg-slate-950 rounded-2xl border border-slate-800/80 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-rose-300 flex items-center space-x-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Automated Conceptual Weak Points</span>
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">AI Pedagogical Scanner</span>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="p-2.5 rounded-xl bg-rose-950/20 border border-rose-800/40 space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-rose-200">Snell&apos;s Law &amp; Lens Formula (Physics)</span>
+                    <span className="text-[10px] font-mono font-bold text-rose-400">8/20 struggling (46%)</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-snug">
+                    Students confusing sign conventions (+/-) for focal length of concave vs convex lens.
+                  </p>
+                </div>
+                <div className="p-2.5 rounded-xl bg-amber-950/20 border border-amber-800/40 space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-amber-200">Speed &amp; Time Word Problems (Math)</span>
+                    <span className="text-[10px] font-mono font-bold text-amber-400">6/20 struggling (52%)</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-snug">
+                    Difficulty translating speed/distance word problems into standard quadratic equations.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Action Strip */}
+          <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-xs text-slate-300">
+              ⚡ <strong>First visit checks for Teacher account:</strong> Instant 1-click teacher mode using the same name and password as your account.
+            </div>
+            <button
+              type="button"
+              onClick={() => onNavigate ? onNavigate('SCHOOL_PORTAL') : (window.location.href = '/school')}
+              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center space-x-1.5 cursor-pointer shrink-0"
+            >
+              <span>Explore /school Offer &amp; Teacher Portal</span>
+              <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+            </button>
           </div>
         </div>
       </section>

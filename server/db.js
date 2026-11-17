@@ -213,13 +213,20 @@ export function initDatabaseSchema() {
     );
 
     CREATE INDEX IF NOT EXISTS idx_learners_email ON learners(email);
+    CREATE INDEX IF NOT EXISTS idx_learners_role ON learners(role);
     CREATE INDEX IF NOT EXISTS idx_subs_learner ON subscriptions(learnerId);
     CREATE INDEX IF NOT EXISTS idx_subs_status ON subscriptions(status);
     CREATE INDEX IF NOT EXISTS idx_ledger_learner ON coin_ledger(learnerId);
+    CREATE INDEX IF NOT EXISTS idx_coin_ledger_learner_ts ON coin_ledger(learnerId, timestampUtc DESC);
     CREATE INDEX IF NOT EXISTS idx_gifts_learner ON gift_requests(learnerId);
+    CREATE INDEX IF NOT EXISTS idx_gift_requests_status ON gift_requests(status);
     CREATE INDEX IF NOT EXISTS idx_progress_learner ON course_progress(learnerId);
+    CREATE INDEX IF NOT EXISTS idx_course_progress_comp ON course_progress(learnerId, subjectId, levelNode);
     CREATE INDEX IF NOT EXISTS idx_attempts_learner ON quiz_attempts(learnerId);
+    CREATE INDEX IF NOT EXISTS idx_quiz_attempts_comp ON quiz_attempts(learnerId, createdAt DESC);
+    CREATE INDEX IF NOT EXISTS idx_quiz_attempts_topic ON quiz_attempts(subjectId, levelNode, passed);
     CREATE INDEX IF NOT EXISTS idx_certs_learner ON certificates(learnerId);
+    CREATE INDEX IF NOT EXISTS idx_acodes_created ON acodes(createdBy, isRedeemed);
     CREATE INDEX IF NOT EXISTS idx_friendships_req ON friendships(requesterId);
     CREATE INDEX IF NOT EXISTS idx_friendships_rec ON friendships(receiverId);
     CREATE INDEX IF NOT EXISTS idx_messages_sender ON student_messages(senderId);

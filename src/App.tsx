@@ -23,6 +23,7 @@ import { HallOfFamePage } from './modules/public/HallOfFamePage';
 import { InnovativeEdtechPage } from './modules/public/InnovativeEdtechPage';
 import { NotFoundPika } from './modules/public/NotFoundPika';
 import { AccountDeletionPage } from './modules/public/AccountDeletionPage';
+import { SchoolPortalPage } from './modules/public/SchoolPortalPage';
 
 // Student Modules
 import { StudentDashboard } from './modules/student/StudentDashboard';
@@ -67,7 +68,8 @@ import {
   ShieldCheck,
   ChevronDown,
   ExternalLink,
-  Crown
+  Crown,
+  School
 } from 'lucide-react';
 
 // Code-split Super-Admin Vault Shell (unlinked from public navigation)
@@ -161,6 +163,16 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
   }
 
   // 3. Public static pages
+  if (
+    p === '/school' ||
+    p === '/schools' ||
+    p === '/institution' ||
+    p === '/institutions' ||
+    p === '/teacher' ||
+    p === '/teachers'
+  ) {
+    return { route: 'SCHOOL_PORTAL' };
+  }
   if (p === '/pricing') return { route: 'PRICING' };
   if (p === '/about') return { route: 'ABOUT' };
   if (p === '/faq') return { route: 'FAQ' };
@@ -208,6 +220,7 @@ function getPathForRoute(route: string): string {
     case 'ADS_FUNNEL': return '/special49';
     case 'ADVERT1_FUNNEL': return '/special49';
     case 'YT_ADS_FUNNEL': return '/special49';
+    case 'SCHOOL_PORTAL': return '/school';
     case 'PRICING': return '/pricing';
     case 'ABOUT': return '/about';
     case 'FAQ': return '/faq';
@@ -417,6 +430,16 @@ export const App: React.FC = () => {
     );
   }
 
+  // Dedicated Institutional Classroom Portal (/school, /schools, /institution, /teacher)
+  if (currentRoute === 'SCHOOL_PORTAL') {
+    return (
+      <SchoolPortalPage
+        onNavigate={navigateTo}
+        onSuccessAuth={() => refreshCurrentLearner()}
+      />
+    );
+  }
+
   return (
     <ErrorBoundary fallbackTitle="AcademicLevel Platform Error">
       <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
@@ -468,6 +491,17 @@ export const App: React.FC = () => {
                     }`}
                   >
                     Special ₹49 Offer
+                  </button>
+                  <button
+                    onClick={() => navigateTo('SCHOOL_PORTAL')}
+                    className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1.5 ${
+                      currentRoute === 'SCHOOL_PORTAL'
+                        ? 'text-amber-400 font-bold bg-amber-500/10 border border-amber-500/30'
+                        : 'text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    <School className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Schools (₹2,499)</span>
                   </button>
                   <button
                     onClick={() => navigateTo('ABOUT')}
@@ -673,6 +707,16 @@ export const App: React.FC = () => {
                   className="w-full text-left p-2.5 rounded-xl text-amber-400 font-bold hover:bg-slate-800"
                 >
                   Special ₹49 Offer
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('SCHOOL_PORTAL');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-amber-300 font-bold hover:bg-slate-800 flex items-center space-x-2"
+                >
+                  <School className="w-4 h-4 text-amber-400" />
+                  <span>Schools &amp; Tutors (₹2,499)</span>
                 </button>
                 <button
                   onClick={() => navigateTo('ABOUT')}
