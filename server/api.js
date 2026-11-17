@@ -293,6 +293,17 @@ export function executePermanentLearnerPurge(learnerId, actorEmail = 'USER_SELF_
   db.prepare('UPDATE learners SET referredBy = NULL WHERE referredBy = ?').run(learnerId);
   db.prepare('DELETE FROM learners WHERE id = ?').run(learnerId);
 
+  // Replicate cascade deletion to Turso cloud asynchronously
+  safeExecuteTursoAsync('DELETE FROM sessions WHERE learnerId = ?', [learnerId]);
+  safeExecuteTursoAsync('DELETE FROM subscriptions WHERE learnerId = ?', [learnerId]);
+  safeExecuteTursoAsync('DELETE FROM course_progress WHERE learnerId = ?', [learnerId]);
+  safeExecuteTursoAsync('DELETE FROM quiz_attempts WHERE learnerId = ?', [learnerId]);
+  safeExecuteTursoAsync('DELETE FROM certificates WHERE learnerId = ?', [learnerId]);
+  safeExecuteTursoAsync('DELETE FROM gift_requests WHERE learnerId = ?', [learnerId]);
+  safeExecuteTursoAsync('DELETE FROM coin_ledger WHERE learnerId = ?', [learnerId]);
+  safeExecuteTursoAsync('DELETE FROM scholarship_claims WHERE learnerId = ?', [learnerId]);
+  safeExecuteTursoAsync('DELETE FROM learners WHERE id = ?', [learnerId]);
+
   // Record immutable security audit log
   try {
     db.prepare(`
@@ -1113,22 +1124,41 @@ apiRouter.post('/students/:id/spin', (req, res) => {
       WHERE id = ?
     `).run(newBalance, nowIso, nowIso, learner.id);
 
+    const spinTxId = 'c_tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+    const spinSig = 'SIG_' + crypto.randomBytes(6).toString('hex');
+    const spinMeta = JSON.stringify({ isJackpot: coinsWon === 40 });
+
     db.prepare(`
       INSERT INTO coin_ledger (
         entryId, learnerId, amount, transactionType, reasonCode,
         balanceAfter, metadataJson, timestampUtc, signatureHash
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
-      'c_tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      spinTxId,
       learner.id,
       coinsWon,
       'CREDIT',
       'DAILY_SPIN_WHEEL',
       newBalance,
-      JSON.stringify({ isJackpot: coinsWon === 40 }),
+      spinMeta,
       nowIso,
-      'SIG_' + crypto.randomBytes(6).toString('hex')
+      spinSig
     );
+
+    // Replicate learner balance update and coin ledger to Turso
+    const updatedLearner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learner.id);
+    if (updatedLearner) safeReplicateAsync('learners', updatedLearner);
+    safeReplicateAsync('coin_ledger', {
+      entryId: spinTxId,
+      learnerId: learner.id,
+      amount: coinsWon,
+      transactionType: 'CREDIT',
+      reasonCode: 'DAILY_SPIN_WHEEL',
+      balanceAfter: newBalance,
+      metadataJson: spinMeta,
+      timestampUtc: nowIso,
+      signatureHash: spinSig
+    });
 
     res.json({ success: true, coinsWon, newBalance, isJackpot: coinsWon === 40 });
   } catch (err) {
@@ -1231,6 +1261,10 @@ apiRouter.post('/payments/submit', paymentLimiter, (req, res) => {
       );
 
       subscription = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(subId);
+    }
+
+    if (subscription) {
+      safeReplicateAsync('subscriptions', subscription);
     }
 
     exportDbToJsonStore();
@@ -3060,6 +3094,11 @@ apiRouter.post('/admin/payments/:id/approve', adminAuth, (req, res) => {
       `Approved subscription ${sub.id} (${sub.planTier} ${sub.durationDays}d) for learner ${sub.learnerId}. UTR: ${sub.utrReference || 'None'}`
     );
 
+    const approvedSub = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(sub.id);
+    if (approvedSub) {
+      safeReplicateAsync('subscriptions', approvedSub);
+    }
+
     exportDbToJsonStore();
 
     res.json({ success: true, message: `Subscription ${sub.id} activated.` });
@@ -3072,6 +3111,10 @@ apiRouter.post('/admin/payments/:id/reject', adminAuth, (req, res) => {
   try {
     const { reason } = req.body;
     db.prepare(`UPDATE subscriptions SET status = 'REVOKED', verifiedByAdmin = ?, verifiedAt = datetime('now') WHERE id = ?`).run(SUPER_ADMIN_EMAIL, req.params.id);
+    const rejectedSub = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(req.params.id);
+    if (rejectedSub) {
+      safeReplicateAsync('subscriptions', rejectedSub);
+    }
     exportDbToJsonStore();
     res.json({ success: true, message: `Subscription ${req.params.id} rejected. Reason: ${reason || 'Admin rejection'}` });
   } catch (err) {

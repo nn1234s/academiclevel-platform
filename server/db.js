@@ -17,10 +17,13 @@ if (!fs.existsSync(dataDir)) {
 
 export const db = new DatabaseSync(DB_PATH);
 
-// Enable WAL mode for high concurrency
+// Enable WAL mode and high-performance settings for massive concurrent student concurrency
 db.exec('PRAGMA journal_mode = WAL;');
 db.exec('PRAGMA synchronous = NORMAL;');
 db.exec('PRAGMA foreign_keys = ON;');
+db.exec('PRAGMA busy_timeout = 5000;');
+db.exec('PRAGMA cache_size = -64000;');
+db.exec('PRAGMA temp_store = MEMORY;');
 
 export function initDatabaseSchema() {
   db.exec(`
@@ -221,6 +224,9 @@ export function initDatabaseSchema() {
     CREATE INDEX IF NOT EXISTS idx_friendships_rec ON friendships(receiverId);
     CREATE INDEX IF NOT EXISTS idx_messages_sender ON student_messages(senderId);
     CREATE INDEX IF NOT EXISTS idx_messages_receiver ON student_messages(receiverId);
+    CREATE INDEX IF NOT EXISTS idx_sessions_learner ON sessions(learnerId);
+    CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expiresAt);
+    CREATE INDEX IF NOT EXISTS idx_claims_scholarship ON scholarship_claims(scholarshipId, learnerId);
 
     CREATE TABLE IF NOT EXISTS scholarships (
       id TEXT PRIMARY KEY,

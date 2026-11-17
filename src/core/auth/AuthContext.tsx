@@ -144,8 +144,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (document.visibilityState === 'visible') onFocusOrVisible();
     });
 
-    // Auto-poll every 15 seconds so admin manual grants reflect smoothly
-    const interval = setInterval(onFocusOrVisible, 15000);
+    // Adaptive visibility-aware auto-poll: only poll when the tab is actively visible to the student
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        onFocusOrVisible();
+      }
+    }, 45000);
 
     return () => {
       isMounted = false;

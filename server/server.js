@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import { apiRouter } from './api.js';
 import { db } from './db.js';
-import { pullAllFromTurso, pushAllToTurso, startPeriodicSync, TURSO_CONFIG } from './tursoClient.js';
+import { pullAllFromTurso, pushAllToTurso, startPeriodicSync, flushTursoWriteBuffer, TURSO_CONFIG } from './tursoClient.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -96,10 +96,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     console.log(`🛡️ Super-Admin Route: /adminservice (Protected)`);
     console.log(`====================================================`);
 
-    // Synchronize latest records from Turso Cloud Database
+    // Synchronize latest records from Turso Cloud Database with zero-write delta checking
     try {
       await pullAllFromTurso(db);
-      startPeriodicSync(db, 60000);
+      startPeriodicSync(db, 300000); // 5-minute background safety check (0 writes if no changes)
     } catch (syncErr) {
       console.warn('[Turso Boot Sync Warning]:', syncErr.message);
     }
@@ -109,6 +109,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const handleShutdown = async (signal) => {
     console.log(`[Shutdown] ${signal} received. Flushing records to Turso cloud...`);
     try {
+      await flushTursoWriteBuffer();
       await pushAllToTurso(db);
       console.log('[Shutdown] Cloud sync complete.');
     } catch (err) {
