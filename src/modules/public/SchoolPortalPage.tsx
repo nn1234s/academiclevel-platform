@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../core/auth/AuthContext';
 import { ApiClient } from '../../core/api/apiClient';
 import { PaymentService } from '../../services/paymentService';
+import { WhatsDifferentFromChatGPT } from '../shared/WhatsDifferentFromChatGPT';
 import {
   GraduationCap,
   School,
@@ -158,12 +159,13 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
     setActivationMessage(null);
 
     try {
-      let activeLearnerId = currentLearner?.id;
+      const isAlreadyTeacher = currentLearner?.role === 'TEACHER' || currentLearner?.role === 'SUPER_ADMIN';
+      let activeLearnerId = isAlreadyTeacher ? currentLearner?.id : null;
 
-      // 1. If not logged in yet, register Teacher Admin account with entered credentials
+      // 1. If not a verified Teacher yet (or currently a student), register a dedicated Teacher Admin account
       if (!activeLearnerId) {
         if (!teacherName.trim() || !teacherEmail.trim() || !teacherPassword.trim()) {
-          setAuthError('Please fill in your Full Name, School Email, and Account Password to create your Teacher Admin account.');
+          setAuthError('Please fill in your Full Name, School Email, and Account Password to create your dedicated Teacher Admin account.');
           setIsActivating(false);
           return;
         }
@@ -175,8 +177,9 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
           grade: 10,
           parentName: schoolName.trim() || 'School Administration',
           parentPin: '1234',
-          password: teacherPassword.trim()
-        });
+          password: teacherPassword.trim(),
+          role: 'TEACHER'
+        } as any);
 
         if (regRes.success && regRes.learner) {
           activeLearnerId = regRes.learner.id;
@@ -752,15 +755,37 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                         </span>
                       </div>
 
-                      {/* If user is NOT logged in: Quick Teacher Admin Setup */}
-                      {!isAuthenticated ? (
+                      {/* Student Account Warning if current session is a student */}
+                      {isAuthenticated && currentLearner?.role !== 'TEACHER' && currentLearner?.role !== 'SUPER_ADMIN' && (
+                        <div className="p-3.5 bg-amber-950/60 rounded-xl border border-amber-500/40 text-xs space-y-2">
+                          <div className="flex items-center space-x-1.5 text-amber-300 font-bold">
+                            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                            <span>Student Account Detected ({currentLearner?.fullName})</span>
+                          </div>
+                          <p className="text-[11px] text-amber-200/90 leading-relaxed">
+                            To prevent quiz answer tampering and protect classroom assessments, <strong>Teacher Admin accounts are strictly isolated from student learner accounts</strong>. Student accounts cannot view teacher answer keys or class diagnostics. Please set up your separate Educator account below.
+                          </p>
+                          <div className="flex items-center space-x-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => logout()}
+                              className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-[10px] transition-colors cursor-pointer"
+                            >
+                              Sign Out of Student Account
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* If user is NOT a verified Teacher yet: Dedicated Educator Setup */}
+                      {(!isAuthenticated || (currentLearner && currentLearner.role !== 'TEACHER' && currentLearner.role !== 'SUPER_ADMIN')) ? (
                         <div className="space-y-2.5 bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
                           <div className="flex items-center space-x-2 text-xs font-bold text-white">
                             <UserCheck className="w-4 h-4 text-amber-400" />
-                            <span>Setup Teacher Admin Account (Same Name &amp; Password)</span>
+                            <span>Setup Dedicated Teacher Admin Account (Isolated from Student Accounts)</span>
                           </div>
                           <p className="text-[11px] text-slate-400">
-                            Create your educator credentials to log back into academiclevel.in anytime and access your {selectedPack === 'PLUS_20' ? '20' : '40'} A-Codes.
+                            Create your official educator credentials to access the Teacher Dashboard, live quiz tracker, and distribute your {selectedPack === 'PLUS_20' ? '20' : '40'} A-Codes.
                           </p>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -813,10 +838,10 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                         <div className="p-3 bg-slate-900/90 rounded-xl border border-emerald-500/30 text-xs space-y-1">
                           <div className="flex items-center space-x-1.5 text-emerald-400 font-bold">
                             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                            <span>Authenticated Account: {currentLearner?.fullName}</span>
+                            <span>Verified Educator Account: {currentLearner?.fullName}</span>
                           </div>
                           <p className="text-[11px] text-slate-300">
-                            Same Name and Password will be linked to your Teacher Admin Dashboard.
+                            Teacher Admin role confirmed ({currentLearner?.email}). Ready to unlock classroom license.
                           </p>
                         </div>
                       )}
@@ -892,6 +917,14 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   Mint 20 Plus or 40 Lite A-Codes with 1 click. Copy, print, or share via WhatsApp with parents and students.
                 </p>
               </div>
+            </div>
+
+            {/* WHAT'S DIFFERENT FROM CHATGPT FOR SCHOOLS & TEACHERS */}
+            <div className="pt-6">
+              <WhatsDifferentFromChatGPT
+                mode="TEACHER_SCHOOL"
+                onCtaClick={() => window.scrollTo({ top: 380, behavior: 'smooth' })}
+              />
             </div>
           </div>
         )}

@@ -1,5 +1,6 @@
 import {
   Learner,
+  UserRole,
   Subscription,
   CoinLedgerEntry,
   LevelProgress,
@@ -319,11 +320,11 @@ class StorageRLSLayerClass {
   // ==========================================
   // Session & Identity Management
   // ==========================================
-  public getCurrentSession(): { learnerId: string; email: string; role: 'STUDENT' | 'SUPER_ADMIN' } | null {
+  public getCurrentSession(): { learnerId: string; email: string; role: UserRole } | null {
     return this.readRaw(STORAGE_KEYS.CURRENT_SESSION, null);
   }
 
-  public setSession(session: { learnerId: string; email: string; role: 'STUDENT' | 'SUPER_ADMIN' } | null) {
+  public setSession(session: { learnerId: string; email: string; role: UserRole } | null) {
     if (!session) {
       if (typeof window !== 'undefined') {
         try {

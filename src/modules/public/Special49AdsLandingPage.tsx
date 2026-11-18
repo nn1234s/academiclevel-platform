@@ -45,6 +45,7 @@ import { UPIQRCheckout } from '../student/UPIQRCheckout';
 import { CLASS_THEMES } from '../../core/theme/classThemes';
 import { Grade, Board } from '../../core/types';
 import { ReCaptchaWidget } from '../shared/ReCaptchaWidget';
+import { WhatsDifferentFromChatGPT } from '../shared/WhatsDifferentFromChatGPT';
 
 export interface Special49AdsLandingPageProps {
   onSuccessRegistered: () => void;
@@ -1655,6 +1656,14 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          {/* WHAT'S DIFFERENT FROM CHATGPT SECTION */}
+          <div className="mt-12">
+            <WhatsDifferentFromChatGPT
+              mode="STUDENT_PARENT"
+              onCtaClick={handleScrollToQr}
+            />
           </div>
         </div>
       </section>

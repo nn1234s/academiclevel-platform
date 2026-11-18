@@ -427,6 +427,7 @@ apiRouter.post('/auth/register', authLimiter, (req, res) => {
 
     const phoneFromEmail = cleanEmail.match(/(\d{10})@special49/);
     const phoneToSet = req.body.phone ? String(req.body.phone).trim() : (phoneFromEmail ? phoneFromEmail[1] : null);
+    const roleToSet = req.body.role === 'TEACHER' ? 'TEACHER' : 'STUDENT';
 
     db.prepare(`
       INSERT INTO learners (
@@ -446,7 +447,7 @@ apiRouter.post('/auth/register', authLimiter, (req, res) => {
       Number(grade),
       parentName ? String(parentName).trim() : null,
       parentPin ? String(parentPin).trim() : '1234',
-      'STUDENT',
+      roleToSet,
       1,
       0,
       0,

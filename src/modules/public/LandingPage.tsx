@@ -6,6 +6,7 @@ import { SiteConfigService } from '../../services/siteConfigService';
 import { PaymentService } from '../../services/paymentService';
 import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
+import { WhatsDifferentFromChatGPT } from '../shared/WhatsDifferentFromChatGPT';
 import {
   Sparkles,
   Zap,
@@ -1055,6 +1056,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
+      {/* 8.5 WHY ACADEMICLEVEL VS FREE CHATGPT */}
+      <section className="max-w-6xl mx-auto px-4 mt-16">
+        <WhatsDifferentFromChatGPT
+          mode="STUDENT_PARENT"
+          onCtaClick={() => setActivatePlanTier('LITE')}
+        />
+      </section>
+
       {/* 9. FOR SCHOOLS, EDUCATORS & INSTITUTIONS: CLASSROOM PACK & INTELLIGENCE */}
       <section className="max-w-6xl mx-auto px-4 mt-16">
         <div className="bg-gradient-to-b from-indigo-950/70 via-slate-900 to-slate-900 border-2 border-indigo-500/50 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
@@ -1211,7 +1220,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* Bottom Action Strip */}
           <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-xs text-slate-300">
-              ⚡ <strong>First visit checks for Teacher account:</strong> Instant 1-click teacher mode using the same name and password as your account.
+              🛡️ <strong>Strict Role Isolation:</strong> Dedicated educator portal. Student accounts cannot view teacher diagnostics or quiz solutions.
             </div>
             <button
               type="button"

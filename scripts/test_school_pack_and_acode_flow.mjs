@@ -64,6 +64,26 @@ runTest('server/api.js contains school pack activation and pack-status endpoints
   assert(content.includes('/school/pack-status/:teacherId'), 'Missing /school/pack-status/:teacherId endpoint');
 });
 
+// 2.3 Verify WhatsDifferentFromChatGPT section across ad, landing and teacher pages
+runTest('WhatsDifferentFromChatGPT section is present in all ad pages and teacher pages', () => {
+  const compContent = fs.readFileSync(path.join(rootDir, 'src/modules/shared/WhatsDifferentFromChatGPT.tsx'), 'utf8');
+  assert(compContent.includes('DIFFERENT FROM CHATGPT'), 'Missing header in WhatsDifferentFromChatGPT');
+  assert(compContent.includes('Socratic AI Tutor'), 'Missing Socratic AI Tutor point');
+  assert(compContent.includes('Curriculum & Syllabus'), 'Missing Curriculum alignment point');
+
+  const adContent = fs.readFileSync(path.join(rootDir, 'src/modules/public/Special49AdsLandingPage.tsx'), 'utf8');
+  assert(adContent.includes('<WhatsDifferentFromChatGPT'), 'Special49AdsLandingPage must embed WhatsDifferentFromChatGPT');
+
+  const landerContent = fs.readFileSync(path.join(rootDir, 'src/modules/public/LandingPage.tsx'), 'utf8');
+  assert(landerContent.includes('<WhatsDifferentFromChatGPT'), 'LandingPage must embed WhatsDifferentFromChatGPT');
+  assert(!landerContent.includes('Instant 1-click teacher mode using the same name and password as your account'), 'Must remove insecure 1-click teacher mode text from LandingPage');
+  assert(landerContent.includes('Strict Role Isolation'), 'LandingPage must feature Strict Role Isolation copy');
+
+  const schoolContent = fs.readFileSync(path.join(rootDir, 'src/modules/public/SchoolPortalPage.tsx'), 'utf8');
+  assert(schoolContent.includes('<WhatsDifferentFromChatGPT'), 'SchoolPortalPage must embed WhatsDifferentFromChatGPT');
+  assert(schoolContent.includes('Teacher Admin accounts are strictly isolated from student learner accounts'), 'SchoolPortalPage must enforce role isolation');
+});
+
 // 3. Verify App.tsx route resolution for /school
 runTest('App.tsx resolves /school and renders SchoolPortalPage', () => {
   const content = fs.readFileSync(path.join(rootDir, 'src/App.tsx'), 'utf8');

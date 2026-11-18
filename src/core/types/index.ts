@@ -1,6 +1,6 @@
 export type Board = 'CBSE' | 'ICSE' | 'IGCSE';
 export type Grade = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-export type UserRole = 'STUDENT' | 'SUPER_ADMIN';
+export type UserRole = 'STUDENT' | 'TEACHER' | 'SUPER_ADMIN';
 
 export type PlanTier = 'FREE' | 'LITE' | 'PLUS' | 'GOLD' | 'TRIAL';
 export type SubscriptionStatus = 'NONE' | 'PENDING_VERIFICATION' | 'ACTIVE' | 'EXPIRED' | 'REVOKED';
