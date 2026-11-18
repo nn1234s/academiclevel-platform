@@ -2970,6 +2970,22 @@ apiRouter.get('/admin/learners', adminAuth, (req, res) => {
   }
 });
 
+apiRouter.get('/admin/acodes', adminAuth, (req, res) => {
+  try {
+    const acodes = db.prepare(`
+      SELECT a.*, l.fullName as redeemedStudentName, l.email as redeemedStudentEmail,
+             t.fullName as teacherName, t.email as teacherEmail
+      FROM acodes a
+      LEFT JOIN learners l ON a.redeemedBy = l.id
+      LEFT JOIN learners t ON a.createdBy = t.id
+      ORDER BY a.createdAt DESC
+    `).all();
+    res.json({ success: true, acodes });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 apiRouter.post('/admin/learners/:id/grant-premium', adminAuth, (req, res) => {
   try {
     const { tier, durationDays, note } = req.body;

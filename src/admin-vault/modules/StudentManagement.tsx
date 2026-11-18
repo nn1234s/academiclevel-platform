@@ -39,6 +39,7 @@ export const StudentManagement: React.FC = () => {
   const [boardFilter, setBoardFilter] = useState<string>('ALL');
   const [gradeFilter, setGradeFilter] = useState<string>('ALL');
   const [tierFilter, setTierFilter] = useState<string>('ALL');
+  const [roleFilter, setRoleFilter] = useState<'ALL' | 'STUDENT' | 'TEACHER' | 'SUPER_ADMIN'>('ALL');
 
   // Selected Kid for deep control modal
   const [controllingLearner, setControllingLearner] = useState<Learner | null>(null);
@@ -340,6 +341,7 @@ export const StudentManagement: React.FC = () => {
 
     const matchesBoard = boardFilter === 'ALL' || l.board === boardFilter;
     const matchesGrade = gradeFilter === 'ALL' || l.grade.toString() === gradeFilter;
+    const matchesRole = roleFilter === 'ALL' || (l.role || 'STUDENT') === roleFilter;
 
     const subInfo = getSubInfo(l.id);
     let matchesTier = true;
@@ -349,7 +351,7 @@ export const StudentManagement: React.FC = () => {
     else if (tierFilter === 'PENDING') matchesTier = Boolean(subInfo.isPending);
     else if (tierFilter === 'SUSPENDED') matchesTier = !l.isActive;
 
-    return matchesSearch && matchesBoard && matchesGrade && matchesTier;
+    return matchesSearch && matchesBoard && matchesGrade && matchesTier && matchesRole;
   });
 
   return (
@@ -358,24 +360,28 @@ export const StudentManagement: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
         <div>
           <div className="flex items-center space-x-2">
-            <h2 className="text-xl font-extrabold text-white">Kid Control & Finder Center</h2>
+            <h2 className="text-xl font-extrabold text-white">Student &amp; Teacher Accounts Management</h2>
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
               Super-Admin Control Plane
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Search any kid, inspect their curriculum, add/deduct coins, and instantly <strong>Grant or Ungrant Premium</strong> with one click.
+            Search any learner or educator, inspect curriculum, manage Teacher Admin roles, and <strong>Grant or Ungrant Premium</strong> with one click.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className="bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl text-center">
-            <span className="text-[10px] text-slate-400 block font-medium">Total Registered</span>
-            <span className="text-sm font-extrabold text-white">{learners.length} Kids</span>
+            <span className="text-[10px] text-slate-400 block font-medium">Students</span>
+            <span className="text-sm font-extrabold text-white">{learners.filter(l => (l.role || 'STUDENT') === 'STUDENT').length} Kids</span>
+          </div>
+          <div className="bg-slate-950 border border-amber-500/30 px-3 py-1.5 rounded-xl text-center">
+            <span className="text-[10px] text-amber-400 block font-medium">Teachers</span>
+            <span className="text-sm font-extrabold text-amber-300">{learners.filter(l => l.role === 'TEACHER').length} Admins</span>
           </div>
           <div className="bg-slate-950 border border-indigo-500/30 px-3 py-1.5 rounded-xl text-center">
             <span className="text-[10px] text-indigo-400 block font-medium">Showing Matches</span>
-            <span className="text-sm font-extrabold text-indigo-300">{filtered.length} Kids</span>
+            <span className="text-sm font-extrabold text-indigo-300">{filtered.length} Accounts</span>
           </div>
         </div>
       </div>
@@ -405,17 +411,31 @@ export const StudentManagement: React.FC = () => {
 
       {/* Search & Multi-Filter Bar */}
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-lg space-y-3">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
           {/* Main Search Input */}
           <div className="lg:col-span-2 relative">
             <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-500" />
             <input
               type="text"
-              placeholder="Find kid by name, email, phone, code, ID..."
+              placeholder="Find kid or teacher by name, email, school, ID..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none"
             />
+          </div>
+
+          {/* Role Filter */}
+          <div>
+            <select
+              value={roleFilter}
+              onChange={e => setRoleFilter(e.target.value as any)}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-300 font-semibold focus:outline-none focus:border-amber-500"
+            >
+              <option value="ALL">All Roles (Students &amp; Teachers)</option>
+              <option value="STUDENT">🎓 Students (Kids Only)</option>
+              <option value="TEACHER">🏫 Teachers (School Admins)</option>
+              <option value="SUPER_ADMIN">🛡️ Super-Admins</option>
+            </select>
           </div>
 
           {/* Board Filter */}
@@ -495,11 +515,26 @@ export const StudentManagement: React.FC = () => {
                       {/* Identity */}
                       <td className="p-4">
                         <div className="flex items-center space-x-2.5">
-                          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-extrabold flex items-center justify-center text-sm shadow-md">
+                          <div className={`w-9 h-9 rounded-xl text-white font-extrabold flex items-center justify-center text-sm shadow-md ${
+                            learner.role === 'TEACHER'
+                              ? 'bg-gradient-to-tr from-amber-600 to-orange-600 ring-2 ring-amber-400/40'
+                              : 'bg-gradient-to-tr from-indigo-600 to-violet-600'
+                          }`}>
                             {learner.fullName.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <p className="font-extrabold text-white text-sm">{learner.fullName}</p>
+                            <div className="flex items-center space-x-1.5 flex-wrap">
+                              <p className="font-extrabold text-white text-sm">{learner.fullName}</p>
+                              {learner.role === 'TEACHER' ? (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                  🏫 Teacher Admin
+                                </span>
+                              ) : learner.role === 'SUPER_ADMIN' ? (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                                  🛡️ Super-Admin
+                                </span>
+                              ) : null}
+                            </div>
                             <p className="text-[11px] text-slate-400 font-mono">{learner.email}</p>
                             <p className="text-[10px] text-indigo-400 font-mono">
                               Code: <strong className="text-indigo-300">{learner.referralCode}</strong>
@@ -511,10 +546,23 @@ export const StudentManagement: React.FC = () => {
 
                       {/* Board & Class */}
                       <td className="p-4">
-                        <span className="font-bold text-slate-200 block text-xs">{learner.board}</span>
-                        <span className="text-[11px] text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded-md border border-indigo-900/50 inline-block mt-0.5 font-semibold">
-                          Class {learner.grade}
-                        </span>
+                        {learner.role === 'TEACHER' ? (
+                          <div>
+                            <span className="font-bold text-amber-300 block text-xs">
+                              {learner.parentName ? `🏫 ${learner.parentName}` : '🏫 School Admin'}
+                            </span>
+                            <span className="text-[10px] text-amber-400/80 bg-amber-950/60 px-2 py-0.5 rounded-md border border-amber-900/50 inline-block mt-0.5 font-semibold">
+                              Classroom &amp; Teacher Portal
+                            </span>
+                          </div>
+                        ) : (
+                          <div>
+                            <span className="font-bold text-slate-200 block text-xs">{learner.board}</span>
+                            <span className="text-[11px] text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded-md border border-indigo-900/50 inline-block mt-0.5 font-semibold">
+                              Class {learner.grade}
+                            </span>
+                          </div>
+                        )}
                       </td>
 
                       {/* Subscription Status & Grant/Ungrant info */}

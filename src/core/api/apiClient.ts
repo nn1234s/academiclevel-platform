@@ -558,6 +558,15 @@ export class ApiClient {
     });
   }
 
+  public static async adminGetACodes(adminEmail: string): Promise<{
+    success: boolean;
+    acodes: any[];
+  }> {
+    return this.request('/admin/acodes', {
+      headers: { 'x-admin-email': adminEmail }
+    });
+  }
+
   public static async adminGetScholarships(adminEmail: string): Promise<{
     success: boolean;
     scholarships: Scholarship[];
