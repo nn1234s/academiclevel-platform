@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../core/auth/AuthContext';
 import { ApiClient } from '../../core/api/apiClient';
-import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
-import { PaymentService, UPI_GATEWAY_URLS } from '../../services/paymentService';
+import { PaymentService } from '../../services/paymentService';
 import {
   GraduationCap,
   School,
@@ -25,7 +24,10 @@ import {
   Sparkles,
   ShieldCheck,
   Lock,
-  UserCheck
+  UserCheck,
+  AlertCircle,
+  LogOut,
+  Search
 } from 'lucide-react';
 
 interface SchoolPortalPageProps {
@@ -59,13 +61,28 @@ interface WeakPointTopic {
 }
 
 export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, onSuccessAuth }) => {
-  const { currentLearner, isAuthenticated, refreshCurrentLearner } = useAuth();
+  const { currentLearner, isAuthenticated, refreshCurrentLearner, logout } = useAuth();
 
-  // Selected Pack Preference: 20 Plus (180d) OR 40 Lite (60d)
-  const [selectedPack, setSelectedPack] = useState<'PLUS_20' | 'LITE_40'>('PLUS_20');
+  // Selected Pack Preference: 40 Lite (60d) [Option B - Recommended] OR 20 Plus (180d) [Option A]
+  const [selectedPack, setSelectedPack] = useState<'PLUS_20' | 'LITE_40'>('LITE_40');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [copiedAll, setCopiedAll] = useState<boolean>(false);
+  const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'OFFER' | 'TRACKER' | 'WEAK_POINTS' | 'ACODES'>('OFFER');
+
+  // Teacher Dashboard Activation State
+  const [isTeacherDashboard, setIsTeacherDashboard] = useState<boolean>(false);
+  const [isTeacherActive, setIsTeacherActive] = useState<boolean>(false);
+  const [serverAcodes, setServerAcodes] = useState<any[]>([]);
+  const [codeFilter, setCodeFilter] = useState<'ALL' | 'AVAILABLE' | 'REDEEMED'>('ALL');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // 2-Step UPI PG Checkout States (Identical to Student Checkout)
+  const [hasOpenedGateway, setHasOpenedGateway] = useState<boolean>(false);
+  const [noticeLang, setNoticeLang] = useState<'EN' | 'HINGLISH'>('EN');
+  const [customRef, setCustomRef] = useState<string>('');
+  const [isActivating, setIsActivating] = useState<boolean>(false);
+  const [activationMessage, setActivationMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Teacher Account Onboarding State
   const [teacherName, setTeacherName] = useState('');
@@ -74,9 +91,8 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
   const [schoolName, setSchoolName] = useState('');
   const [authError, setAuthError] = useState('');
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
-  const [isTeacherActive, setIsTeacherActive] = useState<boolean>(false);
 
-  // Check if current logged-in user is a teacher or has enabled teacher mode
+  // Check if current user is an authenticated Teacher with active school pack
   useEffect(() => {
     if (currentLearner) {
       const isTeacher = (currentLearner as any).role === 'TEACHER' || 
@@ -85,75 +101,189 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
       setIsTeacherActive(Boolean(isTeacher));
       if (!teacherName) setTeacherName(currentLearner.fullName || '');
       if (!teacherEmail) setTeacherEmail(currentLearner.email || '');
+
+      // Check server if this teacher already has an active School Pack minted
+      ApiClient.getSchoolPackStatus(currentLearner.id)
+        .then(res => {
+          if (res && res.success && res.hasActiveSchoolPack && res.acodes?.length > 0) {
+            setServerAcodes(res.acodes);
+            setIsTeacherDashboard(true);
+            setIsTeacherActive(true);
+            if (res.packType === 'PLUS_20') setSelectedPack('PLUS_20');
+            else setSelectedPack('LITE_40');
+            setActiveTab('ACODES');
+          } else if (localStorage.getItem(`al_school_pack_active_${currentLearner.id}`) === 'true') {
+            setIsTeacherDashboard(true);
+            setIsTeacherActive(true);
+            setActiveTab('ACODES');
+          }
+        })
+        .catch(() => {
+          if (localStorage.getItem(`al_school_pack_active_${currentLearner.id}`) === 'true') {
+            setIsTeacherDashboard(true);
+            setIsTeacherActive(true);
+            setActiveTab('ACODES');
+          }
+        });
     }
+
+    try {
+      if (localStorage.getItem('al_school_gateway_opened') === 'true') {
+        setHasOpenedGateway(true);
+      }
+    } catch {}
   }, [currentLearner]);
 
-  // One-click enable teacher mode for existing authenticated account
+  // Step 1: Open Secure UPI PG Gateway
+  const handleOpenGateway = () => {
+    setHasOpenedGateway(true);
+    try {
+      localStorage.setItem('al_school_gateway_opened', 'true');
+    } catch {}
+    window.open(PaymentService.getSchoolGatewayUrl(), '_blank', 'noopener,noreferrer');
+  };
+
+  const handleCopyLink = () => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(PaymentService.getSchoolGatewayUrl());
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
+
+  // Step 2: Payment OK -> Complete Teacher Admin Account & Unlock 40 A-Codes in Teacher Dashboard
+  const handleActivateSchoolPack = async () => {
+    setIsActivating(true);
+    setAuthError('');
+    setActivationMessage(null);
+
+    try {
+      let activeLearnerId = currentLearner?.id;
+
+      // 1. If not logged in yet, register Teacher Admin account with entered credentials
+      if (!activeLearnerId) {
+        if (!teacherName.trim() || !teacherEmail.trim() || !teacherPassword.trim()) {
+          setAuthError('Please fill in your Full Name, School Email, and Account Password to create your Teacher Admin account.');
+          setIsActivating(false);
+          return;
+        }
+
+        const regRes = await ApiClient.register({
+          fullName: teacherName.trim(),
+          email: teacherEmail.trim(),
+          board: 'CBSE',
+          grade: 10,
+          parentName: schoolName.trim() || 'School Administration',
+          parentPin: '1234',
+          password: teacherPassword.trim()
+        });
+
+        if (regRes.success && regRes.learner) {
+          activeLearnerId = regRes.learner.id;
+          if (onSuccessAuth) onSuccessAuth();
+          await refreshCurrentLearner();
+        } else {
+          setAuthError((regRes as any).error || 'Failed to initialize teacher account.');
+          setIsActivating(false);
+          return;
+        }
+      }
+
+      // 2. Call server to mint the 40 Lite or 20 Plus A-Codes and unlock Teacher Dashboard
+      const packRes = await ApiClient.activateSchoolPack({
+        teacherId: activeLearnerId,
+        packType: selectedPack,
+        utrRef: customRef.trim(),
+        schoolName: schoolName.trim() || 'Classroom Administration'
+      });
+
+      if (packRes.success && packRes.acodes) {
+        setServerAcodes(packRes.acodes);
+        setIsTeacherDashboard(true);
+        setIsTeacherActive(true);
+        setActiveTab('ACODES');
+        try {
+          localStorage.setItem(`al_teacher_mode_${activeLearnerId}`, 'true');
+          localStorage.setItem(`al_school_pack_active_${activeLearnerId}`, 'true');
+        } catch {}
+        await refreshCurrentLearner();
+        setActivationMessage({
+          type: 'success',
+          text: `🎉 Payment Confirmed! Unlocked ${selectedPack === 'PLUS_20' ? '20 Plus (180 Days)' : '40 Lite (60 Days)'} A-Codes in your Teacher Dashboard.`
+        });
+      } else {
+        setAuthError(packRes.message || 'Failed to activate classroom pack. Please try again.');
+      }
+    } catch (err: any) {
+      setAuthError(err.message || 'Activation anomaly. Please try again.');
+    } finally {
+      setIsActivating(false);
+    }
+  };
+
+  // Legacy helper hooks for compatibility
   const handleEnableTeacherMode = async () => {
     if (!currentLearner) return;
     try {
       localStorage.setItem(`al_teacher_mode_${currentLearner.id}`, 'true');
       setIsTeacherActive(true);
-      setActiveTab('TRACKER');
+      await handleActivateSchoolPack();
     } catch {}
   };
 
-  // Handle new Teacher Registration
   const handleTeacherRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!teacherName.trim() || !teacherEmail.trim() || !teacherPassword.trim()) {
-      setAuthError('Please fill in your name, school email, and password.');
-      return;
-    }
-
-    setIsSubmittingAuth(true);
-    setAuthError('');
-
-    try {
-      const res = await ApiClient.register({
-        fullName: teacherName.trim(),
-        email: teacherEmail.trim(),
-        board: 'CBSE',
-        grade: 10,
-        parentName: schoolName.trim() || 'School Administration',
-        parentPin: '1234',
-        password: teacherPassword.trim()
-      });
-
-      if (res.success && res.learner) {
-        localStorage.setItem(`al_teacher_mode_${res.learner.id}`, 'true');
-        setIsTeacherActive(true);
-        if (onSuccessAuth) onSuccessAuth();
-        await refreshCurrentLearner();
-        setActiveTab('TRACKER');
-      } else {
-        setAuthError((res as any).error || 'Failed to initialize teacher account.');
-      }
-    } catch (err: any) {
-      setAuthError(err.message || 'Registration anomaly. Please try again.');
-    } finally {
-      setIsSubmittingAuth(false);
-    }
+    await handleActivateSchoolPack();
   };
 
-  // Institutional A-Codes pool (Generated for 20 Plus or 40 Lite)
-  const plusCodes = Array.from({ length: 20 }, (_, i) => ({
-    code: `AL-SCH-PLUS-${(1000 + i * 47).toString(16).toUpperCase()}`,
-    tier: 'PLUS (180 Days)',
-    days: 180,
-    status: i < 7 ? 'REDEEMED' : 'AVAILABLE',
-    studentName: i < 7 ? ['Aarav Patel', 'Priya Sharma', 'Rohan Das', 'Ananya Sen', 'Kabir Verma', 'Diya Nair', 'Ishaan Gupta'][i] : 'Unassigned'
-  }));
+  // Minted A-Codes pool: loaded from server if active, or generated mock for offline fallback
+  const plusCodesFallback = useMemo(() => Array.from({ length: 20 }, (_, i) => ({
+    code: `AL-SCH-PLS-${(1000 + i * 47).toString(16).toUpperCase()}-205`,
+    planTier: 'PLUS',
+    durationDays: 180,
+    isRedeemed: i < 5 ? 1 : 0,
+    studentName: i < 5 ? ['Aarav Patel', 'Priya Sharma', 'Rohan Das', 'Ananya Sen', 'Kabir Verma'][i] : 'Unassigned'
+  })), []);
 
-  const liteCodes = Array.from({ length: 40 }, (_, i) => ({
-    code: `AL-SCH-LITE-${(2000 + i * 31).toString(16).toUpperCase()}`,
-    tier: 'LITE (60 Days)',
-    days: 60,
-    status: i < 14 ? 'REDEEMED' : 'AVAILABLE',
-    studentName: i < 14 ? `Student Batch Cl.10-${i + 1}` : 'Unassigned'
-  }));
+  const liteCodesFallback = useMemo(() => Array.from({ length: 40 }, (_, i) => ({
+    code: `AL-SCH-LTE-${(2000 + i * 31).toString(16).toUpperCase()}-049`,
+    planTier: 'LITE',
+    durationDays: 60,
+    isRedeemed: i < 8 ? 1 : 0,
+    studentName: i < 8 ? `Student Batch Cl.10-${i + 1}` : 'Unassigned'
+  })), []);
 
-  const activeCodes = selectedPack === 'PLUS_20' ? plusCodes : liteCodes;
+  const displayCodes = useMemo(() => {
+    let source = serverAcodes.length > 0
+      ? serverAcodes
+      : (selectedPack === 'PLUS_20' ? plusCodesFallback : liteCodesFallback);
+
+    if (codeFilter === 'AVAILABLE') {
+      source = source.filter(c => !c.isRedeemed);
+    } else if (codeFilter === 'REDEEMED') {
+      source = source.filter(c => c.isRedeemed);
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      source = source.filter(c => 
+        c.code.toLowerCase().includes(q) || 
+        (c.studentName && c.studentName.toLowerCase().includes(q))
+      );
+    }
+
+    return source;
+  }, [serverAcodes, selectedPack, plusCodesFallback, liteCodesFallback, codeFilter, searchQuery]);
+
+  const totalCodesCount = serverAcodes.length > 0 
+    ? serverAcodes.length 
+    : (selectedPack === 'PLUS_20' ? 20 : 40);
+
+  const redeemedCount = serverAcodes.length > 0
+    ? serverAcodes.filter(c => c.isRedeemed).length
+    : (selectedPack === 'PLUS_20' ? 5 : 8);
+
+  const availableCount = totalCodesCount - redeemedCount;
 
   // Real-Time Student Quiz Tracker Data
   const sampleScores: DemoStudentScore[] = [
@@ -223,15 +353,28 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
   };
 
   const handleCopyAllCodes = () => {
-    const textToCopy = `ACADEMICLEVEL SCHOOL PACK (${selectedPack === 'PLUS_20' ? '20 Plus A-Codes - 180 Days' : '40 Lite A-Codes - 60 Days'})\n\n` +
-      activeCodes.map((c, i) => `${i + 1}. Code: ${c.code} (${c.tier}) - Status: ${c.status}`).join('\n') +
-      `\n\nRedeem on: https://academiclevel.in/ad or in-app Profile!`;
+    const listToExport = serverAcodes.length > 0 ? serverAcodes : (selectedPack === 'PLUS_20' ? plusCodesFallback : liteCodesFallback);
+    const tierName = selectedPack === 'PLUS_20' ? '20 Plus A-Codes (180 Days)' : '40 Lite A-Codes (60 Days)';
+    const textToCopy = `ACADEMICLEVEL INSTITUTIONAL SCHOOL PACK\nBatch: ${tierName}\nTeacher: ${currentLearner?.fullName || teacherName || 'Classroom Admin'}\n\n` +
+      listToExport.map((c, i) => `${i + 1}. Code: ${c.code} (${c.durationDays} Days) - Status: ${c.isRedeemed ? `REDEEMED by ${c.studentName || 'Student'}` : 'AVAILABLE'}`).join('\n') +
+      `\n\nStudents can redeem their voucher on: https://academiclevel.in/ad or under in-app Profile!`;
 
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(textToCopy);
       setCopiedAll(true);
       setTimeout(() => setCopiedAll(false), 2500);
     }
+  };
+
+  const handleWhatsAppShare = () => {
+    const tierName = selectedPack === 'PLUS_20' ? '20 Plus A-Codes (180 Days)' : '40 Lite A-Codes (60 Days)';
+    const text = encodeURIComponent(
+      `📚 *AcademicLevel School Pack - Student Vouchers*\n` +
+      `Batch: ${tierName}\n\n` +
+      `Students: Enter your assigned A-CODE at checkout or in your AcademicLevel profile to activate your full plan with unlimited quizzes & AI tutor!\n\n` +
+      `Redeem link: https://academiclevel.in/school`
+    );
+    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
   return (
@@ -250,7 +393,9 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
               <span className="font-extrabold text-sm tracking-tight text-white block leading-none">
                 AcademicLevel
               </span>
-              <span className="text-[10px] text-amber-400 font-semibold">Institutional School Portal</span>
+              <span className="text-[10px] text-amber-400 font-semibold">
+                {isTeacherDashboard ? 'Teacher Admin Dashboard' : 'Institutional School Portal'}
+              </span>
             </div>
           </div>
 
@@ -261,14 +406,22 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
             >
               ← Back to {isAuthenticated ? 'Dashboard' : 'Home'}
             </button>
-            <a
-              href={PaymentService.getSchoolGatewayUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black transition-all flex items-center space-x-1 shadow-md shadow-amber-950/40"
-            >
-              <span>Get School Pack (₹2,499) ↗</span>
-            </a>
+            {!isTeacherDashboard ? (
+              <a
+                href={PaymentService.getSchoolGatewayUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setHasOpenedGateway(true)}
+                className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black transition-all flex items-center space-x-1 shadow-md shadow-amber-950/40"
+              >
+                <span>Get School Pack (₹2,499) ↗</span>
+              </a>
+            ) : (
+              <span className="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[11px] font-mono font-bold flex items-center space-x-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Verified Teacher Admin</span>
+              </span>
+            )}
           </div>
         </div>
       </header>
@@ -278,160 +431,160 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
         <div className="max-w-5xl mx-auto text-center space-y-4">
           <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold shadow-lg shadow-amber-950/30">
             <School className="w-4 h-4 text-amber-400" />
-            <span>ACADEMICLEVEL FOR SCHOOLS &amp; EDUCATORS</span>
+            <span>{isTeacherDashboard ? 'TEACHER ADMIN DASHBOARD' : 'ACADEMICLEVEL FOR SCHOOLS & EDUCATORS'}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto">
-            Institutional Classroom Pack • <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">₹2,499 Flat</span>
+            {isTeacherDashboard ? (
+              <>
+                Classroom Vouchers &amp; <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">Teacher Portal</span>
+              </>
+            ) : (
+              <>
+                Institutional Classroom Pack • <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">₹2,499 Flat</span>
+              </>
+            )}
           </h1>
 
           <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Equip your entire classroom with <strong className="text-white">20 Plus (180 Days)</strong> or <strong className="text-white">40 Lite (60 Days)</strong> A-Codes, live quiz tracking, and automated conceptual weak point diagnostics.
+            {isTeacherDashboard
+              ? `Manage your classroom voucher keys, track live student quiz performance, and identify conceptual bottlenecks across Class 10.`
+              : `Equip your entire classroom with 40 Lite (60 Days) or 20 Plus (180 Days) A-Codes, live quiz tracking, and automated conceptual weak point diagnostics.`}
           </p>
 
           {/* Quick Tab Switcher */}
           <div className="pt-4 flex flex-wrap justify-center gap-2 text-xs font-bold">
-            <button
-              onClick={() => setActiveTab('OFFER')}
-              className={`px-4 py-2 rounded-xl transition-all ${
-                activeTab === 'OFFER'
-                  ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
-                  : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
-              }`}
-            >
-              🎟️ School Pack Offer (₹2,499)
-            </button>
-            <button
-              onClick={() => setActiveTab('TRACKER')}
-              className={`px-4 py-2 rounded-xl transition-all ${
-                activeTab === 'TRACKER'
-                  ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
-                  : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
-              }`}
-            >
-              📊 Live Quiz Tracker
-            </button>
-            <button
-              onClick={() => setActiveTab('WEAK_POINTS')}
-              className={`px-4 py-2 rounded-xl transition-all ${
-                activeTab === 'WEAK_POINTS'
-                  ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
-                  : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
-              }`}
-            >
-              🎯 Student Weak Points
-            </button>
-            <button
-              onClick={() => setActiveTab('ACODES')}
-              className={`px-4 py-2 rounded-xl transition-all ${
-                activeTab === 'ACODES'
-                  ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
-                  : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
-              }`}
-            >
-              🔑 Classroom A-Codes Vault
-            </button>
+            {!isTeacherDashboard ? (
+              <>
+                <button
+                  onClick={() => setActiveTab('OFFER')}
+                  className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
+                    activeTab === 'OFFER'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
+                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                  }`}
+                >
+                  🎟️ School Pack Offer (₹2,499)
+                </button>
+                <button
+                  onClick={() => setActiveTab('TRACKER')}
+                  className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
+                    activeTab === 'TRACKER'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
+                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                  }`}
+                >
+                  📊 Live Quiz Tracker Preview
+                </button>
+                <button
+                  onClick={() => setActiveTab('WEAK_POINTS')}
+                  className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
+                    activeTab === 'WEAK_POINTS'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
+                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                  }`}
+                >
+                  🎯 Student Weak Points Preview
+                </button>
+                <button
+                  onClick={() => setActiveTab('ACODES')}
+                  className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 ${
+                    activeTab === 'ACODES'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
+                      : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Lock className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Classroom A-Codes Vault (Locked)</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setActiveTab('ACODES')}
+                  className={`px-5 py-2.5 rounded-xl transition-all cursor-pointer flex items-center space-x-2 ${
+                    activeTab === 'ACODES'
+                      ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black shadow-lg shadow-amber-500/30 ring-2 ring-amber-400/50'
+                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                  }`}
+                >
+                  <KeyRound className="w-4 h-4 text-slate-950" />
+                  <span>🔑 Classroom A-Codes ({totalCodesCount})</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('TRACKER')}
+                  className={`px-5 py-2.5 rounded-xl transition-all cursor-pointer flex items-center space-x-2 ${
+                    activeTab === 'TRACKER'
+                      ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
+                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                  }`}
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  <span>📊 Live Quiz Tracker</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('WEAK_POINTS')}
+                  className={`px-5 py-2.5 rounded-xl transition-all cursor-pointer flex items-center space-x-2 ${
+                    activeTab === 'WEAK_POINTS'
+                      ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
+                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                  }`}
+                >
+                  <TrendingDown className="w-4 h-4" />
+                  <span>🎯 Conceptual Weak Points</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-8 mt-8 space-y-8">
-        {/* FIRST-VISIT TEACHER ACCOUNT CHECK / QUICK LOGIN */}
-        {!isTeacherActive ? (
-          <div className="bg-gradient-to-r from-indigo-950/80 via-slate-900 to-indigo-950/80 border-2 border-indigo-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-center space-x-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 flex items-center justify-center shrink-0">
-                  <UserCheck className="w-6 h-6 text-indigo-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-black text-white">
-                    {isAuthenticated ? `Welcome, ${currentLearner?.fullName}!` : 'First Visit? Create or Connect Teacher Account'}
-                  </h3>
-                  <p className="text-xs text-slate-300 mt-0.5">
-                    {isAuthenticated 
-                      ? 'You are signed in with a student account. Enable Teacher Mode with the same name and password!'
-                      : 'Create your school admin profile with your name and password to access the Classroom Dashboard.'}
-                  </p>
-                </div>
+        {/* TEACHER DASHBOARD HEADER (ONLY WHEN ACTIVE & UNLOCKED) */}
+        {isTeacherDashboard && (
+          <div className="p-5 bg-gradient-to-r from-emerald-950/60 via-slate-900 to-indigo-950/60 border-2 border-emerald-500/40 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+            <div className="flex items-center space-x-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center shrink-0">
+                <School className="w-6 h-6" />
               </div>
-
-              {isAuthenticated ? (
-                <button
-                  onClick={handleEnableTeacherMode}
-                  className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all shrink-0 cursor-pointer"
-                >
-                  Enable Teacher Mode (Same Name &amp; Pass) ↗
-                </button>
-              ) : null}
+              <div>
+                <div className="flex items-center space-x-2">
+                  <h3 className="text-base font-black text-white">
+                    {currentLearner?.fullName || teacherName || 'Teacher Admin'}
+                  </h3>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                    Classroom Admin
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  Institutional School License Active • Batch: <strong className="text-amber-400">{selectedPack === 'PLUS_20' ? '20 Plus A-Codes (180 Days)' : '40 Lite A-Codes (60 Days)'}</strong>
+                </p>
+              </div>
             </div>
 
-            {!isAuthenticated && (
-              <form onSubmit={handleTeacherRegister} className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2">
-                <div>
-                  <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Teacher / Admin Name</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Mrs. Sunita Sharma"
-                    value={teacherName}
-                    onChange={e => setTeacherName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] text-slate-400 mb-1 font-semibold">School / Institution Email</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="teacher@dps-school.edu.in"
-                    value={teacherEmail}
-                    onChange={e => setTeacherEmail(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Account Password</label>
-                  <input
-                    type="password"
-                    required
-                    placeholder="Enter password"
-                    value={teacherPassword}
-                    onChange={e => setTeacherPassword(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-400"
-                  />
-                </div>
-                <div className="flex items-end">
-                  <button
-                    type="submit"
-                    disabled={isSubmittingAuth}
-                    className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all cursor-pointer disabled:opacity-50"
-                  >
-                    {isSubmittingAuth ? 'Creating Account...' : 'Create Teacher Account ↗'}
-                  </button>
-                </div>
-                {authError && (
-                  <p className="col-span-1 sm:col-span-4 text-xs text-rose-400 font-semibold">{authError}</p>
-                )}
-              </form>
-            )}
-          </div>
-        ) : (
-          <div className="p-4 bg-emerald-950/40 border border-emerald-500/40 rounded-2xl flex items-center justify-between text-xs">
-            <div className="flex items-center space-x-2 text-emerald-300 font-bold">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>Teacher Mode Active: Verified Educator Account ({currentLearner?.fullName || teacherName})</span>
+            <div className="flex items-center space-x-2 text-xs">
+              <button
+                onClick={handleCopyAllCodes}
+                className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer"
+              >
+                {copiedAll ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                <span>{copiedAll ? 'Copied!' : 'Copy Vouchers'}</span>
+              </button>
+              <button
+                onClick={handleWhatsAppShare}
+                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span>WhatsApp Share</span>
+              </button>
             </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">
-              Classroom Admin
-            </span>
           </div>
         )}
 
-        {/* TAB 1: THE ₹2,499 SCHOOL PACK OFFER */}
-        {activeTab === 'OFFER' && (
+        {/* PUBLIC VIEW: THE ₹2,499 SCHOOL PACK OFFER & 2-STEP UPI PG CHECKOUT */}
+        {!isTeacherDashboard && activeTab === 'OFFER' && (
           <div className="space-y-6">
-            <div className="bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 border-2 border-amber-500/50 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+            <div className="bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 border-2 border-amber-500/50 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-6 relative overflow-hidden">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div className="space-y-3 max-w-xl">
                   <span className="px-3 py-1 rounded-full text-[10px] font-mono font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40">
@@ -444,70 +597,266 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                     Designed for schools, coaching institutes, and tuition centers. Get an all-in-one license with your choice of bulk student access passes.
                   </p>
 
-                  {/* Choice Selector: 20 Plus OR 40 Lite */}
+                  {/* Choice Selector: 40 Lite (Option B) OR 20 Plus (Option A) */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedPack('PLUS_20')}
-                      className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
-                        selectedPack === 'PLUS_20'
-                          ? 'bg-amber-500/20 border-amber-400 text-amber-200 ring-2 ring-amber-500/30'
-                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-                      }`}
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="font-extrabold text-sm text-white">Option A: 20 Plus A-Codes</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/30 text-amber-300 font-bold">180 Days</span>
-                      </div>
-                      <p className="text-[11px] text-slate-300 mt-1">
-                        6 Months Full Access + Olympiad reasoning track for 20 students.
-                      </p>
-                    </button>
-
                     <button
                       type="button"
                       onClick={() => setSelectedPack('LITE_40')}
                       className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                         selectedPack === 'LITE_40'
-                          ? 'bg-indigo-500/20 border-indigo-400 text-indigo-200 ring-2 ring-indigo-500/30'
+                          ? 'bg-amber-500/20 border-amber-400 text-amber-200 ring-2 ring-amber-500/30'
                           : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                       }`}
                     >
                       <div className="flex justify-between items-center">
                         <span className="font-extrabold text-sm text-white">Option B: 40 Lite A-Codes</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-bold">60 Days</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/30 text-amber-300 font-bold">60 Days</span>
                       </div>
                       <p className="text-[11px] text-slate-300 mt-1">
-                        2 Months Unlimited Quizzes &amp; Socratic AI tutor for 40 students.
+                        2 Months Unlimited Quizzes &amp; Socratic AI tutor for 40 students. (~₹62.47 / student).
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedPack('PLUS_20')}
+                      className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                        selectedPack === 'PLUS_20'
+                          ? 'bg-indigo-500/20 border-indigo-400 text-indigo-200 ring-2 ring-indigo-500/30'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="font-extrabold text-sm text-white">Option A: 20 Plus A-Codes</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-bold">180 Days</span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 mt-1">
+                        6 Months Full Access + Olympiad reasoning track for 20 students. (~₹124.95 / student).
                       </p>
                     </button>
                   </div>
                 </div>
 
-                {/* Price Box & CTA */}
-                <div className="bg-slate-950 border border-slate-800 p-6 rounded-3xl text-center min-w-[260px] space-y-3 self-stretch md:self-auto flex flex-col justify-center">
+                {/* Price Box */}
+                <div className="bg-slate-950 border border-slate-800 p-6 rounded-3xl text-center min-w-[240px] space-y-2 self-stretch md:self-auto flex flex-col justify-center">
                   <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest block">Flat Institutional Fee</span>
                   <div className="text-4xl font-black text-amber-400">₹2,499</div>
                   <span className="text-[11px] text-emerald-400 font-bold block">
                     {selectedPack === 'PLUS_20' ? 'Only ~₹124.95 / student (6 mo)' : 'Only ~₹62.47 / student (2 mo)'}
                   </span>
+                  <div className="pt-2 text-[10px] text-slate-400 font-medium">
+                    Includes Teacher Dashboard, Live Quiz Tracker, Weak Points Diagnostics &amp; {selectedPack === 'PLUS_20' ? '20' : '40'} Student Vouchers.
+                  </div>
+                </div>
+              </div>
 
-                  <a
-                    href={PaymentService.getSchoolGatewayUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer"
-                  >
-                    <span>BUY SCHOOL PACK (₹2,499) ↗</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
+              {/* 2-STEP REAL UPI PG CHECKOUT & PAYMENT OK SCREEN (MATCHING STUDENT FLOW) */}
+              <div className="border-t border-slate-800 pt-6 space-y-4">
+                <div className="flex items-center space-x-2 text-sm font-bold text-amber-400">
+                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <span>Instant Payment &amp; Automated Teacher Admin Activation Flow</span>
+                </div>
 
-                  <button
-                    onClick={() => setActiveTab('ACODES')}
-                    className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-colors cursor-pointer"
-                  >
-                    View Included A-Codes Demo
-                  </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {/* STEP 1: OPEN SECURE UPI PG GATEWAY */}
+                  <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-amber-300 flex items-center space-x-1.5">
+                          <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[11px] font-black">1</span>
+                          <span>Step 1: Open Secure Gateway</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                          Official CIT UPI PG Gateway
+                        </span>
+                      </div>
+
+                      {/* Payment Return Notice with English & Hinglish Toggle */}
+                      <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-2 text-left">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center space-x-1.5 font-bold text-amber-300">
+                            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                            <span>Payment Return Notice</span>
+                          </div>
+                          <div className="flex bg-slate-900 rounded-lg p-0.5 text-[10px] font-bold border border-slate-700 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setNoticeLang('EN')}
+                              className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'EN' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+                            >
+                              English
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setNoticeLang('HINGLISH')}
+                              className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'HINGLISH' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+                            >
+                              Hinglish
+                            </button>
+                          </div>
+                        </div>
+                        {noticeLang === 'EN' ? (
+                          <p className="text-[11px] leading-relaxed text-amber-200/90 font-medium">
+                            ⚠️ <strong>AFTER you have paid in UPI PG</strong>, instead of being stuck on that page, <strong>CLICK back and return here</strong>, otherwise we will forget your payment as we track payments and accounts by the pay now button click.
+                          </p>
+                        ) : (
+                          <p className="text-[11px] leading-relaxed text-amber-200/90 font-medium">
+                            ⚠️ <strong>UPI PG mein payment complete karne ke baad</strong>, wahan page par ruke rehne ke bajaye <strong>CLICK back karke yahan wapas aaiye</strong>, warna hum aapki payment bhool sakte hain kyunki hum payments aur accounts ko Pay Now button click ke through track karte hain.
+                          </p>
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleOpenGateway}
+                        className="w-full py-4 px-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-black text-sm rounded-2xl shadow-xl transition-all flex items-center justify-center space-x-2 cursor-pointer transform hover:scale-[1.01]"
+                      >
+                        <ExternalLink className="w-5 h-5" />
+                        <span>BUY SCHOOL PACK (₹2,499) ↗</span>
+                      </button>
+                    </div>
+
+                    {/* Gateway Link Preview & Copy */}
+                    <div className="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-800 text-[11px] font-mono text-slate-400 mt-2">
+                      <span className="truncate pr-2">{PaymentService.getSchoolGatewayUrl()}</span>
+                      <button
+                        type="button"
+                        onClick={handleCopyLink}
+                        className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold rounded-lg text-[10px] transition-colors flex items-center space-x-1 flex-shrink-0 cursor-pointer"
+                      >
+                        {copiedLink ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span className="text-emerald-300">Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3 text-slate-400" />
+                            <span>Copy Link</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* STEP 2: PAYMENT OK SCREEN FOR TEACHER ADMIN ACCOUNT */}
+                  <div className="p-5 bg-slate-950 rounded-2xl border border-emerald-500/40 space-y-3 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-emerald-300 flex items-center space-x-1.5">
+                          <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[11px] font-black">2</span>
+                          <span>{hasOpenedGateway ? 'Payment OK. Complete Activation:-' : 'Step 2: Instant Teacher Admin Activation'}</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                          Zero Wait Time
+                        </span>
+                      </div>
+
+                      {/* If user is NOT logged in: Quick Teacher Admin Setup */}
+                      {!isAuthenticated ? (
+                        <div className="space-y-2.5 bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                          <div className="flex items-center space-x-2 text-xs font-bold text-white">
+                            <UserCheck className="w-4 h-4 text-amber-400" />
+                            <span>Setup Teacher Admin Account (Same Name &amp; Password)</span>
+                          </div>
+                          <p className="text-[11px] text-slate-400">
+                            Create your educator credentials to log back into academiclevel.in anytime and access your {selectedPack === 'PLUS_20' ? '20' : '40'} A-Codes.
+                          </p>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[10px] font-semibold text-slate-400 mb-0.5">Teacher Name</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. Mrs. Sunita Sharma"
+                                value={teacherName}
+                                onChange={e => setTeacherName(e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-semibold text-slate-400 mb-0.5">School Email</label>
+                              <input
+                                type="email"
+                                placeholder="teacher@dps-school.edu.in"
+                                value={teacherEmail}
+                                onChange={e => setTeacherEmail(e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[10px] font-semibold text-slate-400 mb-0.5">Account Password</label>
+                              <input
+                                type="password"
+                                placeholder="Choose login password"
+                                value={teacherPassword}
+                                onChange={e => setTeacherPassword(e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-semibold text-slate-400 mb-0.5">School / Center Name</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. Delhi Public School"
+                                value={schoolName}
+                                onChange={e => setSchoolName(e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-3 bg-slate-900/90 rounded-xl border border-emerald-500/30 text-xs space-y-1">
+                          <div className="flex items-center space-x-1.5 text-emerald-400 font-bold">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            <span>Authenticated Account: {currentLearner?.fullName}</span>
+                          </div>
+                          <p className="text-[11px] text-slate-300">
+                            Same Name and Password will be linked to your Teacher Admin Dashboard.
+                          </p>
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="block text-[11px] text-slate-400 mb-1">
+                          UPI PG Reference / UTR (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Transaction ID from payment receipt (optional)"
+                          value={customRef}
+                          onChange={e => setCustomRef(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-800 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 font-mono focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-2 space-y-2">
+                      <button
+                        type="button"
+                        onClick={handleActivateSchoolPack}
+                        disabled={isActivating}
+                        className="w-full py-4 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-amber-950/40 transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+                      >
+                        {isActivating ? (
+                          <span>Activating Teacher Dashboard &amp; Minting Vouchers...</span>
+                        ) : (
+                          <>
+                            <Zap className="w-4 h-4 fill-slate-950" />
+                            <span>I Have Paid — Open Teacher Dashboard &amp; View {selectedPack === 'PLUS_20' ? '20' : '40'} A-Codes</span>
+                          </>
+                        )}
+                      </button>
+
+                      {authError && (
+                        <p className="text-xs text-rose-400 font-semibold text-center">{authError}</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -543,6 +892,160 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   Mint 20 Plus or 40 Lite A-Codes with 1 click. Copy, print, or share via WhatsApp with parents and students.
                 </p>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* PUBLIC VIEW: A-CODES LOCKED TEASER (IF SOMEONE CLICKS ACODES BEFORE PAYMENT) */}
+        {!isTeacherDashboard && activeTab === 'ACODES' && (
+          <div className="bg-slate-900 border-2 border-dashed border-amber-500/40 rounded-3xl p-8 sm:p-12 text-center space-y-5 shadow-2xl">
+            <div className="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto shadow-lg shadow-amber-950/40">
+              <Lock className="w-8 h-8" />
+            </div>
+
+            <div className="max-w-md mx-auto space-y-2">
+              <h3 className="text-xl font-black text-white">
+                🔒 Classroom A-Codes Vault is Locked
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                To protect institutional passes, student A-codes are not displayed in the open. 
+                Complete payment for the <strong>School Pack (₹2,499)</strong> and activate your Teacher Admin account to reveal and distribute your <strong>40 Lite (or 20 Plus) A-Codes</strong>.
+              </p>
+            </div>
+
+            <div className="pt-2">
+              <button
+                onClick={() => setActiveTab('OFFER')}
+                className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg transition-all cursor-pointer inline-flex items-center space-x-2"
+              >
+                <span>Go to ₹2,499 School Offer &amp; Unlock 40 A-Codes</span>
+                <ArrowRight className="w-4 h-4 text-slate-950" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: A-CODES VAULT IN TEACHER DASHBOARD (REVEALED ONLY IN TEACHER DASHBOARD) */}
+        {isTeacherDashboard && activeTab === 'ACODES' && (
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-5">
+            {activationMessage && (
+              <div className="p-3 bg-emerald-950/80 border border-emerald-500/40 rounded-xl text-xs text-emerald-300 flex items-center space-x-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{activationMessage.text}</span>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div>
+                <h3 className="text-lg font-black text-white flex items-center space-x-2">
+                  <KeyRound className="w-5 h-5 text-amber-400" />
+                  <span>Classroom A-Codes Voucher Vault ({totalCodesCount} Keys)</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Distribute these unique voucher keys to your students. They can enter their code on the payment page or student profile for instant pass activation.
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={handleCopyAllCodes}
+                  className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer"
+                >
+                  {copiedAll ? <Check className="w-3.5 h-3.5 text-slate-950" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedAll ? 'All Codes Copied!' : `Copy All ${totalCodesCount} Vouchers`}</span>
+                </button>
+                <button
+                  onClick={handleWhatsAppShare}
+                  className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>WhatsApp</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Voucher Counter & Filter Bar */}
+            <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center space-x-4">
+                <div>
+                  <span className="text-[10px] text-slate-400 uppercase font-mono block">Total Minted</span>
+                  <span className="text-base font-black text-white">{totalCodesCount}</span>
+                </div>
+                <div className="border-l border-slate-800 pl-4">
+                  <span className="text-[10px] text-emerald-400 uppercase font-mono block">Available</span>
+                  <span className="text-base font-black text-emerald-400">{availableCount}</span>
+                </div>
+                <div className="border-l border-slate-800 pl-4">
+                  <span className="text-[10px] text-slate-400 uppercase font-mono block">Redeemed</span>
+                  <span className="text-base font-black text-slate-300">{redeemedCount}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" />
+                  <input
+                    type="text"
+                    placeholder="Search code or student..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="bg-slate-900 border border-slate-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 w-44"
+                  />
+                </div>
+
+                <div className="flex bg-slate-900 rounded-xl p-1 border border-slate-700 text-[10px] font-bold">
+                  <button
+                    onClick={() => setCodeFilter('ALL')}
+                    className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${codeFilter === 'ALL' ? 'bg-amber-400 text-slate-950' : 'text-slate-400'}`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => setCodeFilter('AVAILABLE')}
+                    className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${codeFilter === 'AVAILABLE' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400'}`}
+                  >
+                    Available
+                  </button>
+                  <button
+                    onClick={() => setCodeFilter('REDEEMED')}
+                    className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${codeFilter === 'REDEEMED' ? 'bg-slate-700 text-white' : 'text-slate-400'}`}
+                  >
+                    Redeemed
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Grid of A-Codes */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {displayCodes.map((c) => (
+                <div key={c.code} className="p-3 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-between text-xs hover:border-slate-700 transition-colors">
+                  <div className="pr-2">
+                    <div className="flex items-center space-x-1.5">
+                      <span className="font-mono font-bold text-amber-300">{c.code}</span>
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                        c.isRedeemed ? 'bg-slate-800 text-slate-400' : 'bg-emerald-500/20 text-emerald-300'
+                      }`}>
+                        {c.isRedeemed ? 'REDEEMED' : 'AVAILABLE'}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                      {c.planTier || 'LITE'} ({c.durationDays || 60} Days) • {c.isRedeemed ? 'Student: ' : 'Assigned: '}
+                      <strong className={c.isRedeemed ? 'text-emerald-300 font-semibold' : 'text-slate-200'}>
+                        {c.studentName || 'Unassigned'}
+                      </strong>
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => handleCopySingleCode(c.code)}
+                    className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-colors cursor-pointer shrink-0"
+                    title="Copy Voucher Code"
+                  >
+                    {copiedCode === c.code ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -682,61 +1185,6 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   >
                     <span>Launch 5-Question Remedial Quiz</span>
                     <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* TAB 4: A-CODES VAULT (20 PLUS OR 40 LITE) */}
-        {activeTab === 'ACODES' && (
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-5">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-              <div>
-                <h3 className="text-lg font-black text-white flex items-center space-x-2">
-                  <KeyRound className="w-5 h-5 text-amber-400" />
-                  <span>Classroom A-Codes Voucher Vault</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Distribute these unique voucher keys to your students. They can redeem them on the checkout page or student profile.
-                </p>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={handleCopyAllCodes}
-                  className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer"
-                >
-                  {copiedAll ? <Check className="w-3.5 h-3.5 text-slate-950" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedAll ? 'All Codes Copied!' : 'Copy All Vouchers'}</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {activeCodes.map((c, idx) => (
-                <div key={c.code} className="p-3 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-between text-xs">
-                  <div>
-                    <div className="flex items-center space-x-1.5">
-                      <span className="font-mono font-bold text-amber-300">{c.code}</span>
-                      <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
-                        c.status === 'REDEEMED' ? 'bg-slate-800 text-slate-400' : 'bg-emerald-500/20 text-emerald-300'
-                      }`}>
-                        {c.status}
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">
-                      {c.tier} • Assigned: <strong className="text-slate-200">{c.studentName}</strong>
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={() => handleCopySingleCode(c.code)}
-                    className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-colors cursor-pointer"
-                    title="Copy Voucher Code"
-                  >
-                    {copiedCode === c.code ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               ))}

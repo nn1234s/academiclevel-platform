@@ -2512,6 +2512,118 @@ apiRouter.post('/learners/:id/acodes/generate', (req, res) => {
 });
 
 // ==========================================
+// School Institutional Pack & Teacher Dashboard
+// ==========================================
+apiRouter.post('/school/activate-pack', (req, res) => {
+  try {
+    const { teacherId, packType = 'LITE_40', utrRef = '', schoolName = '' } = req.body || {};
+    if (!teacherId) {
+      return res.status(400).json({ success: false, error: 'teacherId is required' });
+    }
+
+    const teacher = db.prepare('SELECT id, fullName, email, role FROM learners WHERE id = ?').get(teacherId);
+    if (!teacher) {
+      return res.status(404).json({ success: false, error: 'Teacher account not found' });
+    }
+
+    // Set role to TEACHER if not already SUPER_ADMIN
+    if (teacher.role !== 'SUPER_ADMIN') {
+      db.prepare(`UPDATE learners SET role = 'TEACHER', updatedAt = ? WHERE id = ?`).run(new Date().toISOString(), teacherId);
+    }
+
+    // Check if teacher already has minted school pack A-codes
+    let existingCodes = db.prepare(`SELECT * FROM acodes WHERE createdBy = ? AND code LIKE 'AL-SCH-%' ORDER BY createdAt ASC`).all(teacherId);
+    
+    if (existingCodes && existingCodes.length > 0) {
+      return res.json({
+        success: true,
+        alreadyActive: true,
+        message: `School Pack is already active for this Teacher Admin account!`,
+        packType: existingCodes.length >= 40 ? 'LITE_40' : (existingCodes[0]?.planTier === 'PLUS' ? 'PLUS_20' : 'LITE_40'),
+        acodes: existingCodes
+      });
+    }
+
+    // Determine count, tier, and days
+    const isPlus = packType === 'PLUS_20';
+    const count = isPlus ? 20 : 40;
+    const planTier = isPlus ? 'PLUS' : 'LITE';
+    const durationDays = isPlus ? 180 : 60;
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString(); // 1 year validity
+
+    const insertStmt = db.prepare(`
+      INSERT INTO acodes (code, planTier, durationDays, isRedeemed, createdBy, expiresAt, createdAt)
+      VALUES (?, ?, ?, 0, ?, ?, ?)
+    `);
+
+    const prefix = isPlus ? 'AL-SCH-PLS' : 'AL-SCH-LTE';
+    const generatedCodes = [];
+
+    const tx = db.transaction(() => {
+      for (let i = 0; i < count; i++) {
+        const randA = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const randB = Math.floor(1000 + Math.random() * 9000);
+        const code = `${prefix}-${randA}-${randB}`;
+        insertStmt.run(code, planTier, durationDays, teacherId, expiresAt, now.toISOString());
+        generatedCodes.push({
+          code,
+          planTier,
+          durationDays,
+          isRedeemed: 0,
+          createdBy: teacherId,
+          expiresAt,
+          createdAt: now.toISOString()
+        });
+      }
+    });
+
+    tx();
+    exportDbToJsonStore();
+
+    res.json({
+      success: true,
+      message: `Successfully minted ${count} ${planTier} A-Codes (${durationDays} Days each) for ${teacher.fullName}!`,
+      packType: isPlus ? 'PLUS_20' : 'LITE_40',
+      acodes: generatedCodes
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.get('/school/pack-status/:teacherId', (req, res) => {
+  try {
+    const { teacherId } = req.params;
+    if (!teacherId) return res.status(400).json({ success: false, error: 'teacherId is required' });
+
+    const codes = db.prepare(`
+      SELECT a.*, l.fullName as studentName, l.email as studentEmail
+      FROM acodes a
+      LEFT JOIN learners l ON a.redeemedBy = l.id
+      WHERE a.createdBy = ? AND a.code LIKE 'AL-SCH-%'
+      ORDER BY a.createdAt ASC
+    `).all(teacherId);
+
+    const totalCount = codes.length;
+    const redeemedCount = codes.filter(c => c.isRedeemed).length;
+    const availableCount = totalCount - redeemedCount;
+
+    res.json({
+      success: true,
+      hasActiveSchoolPack: totalCount > 0,
+      packType: totalCount >= 40 ? 'LITE_40' : (codes[0]?.planTier === 'PLUS' ? 'PLUS_20' : 'LITE_40'),
+      totalCount,
+      redeemedCount,
+      availableCount,
+      acodes: codes
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
 // StudentPacks — Real-Time Peer & Messaging Engine
 // ==========================================
 apiRouter.get('/student-packs/peers', (req, res) => {

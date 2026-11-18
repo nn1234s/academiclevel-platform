@@ -45,6 +45,9 @@ runTest('SchoolPortalPage.tsx contains 2499 offer, 20 Plus / 40 Lite codes, Quiz
   assert(content.includes('weakPointTopics') || content.includes('Conceptual Weak Points'), 'Missing Weak Points diagnostic');
   assert(content.includes('handleEnableTeacherMode') || content.includes('handleTeacherRegister'), 'Missing Teacher account activation');
   assert(content.includes('PaymentService.getSchoolGatewayUrl()'), 'SchoolPortalPage must link directly to PaymentService.getSchoolGatewayUrl()');
+  assert(content.includes('isTeacherDashboard'), 'SchoolPortalPage must track isTeacherDashboard');
+  assert(content.includes('Payment OK. Complete Activation:-'), 'SchoolPortalPage must feature Payment OK activation step');
+  assert(content.includes('Classroom A-Codes Vault is Locked') || content.includes('Classroom A-Codes Vault (Locked)'), 'A-Codes must not be in the open before payment activation');
 });
 
 // 2.1 Verify PaymentService UPI_GATEWAY_URLS contains SCHOOL pack url
@@ -52,6 +55,13 @@ runTest('PaymentService.ts contains official ₹2,499 School gateway URL', () =>
   const content = fs.readFileSync(path.join(rootDir, 'src/services/paymentService.ts'), 'utf8');
   assert(content.includes('https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true'), 'Missing VucCVS8VRxJC9iQWEjVv school payment url in paymentService');
   assert(content.includes('getSchoolGatewayUrl'), 'Missing getSchoolGatewayUrl method in PaymentService');
+});
+
+// 2.2 Verify server/api.js provides /api/school/activate-pack and /api/school/pack-status/:teacherId
+runTest('server/api.js contains school pack activation and pack-status endpoints', () => {
+  const content = fs.readFileSync(path.join(rootDir, 'server/api.js'), 'utf8');
+  assert(content.includes('/school/activate-pack'), 'Missing /school/activate-pack endpoint');
+  assert(content.includes('/school/pack-status/:teacherId'), 'Missing /school/pack-status/:teacherId endpoint');
 });
 
 // 3. Verify App.tsx route resolution for /school

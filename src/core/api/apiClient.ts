@@ -650,4 +650,31 @@ export class ApiClient {
       body: JSON.stringify({ planTier, durationDays })
     });
   }
+
+  // ==========================================
+  // School Institutional Pack & Teacher Operations
+  // ==========================================
+  public static async activateSchoolPack(params: {
+    teacherId: string;
+    packType?: 'PLUS_20' | 'LITE_40';
+    utrRef?: string;
+    schoolName?: string;
+  }): Promise<{ success: boolean; packType: string; acodes: any[]; message?: string }> {
+    return this.request('/school/activate-pack', {
+      method: 'POST',
+      body: JSON.stringify(params)
+    });
+  }
+
+  public static async getSchoolPackStatus(teacherId: string): Promise<{
+    success: boolean;
+    hasActiveSchoolPack: boolean;
+    packType?: 'PLUS_20' | 'LITE_40';
+    acodes: any[];
+    totalCount: number;
+    redeemedCount: number;
+    availableCount: number;
+  }> {
+    return this.request(`/school/pack-status/${teacherId}`);
+  }
 }
