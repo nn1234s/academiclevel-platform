@@ -264,21 +264,6 @@ export async function pullAllFromTurso(localDb) {
 
   console.log('[Turso] Checking cloud database for stored learner records...');
 
-  // Enforce zero-tolerance purge of dummy test accounts on boot
-  const DUMMY_DELETE_SQL = `
-    DELETE FROM learners WHERE 
-      email LIKE '%@example.com' OR 
-      email LIKE '%@academiclevel.test' OR 
-      email LIKE '%@test.com' OR 
-      email LIKE '%friend%@gmail.com' OR 
-      email = 'user@gmail.com' OR 
-      email LIKE 'audit_%@academiclevel.in'
-  `;
-  try {
-    localDb.prepare(DUMMY_DELETE_SQL).run();
-    await executeTurso(DUMMY_DELETE_SQL);
-  } catch {}
-
   const tables = [
     'learners', 'subscriptions', 'coin_ledger', 'gift_requests',
     'quiz_attempts', 'course_progress', 'certificates', 'acodes',
@@ -290,17 +275,6 @@ export async function pullAllFromTurso(localDb) {
   for (const table of tables) {
     try {
       let rows = await queryTurso(`SELECT * FROM ${table};`);
-      if (table === 'learners' && Array.isArray(rows)) {
-        rows = rows.filter(r => {
-          const em = (r.email || '').toLowerCase();
-          return !em.includes('@example.com') && 
-                 !em.includes('@academiclevel.test') && 
-                 !em.includes('@test.com') && 
-                 !em.includes('friend@gmail.com') && 
-                 em !== 'user@gmail.com' && 
-                 !em.startsWith('audit_');
-        });
-      }
 
       if (rows && rows.length > 0) {
         const cols = Object.keys(rows[0]);
@@ -334,33 +308,6 @@ export async function pushAllToTurso(localDb, { forceAll = false } = {}) {
   // Flush any in-flight buffered writes first
   await flushTursoWriteBuffer();
 
-  // Only purge dummy accounts if any actually exist in local database
-  try {
-    const dummyCount = localDb.prepare(`
-      SELECT count(*) as count FROM learners WHERE 
-        email LIKE '%@example.com' OR 
-        email LIKE '%@academiclevel.test' OR 
-        email LIKE '%@test.com' OR 
-        email LIKE '%friend%@gmail.com' OR 
-        email = 'user@gmail.com' OR 
-        email LIKE 'audit_%@academiclevel.in'
-    `).get().count;
-
-    if (dummyCount > 0) {
-      const DUMMY_DELETE_SQL = `
-        DELETE FROM learners WHERE 
-          email LIKE '%@example.com' OR 
-          email LIKE '%@academiclevel.test' OR 
-          email LIKE '%@test.com' OR 
-          email LIKE '%friend%@gmail.com' OR 
-          email = 'user@gmail.com' OR 
-          email LIKE 'audit_%@academiclevel.in'
-      `;
-      localDb.prepare(DUMMY_DELETE_SQL).run();
-      await executeTurso(DUMMY_DELETE_SQL);
-    }
-  } catch {}
-
   const tables = [
     'learners', 'subscriptions', 'coin_ledger', 'gift_requests',
     'quiz_attempts', 'course_progress', 'certificates', 'acodes',
@@ -374,19 +321,6 @@ export async function pushAllToTurso(localDb, { forceAll = false } = {}) {
     try {
       let rows = localDb.prepare(`SELECT * FROM ${table}`).all();
       if (!rows || rows.length === 0) continue;
-
-      if (table === 'learners') {
-        rows = rows.filter(r => {
-          const em = (r.email || '').toLowerCase();
-          return !em.includes('@example.com') && 
-                 !em.includes('@academiclevel.test') && 
-                 !em.includes('@test.com') && 
-                 !em.includes('friend@gmail.com') && 
-                 em !== 'user@gmail.com' && 
-                 !em.startsWith('audit_');
-        });
-      }
-      if (rows.length === 0) continue;
 
       // Filter rows that are genuinely dirty (hash mismatch or missing in synced cache)
       const dirtyRows = forceAll ? rows : rows.filter(r => {
@@ -456,21 +390,14 @@ export function startPeriodicSync(localDb, intervalMs = 300000) {
 // Automated zero-cost database maintenance to keep Turso storage permanently lean
 export function runAutomatedMaintenance(localDb) {
   try {
-    // 1. Purge expired auth sessions in local DB and Turso
-    const expiredRes = localDb.prepare("DELETE FROM sessions WHERE datetime(expiresAt) < datetime('now')").run();
-    if (expiredRes && expiredRes.changes > 0) {
-      console.log(`[Maintenance] Purged ${expiredRes.changes} expired session tokens.`);
-      executeTurso("DELETE FROM sessions WHERE datetime(expiresAt) < datetime('now');").catch(() => {});
-    }
-
-    // 2. Retain 90 days of security audit logs
+    // 1. Retain 90 days of security audit logs (safe archival)
     const auditRes = localDb.prepare("DELETE FROM security_audit_logs WHERE datetime(timestampUtc) < datetime('now', '-90 days')").run();
     if (auditRes && auditRes.changes > 0) {
       console.log(`[Maintenance] Purged ${auditRes.changes} historical audit logs older than 90 days.`);
       executeTurso("DELETE FROM security_audit_logs WHERE datetime(timestampUtc) < datetime('now', '-90 days');").catch(() => {});
     }
 
-    // 3. Keep local SQLite WAL file compact
+    // 2. Keep local SQLite WAL file compact
     localDb.exec('PRAGMA wal_checkpoint(PASSIVE);');
   } catch (err) {
     console.warn('[Maintenance Non-fatal Warning]:', err.message);

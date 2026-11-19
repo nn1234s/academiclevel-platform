@@ -33,7 +33,7 @@ import {
 
 export const StudentManagement: React.FC = () => {
   const [learners, setLearners] = useState<Learner[]>(() =>
-    StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL).filter(l => !isTestOrDummyAccount(l?.email, l?.fullName))
+    StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL)
   );
   const [search, setSearch] = useState('');
   const [boardFilter, setBoardFilter] = useState<string>('ALL');
@@ -83,11 +83,11 @@ export const StudentManagement: React.FC = () => {
       if (res.ok) {
         const data = await res.json();
         if (data.success && Array.isArray(data.learners)) {
-          const clean = data.learners.filter((l: Learner) => !isTestOrDummyAccount(l?.email, l?.fullName));
-          setLearners(clean);
-          StorageRLSLayer.setLearnersAdmin(clean, SUPER_ADMIN_EMAIL);
+          const allLearners = data.learners;
+          setLearners(allLearners);
+          StorageRLSLayer.setLearnersAdmin(allLearners, SUPER_ADMIN_EMAIL);
           if (controllingLearner) {
-            const refreshedTarget = clean.find((l: Learner) => l.id === controllingLearner.id);
+            const refreshedTarget = allLearners.find((l: Learner) => l.id === controllingLearner.id);
             if (refreshedTarget) setControllingLearner(refreshedTarget);
           }
           return;
@@ -96,7 +96,7 @@ export const StudentManagement: React.FC = () => {
     } catch {}
 
     await StorageRLSLayer.syncWithServer();
-    const updated = StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL).filter(l => !isTestOrDummyAccount(l?.email, l?.fullName));
+    const updated = StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL);
     setLearners(updated);
     if (controllingLearner) {
       const refreshedTarget = updated.find(l => l.id === controllingLearner.id);

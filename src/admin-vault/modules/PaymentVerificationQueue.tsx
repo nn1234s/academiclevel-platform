@@ -34,7 +34,7 @@ export const PaymentVerificationQueue: React.FC = () => {
   const [copiedUpi, setCopiedUpi] = useState<string | null>(null);
   const [showHowItWorks, setShowHowItWorks] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [filterTab, setFilterTab] = useState<'PENDING' | 'APPROVED' | 'ALL'>('PENDING');
+  const [filterTab, setFilterTab] = useState<'ALL' | 'PENDING' | 'APPROVED'>('ALL');
 
   // Quick manual grant modal state
   const [showGrantModal, setShowGrantModal] = useState<boolean>(false);
@@ -189,8 +189,9 @@ export const PaymentVerificationQueue: React.FC = () => {
       : allSubs;
 
   const filteredSubs = currentDisplayList.filter(s => {
+    if (!searchTerm.trim()) return true;
     const learner = getLearnerForSub(s);
-    const searchLower = searchTerm.toLowerCase();
+    const searchLower = searchTerm.trim().toLowerCase();
     return (
       (learner?.fullName && learner.fullName.toLowerCase().includes(searchLower)) ||
       (learner?.email && learner.email.toLowerCase().includes(searchLower)) ||
@@ -198,6 +199,8 @@ export const PaymentVerificationQueue: React.FC = () => {
       (s.payerUpiId && s.payerUpiId.toLowerCase().includes(searchLower)) ||
       (s.utrReference && s.utrReference.toLowerCase().includes(searchLower)) ||
       (s.planTier && s.planTier.toLowerCase().includes(searchLower)) ||
+      (s.learnerId && s.learnerId.toLowerCase().includes(searchLower)) ||
+      (s.invoiceNumber && s.invoiceNumber.toLowerCase().includes(searchLower)) ||
       s.id.toLowerCase().includes(searchLower)
     );
   });
@@ -315,6 +318,17 @@ export const PaymentVerificationQueue: React.FC = () => {
         {/* Filter Tabs */}
         <div className="flex space-x-1.5 bg-slate-900 border border-slate-800 p-1.5 rounded-2xl w-fit">
           <button
+            onClick={() => setFilterTab('ALL')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
+              filterTab === 'ALL'
+                ? 'bg-indigo-600 text-white shadow-md font-black'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <span>All Buyers ({allSubs.length})</span>
+          </button>
+
+          <button
             onClick={() => setFilterTab('PENDING')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
               filterTab === 'PENDING'
@@ -332,7 +346,7 @@ export const PaymentVerificationQueue: React.FC = () => {
             onClick={() => setFilterTab('APPROVED')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
               filterTab === 'APPROVED'
-                ? 'bg-emerald-600 text-white shadow-md'
+                ? 'bg-emerald-600 text-white shadow-md font-black'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -340,17 +354,6 @@ export const PaymentVerificationQueue: React.FC = () => {
             <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-300 font-mono">
               {approvedSubs.length}
             </span>
-          </button>
-
-          <button
-            onClick={() => setFilterTab('ALL')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              filterTab === 'ALL'
-                ? 'bg-indigo-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <span>All ({allSubs.length})</span>
           </button>
         </div>
 
@@ -423,14 +426,14 @@ export const PaymentVerificationQueue: React.FC = () => {
                     <div>
                       <div className="flex items-center space-x-2">
                         <span className="font-extrabold text-base text-white">
-                          {learner?.fullName || 'Anonymous Student'}
+                          {learner?.fullName || (sub.payerUpiId ? `Paid Buyer (${sub.payerUpiId})` : `Subscriber (${sub.learnerId})`)}
                         </span>
                         <span className="text-[10px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
-                          {learner?.board || 'CBSE'} Class {learner?.grade || '7'}
+                          {learner?.board || 'Active'} Class {learner?.grade || 'Course'}
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-400 font-mono">
-                        Email: {learner?.email || sub.learnerId} {learner?.phone ? `• Phone: ${learner.phone}` : ''}
+                        Contact: {learner?.email || sub.payerUpiId || sub.learnerId} {learner?.phone ? `• Phone: ${learner.phone}` : ''}
                       </p>
                     </div>
                   </div>
