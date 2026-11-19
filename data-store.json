@@ -27,7 +27,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": "2026-11-09T13:30:06.834Z",
       "createdAt": "2026-11-09T13:29:42.565Z",
-      "updatedAt": "2026-11-19T04:43:38.827Z",
+      "updatedAt": "2026-11-19T08:34:27.341Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -61,7 +61,7 @@
       "avatarFrame": "Emerald",
       "lastSpinTimestampUtc": "2026-11-09T13:57:04.753Z",
       "createdAt": "2026-11-09T13:46:57.966Z",
-      "updatedAt": "2026-11-19T04:43:38.830Z",
+      "updatedAt": "2026-11-19T08:34:27.346Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -95,7 +95,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-09T13:55:04.826Z",
-      "updatedAt": "2026-11-19T04:43:38.830Z",
+      "updatedAt": "2026-11-19T08:34:27.347Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -129,7 +129,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13 05:20:09",
-      "updatedAt": "2026-11-19T04:43:38.830Z",
+      "updatedAt": "2026-11-19T08:34:27.347Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -163,7 +163,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13T06:42:32.181Z",
-      "updatedAt": "2026-11-19T04:43:38.830Z",
+      "updatedAt": "2026-11-19T08:34:27.347Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -1200,28 +1200,73 @@
       "targetId": "cfg_ads",
       "severity": "INFO",
       "details": "Super-Admin updated ADS settings."
+    },
+    {
+      "id": "del_1795077267440_4un3",
+      "timestampUtc": "2026-11-19T08:34:27.441Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "DELETE_ACCOUNT_PURGE",
+      "targetId": "lrn_test_deletion_1795077267378",
+      "severity": "WARNING",
+      "details": "Account deletion purge executed for learner Temporary Student (delete_me_1795077267378@temp.test, ID: lrn_test_deletion_1795077267378). All associated records cascade deleted."
+    },
+    {
+      "id": "admin_cfg_1795077267446",
+      "timestampUtc": "2026-11-19T08:34:27.445Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_pricing",
+      "severity": "INFO",
+      "details": "Super-Admin updated PRICING settings."
+    },
+    {
+      "id": "admin_cfg_1795077267456",
+      "timestampUtc": "2026-11-19T08:34:27.455Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_home",
+      "severity": "INFO",
+      "details": "Super-Admin updated HOME settings."
+    },
+    {
+      "id": "admin_cfg_1795077267460",
+      "timestampUtc": "2026-11-19T08:34:27.460Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_legal",
+      "severity": "INFO",
+      "details": "Super-Admin updated LEGAL settings."
+    },
+    {
+      "id": "admin_cfg_1795077267472",
+      "timestampUtc": "2026-11-19T08:34:27.472Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_ads",
+      "severity": "INFO",
+      "details": "Super-Admin updated ADS settings."
     }
   ],
   "al_prod_system_settings_v1": [
     {
       "key": "cfg_pricing",
       "value": "{\"litePriceInr\":49,\"liteDurationDays\":60,\"plusPriceInr\":129,\"plusDurationDays\":180,\"upiVpa\":\"theattirebbsr@okicici\",\"merchantName\":\"17 Pratyusha Nanda\",\"discountBadge\":\"Special Launch Offer (95% Off)\"}",
-      "updatedAt": "2026-11-19T04:43:38.983Z"
+      "updatedAt": "2026-11-19T08:34:27.475Z"
     },
     {
       "key": "cfg_home",
       "value": "{\"heroTitle\":\"Master Your School Curriculum with Adaptive AI Quizzes\",\"heroSubtitle\":\"CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant Socratic guidance, verifiable certificates, and an earnable Study Coin economy.\",\"announcementActive\":true,\"announcementText\":\"🚀 12,000 Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.\",\"statsStudents\":\"10,000+\",\"statsQuizzes\":\"500,000+\",\"statsPassRate\":\"99.4%\",\"bannerCtaText\":\"Start Free Practice Now\"}",
-      "updatedAt": "2026-11-19T04:43:38.983Z"
+      "updatedAt": "2026-11-19T08:34:27.475Z"
     },
     {
       "key": "cfg_legal",
       "value": "{\"contactEmail\":\"academiclevels@gmail.com\",\"lastUpdatedDate\":\"November 2026\",\"privacyPolicyHeading\":\"AcademicLevel Privacy & Data Protection Policy\",\"privacySummary\":\"We collect only what is strictly necessary for academic assessment, certificate generation, and parent reporting. Learner data is never sold or used for third-party ad tracking.\",\"termsHeading\":\"AcademicLevel Terms of Service & Learner Agreement\",\"termsSummary\":\"Subscriptions grant non-transferable access for the specified duration. Study Coins are gamified reward tokens redeemable for verified gift cards and platform cosmetics according to published rules.\",\"refundPolicySummary\":\"Subscriptions are eligible for a 100% full refund within 20 minutes of purchase for accidental transactions, incorrect plan selections, or duplicate payments. Contact academiclevels@gmail.com with your transaction UTR.\"}",
-      "updatedAt": "2026-11-19T04:43:38.983Z"
+      "updatedAt": "2026-11-19T08:34:27.475Z"
     },
     {
       "key": "cfg_ads",
       "value": "{\"mainHeading\":\"Score 95%+ in School Exams Without Expensive Tuitions\",\"subHeading\":\"CBSE & ICSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Socratic Nova AI Tutor & Real Study Coin Rewards.\",\"offerPriceInr\":49,\"originalPriceInr\":999,\"discountPercent\":95,\"guaranteeDays\":60,\"timerHours\":48,\"ctaText\":\"Claim 60-Day Unlimited Pass for ₹49\",\"urgentNotice\":\"⚡ FLASH OFFER: Only 17 spots remaining at ₹49 for today's cohort.\"}",
-      "updatedAt": "2026-11-19T04:43:38.983Z"
+      "updatedAt": "2026-11-19T08:34:27.475Z"
     }
   ]
 }

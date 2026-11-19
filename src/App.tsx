@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { useAuth } from './core/auth/AuthContext';
 import { StorageRLSLayer } from './core/storage/StorageRLSLayer';
 import { Board, Grade, LevelNode, Question } from './core/types';
@@ -69,7 +69,9 @@ import {
   ChevronDown,
   ExternalLink,
   Crown,
-  School
+  School,
+  HelpCircle,
+  FileText
 } from 'lucide-react';
 
 // Code-split Super-Admin Vault Shell (unlinked from public navigation)
@@ -291,6 +293,35 @@ export const App: React.FC = () => {
   // Mobile drawer
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Desktop header dropdown state
+  const [activeDropdown, setActiveDropdown] = useState<'OFFERS' | 'ABOUT' | null>(null);
+  const dropdownTimeoutRef = useRef<any>(null);
+  const navContainerRef = useRef<HTMLElement | null>(null);
+
+  const handleDropdownEnter = (type: 'OFFERS' | 'ABOUT') => {
+    if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
+    setActiveDropdown(type);
+  };
+
+  const handleDropdownLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+    }, 150);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (navContainerRef.current && !navContainerRef.current.contains(e.target as Node)) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
+    };
+  }, []);
+
   // On initial mount: if visitor requested protected deep link while unauthenticated, trigger login
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -346,6 +377,7 @@ export const App: React.FC = () => {
   const navigateTo = (route: string, extra?: any) => {
     setCurrentRoute(route);
     setMobileMenuOpen(false);
+    setActiveDropdown(null);
 
     if (typeof window !== 'undefined') {
       const targetPath = getPathForRoute(route);
@@ -464,81 +496,281 @@ export const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center space-x-1 text-xs font-semibold">
+            {/* Desktop Navigation Links with Clean Dropdowns */}
+            <nav ref={navContainerRef} className="hidden md:flex items-center space-x-1.5 text-xs font-semibold">
               {!isAuthenticated ? (
                 <>
+                  {/* Direct Link: Home */}
                   <button
                     onClick={() => navigateTo('HOME')}
-                    className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'HOME' ? 'text-indigo-400 font-bold' : 'text-slate-300 hover:text-white'
+                    className={`px-3 py-2 rounded-xl transition-all cursor-pointer ${
+                      currentRoute === 'HOME'
+                        ? 'text-indigo-400 font-bold bg-indigo-500/10'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
                     }`}
                   >
                     Home
                   </button>
-                  <button
-                    onClick={() => navigateTo('PUBLIC_COURSES')}
-                    className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'PUBLIC_COURSES' ? 'text-indigo-400 font-bold' : 'text-slate-300 hover:text-white'
-                    }`}
+
+                  {/* Dropdown 1: Curriculum & Offers */}
+                  <div
+                    className="relative"
+                    onMouseEnter={() => handleDropdownEnter('OFFERS')}
+                    onMouseLeave={handleDropdownLeave}
                   >
-                    Curriculum
-                  </button>
-                  <button
-                    onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
-                    className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'SPECIAL_49_FUNNEL' ? 'text-amber-400 font-bold' : 'text-slate-300 hover:text-white'
-                    }`}
+                    <button
+                      onClick={() => setActiveDropdown(activeDropdown === 'OFFERS' ? null : 'OFFERS')}
+                      className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer ${
+                        currentRoute === 'PUBLIC_COURSES' ||
+                        currentRoute === 'SPECIAL_49_FUNNEL' ||
+                        currentRoute === 'SCHOOL_PORTAL' ||
+                        currentRoute === 'PRICING'
+                          ? 'text-amber-400 font-bold bg-amber-500/10'
+                          : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <span>Curriculum &amp; Offers</span>
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                          activeDropdown === 'OFFERS' ? 'rotate-180 text-amber-400' : 'text-slate-400'
+                        }`}
+                      />
+                    </button>
+
+                    {activeDropdown === 'OFFERS' && (
+                      <div className="absolute top-full left-0 mt-1.5 w-80 bg-slate-900/98 backdrop-blur-2xl border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                        <div className="p-1.5 space-y-1">
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('PUBLIC_COURSES');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <BookOpen className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-white group-hover:text-indigo-300 transition-colors">
+                                Curriculum &amp; Syllabi
+                              </p>
+                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                                CBSE, ICSE &amp; Cambridge IGCSE Classes 1 to 12
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('SPECIAL_49_FUNNEL');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-500/10 border border-amber-500/20 text-amber-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <Zap className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">
+                                  Special ₹49 Pass
+                                </p>
+                                <span className="text-[9px] font-black bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/40">
+                                  HOT
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                                60-Day unlimited concept booster &amp; quizzes
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('SCHOOL_PORTAL');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <School className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs font-bold text-white group-hover:text-emerald-300 transition-colors">
+                                  Schools (₹2,499)
+                                </p>
+                                <span className="text-[9px] font-black bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/40">
+                                  PACK
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                                Institutional pack with 40 Lite or 20 Plus A-Codes
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('PRICING');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer border-t border-slate-800/60 pt-2.5 mt-1"
+                          >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-sky-500/10 border border-sky-500/20 text-sky-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <CreditCard className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-white group-hover:text-sky-300 transition-colors">
+                                All Plans &amp; Pricing
+                              </p>
+                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                                Compare Lite (₹49), Plus (₹129) &amp; 1-Year Gold VIP
+                              </p>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Dropdown 2: About & Trust */}
+                  <div
+                    className="relative"
+                    onMouseEnter={() => handleDropdownEnter('ABOUT')}
+                    onMouseLeave={handleDropdownLeave}
                   >
-                    Special ₹49 Offer
-                  </button>
-                  <button
-                    onClick={() => navigateTo('SCHOOL_PORTAL')}
-                    className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1.5 ${
-                      currentRoute === 'SCHOOL_PORTAL'
-                        ? 'text-amber-400 font-bold bg-amber-500/10 border border-amber-500/30'
-                        : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    <School className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Schools (₹2,499)</span>
-                  </button>
-                  <button
-                    onClick={() => navigateTo('ABOUT')}
-                    className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'ABOUT' ? 'text-indigo-400 font-bold' : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    About
-                  </button>
-                  <button
-                    onClick={() => navigateTo('FAQ')}
-                    className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'FAQ' ? 'text-indigo-400 font-bold' : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    FAQ
-                  </button>
-                  <button
-                    onClick={() => navigateTo('HALL_OF_FAME')}
-                    className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1 ${
-                      currentRoute === 'HALL_OF_FAME' ? 'text-blue-400 font-bold bg-blue-500/10' : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-                    <span>Bug Bounty</span>
-                  </button>
-                  <button
-                    onClick={() => navigateTo('INNOVATIVE_EDTECH')}
-                    className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1.5 ${
-                      currentRoute === 'INNOVATIVE_EDTECH'
-                        ? 'text-amber-400 font-bold bg-amber-500/10 border border-amber-500/30'
-                        : 'text-amber-300/90 hover:text-amber-300'
-                    }`}
-                  >
-                    <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                    <span>#1 EdTech Award</span>
-                  </button>
+                    <button
+                      onClick={() => setActiveDropdown(activeDropdown === 'ABOUT' ? null : 'ABOUT')}
+                      className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer ${
+                        currentRoute === 'ABOUT' ||
+                        currentRoute === 'FAQ' ||
+                        currentRoute === 'HALL_OF_FAME' ||
+                        currentRoute === 'INNOVATIVE_EDTECH' ||
+                        currentRoute === 'PRIVACY'
+                          ? 'text-indigo-400 font-bold bg-indigo-500/10'
+                          : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <span>About &amp; Trust</span>
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                          activeDropdown === 'ABOUT' ? 'rotate-180 text-indigo-400' : 'text-slate-400'
+                        }`}
+                      />
+                    </button>
+
+                    {activeDropdown === 'ABOUT' && (
+                      <div className="absolute top-full left-0 mt-1.5 w-80 bg-slate-900/98 backdrop-blur-2xl border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                        <div className="p-1.5 space-y-1">
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('ABOUT');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-purple-500/10 border border-purple-500/20 text-purple-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <Sparkles className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-white group-hover:text-purple-300 transition-colors">
+                                About Us
+                              </p>
+                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                                Mission, Socratic AI methodology &amp; pedagogy
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('FAQ');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 border border-blue-500/20 text-blue-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <HelpCircle className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors">
+                                Frequently Asked Questions
+                              </p>
+                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                                Parent guides, student safety &amp; answers
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('INNOVATIVE_EDTECH');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-500/10 border border-amber-500/20 text-amber-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <Trophy className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">
+                                  #1 EdTech Award
+                                </p>
+                                <span className="text-[9px] font-black bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/40">
+                                  WINNER
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                                Century EdTech Leader &amp; Innovation recognition
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('HALL_OF_FAME');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <ShieldCheck className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors">
+                                Security &amp; Bug Bounty
+                              </p>
+                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                                Hall of Fame &amp; responsible disclosure policy
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('PRIVACY');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer border-t border-slate-800/60 pt-2.5 mt-1"
+                          >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800 border border-slate-700 text-slate-300 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <FileText className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-white group-hover:text-slate-200 transition-colors">
+                                Terms &amp; 20-Min Refund
+                              </p>
+                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                                Privacy protection, DPDP &amp; cancellation policy
+                              </p>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </>
               ) : (
                 /* Authenticated Student Navigation */
@@ -677,74 +909,125 @@ export const App: React.FC = () => {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-slate-900 border-b border-slate-800 p-4 space-y-2 text-xs font-semibold">
+          <div className="md:hidden bg-slate-900 border-b border-slate-800 p-4 space-y-4 text-xs font-semibold">
             {!isAuthenticated ? (
-              <>
+              <div className="space-y-3">
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     setAuthModalMode('LOGIN');
                     setAuthModalOpen(true);
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-indigo-300 font-bold bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20"
+                  className="w-full text-left p-2.5 rounded-xl text-indigo-300 font-bold bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 flex items-center justify-between"
                 >
-                  Sign In (Existing User)
+                  <span>Sign In (Existing User)</span>
+                  <span className="text-[10px] bg-indigo-500/20 px-2 py-0.5 rounded-full font-mono text-indigo-300">
+                    Student &amp; Educator
+                  </span>
                 </button>
+
                 <button
                   onClick={() => navigateTo('HOME')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
+                  className="w-full text-left p-2 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
                 >
-                  Home
+                  <span>Home</span>
                 </button>
-                <button
-                  onClick={() => navigateTo('PUBLIC_COURSES')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
-                >
-                  Curriculum & Boards
-                </button>
-                <button
-                  onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
-                  className="w-full text-left p-2.5 rounded-xl text-amber-400 font-bold hover:bg-slate-800"
-                >
-                  Special ₹49 Offer
-                </button>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigateTo('SCHOOL_PORTAL');
-                  }}
-                  className="w-full text-left p-2.5 rounded-xl text-amber-300 font-bold hover:bg-slate-800 flex items-center space-x-2"
-                >
-                  <School className="w-4 h-4 text-amber-400" />
-                  <span>Schools &amp; Tutors (₹2,499)</span>
-                </button>
-                <button
-                  onClick={() => navigateTo('ABOUT')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
-                >
-                  About Us
-                </button>
-                <button
-                  onClick={() => navigateTo('FAQ')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
-                >
-                  FAQ
-                </button>
-                <button
-                  onClick={() => navigateTo('HALL_OF_FAME')}
-                  className="w-full text-left p-2.5 rounded-xl text-blue-400 font-semibold hover:bg-slate-800 flex items-center space-x-2"
-                >
-                  <ShieldCheck className="w-4 h-4 text-blue-400" />
-                  <span>Security &amp; Bug Bounty</span>
-                </button>
-                <button
-                  onClick={() => navigateTo('INNOVATIVE_EDTECH')}
-                  className="w-full text-left p-2.5 rounded-xl text-amber-300 font-semibold hover:bg-slate-800 flex items-center space-x-2"
-                >
-                  <Trophy className="w-4 h-4 text-amber-400" />
-                  <span>🏆 #1 Most Innovative EdTech</span>
-                </button>
-              </>
+
+                {/* Group 1: Curriculum & Offers */}
+                <div className="pt-2 border-t border-slate-800/80 space-y-1">
+                  <p className="px-2 text-[10px] font-black uppercase tracking-wider text-slate-500 font-mono mb-1">
+                    Curriculum &amp; Offers
+                  </p>
+                  <button
+                    onClick={() => navigateTo('PUBLIC_COURSES')}
+                    className="w-full text-left p-2 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
+                  >
+                    <BookOpen className="w-4 h-4 text-indigo-400" />
+                    <span>Curriculum &amp; Syllabi (Classes 1–12)</span>
+                  </button>
+                  <button
+                    onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
+                    className="w-full text-left p-2 rounded-xl text-amber-400 font-bold hover:bg-slate-800 flex items-center justify-between"
+                  >
+                    <span className="flex items-center space-x-2">
+                      <Zap className="w-4 h-4 text-amber-400" />
+                      <span>Special ₹49 Pass</span>
+                    </span>
+                    <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30">
+                      HOT
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigateTo('SCHOOL_PORTAL');
+                    }}
+                    className="w-full text-left p-2 rounded-xl text-emerald-300 font-bold hover:bg-slate-800 flex items-center justify-between"
+                  >
+                    <span className="flex items-center space-x-2">
+                      <School className="w-4 h-4 text-emerald-400" />
+                      <span>Schools &amp; Tutors</span>
+                    </span>
+                    <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                      ₹2,499
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => navigateTo('PRICING')}
+                    className="w-full text-left p-2 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
+                  >
+                    <CreditCard className="w-4 h-4 text-sky-400" />
+                    <span>All Plans &amp; Pricing</span>
+                  </button>
+                </div>
+
+                {/* Group 2: About & Trust */}
+                <div className="pt-2 border-t border-slate-800/80 space-y-1">
+                  <p className="px-2 text-[10px] font-black uppercase tracking-wider text-slate-500 font-mono mb-1">
+                    About &amp; Trust
+                  </p>
+                  <button
+                    onClick={() => navigateTo('ABOUT')}
+                    className="w-full text-left p-2 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
+                  >
+                    <Sparkles className="w-4 h-4 text-purple-400" />
+                    <span>About AcademicLevel</span>
+                  </button>
+                  <button
+                    onClick={() => navigateTo('FAQ')}
+                    className="w-full text-left p-2 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
+                  >
+                    <HelpCircle className="w-4 h-4 text-blue-400" />
+                    <span>Frequently Asked Questions</span>
+                  </button>
+                  <button
+                    onClick={() => navigateTo('INNOVATIVE_EDTECH')}
+                    className="w-full text-left p-2 rounded-xl text-amber-300 font-semibold hover:bg-slate-800 flex items-center justify-between"
+                  >
+                    <span className="flex items-center space-x-2">
+                      <Trophy className="w-4 h-4 text-amber-400" />
+                      <span>#1 EdTech Award</span>
+                    </span>
+                    <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30">
+                      WINNER
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => navigateTo('HALL_OF_FAME')}
+                    className="w-full text-left p-2 rounded-xl text-cyan-400 font-semibold hover:bg-slate-800 flex items-center space-x-2"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-cyan-400" />
+                    <span>Security &amp; Bug Bounty</span>
+                  </button>
+                  <button
+                    onClick={() => navigateTo('PRIVACY')}
+                    className="w-full text-left p-2 rounded-xl text-slate-400 font-medium hover:bg-slate-800 flex items-center space-x-2"
+                  >
+                    <FileText className="w-4 h-4 text-slate-400" />
+                    <span>Terms, Privacy &amp; 20-Min Refund</span>
+                  </button>
+                </div>
+              </div>
             ) : (
               <>
                 <button

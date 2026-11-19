@@ -91,7 +91,7 @@ runTest('App.tsx resolves /school and renders SchoolPortalPage', () => {
   assert(content.includes("route: 'SCHOOL_PORTAL'"), 'Missing SCHOOL_PORTAL route mapping');
   assert(content.includes("case 'SCHOOL_PORTAL': return '/school';"), 'Missing reverse path for SCHOOL_PORTAL');
   assert(content.includes('<SchoolPortalPage'), 'SchoolPortalPage must be rendered');
-  assert(content.includes('Schools (₹2,499)'), 'Nav header must contain Schools link');
+  assert(content.includes('Schools (₹2,499)') || (content.includes('Schools') && content.includes('₹2,499')), 'Nav header must contain Schools link');
 });
 
 // 4. Verify LandingPage.tsx includes School pack, Quiz tracking, and Weak Points
