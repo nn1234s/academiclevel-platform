@@ -32,7 +32,7 @@ const DEFAULT_LEGAL = {
   privacySummary: 'We collect only what is strictly necessary for academic assessment, certificate generation, and parent reporting. Learner data is never sold or used for third-party ad tracking.',
   termsHeading: 'AcademicLevel Terms of Service & Learner Agreement',
   termsSummary: 'Subscriptions grant non-transferable access for the specified duration. Study Coins are gamified reward tokens redeemable for verified gift cards and platform cosmetics according to published rules.',
-  refundPolicySummary: 'Subscriptions can be cancelled within 48 hours if no quizzes or certificate entitlements have been generated. Contact academiclevels@gmail.com with your transaction UTR.'
+  refundPolicySummary: 'Subscriptions are eligible for a 100% full refund within 20 minutes of purchase for accidental transactions, incorrect plan selections, or duplicate payments. Contact academiclevels@gmail.com with your transaction UTR.'
 };
 
 const DEFAULT_ADS = {
@@ -149,8 +149,8 @@ function createMockRes() {
   assert.strictEqual(ledger.length, 0, 'Associated coin_ledger must be cascade deleted');
 
   // Verify audit log entry
-  const audit = db.prepare(`SELECT * FROM security_audit_logs WHERE targetId = ? AND actionType = 'DELETE_LEARNER'`).get(testLearnerId);
-  assert(audit, 'Security audit log must be recorded for DELETE_LEARNER');
+  const audit = db.prepare(`SELECT * FROM security_audit_logs WHERE targetId = ? AND actionType IN ('DELETE_LEARNER', 'DELETE_ACCOUNT_PURGE')`).get(testLearnerId);
+  assert(audit, 'Security audit log must be recorded for DELETE_LEARNER or DELETE_ACCOUNT_PURGE');
 
   console.log('[PASS] Test 1: Admin DELETE /admin/learners/:id purges learner, cascades child records, and writes security audit log');
 }

@@ -251,8 +251,8 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
             )}
             <ul className="list-disc pl-5 space-y-2">
               <li>AcademicLevel Lite is listed at ₹49 for 2 months (60 days); AcademicLevel Plus is listed at ₹129 for 6 months (180 days). The price and plan shown at checkout should be checked before paying.</li>
-              <li>Payments are made through the displayed UPI QR/ID outside the app. A parent or guardian must supervise purchases by a child.</li>
-              <li>Payment is not automatically verified by AcademicLevel. The activation button is a user confirmation flow and does not independently check a bank or UPI transaction. Do not activate until the payer/guardian has confirmed the payment in their own payment app.</li>
+              <li>Payments are processed securely via our integrated UPI Payment Gateway (UPIPG) and authorized checkout links. A parent or guardian must supervise purchases by a child.</li>
+              <li>Gateway transactions and payment confirmations are verified and recorded securely. Subscriptions activate instantly upon successful gateway completion or verified payment confirmation.</li>
               <li>ACodes are intended for one learner and one redemption. Treat a code like a voucher; do not publish it or share it with strangers. ACode creation in the app is not proof that payment was received.</li>
               <li>
                 Keep your payment receipt. For an incorrect activation, duplicate payment or payment dispute, contact{' '}
@@ -286,10 +286,11 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
             )}
             <ul className="list-disc pl-5 space-y-2">
               <li>
-                For payment errors, accidental purchases, duplicate transactions, access problems, cancellation requests or reward fulfilment concerns, email{' '}
+                Full refunds are available within a strict <strong>20-minute window</strong> from the time of transaction for accidental purchases, incorrect plan selections, or duplicate payments. To claim a full refund, email{' '}
                 <a href="mailto:academiclevels@gmail.com" className="text-indigo-600 hover:underline font-medium">
                   academiclevels@gmail.com
-                </a>. Include the account email, plan/order details and payment reference, with sensitive payment credentials removed. Each request will be reviewed under the facts and applicable consumer law. This page does not promise that every purchase is refundable or non-refundable, and does not override statutory rights.
+                </a>{' '}
+                within 20 minutes of payment with your registered account email, plan details, and UPI transaction reference/UTR. Eligible requests submitted within the 20-minute window are processed for a 100% full refund.
               </li>
               <li>
                 For privacy complaints, use the subject &quot;Privacy Complaint&quot;. We will acknowledge and review complaints and provide a response or next steps. You may also exercise rights or approach the appropriate authority as provided by applicable law.

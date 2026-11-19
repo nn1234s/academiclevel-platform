@@ -27,7 +27,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": "2026-11-09T13:30:06.834Z",
       "createdAt": "2026-11-09T13:29:42.565Z",
-      "updatedAt": "2026-11-14T11:01:20.922Z",
+      "updatedAt": "2026-11-19T04:43:38.827Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -61,7 +61,7 @@
       "avatarFrame": "Emerald",
       "lastSpinTimestampUtc": "2026-11-09T13:57:04.753Z",
       "createdAt": "2026-11-09T13:46:57.966Z",
-      "updatedAt": "2026-11-14T11:01:20.932Z",
+      "updatedAt": "2026-11-19T04:43:38.830Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -95,7 +95,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-09T13:55:04.826Z",
-      "updatedAt": "2026-11-14T11:01:20.932Z",
+      "updatedAt": "2026-11-19T04:43:38.830Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -129,7 +129,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13 05:20:09",
-      "updatedAt": "2026-11-14T11:01:20.933Z",
+      "updatedAt": "2026-11-19T04:43:38.830Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -163,7 +163,7 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13T06:42:32.181Z",
-      "updatedAt": "2026-11-14T11:01:20.933Z",
+      "updatedAt": "2026-11-19T04:43:38.830Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
@@ -499,6 +499,51 @@
     }
   ],
   "al_prod_security_audit_logs_v1": [
+    {
+      "id": "admin_del_1794675241061_kw2j",
+      "timestampUtc": "2026-11-14T16:54:01.061Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "DELETE_LEARNER",
+      "targetId": "lrn_test_deletion_1794675241057",
+      "severity": "WARNING",
+      "details": "Super-Admin deleted learner Temporary Student (delete_me_1794675241057@temp.test, ID: lrn_test_deletion_1794675241057) and purged all associated data."
+    },
+    {
+      "id": "admin_cfg_1794675241070",
+      "timestampUtc": "2026-11-14T16:54:01.069Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_pricing",
+      "severity": "INFO",
+      "details": "Super-Admin updated PRICING settings."
+    },
+    {
+      "id": "admin_cfg_1794675241081",
+      "timestampUtc": "2026-11-14T16:54:01.080Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_home",
+      "severity": "INFO",
+      "details": "Super-Admin updated HOME settings."
+    },
+    {
+      "id": "admin_cfg_1794675241086",
+      "timestampUtc": "2026-11-14T16:54:01.086Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_legal",
+      "severity": "INFO",
+      "details": "Super-Admin updated LEGAL settings."
+    },
+    {
+      "id": "admin_cfg_1794675241098",
+      "timestampUtc": "2026-11-14T16:54:01.098Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_ads",
+      "severity": "INFO",
+      "details": "Super-Admin updated ADS settings."
+    },
     {
       "id": "admin_del_1794634867933_jfog",
       "timestampUtc": "2026-11-14T05:41:07.933Z",
@@ -1101,28 +1146,82 @@
       "targetId": "cfg_ads",
       "severity": "INFO",
       "details": "Super-Admin updated ADS settings."
+    },
+    {
+      "id": "del_1795063357778_9719",
+      "timestampUtc": "2026-11-19T04:42:37.778Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "DELETE_ACCOUNT_PURGE",
+      "targetId": "lrn_test_deletion_1795063357690",
+      "severity": "WARNING",
+      "details": "Account deletion purge executed for learner Temporary Student (delete_me_1795063357690@temp.test, ID: lrn_test_deletion_1795063357690). All associated records cascade deleted."
+    },
+    {
+      "id": "del_1795063418943_x9ap",
+      "timestampUtc": "2026-11-19T04:43:38.943Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "DELETE_ACCOUNT_PURGE",
+      "targetId": "lrn_test_deletion_1795063418875",
+      "severity": "WARNING",
+      "details": "Account deletion purge executed for learner Temporary Student (delete_me_1795063418876@temp.test, ID: lrn_test_deletion_1795063418875). All associated records cascade deleted."
+    },
+    {
+      "id": "admin_cfg_1795063418949",
+      "timestampUtc": "2026-11-19T04:43:38.948Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_pricing",
+      "severity": "INFO",
+      "details": "Super-Admin updated PRICING settings."
+    },
+    {
+      "id": "admin_cfg_1795063418961",
+      "timestampUtc": "2026-11-19T04:43:38.960Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_home",
+      "severity": "INFO",
+      "details": "Super-Admin updated HOME settings."
+    },
+    {
+      "id": "admin_cfg_1795063418964",
+      "timestampUtc": "2026-11-19T04:43:38.964Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_legal",
+      "severity": "INFO",
+      "details": "Super-Admin updated LEGAL settings."
+    },
+    {
+      "id": "admin_cfg_1795063418979",
+      "timestampUtc": "2026-11-19T04:43:38.978Z",
+      "actorEmail": "naitiknanda1235@gmail.com",
+      "actionType": "UPDATE_SYSTEM_CONFIG",
+      "targetId": "cfg_ads",
+      "severity": "INFO",
+      "details": "Super-Admin updated ADS settings."
     }
   ],
   "al_prod_system_settings_v1": [
     {
       "key": "cfg_pricing",
-      "value": "{\"litePriceInr\":49,\"liteDurationDays\":60,\"plusPriceInr\":129,\"plusDurationDays\":180,\"upiVpa\":\"theattirebbsr@okicici\",\"merchantName\":\"Pratyusha Nanda\",\"discountBadge\":\"Special Launch Offer (95% Off)\"}",
-      "updatedAt": "2026-11-15T04:30:00.000Z"
+      "value": "{\"litePriceInr\":49,\"liteDurationDays\":60,\"plusPriceInr\":129,\"plusDurationDays\":180,\"upiVpa\":\"theattirebbsr@okicici\",\"merchantName\":\"17 Pratyusha Nanda\",\"discountBadge\":\"Special Launch Offer (95% Off)\"}",
+      "updatedAt": "2026-11-19T04:43:38.983Z"
     },
     {
       "key": "cfg_home",
-      "value": "{\"heroTitle\":\"Master All Classes 1 to 12 With India Top Adaptive AI\",\"heroSubtitle\":\"Personalized Socratic Quizzes, CBSE/ICSE curriculum mastery, and real digital gift cards.\",\"announcementActive\":true,\"announcementText\":\"🔥 New AI Olympiad Track Live across all grades!\",\"featureAiQuiz\":\"Nova AI Socratic Tutor\",\"statsQuizzes\":\"12,000+ Questions\",\"statsPassRate\":\"CBSE • ICSE • IGCSE\",\"bannerCtaText\":\"Start Free Practice Now\",\"updatedAt\":\"2026-11-15T04:30:00.000Z\"}",
-      "updatedAt": "2026-11-15T04:30:00.000Z"
+      "value": "{\"heroTitle\":\"Master Your School Curriculum with Adaptive AI Quizzes\",\"heroSubtitle\":\"CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant Socratic guidance, verifiable certificates, and an earnable Study Coin economy.\",\"announcementActive\":true,\"announcementText\":\"🚀 12,000 Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.\",\"statsStudents\":\"10,000+\",\"statsQuizzes\":\"500,000+\",\"statsPassRate\":\"99.4%\",\"bannerCtaText\":\"Start Free Practice Now\"}",
+      "updatedAt": "2026-11-19T04:43:38.983Z"
     },
     {
       "key": "cfg_legal",
-      "value": "{\"contactEmail\":\"academiclevels@gmail.com\",\"lastUpdatedDate\":\"November 2026\",\"privacyPolicyHeading\":\"AcademicLevel Privacy & Data Protection Policy\",\"privacySummary\":\"We collect only what is strictly necessary for academic assessment, certificate generation, and parent reporting. Learner data is never sold or used for third-party ad tracking.\",\"termsHeading\":\"AcademicLevel Terms of Service & Learner Agreement\",\"termsSummary\":\"Subscriptions grant non-transferable access for the specified duration. Study Coins are gamified reward tokens redeemable for verified gift cards and platform cosmetics according to published rules.\",\"refundPolicySummary\":\"Subscriptions can be cancelled within 48 hours if no quizzes or certificate entitlements have been generated. Contact academiclevels@gmail.com with your transaction UTR.\"}",
-      "updatedAt": "2026-11-14T11:01:11.737Z"
+      "value": "{\"contactEmail\":\"academiclevels@gmail.com\",\"lastUpdatedDate\":\"November 2026\",\"privacyPolicyHeading\":\"AcademicLevel Privacy & Data Protection Policy\",\"privacySummary\":\"We collect only what is strictly necessary for academic assessment, certificate generation, and parent reporting. Learner data is never sold or used for third-party ad tracking.\",\"termsHeading\":\"AcademicLevel Terms of Service & Learner Agreement\",\"termsSummary\":\"Subscriptions grant non-transferable access for the specified duration. Study Coins are gamified reward tokens redeemable for verified gift cards and platform cosmetics according to published rules.\",\"refundPolicySummary\":\"Subscriptions are eligible for a 100% full refund within 20 minutes of purchase for accidental transactions, incorrect plan selections, or duplicate payments. Contact academiclevels@gmail.com with your transaction UTR.\"}",
+      "updatedAt": "2026-11-19T04:43:38.983Z"
     },
     {
       "key": "cfg_ads",
       "value": "{\"mainHeading\":\"Score 95%+ in School Exams Without Expensive Tuitions\",\"subHeading\":\"CBSE & ICSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Socratic Nova AI Tutor & Real Study Coin Rewards.\",\"offerPriceInr\":49,\"originalPriceInr\":999,\"discountPercent\":95,\"guaranteeDays\":60,\"timerHours\":48,\"ctaText\":\"Claim 60-Day Unlimited Pass for ₹49\",\"urgentNotice\":\"⚡ FLASH OFFER: Only 17 spots remaining at ₹49 for today's cohort.\"}",
-      "updatedAt": "2026-11-14T11:01:11.737Z"
+      "updatedAt": "2026-11-19T04:43:38.983Z"
     }
   ]
 }

@@ -4772,7 +4772,7 @@ const DEFAULT_CONFIG = {
     privacySummary: 'We collect only what is strictly necessary for academic assessment, certificate generation, and parent reporting. Learner data is never sold or used for third-party ad tracking.',
     termsHeading: 'AcademicLevel Terms of Service & Learner Agreement',
     termsSummary: 'Subscriptions grant non-transferable access for the specified duration. Study Coins are gamified reward tokens redeemable for verified gift cards and platform cosmetics according to published rules.',
-    refundPolicySummary: 'Subscriptions can be cancelled within 48 hours if no quizzes or certificate entitlements have been generated. Contact academiclevels@gmail.com with your transaction UTR.'
+    refundPolicySummary: 'Subscriptions are eligible for a 100% full refund within 20 minutes of purchase for accidental transactions, incorrect plan selections, or duplicate payments. Contact academiclevels@gmail.com with your transaction UTR.'
   },
   ads: {
     mainHeading: 'Score 95%+ in School Exams Without Expensive Tuitions',
