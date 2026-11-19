@@ -36,16 +36,8 @@ The system delivers age-adaptive pedagogical interfaces (Classes 1–4 Visual Ga
                         |   - Anti-Cheat Quiz Timer Guard      |
                         +------------------+-------------------+
                                            |
-          +--------------------------------+--------------------------------+
-          |                                                                 |
-+---------v-------------------------+                    +------------------v--------------------+
-|  Curriculum & Intelligence Engine |                    |   Audited Admin Control Plane         |
-|  - Board x Class 1-12 Syllabi     |                    |   Route: /ops-vault-al99 (Code-Split) |
-|  - 4-Tier Progression Nodes       |                    |   Lock: Hidden        |
-|  - Offline IndexedDB/Local Cache  |                    |   - UPI 12-Digit Verification Queue   |
-|  - Nova AI Socratic Engine        |                    |   - Entitlements & ACodes Manager     |
-+-----------------------------------+                    |   - Ledger Inspector & Audit Logs     |
-                                                         +---------------------------------------+
+
+
 ```
 
 ---
@@ -56,10 +48,7 @@ The system delivers age-adaptive pedagogical interfaces (Classes 1–4 Visual Ga
    - Strictly `quizzes_taken <= 25` OR `levels_completed <= 3`.
    - Whichever threshold is reached first activates the `PAYWALL_LOCKED` state.
    - Earned certificates, coin balance, and profile remain accessible in read-only mode during paywall lock.
-2. **Subscription Tiers**:
-   - **Lite Plan**: ₹49 for 60 calendar days.
-   - **Plus Plan**: ₹129 for 180 calendar days.
-   - Subscriptions are activated exclusively upon admin approval of a valid 12-digit UTR.
+
 3. **Class Change Governance**:
    - Maximum 1 class change during an active Premium period (`class_changes_used_premium <= 1`).
    - Maximum 1 class change post-expiry (`class_changes_used_post_expiry <= 1`).
@@ -77,7 +66,7 @@ The system delivers age-adaptive pedagogical interfaces (Classes 1–4 Visual Ga
 
 ## 2.5 Hybrid AI Intelligence Engine (Live Gemini + Resilient Syllabus Fallback)
 
-Operates Google Gemini 1.5 Flash live assessment generation with sub-4s automatic fallback to the verified offline syllabus question bank.
+Operates Google Gemini 3.5 Flash live assessment generation with sub-4s automatic fallback to the verified offline syllabus question bank.
 
 ---
 
