@@ -310,3 +310,50 @@ export interface SystemMetrics {
   quizzesCompleted24h: number;
   offlineFallbackHits: number;
 }
+
+export interface QuizReportQuestionDetail {
+  questionId: string;
+  questionText: string;
+  options: string[];
+  chosenIndex: number;
+  correctIndex: number;
+  isCorrect: boolean;
+  topicTag: string;
+  explanation: string;
+}
+
+export interface QuizReportDetail {
+  quizTitle: string;
+  board: Board;
+  grade: Grade;
+  subjectId: string;
+  levelNode: LevelNode;
+  score: number;
+  totalQuestions: number;
+  accuracyPercent: number;
+  passed: boolean;
+  coinsEarned: number;
+  antiCheatPassed: boolean;
+  timeSpentSeconds: number;
+  masteredTopics: string[];
+  weakTopics: string[];
+  aiTutorFeedback: string;
+  completedAt: string;
+  questions: QuizReportQuestionDetail[];
+}
+
+export interface MailboxMessage {
+  id: string;
+  learnerId: string;
+  sender: 'NOVA_AI' | 'ACADEMIC_LEVEL' | 'SYSTEM';
+  senderName: string;
+  senderAvatar?: string;
+  subject: string;
+  preview: string;
+  body: string;
+  category: 'QUIZ_REPORT' | 'ACHIEVEMENT' | 'SYSTEM' | 'REWARD';
+  isRead: boolean;
+  isStarred?: boolean;
+  createdAt: string;
+  quizReport?: QuizReportDetail;
+}

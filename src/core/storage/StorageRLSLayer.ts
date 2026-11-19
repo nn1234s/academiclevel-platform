@@ -12,7 +12,8 @@ import {
   GiftRequest,
   AuditLogEntry,
   Scholarship,
-  ScholarshipClaim
+  ScholarshipClaim,
+  MailboxMessage
 } from '../types';
 
 /**
@@ -36,6 +37,7 @@ const STORAGE_KEYS = {
   SCHOLARSHIP_CLAIMS: 'al_prod_scholarship_claims_v1',
   AUDIT_LOGS: 'al_prod_security_audit_logs_v1',
   CURRENT_SESSION: 'al_prod_session_v1',
+  MAILBOX_MESSAGES: 'al_prod_mailbox_messages_v1',
 };
 
 export const SUPER_ADMIN_EMAIL = 'admin@academiclevel.in';
@@ -910,6 +912,60 @@ class StorageRLSLayerClass {
       throw new Error('Access denied: 403 Forbidden.');
     }
     return this.readRaw<AuditLogEntry[]>(STORAGE_KEYS.AUDIT_LOGS, []);
+  }
+
+  // ==========================================
+  // Student Mailbox & Quiz Diagnostic Reports
+  // ==========================================
+  public getMailboxMessages(learnerId: string): MailboxMessage[] {
+    const all = this.readRaw<MailboxMessage[]>(STORAGE_KEYS.MAILBOX_MESSAGES, []);
+    return all
+      .filter(m => m.learnerId === learnerId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  public sendMailboxMessage(message: MailboxMessage): void {
+    const all = this.readRaw<MailboxMessage[]>(STORAGE_KEYS.MAILBOX_MESSAGES, []);
+    const idx = all.findIndex(m => m.id === message.id);
+    if (idx >= 0) {
+      all[idx] = message;
+    } else {
+      all.unshift(message);
+    }
+    this.writeRaw(STORAGE_KEYS.MAILBOX_MESSAGES, all);
+  }
+
+  public markMailboxMessageRead(messageId: string, learnerId: string, isRead: boolean = true): void {
+    const all = this.readRaw<MailboxMessage[]>(STORAGE_KEYS.MAILBOX_MESSAGES, []);
+    const updated = all.map(m => {
+      if (m.id === messageId && m.learnerId === learnerId) {
+        return { ...m, isRead };
+      }
+      return m;
+    });
+    this.writeRaw(STORAGE_KEYS.MAILBOX_MESSAGES, updated);
+  }
+
+  public markAllMailboxMessagesRead(learnerId: string): void {
+    const all = this.readRaw<MailboxMessage[]>(STORAGE_KEYS.MAILBOX_MESSAGES, []);
+    const updated = all.map(m => {
+      if (m.learnerId === learnerId) {
+        return { ...m, isRead: true };
+      }
+      return m;
+    });
+    this.writeRaw(STORAGE_KEYS.MAILBOX_MESSAGES, updated);
+  }
+
+  public deleteMailboxMessage(messageId: string, learnerId: string): void {
+    const all = this.readRaw<MailboxMessage[]>(STORAGE_KEYS.MAILBOX_MESSAGES, []);
+    const filtered = all.filter(m => !(m.id === messageId && m.learnerId === learnerId));
+    this.writeRaw(STORAGE_KEYS.MAILBOX_MESSAGES, filtered);
+  }
+
+  public getUnreadMailboxCount(learnerId: string): number {
+    const all = this.readRaw<MailboxMessage[]>(STORAGE_KEYS.MAILBOX_MESSAGES, []);
+    return all.filter(m => m.learnerId === learnerId && !m.isRead).length;
   }
 }
 

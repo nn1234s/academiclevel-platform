@@ -2823,6 +2823,134 @@ apiRouter.post('/student-packs/message', (req, res) => {
   }
 });
 
+// ==========================================
+// Student Mailbox & Quiz Diagnostic Reports
+// ==========================================
+apiRouter.get('/mailbox', (req, res) => {
+  try {
+    const learnerId = req.query.learnerId;
+    if (!learnerId) {
+      return res.status(400).json({ success: false, error: 'learnerId query parameter is required' });
+    }
+
+    const rows = db.prepare('SELECT * FROM mailbox_messages WHERE learnerId = ? ORDER BY createdAt DESC').all(learnerId);
+    const messages = rows.map(r => ({
+      id: r.id,
+      learnerId: r.learnerId,
+      sender: r.sender,
+      senderName: r.senderName,
+      senderAvatar: r.senderAvatar,
+      subject: r.subject,
+      preview: r.preview,
+      body: r.body,
+      category: r.category,
+      isRead: Boolean(r.isRead),
+      isStarred: Boolean(r.isStarred),
+      createdAt: r.createdAt,
+      quizReport: r.quizReportJson ? JSON.parse(r.quizReportJson) : undefined
+    }));
+
+    res.json({ success: true, messages });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/mailbox/send', (req, res) => {
+  try {
+    const { id, learnerId, sender, senderName, senderAvatar, subject, preview, body, category, isRead, isStarred, createdAt, quizReport } = req.body;
+    if (!learnerId || !subject) {
+      return res.status(400).json({ success: false, error: 'learnerId and subject are required' });
+    }
+
+    const msgId = id || ('msg_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6));
+    const now = createdAt || new Date().toISOString();
+
+    db.prepare(`
+      INSERT OR REPLACE INTO mailbox_messages (
+        id, learnerId, sender, senderName, senderAvatar, subject, preview, body, category, isRead, isStarred, quizReportJson, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      msgId,
+      learnerId,
+      sender || 'NOVA_AI',
+      senderName || 'Nova AI Tutor',
+      senderAvatar || null,
+      subject,
+      preview || '',
+      body || '',
+      category || 'QUIZ_REPORT',
+      isRead ? 1 : 0,
+      isStarred ? 1 : 0,
+      quizReport ? JSON.stringify(quizReport) : null,
+      now
+    );
+
+    markTursoDirty();
+    res.json({ success: true, id: msgId });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.patch('/mailbox/:id/read', (req, res) => {
+  try {
+    const { id } = req.params;
+    const { learnerId, isRead = true } = req.body || {};
+
+    if (learnerId) {
+      db.prepare('UPDATE mailbox_messages SET isRead = ? WHERE id = ? AND learnerId = ?').run(
+        isRead ? 1 : 0,
+        id,
+        learnerId
+      );
+    } else {
+      db.prepare('UPDATE mailbox_messages SET isRead = ? WHERE id = ?').run(
+        isRead ? 1 : 0,
+        id
+      );
+    }
+
+    markTursoDirty();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.post('/mailbox/mark-all-read', (req, res) => {
+  try {
+    const { learnerId } = req.body || {};
+    if (!learnerId) {
+      return res.status(400).json({ success: false, error: 'learnerId is required' });
+    }
+
+    db.prepare('UPDATE mailbox_messages SET isRead = 1 WHERE learnerId = ?').run(learnerId);
+    markTursoDirty();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+apiRouter.delete('/mailbox/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const learnerId = req.query.learnerId || req.body?.learnerId;
+
+    if (learnerId) {
+      db.prepare('DELETE FROM mailbox_messages WHERE id = ? AND learnerId = ?').run(id, learnerId);
+    } else {
+      db.prepare('DELETE FROM mailbox_messages WHERE id = ?').run(id);
+    }
+
+    markTursoDirty();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 apiRouter.get('/admin/moderation/flagged-messages', adminAuth, (req, res) => {
   try {
     const flagged = db.prepare('SELECT * FROM student_messages WHERE flaggedForReview = 1 ORDER BY createdAt DESC').all();

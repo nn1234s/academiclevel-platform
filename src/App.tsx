@@ -71,7 +71,8 @@ import {
   Crown,
   School,
   HelpCircle,
-  FileText
+  FileText,
+  Mail
 } from 'lucide-react';
 
 // Code-split Super-Admin Vault Shell (unlinked from public navigation)
@@ -285,6 +286,8 @@ export const App: React.FC = () => {
   const [activeSubjectId, setActiveSubjectId] = useState<string>('math');
   const [activeLevelNode, setActiveLevelNode] = useState<LevelNode>('FOUNDATION');
   const [activeGradeOverride, setActiveGradeOverride] = useState<Grade | null>(null);
+  const [dashboardOpenMailbox, setDashboardOpenMailbox] = useState<boolean>(false);
+  const [dashboardActiveReportId, setDashboardActiveReportId] = useState<string | null>(null);
   const [novaQuestionContext, setNovaQuestionContext] = useState<{
     q: Question;
     chosenIdx: number;
@@ -389,6 +392,12 @@ export const App: React.FC = () => {
     if (extra?.subjectId) setActiveSubjectId(extra.subjectId);
     if (extra?.node) setActiveLevelNode(extra.node);
     if (extra?.grade) setActiveGradeOverride(extra.grade);
+    if (extra?.openMailbox !== undefined) {
+      setDashboardOpenMailbox(Boolean(extra.openMailbox));
+    }
+    if (extra?.activeReportId !== undefined) {
+      setDashboardActiveReportId(extra.activeReportId || null);
+    }
   };
 
   const effectiveGrade: Grade = (isSuperAdmin && activeGradeOverride) ? activeGradeOverride : (currentLearner?.grade || 10);
@@ -868,6 +877,23 @@ export const App: React.FC = () => {
                     </button>
                   )}
 
+                  {/* Mailbox Badge */}
+                  <button
+                    onClick={() => {
+                      navigateTo('DASHBOARD', { openMailbox: true });
+                    }}
+                    title="Open Student Mailbox & Quiz Diagnostic Reports"
+                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-bold hover:bg-purple-500/20 transition-all shadow-sm cursor-pointer relative"
+                  >
+                    <Mail className="w-4 h-4 text-purple-400" />
+                    <span className="hidden sm:inline">Mailbox</span>
+                    {currentLearner && StorageRLSLayer.getUnreadMailboxCount(currentLearner.id) > 0 && (
+                      <span className="px-1.5 py-0.2 bg-amber-400 text-slate-950 text-[10px] font-black rounded-full animate-pulse">
+                        {StorageRLSLayer.getUnreadMailboxCount(currentLearner.id)}
+                      </span>
+                    )}
+                  </button>
+
                   {/* Coin Badge */}
                   <button
                     onClick={() => navigateTo('GIFT_STORE')}
@@ -1201,6 +1227,8 @@ export const App: React.FC = () => {
                   onSelectGradeOverride={setActiveGradeOverride}
                   onNavigate={navigateTo}
                   onOpenUpgradeModal={() => setPaywallModalOpen(true)}
+                  initialOpenMailbox={dashboardOpenMailbox}
+                  initialMailboxReportId={dashboardActiveReportId}
                 />
               )}
 
@@ -1231,6 +1259,10 @@ export const App: React.FC = () => {
                   onFinish={() => {
                     refreshCurrentLearner();
                     navigateTo('DASHBOARD');
+                  }}
+                  onOpenMailbox={(reportId) => {
+                    refreshCurrentLearner();
+                    navigateTo('DASHBOARD', { openMailbox: true, activeReportId: reportId });
                   }}
                   onOpenNovaAi={(q, chosenIdx) => {
                     setNovaQuestionContext({ q, chosenIdx });

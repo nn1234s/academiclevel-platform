@@ -311,6 +311,24 @@ export function initDatabaseSchema() {
 
     CREATE INDEX IF NOT EXISTS idx_cc_challenge ON challenge_completions(challengeId);
     CREATE INDEX IF NOT EXISTS idx_cc_learner ON challenge_completions(learnerId);
+
+    CREATE TABLE IF NOT EXISTS mailbox_messages (
+      id TEXT PRIMARY KEY,
+      learnerId TEXT NOT NULL,
+      sender TEXT NOT NULL DEFAULT 'NOVA_AI',
+      senderName TEXT NOT NULL DEFAULT 'Nova AI Tutor',
+      senderAvatar TEXT,
+      subject TEXT NOT NULL,
+      preview TEXT,
+      body TEXT NOT NULL,
+      category TEXT NOT NULL DEFAULT 'QUIZ_REPORT',
+      isRead INTEGER NOT NULL DEFAULT 0,
+      isStarred INTEGER NOT NULL DEFAULT 0,
+      quizReportJson TEXT,
+      createdAt TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_mailbox_learner ON mailbox_messages(learnerId, createdAt DESC);
+    CREATE INDEX IF NOT EXISTS idx_mailbox_unread ON mailbox_messages(learnerId, isRead);
   `);
 
   // Safe additive schema migrations for full synchronization
@@ -547,6 +565,32 @@ function migrateFromJsonStore() {
         a.targetId || 'SYSTEM',
         a.severity || 'INFO',
         a.details || ''
+      );
+    });
+
+    // 5.5 Migrate Mailbox Messages
+    const mailboxMessages = data['al_prod_mailbox_messages_v1'] || [];
+    const insertMailbox = db.prepare(`
+      INSERT OR REPLACE INTO mailbox_messages (
+        id, learnerId, sender, senderName, senderAvatar, subject, preview, body, category, isRead, isStarred, quizReportJson, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    mailboxMessages.forEach(m => {
+      insertMailbox.run(
+        m.id,
+        m.learnerId,
+        m.sender || 'NOVA_AI',
+        m.senderName || 'Nova AI Tutor',
+        m.senderAvatar || null,
+        m.subject,
+        m.preview || '',
+        m.body || '',
+        m.category || 'QUIZ_REPORT',
+        m.isRead ? 1 : 0,
+        m.isStarred ? 1 : 0,
+        m.quizReport ? JSON.stringify(m.quizReport) : null,
+        m.createdAt || new Date().toISOString()
       );
     });
 
