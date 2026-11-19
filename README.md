@@ -74,8 +74,8 @@ Operates Google Gemini 3.5 Flash live assessment generation with sub-4s automati
 
 | Threat Vector | Mitigation Strategy | Implementation |
 |---|---|---|
-| **Admin Route Discovery** | Complete exclusion from public sitemap, navigation, and robots; code-split under `/ops-vault-al99`. | React Lazy route with no public links |
-| **Admin Impersonation** | Hard-locked to verified admin email and passkey session authentication. Any unauthorized access attempt yields 403 Forbidden and writes an immutable audit record. | `SuperAdminGuard.tsx` & `SecurityAuditService` |
+| **Route Obfuscation** | Complete exclusion from public sitemap, navigation, and robots; code-split under isolated internal path. | React Lazy route with no public links |
+| **Identity Protection** | Hard-locked to verified cryptographic email and passkey hashes. Any unauthorized access attempt yields 403 Forbidden and writes an immutable audit record. | `SuperAdminGuard.tsx` & `SecurityAuditService` |
 | **Cross-Tenant Data Leakage** | Row-Level Security (RLS) simulation enforcing `learner_id` isolation on every read and write operation. | `StorageRLSLayer.ts` |
 | **Payment UTR Replay Fraud** | Global unique constraint on 12-digit UTRs (`^[0-9]{12}$`) backed by SHA-256 fingerprint hashing. | `PaymentService.ts` |
 | **Quiz Speedrun / Cheating** | Enforced minimum dwell time per question ($\ge 3$ seconds) before submit is accepted; prevents automated bot scripts. | `QuizEngine.ts` |
@@ -111,7 +111,7 @@ academiclevel-platform/
 │   │   ├── student/           # 19 Age-Adaptive student modules
 │   │   ├── public/            # 9 Public landing pages + /ads funnel
 │   │   └── shared/            # Reusable UI components & ErrorBoundary
-│   ├── admin-vault/           # /ops-vault-al99 12 Enterprise Admin modules
+│   ├── admin-vault/           # Internal operations & verification modules
 │   ├── App.tsx
 │   ├── index.css
 │   └── main.tsx
@@ -139,12 +139,12 @@ All notable changes, architectural decisions, and security hardening updates are
     - Students can now submit their payment verification by entering solely their Payer UPI ID.
     - If UTR is omitted, the platform automatically provisions an internal audit reference (`UPI-REF-XXXX`).
     - If UTR is entered, the platform continues to enforce 12-digit integrity and duplicate replay fraud prevention.
-    - Added one-click copy button for Payer UPI ID inside Super-Admin Payment Verification Queue for effortless bank statement reconciliation.
-- **Kid Control & Finder Center in Super-Admin Vault (`/ops-vault-al99`)**:
+    - Added one-click copy button for Payer UPI ID inside Operations Payment Verification Queue for effortless bank statement reconciliation.
+- **Kid Control & Finder Center in Operations Vault**:
   - Overhauled `StudentManagement.tsx` into an all-in-one Kid Finder & Control dashboard.
   - Multi-attribute search (Student Name, Email, Phone, Referral Code, Student ID) with filters for Board (CBSE/ICSE/IGCSE), Class (1 to 12), and Subscription State (Free Tier, Lite, Plus, Pending, Suspended).
-  - **Instant One-Click Grant Premium:** Super-admin can grant Lite (60d), Plus (180d), Trial (30d), Annual (365d), or custom durations to any kid with immediate ledger logging.
-  - **Instant One-Click Ungrant Premium:** Super-admin can revoke premium on demand, immediately returning student to Free Tier.
+  - **Instant One-Click Grant Premium:** Operations can grant Lite (60d), Plus (180d), Trial (30d), Annual (365d), or custom durations to any kid with immediate ledger logging.
+  - **Instant One-Click Ungrant Premium:** Operations can revoke premium on demand, immediately returning student to Free Tier.
   - **Deep Kid Control Drawer:**
     - Override & switch student Board (CBSE, ICSE, IGCSE) and Class (1–12) without burning the student's 1-change limit.
     - Reset Class Change Limits (`classChangesUsedPremium = 0`, `classChangesUsedPostExpiry = 0`).
@@ -155,7 +155,7 @@ All notable changes, architectural decisions, and security hardening updates are
 - **Verified Server-Side 1-Day Verification Flow**:
   - Configured `UPIQRCheckout.tsx` and `PremiumCenter.tsx` so that upon payment submission, students see:
     `"Thank you for your purchase. Due to server side checks, we will grant after 1 day."`
-  - Payments enter the Super-Admin Payment Verification Queue (`/ops-vault-al99`), where the admin can verify the UTR and approve/activate the subscription immediately.
+  - Payments enter the Operations Payment Verification Queue, where the team can verify the UTR and approve/activate the subscription immediately.
 
 - **Amazon GC & Digital Voucher Email Request Dispatch (`academiclevels@gmail.com`)**:
   - In `GiftStore.tsx`, when a learner redeems coins for an Amazon Pay or digital gift card, the platform debits the append-only ledger and prepares a formal claim dispatched to **`academiclevels@gmail.com`**.
@@ -198,7 +198,7 @@ All notable changes, architectural decisions, and security hardening updates are
   - `src/core/security/utrValidator.ts`: 12-digit numeric constraint `^[0-9]{12}$` & deduplication fingerprinting.
   - `src/core/security/piiFirewall.ts`: Regex firewall blocking phone numbers, emails, social handles, external links, and vulgarity.
   - `src/core/storage/StorageRLSLayer.ts`: Zero demo accounts, strict Row-Level Security simulation scoping every query to `learner_id`.
-  - `src/core/auth/SuperAdminGuard.tsx`: Hard lock exclusively granting `/ops-vault-al99` access to authorized admin credentials. Any unauthorized attempt triggers immediate 403 Forbidden and audit record.
+  - `src/core/auth/SuperAdminGuard.tsx`: Hard lock exclusively granting operations console access to verified cryptographic credentials. Any unauthorized attempt triggers immediate 403 Forbidden and audit record.
   - `src/core/auth/AuthContext.tsx`: Full auth provider, session manager, and controlled class-change governance (`classChangesUsedPremium <= 1`, `classChangesUsedPostExpiry <= 1`).
 
 - **Multi-Board Curriculum Engine & Quota Gatekeeper (Phase 2)**:

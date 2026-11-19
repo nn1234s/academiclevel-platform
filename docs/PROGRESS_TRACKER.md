@@ -47,7 +47,7 @@ Lead Architect: Antigravity AI & Lead Enterprise Team
 ### Phase 4: Audited UPI QR Checkout & Exclusive Admin Control Plane
 - [x] Dynamic UPI QR Generator (₹49 Lite / ₹129 Plus) (`src/modules/student/UPIQRCheckout.tsx`, `src/services/paymentService.ts`)
 - [x] 12-Digit UTR Capture & Duplicate Fraud Prevention (`src/core/security/utrValidator.ts`)
-- [x] Code-Split Super-Admin Shell (`/ops-vault-al99`) (`src/admin-vault/AdminVaultShell.tsx`)
+- [x] Code-Split Operations Vault Shell (`src/admin-vault/AdminVaultShell.tsx`)
 - [x] 12 Enterprise Admin Modules:
   1. Student Management (`src/admin-vault/modules/StudentManagement.tsx`)
   2. UPI Payment Verification Queue (`src/admin-vault/modules/PaymentVerificationQueue.tsx`)

@@ -225,7 +225,7 @@ class StorageRLSLayerClass {
     if (passkey) headers['x-admin-passkey'] = passkey;
     if (email) headers['x-admin-email'] = email;
     // Fallback: if token has passkey value, also set it as x-admin-passkey
-    if (!passkey && token && (token === 'naitik2026' || token === 'vault99' || token === 'admin2026')) {
+    if (!passkey && token && !token.startsWith('adm_sess_')) {
       headers['x-admin-passkey'] = token;
     }
     return headers;
