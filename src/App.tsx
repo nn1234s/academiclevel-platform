@@ -538,7 +538,10 @@ export const App: React.FC = () => {
                     </button>
 
                     {activeDropdown === 'OFFERS' && (
-                      <div className="absolute top-full left-0 mt-1.5 w-80 bg-slate-900/98 backdrop-blur-2xl border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                      <div
+                        className="absolute top-full left-0 mt-2 w-80 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl shadow-black p-2 z-[9999] ring-1 ring-slate-700/60"
+                        style={{ backgroundColor: '#0f172a', zIndex: 9999 }}
+                      >
                         <div className="p-1.5 space-y-1">
                           <button
                             onClick={() => {
@@ -661,7 +664,10 @@ export const App: React.FC = () => {
                     </button>
 
                     {activeDropdown === 'ABOUT' && (
-                      <div className="absolute top-full left-0 mt-1.5 w-80 bg-slate-900/98 backdrop-blur-2xl border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                      <div
+                        className="absolute top-full left-0 mt-2 w-80 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl shadow-black p-2 z-[9999] ring-1 ring-slate-700/60"
+                        style={{ backgroundColor: '#0f172a', zIndex: 9999 }}
+                      >
                         <div className="p-1.5 space-y-1">
                           <button
                             onClick={() => {
