@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import { apiRouter } from './api.js';
 import { db } from './db.js';
-import { pullAllFromTurso, pushAllToTurso, startPeriodicSync, flushTursoWriteBuffer, TURSO_CONFIG } from './tursoClient.js';
+import { pullAllFromTurso, pushAllToTurso, startPeriodicSync, flushTursoWriteBuffer, runAutomatedMaintenance, TURSO_CONFIG } from './tursoClient.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -99,6 +99,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     // Synchronize latest records from Turso Cloud Database with zero-write delta checking
     try {
       await pullAllFromTurso(db);
+      runAutomatedMaintenance(db);
       startPeriodicSync(db, 300000); // 5-minute background safety check (0 writes if no changes)
     } catch (syncErr) {
       console.warn('[Turso Boot Sync Warning]:', syncErr.message);
