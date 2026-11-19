@@ -496,7 +496,7 @@ apiRouter.post('/auth/register', authLimiter, (req, res) => {
       cleanEmail,
       'STUDENT',
       now,
-      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
     );
 
     // Auto-Grant 60 Days of Unlimited Quizzes (Concept Booster / LITE Plan) on signup
@@ -689,7 +689,7 @@ apiRouter.post('/auth/login', authLimiter, (req, res) => {
         cleanEmail,
         learner.role,
         new Date().toISOString(),
-        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
       );
       delete learner.passwordHash;
       delete learner.passwordSalt;
@@ -730,7 +730,7 @@ apiRouter.post('/auth/login', authLimiter, (req, res) => {
       cleanEmail,
       learner.role,
       new Date().toISOString(),
-      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
     );
 
     delete learner.passwordHash;
@@ -3085,9 +3085,6 @@ apiRouter.get('/admin/learners', adminAuth, (req, res) => {
   try {
     const learners = db.prepare(`
       SELECT * FROM learners 
-      WHERE email NOT LIKE '%@example.com' 
-        AND email NOT LIKE '%@academiclevel.test' 
-        AND email NOT LIKE '%@test.com'
       ORDER BY createdAt DESC
     `).all();
     const subs = db.prepare(`SELECT * FROM subscriptions WHERE status = 'ACTIVE' AND (expiresAt IS NULL OR datetime(expiresAt) > datetime('now'))`).all();

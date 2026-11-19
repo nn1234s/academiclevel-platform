@@ -42,27 +42,8 @@ const STORAGE_KEYS = {
 
 export const SUPER_ADMIN_EMAIL = 'admin@academiclevel.in';
 
-export const isTestOrDummyAccount = (email?: string, name?: string): boolean => {
-  if (!email) return false;
-  const em = String(email).toLowerCase();
-  if (em.includes('@example.com') || em.includes('@academiclevel.test') || em.includes('@test.com')) return true;
-  if (
-    em.startsWith('audit_') ||
-    em.startsWith('pwd_test_') ||
-    em.startsWith('brute_') ||
-    em.startsWith('legacy_') ||
-    em.startsWith('scholar_') ||
-    em.startsWith('kid_') ||
-    em.startsWith('aarav_') ||
-    em.startsWith('bhavya_') ||
-    em.startsWith('test_quota_') ||
-    em.startsWith('test_pay_') ||
-    em.startsWith('sec_u')
-  ) return true;
-  if (name) {
-    const nm = String(name).toLowerCase();
-    if (nm.includes('test student') || nm.includes('test kid') || nm.includes('scholar tester') || nm.includes('security user')) return true;
-  }
+export const isTestOrDummyAccount = (_email?: string, _name?: string): boolean => {
+  // Never filter out or hide real registered students or worldwide accounts
   return false;
 };
 
