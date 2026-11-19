@@ -1,4 +1,4 @@
-import { Learner, Board, Grade, Subscription, GiftRequest, CoinLedgerEntry, QuizAttempt, LevelProgress, Certificate, Friendship, StudentPackMessage, Scholarship, ScholarshipClaim } from '../types';
+import { Learner, Board, Grade, Subscription, GiftRequest, CoinLedgerEntry, QuizAttempt, LevelProgress, Certificate, Friendship, StudentPackMessage, Scholarship, ScholarshipClaim, MailboxMessage } from '../types';
 
 const BASE_URL = '/api';
 
@@ -685,5 +685,40 @@ export class ApiClient {
     availableCount: number;
   }> {
     return this.request(`/school/pack-status/${teacherId}`);
+  }
+
+  // ==========================================
+  // Student Mailbox & Quiz Diagnostic Reports
+  // ==========================================
+  public static async getMailboxMessages(learnerId: string): Promise<{ success: boolean; messages: MailboxMessage[] }> {
+    return this.request(`/mailbox?learnerId=${encodeURIComponent(learnerId)}`);
+  }
+
+  public static async sendMailboxMessage(message: Partial<MailboxMessage>): Promise<{ success: boolean; id: string }> {
+    return this.request('/mailbox/send', {
+      method: 'POST',
+      body: JSON.stringify(message)
+    });
+  }
+
+  public static async markMailboxRead(id: string, learnerId?: string, isRead: boolean = true): Promise<{ success: boolean }> {
+    return this.request(`/mailbox/${encodeURIComponent(id)}/read`, {
+      method: 'PATCH',
+      body: JSON.stringify({ learnerId, isRead })
+    });
+  }
+
+  public static async markAllMailboxRead(learnerId: string): Promise<{ success: boolean }> {
+    return this.request('/mailbox/mark-all-read', {
+      method: 'POST',
+      body: JSON.stringify({ learnerId })
+    });
+  }
+
+  public static async deleteMailboxMessage(id: string, learnerId?: string): Promise<{ success: boolean }> {
+    const q = learnerId ? `?learnerId=${encodeURIComponent(learnerId)}` : '';
+    return this.request(`/mailbox/${encodeURIComponent(id)}${q}`, {
+      method: 'DELETE'
+    });
   }
 }

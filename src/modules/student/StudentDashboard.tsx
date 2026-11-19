@@ -39,8 +39,11 @@ import {
   Package,
   Truck,
   MapPin,
-  Crown
+  Crown,
+  Mail
 } from 'lucide-react';
+import { StudentMailboxModal } from './StudentMailboxModal';
+import { MailboxMessage } from '../../core/types';
 
 interface StudentDashboardProps {
   learner: Learner;
@@ -48,6 +51,8 @@ interface StudentDashboardProps {
   onSelectGradeOverride?: (grade: Grade) => void;
   onNavigate: (module: string, extra?: any) => void;
   onOpenUpgradeModal: () => void;
+  initialOpenMailbox?: boolean;
+  initialMailboxReportId?: string | null;
 }
 
 export const StudentDashboard: React.FC<StudentDashboardProps> = ({
@@ -56,8 +61,21 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   onSelectGradeOverride,
   onNavigate,
   onOpenUpgradeModal,
+  initialOpenMailbox = false,
+  initialMailboxReportId = null,
 }) => {
   const { refreshCurrentLearner } = useAuth();
+
+  // Student Mailbox State
+  const [isMailboxOpen, setIsMailboxOpen] = useState<boolean>(initialOpenMailbox);
+  const [selectedMailboxMessageId, setSelectedMailboxMessageId] = useState<string | null>(initialMailboxReportId);
+  const [unreadMailCount, setUnreadMailCount] = useState<number>(() => {
+    return StorageRLSLayer.getUnreadMailboxCount(learner.id);
+  });
+  const [latestReportMsg, setLatestReportMsg] = useState<MailboxMessage | null>(() => {
+    const msgs = StorageRLSLayer.getMailboxMessages(learner.id);
+    return msgs.find(m => m.category === 'QUIZ_REPORT') || null;
+  });
 
   // Dispatched & Active Rewards State & Automatic Backend Sync
   const [dispatchedGifts, setDispatchedGifts] = useState<GiftRequest[]>(() => {
@@ -66,6 +84,21 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
     );
   });
   const [copiedGiftCode, setCopiedGiftCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialOpenMailbox) {
+      setIsMailboxOpen(true);
+      if (initialMailboxReportId) {
+        setSelectedMailboxMessageId(initialMailboxReportId);
+      }
+    }
+  }, [initialOpenMailbox, initialMailboxReportId]);
+
+  useEffect(() => {
+    setUnreadMailCount(StorageRLSLayer.getUnreadMailboxCount(learner.id));
+    const msgs = StorageRLSLayer.getMailboxMessages(learner.id);
+    setLatestReportMsg(msgs.find(m => m.category === 'QUIZ_REPORT') || null);
+  }, [learner.id, isMailboxOpen]);
 
   useEffect(() => {
     refreshCurrentLearner();
@@ -263,6 +296,31 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 1,000 Quizzes
               </span>
             </div>
+
+            <button
+              onClick={() => {
+                setSelectedMailboxMessageId(null);
+                setIsMailboxOpen(true);
+              }}
+              className="flex items-center space-x-3 w-full justify-between pt-2 border-t border-white/10 hover:bg-white/10 p-1.5 rounded-xl transition-all cursor-pointer group text-left"
+              title="Open Student Mailbox"
+            >
+              <span className="text-xs font-bold text-white/90 flex items-center space-x-1.5">
+                <Mail className="w-3.5 h-3.5 text-indigo-300 group-hover:scale-110 transition-transform" />
+                <span>Mailbox:</span>
+              </span>
+              <div className="flex items-center space-x-1">
+                {unreadMailCount > 0 ? (
+                  <span className="font-mono text-xs font-black bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full animate-pulse shadow-sm">
+                    {unreadMailCount} New
+                  </span>
+                ) : (
+                  <span className="font-mono text-xs font-bold bg-white/20 px-2 py-0.5 rounded-full text-white group-hover:bg-white/30 transition-colors">
+                    Reports
+                  </span>
+                )}
+              </div>
+            </button>
           </div>
         </div>
       </div>
@@ -751,8 +809,51 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </div>
       </div>
 
+      {/* 4.5 Latest Quiz Diagnostic Report Spotlight */}
+      {latestReportMsg && latestReportMsg.quizReport && (
+        <div className="bg-gradient-to-r from-purple-950/60 via-slate-900 to-indigo-950/60 border border-purple-500/40 rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center space-x-4 min-w-0">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg flex-shrink-0 shadow-inner ${
+              latestReportMsg.quizReport.accuracyPercent >= 70
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+            }`}>
+              {latestReportMsg.quizReport.accuracyPercent}%
+            </div>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-950 text-purple-300 border border-purple-800">
+                  Latest Quiz Report
+                </span>
+                <span className="text-xs font-bold text-white truncate">
+                  {latestReportMsg.quizReport.subjectId.toUpperCase()} • {latestReportMsg.quizReport.levelNode}
+                </span>
+                <span className="text-[11px] text-slate-400 font-mono">
+                  ({latestReportMsg.quizReport.score}/{latestReportMsg.quizReport.totalQuestions} Correct)
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 line-clamp-1 max-w-xl">
+                {latestReportMsg.preview}
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              setSelectedMailboxMessageId(latestReportMsg.id);
+              setIsMailboxOpen(true);
+            }}
+            className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-950 transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer"
+          >
+            <Mail className="w-4 h-4" />
+            <span>View Full Report</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* 5. Quick Launch Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
         <button
           onClick={() => onNavigate('SPIN_WHEEL')}
           className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 text-left transition-all group"
@@ -787,6 +888,25 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </button>
 
         <button
+          onClick={() => {
+            setSelectedMailboxMessageId(null);
+            setIsMailboxOpen(true);
+          }}
+          className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 text-left transition-all group relative overflow-hidden"
+        >
+          {unreadMailCount > 0 && (
+            <span className="absolute top-3 right-3 px-2 py-0.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[10px] font-bold rounded-full animate-pulse">
+              {unreadMailCount} New
+            </span>
+          )}
+          <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <Mail className="w-5 h-5" />
+          </div>
+          <p className="text-xs font-bold text-white">Student Mailbox</p>
+          <span className="text-[10px] text-slate-400">Quiz Diagnostic Reports</span>
+        </button>
+
+        <button
           onClick={() => onNavigate('GIFT_STORE')}
           className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 text-left transition-all group"
         >
@@ -794,7 +914,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <Award className="w-5 h-5" />
           </div>
           <p className="text-xs font-bold text-white">Rewards Store</p>
-          <span className="text-[10px] text-slate-400">Mystery Boxes, Toys, Badges &amp; Bottles</span>
+          <span className="text-[10px] text-slate-400">Toys, Badges &amp; Bottles</span>
         </button>
       </div>
 
@@ -898,6 +1018,25 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         onClose={() => setIsStickerBookOpen(false)}
         learner={learner}
         onStartQuiz={() => onNavigate('COURSES', { grade: activeGrade })}
+      />
+
+      {/* Student Mailbox Modal */}
+      <StudentMailboxModal
+        isOpen={isMailboxOpen}
+        onClose={() => {
+          setIsMailboxOpen(false);
+          setUnreadMailCount(StorageRLSLayer.getUnreadMailboxCount(learner.id));
+        }}
+        learnerId={learner.id}
+        initialSelectedMessageId={selectedMailboxMessageId}
+        onNavigateToQuiz={(sId) => {
+          setIsMailboxOpen(false);
+          onNavigate('COURSES', sId ? { subjectId: sId } : undefined);
+        }}
+        onOpenNovaAi={() => {
+          setIsMailboxOpen(false);
+          onNavigate('NOVA_AI');
+        }}
       />
     </div>
   );

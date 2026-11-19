@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Question, Board, Grade, LevelNode, Learner, QuizAttempt, LevelProgress } from '../../core/types';
+import { Question, Board, Grade, LevelNode, Learner, QuizAttempt, LevelProgress, MailboxMessage, QuizReportDetail } from '../../core/types';
 import { OfflineBankService } from '../../services/offlineBankService';
 import { HybridQuizService } from '../../services/hybridQuizService';
 import { CoinLedgerService } from '../../services/coinLedgerService';
@@ -25,7 +25,8 @@ import {
   Target,
   Flame,
   Atom,
-  BookOpen
+  BookOpen,
+  Mail
 } from 'lucide-react';
 
 interface QuizEngineProps {
@@ -36,6 +37,7 @@ interface QuizEngineProps {
   learner: Learner;
   onFinish: () => void;
   onOpenNovaAi: (question: Question, chosenIndex: number) => void;
+  onOpenMailbox?: (reportId?: string) => void;
 }
 
 export const QuizEngine: React.FC<QuizEngineProps> = ({
@@ -46,6 +48,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   learner,
   onFinish,
   onOpenNovaAi,
+  onOpenMailbox,
 }) => {
   const { refreshCurrentLearner } = useAuth();
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -58,6 +61,16 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
+
+  // Diagnostic Answer Log for Mailbox Report Generation
+  interface AnswerLog {
+    question: Question;
+    chosenIndex: number;
+    isCorrect: boolean;
+    dwellSeconds: number;
+  }
+  const [answersLog, setAnswersLog] = useState<AnswerLog[]>([]);
+  const [generatedReportId, setGeneratedReportId] = useState<string | null>(null);
 
   // Anti-Cheat Timer: Minimum 3 seconds dwell time per question
   const [questionDwellSeconds, setQuestionDwellSeconds] = useState<number>(0);
@@ -90,6 +103,8 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       setSelectedOption(null);
       setIsAnswerSubmitted(false);
       setQuestionDwellSeconds(0);
+      setAnswersLog([]);
+      setGeneratedReportId(null);
     }
   }, [board, grade, subjectId, levelNode]);
 
@@ -127,6 +142,16 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
     if (isCorrect) {
       setScore(prev => prev + 1);
     }
+
+    setAnswersLog(prev => [
+      ...prev.filter(a => a.question.id !== currentQuestion.id),
+      {
+        question: currentQuestion,
+        chosenIndex: selectedOption,
+        isCorrect,
+        dwellSeconds: Math.max(1, questionDwellSeconds)
+      }
+    ]);
 
     setIsAnswerSubmitted(true);
   };
@@ -233,6 +258,89 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         }
       }
 
+      // 6. Generate & Deliver In-Depth Quiz Diagnostic Report to Student Mailbox
+      const allAnswers = answersLog.some(a => a.question.id === currentQuestion.id)
+        ? answersLog
+        : [
+            ...answersLog,
+            {
+              question: currentQuestion,
+              chosenIndex: selectedOption ?? -1,
+              isCorrect: (selectedOption ?? -1) === currentQuestion.correctIndex,
+              dwellSeconds: Math.max(1, questionDwellSeconds)
+            }
+          ];
+
+      const masteredTopics = Array.from(
+        new Set(allAnswers.filter(a => a.isCorrect).map(a => a.question.topicTag || 'Core Concept'))
+      );
+      const weakTopics = Array.from(
+        new Set(allAnswers.filter(a => !a.isCorrect).map(a => a.question.topicTag || 'Core Concept'))
+      );
+      const totalDwell = allAnswers.reduce((sum, a) => sum + (a.dwellSeconds || 0), 0);
+
+      let aiFeedback = '';
+      if (accuracyPercent === 100) {
+        aiFeedback = `🌟 Flawless Mastery! You achieved 100% accuracy in ${board} Class ${grade} ${subjectId.toUpperCase()} (${levelNode}). Outstanding conceptual clarity across ${masteredTopics.join(', ')}!`;
+      } else if (accuracyPercent >= 70) {
+        aiFeedback = `🎉 Great job achieving ${accuracyPercent}%! You demonstrated strong mastery in ${masteredTopics.join(', ')}. ${weakTopics.length > 0 ? `To aim for 100%, consider reviewing ${weakTopics.join(', ')} with Nova AI.` : ''}`;
+      } else if (accuracyPercent >= 40) {
+        aiFeedback = `📚 Good effort scoring ${accuracyPercent}%. You have solid fundamentals in ${masteredTopics.length > 0 ? masteredTopics.join(', ') : 'initial questions'}, but need reinforcement in ${weakTopics.join(', ')}. Check out the step-by-step solutions below!`;
+      } else {
+        aiFeedback = `💪 Every expert starts with practice! You scored ${accuracyPercent}%. Let's review the concepts in ${weakTopics.join(', ')} together. Try asking Nova AI Tutor to explain each missed question step-by-step.`;
+      }
+
+      const reportDetail: QuizReportDetail = {
+        quizTitle: `${subjectId.toUpperCase()} • ${levelNode} Assessment`,
+        board,
+        grade,
+        subjectId,
+        levelNode,
+        score: finalScore,
+        totalQuestions,
+        accuracyPercent,
+        passed,
+        coinsEarned: passed ? 25 : 0,
+        antiCheatPassed,
+        timeSpentSeconds: totalDwell,
+        masteredTopics,
+        weakTopics,
+        aiTutorFeedback: aiFeedback,
+        completedAt: new Date().toISOString(),
+        questions: allAnswers.map(a => ({
+          questionId: a.question.id,
+          questionText: a.question.text,
+          options: a.question.options,
+          chosenIndex: a.chosenIndex,
+          correctIndex: a.question.correctIndex,
+          isCorrect: a.isCorrect,
+          topicTag: a.question.topicTag || 'General',
+          explanation: a.question.explanation || 'Review the core concept in your syllabus curriculum.'
+        }))
+      };
+
+      const reportMsgId = 'rep_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+      const mailboxMsg: MailboxMessage = {
+        id: reportMsgId,
+        learnerId: learner.id,
+        sender: 'NOVA_AI',
+        senderName: 'Nova AI Tutor',
+        senderAvatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&auto=format&fit=crop&q=80',
+        subject: passed
+          ? `📊 Quiz Mastery Report: ${subjectId.toUpperCase()} (${accuracyPercent}%)`
+          : `📋 Quiz Diagnostic Report: ${subjectId.toUpperCase()} (${accuracyPercent}%)`,
+        preview: `Scored ${finalScore}/${totalQuestions} (${accuracyPercent}%) in ${board} Class ${grade}. ${passed ? 'Mastery verified! +25 Coins.' : 'Areas to review: ' + (weakTopics.slice(0, 2).join(', ') || 'Concepts')}`,
+        body: aiFeedback,
+        category: 'QUIZ_REPORT',
+        isRead: false,
+        createdAt: new Date().toISOString(),
+        quizReport: reportDetail
+      };
+
+      StorageRLSLayer.sendMailboxMessage(mailboxMsg);
+      ApiClient.sendMailboxMessage(mailboxMsg).catch(() => {});
+      setGeneratedReportId(reportMsgId);
+
       // Synchronize updated quiz counts, streak, and coin balance with React session state
       setTimeout(() => {
         refreshCurrentLearner();
@@ -316,9 +424,41 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         )}
 
         {/* Anti-cheat audit badge */}
-        <div className="inline-flex items-center space-x-2 text-[11px] text-slate-400 bg-slate-950 px-3.5 py-1.5 rounded-full border border-slate-800 mb-8">
+        <div className="inline-flex items-center space-x-2 text-[11px] text-slate-400 bg-slate-950 px-3.5 py-1.5 rounded-full border border-slate-800 mb-6">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
           <span>Anti-Cheat Verification: {antiCheatViolations === 0 ? 'Passed (Full Integrity)' : 'Anomalous speedrun detected'}</span>
+        </div>
+
+        {/* Mailbox Diagnostic Report Notification Banner */}
+        <div className="mb-8 p-4 sm:p-5 bg-gradient-to-r from-purple-950/60 via-slate-900 to-indigo-950/60 border border-purple-500/40 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-lg">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center justify-center flex-shrink-0 shadow-inner">
+              <Mail className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-white flex items-center space-x-1.5">
+                <span>Quiz Diagnostic Report Delivered!</span>
+                <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+              </p>
+              <p className="text-[11px] text-purple-300/80">
+                Nova AI has analyzed your answers, topic strengths, and solutions in your Student Mailbox.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              if (onOpenMailbox) {
+                onOpenMailbox(generatedReportId || undefined);
+              } else {
+                onFinish();
+              }
+            }}
+            className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-md shadow-purple-950 transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer"
+          >
+            <span>Open Report in Mailbox</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
