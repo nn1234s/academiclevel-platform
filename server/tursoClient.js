@@ -441,9 +441,38 @@ export function startPeriodicSync(localDb, intervalMs = 300000) {
     }
   }, intervalMs);
 
-  // Unref timer so it doesn't block process exit
-  if (timer.unref) {
-    timer.unref();
-  }
+  // Daily automated zero-cost housekeeping (pruning expired sessions and old logs)
+  const maintenanceTimer = setInterval(() => {
+    runAutomatedMaintenance(localDb);
+  }, 24 * 60 * 60 * 1000);
+
+  // Unref timers so they don't block process exit
+  if (timer.unref) timer.unref();
+  if (maintenanceTimer.unref) maintenanceTimer.unref();
+
   return timer;
+}
+
+// Automated zero-cost database maintenance to keep Turso storage permanently lean
+export function runAutomatedMaintenance(localDb) {
+  try {
+    // 1. Purge expired auth sessions in local DB and Turso
+    const expiredRes = localDb.prepare("DELETE FROM sessions WHERE datetime(expiresAt) < datetime('now')").run();
+    if (expiredRes && expiredRes.changes > 0) {
+      console.log(`[Maintenance] Purged ${expiredRes.changes} expired session tokens.`);
+      executeTurso("DELETE FROM sessions WHERE datetime(expiresAt) < datetime('now');").catch(() => {});
+    }
+
+    // 2. Retain 90 days of security audit logs
+    const auditRes = localDb.prepare("DELETE FROM security_audit_logs WHERE datetime(timestampUtc) < datetime('now', '-90 days')").run();
+    if (auditRes && auditRes.changes > 0) {
+      console.log(`[Maintenance] Purged ${auditRes.changes} historical audit logs older than 90 days.`);
+      executeTurso("DELETE FROM security_audit_logs WHERE datetime(timestampUtc) < datetime('now', '-90 days');").catch(() => {});
+    }
+
+    // 3. Keep local SQLite WAL file compact
+    localDb.exec('PRAGMA wal_checkpoint(PASSIVE);');
+  } catch (err) {
+    console.warn('[Maintenance Non-fatal Warning]:', err.message);
+  }
 }
