@@ -138,27 +138,11 @@ export class ApiClient {
 
   public static async updateStudentProgressCounters(
     id: string,
-    counters: {
-      quizzesCompletedCount?: number;
-      levelsCompletedCount?: number;
-      dailyQuizCount?: number;
-      dailyQuizDate?: string;
-      examModeEnabled?: boolean;
-    }
+    counters: { quizzesCompletedCount?: number; levelsCompletedCount?: number }
   ): Promise<{ success: boolean; learner?: Learner }> {
     return this.request(`/students/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(counters)
-    });
-  }
-
-  public static async setExamMode(
-    id: string,
-    enabled: boolean
-  ): Promise<{ success: boolean; learner?: Learner }> {
-    return this.request(`/students/${id}/exam-mode`, {
-      method: 'POST',
-      body: JSON.stringify({ enabled })
     });
   }
 
@@ -267,7 +251,7 @@ export class ApiClient {
   // ==========================================
   public static async submitPayment(
     learnerId: string,
-    tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD',
+    tier: 'LITE' | 'PLUS' | 'GOLD',
     payerUpiId: string,
     utrReference?: string
   ): Promise<{ success: boolean; message: string; subscription: Subscription }> {

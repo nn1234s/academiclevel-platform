@@ -3,7 +3,7 @@ import { PLAN_PRICING } from '../../services/paymentService';
 import { Check, Sparkles, Zap, ArrowRight, ShieldCheck } from 'lucide-react';
 
 interface PricingPageProps {
-  onSelectPlan: (tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD') => void;
+  onSelectPlan: (tier: 'LITE' | 'PLUS' | 'GOLD') => void;
   onOpenRegister: () => void;
 }
 
@@ -104,35 +104,35 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, onOpenRe
           </button>
         </div>
 
-        {/* GOD Plan (Crown Maximum Value - 3 Full Years / 1,095 Days) */}
-        <div className="bg-gradient-to-b from-amber-950/70 via-purple-950/40 to-slate-900 border-2 border-amber-400 rounded-3xl p-6 flex flex-col justify-between shadow-2xl relative ring-4 ring-amber-500/30">
-          <span className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-slate-950 tracking-widest uppercase shadow-md animate-pulse">
-            👑 3-YEAR GOD MODE • BEST VALUE
+        {/* Gold Plan (Crown Best Value - 365 Days) */}
+        <div className="bg-gradient-to-b from-amber-950/60 via-slate-900 to-slate-900 border-2 border-amber-400 rounded-3xl p-6 flex flex-col justify-between shadow-2xl relative ring-4 ring-amber-500/20">
+          <span className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 tracking-widest uppercase shadow-md animate-pulse">
+            👑 1-YEAR GOLD • BEST VALUE
           </span>
           <div>
             <div className="flex justify-between items-center mb-2">
               <span className="text-xs font-black text-amber-400 flex items-center space-x-1">
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>GOD PASS (3 FULL YEARS)</span>
+                <span>GOLD PASS (365 DAYS)</span>
               </span>
-              <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                1,095 Days (3 Yrs)
+              <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300">
+                1 Full Year
               </span>
             </div>
             <div className="flex items-baseline space-x-1.5 mb-2">
-              <span className="text-4xl font-black text-amber-300">₹450</span>
-              <span className="text-xs text-slate-400">/ 3 years (~₹12.50/mo)</span>
+              <span className="text-4xl font-black text-amber-300">₹205</span>
+              <span className="text-xs text-slate-400">/ 365 days</span>
             </div>
 
             <div className="mb-4 p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-200">
-              ⭐ <strong>Pay once for 3 Full Academic Years</strong>. Guarantees <strong>100% Physical Gift Store Redemption</strong> for Milton bottles, Pokémon sets &amp; tech accessories! Only <strong>~41 paise/day</strong>!
+              ⭐ <strong>Pay just ₹76 more</strong> than 6-month plan to get <strong>185 EXTRA DAYS (Double your duration to 365 Days!)</strong>. Only <strong>~56 paise/day</strong>!
             </div>
 
             <p className="text-xs text-slate-300 mb-6 leading-relaxed">
-              3 Full Years of complete academic mastery, all CBSE/ICSE classes, guaranteed physical gift redemptions, and permanent God Scholar Crown badge.
+              Complete full-year academic mastery, both terms &amp; final board exams, VIP reward priority.
             </p>
             <ul className="space-y-2 text-xs text-slate-200 font-medium">
-              {PLAN_PRICING.GOD.features.map((f, i) => (
+              {PLAN_PRICING.GOLD.features.map((f, i) => (
                 <li key={i} className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
                   <span>{f}</span>
@@ -142,9 +142,9 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, onOpenRe
           </div>
           <button
             onClick={handleGoToAdPage}
-            className="mt-8 w-full py-3.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-amber-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer transform hover:scale-[1.01]"
+            className="mt-8 w-full py-3.5 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-amber-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer transform hover:scale-[1.01]"
           >
-            <span>Claim 3-Year GOD Pass (₹450) — Best Value ↗</span>
+            <span>Claim 365-Day Gold Pass (₹205) — Best Value ↗</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

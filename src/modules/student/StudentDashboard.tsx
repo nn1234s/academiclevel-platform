@@ -85,21 +85,6 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   });
   const [copiedGiftCode, setCopiedGiftCode] = useState<string | null>(null);
 
-  // Daily Quiz Quota & Exam Mode state
-  const [examMode, setExamMode] = useState<boolean>(Boolean(learner.examModeEnabled));
-  useEffect(() => {
-    setExamMode(Boolean(learner.examModeEnabled));
-  }, [learner.examModeEnabled]);
-
-  const dailyStatus = QuotaService.getDailyQuizStatus(learner, examMode);
-
-  const handleToggleExamMode = (targetState?: boolean) => {
-    const next = targetState !== undefined ? targetState : !examMode;
-    setExamMode(next);
-    QuotaService.toggleExamMode(learner.id, next);
-    refreshCurrentLearner();
-  };
-
   useEffect(() => {
     if (initialOpenMailbox) {
       setIsMailboxOpen(true);
@@ -742,17 +727,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div>
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
               <Zap className="w-4 h-4 text-amber-400" />
-              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'GOD' ? '👑 3-Year GOD VIP Status' : (quota.activePlan === 'GOLD' ? '👑 1-Year Gold VIP Status' : (quota.activePlan === 'LITE' ? 'Concept Booster Status' : `${quota.activePlan} Scholar Status`))) : 'Subscription & Quota Engine'}</span>
+              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'GOLD' ? '👑 1-Year Gold VIP Status' : (quota.activePlan === 'LITE' ? 'Concept Booster Status' : `${quota.activePlan} Scholar Status`)) : 'Subscription & Quota Engine'}</span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
               {quota.hasActiveSubscription
-                ? (quota.activePlan === 'GOD'
-                    ? `👑 3-Year GOD Pass Active • Full 1,095 Days VIP Access • Senior Exam Mode & Unlimited Practice (${quota.daysRemaining} days remaining)`
-                    : (quota.activePlan === 'GOLD'
-                        ? `👑 1-Year Gold Pass Active • Full 365 Days All-Access Pass • All Quotas Lifted (${quota.daysRemaining} days remaining)`
-                        : (quota.activePlan === 'LITE'
-                            ? `Concept Booster Active • 60 Days Unlimited Quizzes (${quota.daysRemaining} days remaining)`
-                            : `${quota.activePlan} Plan Active • Unlimited Access (${quota.daysRemaining} days remaining)`)))
+                ? (quota.activePlan === 'GOLD'
+                    ? `👑 1-Year Gold Pass Active • Full 365 Days All-Access Pass • All Quotas Lifted (${quota.daysRemaining} days remaining)`
+                    : (quota.activePlan === 'LITE'
+                        ? `Concept Booster Active • 60 Days Unlimited Quizzes (${quota.daysRemaining} days remaining)`
+                        : `${quota.activePlan} Plan Active • Unlimited Access (${quota.daysRemaining} days remaining)`))
                 : '60-Day Concept Booster pass expired. Upgrade to continue unlimited quizzes.'}
             </p>
           </div>
@@ -822,85 +805,6 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 }}
               />
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 4.25 ⚡ Exam Mode & Daily Study Pacing */}
-      <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-indigo-950/40 border border-amber-500/30 rounded-3xl p-6 shadow-xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="space-y-1">
-            <div className="flex items-center space-x-2">
-              <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                <Zap className="w-3 h-3 text-amber-400 fill-amber-400" />
-                <span>Daily Quiz Discipline &amp; Exam Mode</span>
-              </span>
-              {dailyStatus.isSeniorGrade && (
-                <span className="text-[10px] font-mono font-bold text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full">
-                  Class {learner.grade} Senior Track
-                </span>
-              )}
-            </div>
-            <h3 className="text-lg font-black text-white flex items-center gap-2">
-              <span>Daily Goal: {dailyStatus.quizzesToday} / {dailyStatus.dailyLimit} Quizzes</span>
-              {dailyStatus.isLimitReached && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono">
-                  Daily Quota Reached!
-                </span>
-              )}
-            </h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              {dailyStatus.isSeniorGrade
-                ? 'Senior classes (Class 9-12) enjoy 10 default daily quizzes for rigorous Board & entrance prep (+5 with Exam Mode).'
-                : 'Junior classes (Class 1-8) follow a 5 daily quiz healthy balance (+5 with Exam Mode for school exams).'}
-            </p>
-          </div>
-
-          {/* Toggle Switch */}
-          <div className="flex items-center gap-3 bg-slate-950/80 border border-slate-800 p-2.5 rounded-2xl shrink-0">
-            <div className="text-right">
-              <span className="text-xs font-bold text-white block">⚡ Exam Mode</span>
-              <span className="text-[10px] font-mono text-slate-400">
-                {examMode ? `Active (+5 extra / ${dailyStatus.dailyLimit} max)` : 'Normal study pacing'}
-              </span>
-            </div>
-            <button
-              onClick={() => handleToggleExamMode()}
-              className={`w-12 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${
-                examMode ? 'bg-amber-500' : 'bg-slate-700'
-              }`}
-              aria-label="Toggle Exam Mode"
-            >
-              <div
-                className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
-                  examMode ? 'translate-x-6' : 'translate-x-0'
-                }`}
-              />
-            </button>
-          </div>
-        </div>
-
-        {/* Daily Quiz Progress Bar */}
-        <div className="space-y-1.5 pt-1">
-          <div className="flex justify-between text-xs font-mono text-slate-400">
-            <span>Completed Today</span>
-            <span className="text-white font-bold">
-              {dailyStatus.quizzesToday} of {dailyStatus.dailyLimit} ({dailyStatus.remainingToday} remaining)
-            </span>
-          </div>
-          <div className="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800">
-            <div
-              className={`h-full rounded-full transition-all duration-300 ${
-                dailyStatus.isLimitReached
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
-                  : examMode
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-400'
-                  : 'bg-gradient-to-r from-indigo-500 to-purple-500'
-              }`}
-              style={{
-                width: `${Math.min(100, (dailyStatus.quizzesToday / (dailyStatus.dailyLimit || 1)) * 100)}%`
-              }}
-            />
           </div>
         </div>
       </div>

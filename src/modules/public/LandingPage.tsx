@@ -56,7 +56,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [pricingConfig, setPricingConfig] = useState(() => SiteConfigService.getPricing());
 
   // Direct UPI PG & Instant Pass Activation State
-  const [activatePlanTier, setActivatePlanTier] = useState<'LITE' | 'PLUS' | 'GOD' | 'GOLD' | null>(null);
+  const [activatePlanTier, setActivatePlanTier] = useState<'LITE' | 'PLUS' | 'GOLD' | null>(null);
   const [studentFullName, setStudentFullName] = useState('');
   const [studentContact, setStudentContact] = useState('');
   const [studentPassword, setStudentPassword] = useState('');
@@ -68,7 +68,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [activateSuccess, setActivateSuccess] = useState(false);
   const [noticeLang, setNoticeLang] = useState<'EN' | 'HINGLISH'>('EN');
 
-  const handleBuyNow = (tier: 'LITE' | 'PLUS' | 'GOD' | 'GOLD') => {
+  const handleBuyNow = (tier: 'LITE' | 'PLUS' | 'GOLD') => {
     const url = PaymentService.getGatewayUrl(tier);
     try {
       sessionStorage.setItem('al_landing_pending_tier', tier);
@@ -981,74 +981,70 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
           </div>
 
-          {/* GOD Plan (Crown Best Value - 3 Full Years / 1,095 Days) */}
-          <div className="bg-gradient-to-b from-amber-950/70 via-purple-950/40 to-slate-900 border-2 border-amber-400 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative ring-4 ring-amber-500/30">
-            <span className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-slate-950 tracking-widest uppercase shadow-md animate-pulse">
-              👑 3-YEAR GOD MODE • UNBEATABLE BEST VALUE
+          {/* Gold Plan (Crown Best Value - 365 Days) */}
+          <div className="bg-gradient-to-b from-amber-950/70 via-slate-900 to-slate-900 border-2 border-amber-400 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative ring-4 ring-amber-500/30">
+            <span className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 tracking-widest uppercase shadow-md animate-pulse">
+              👑 1-YEAR GOLD • UNBEATABLE BEST VALUE
             </span>
             <div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-black text-amber-400 flex items-center space-x-1">
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <span>GOD MODE (3 FULL YEARS)</span>
+                  <span>GOLD PLAN (365 DAYS)</span>
                 </span>
-                <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                  {pricingConfig.godDurationDays || 1095} Days (3 Full Years)
+                <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300">
+                  {pricingConfig.goldDurationDays || 365} Days (1 Full Year)
                 </span>
               </div>
               <div className="flex items-baseline space-x-1.5 mb-2">
-                <span className="text-4xl font-black text-amber-300">₹{pricingConfig.godPriceInr || 450}</span>
-                <span className="text-xs text-slate-400">/ 3 years</span>
+                <span className="text-4xl font-black text-amber-300">₹{pricingConfig.goldPriceInr || 205}</span>
+                <span className="text-xs text-slate-400">/ 365 days</span>
                 <span className="text-xs text-amber-300 font-bold bg-amber-950 px-2 py-0.5 rounded border border-amber-800">
-                  ~₹12.50/mo (Only ~41 paise/day!)
+                  ~₹17.08/mo (Only ~56 paise/day!)
                 </span>
               </div>
 
               {/* Value Comparison Pill */}
               <div className="mb-4 p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-200">
-                ⭐ <strong>Pay once for 3 Full Academic Years (1,095 Days)</strong>. Guarantees <strong>100% Physical Gift Store Redemption</strong> for Milton insulated bottles, Pokémon sets &amp; tech accessories! Only ~41 paise/day!
+                ⭐ <strong>Pay just ₹76 more</strong> than 6-month plan to get <strong>185 EXTRA DAYS (Double your duration to 365 Days!)</strong>. Covers the entire school year!
               </div>
 
               <ul className="space-y-2 text-xs text-slate-200">
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span className="font-bold text-white">Full 3-Year (1,095 Days) All-Access Pass Across 3 Classes</span>
+                  <span className="font-bold text-white">Full 365-Day Complete Academic Year Coverage</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span>100% Guaranteed Physical Gift Store Redemption Unlock</span>
+                  <span>Both Terms, Midterms &amp; Board Final Exams Covered</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span>Both Terms, Pre-Boards, Boards &amp; Olympiad Prep Included</span>
+                  <span>VIP Priority Store Rewards (Pokémon, Milton &amp; Mystery Box)</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span>Exclusive GOD Scholar Crown Badge &amp; Golden Avatar Frame</span>
+                  <span>Exclusive Gold Scholar Profile Badge &amp; Frame</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span>24/7 Nova AI Socratic Tutor with VIP Priority Pool</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span>Annual Master Certificates of Academic Excellence</span>
+                  <span>Annual Master Certificate of Academic Excellence</span>
                 </li>
               </ul>
             </div>
             <div className="mt-6 space-y-2">
               <button
                 type="button"
-                onClick={() => handleBuyNow('GOD')}
-                className="w-full py-3.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-amber-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer transform hover:scale-[1.01]"
+                onClick={() => handleBuyNow('GOLD')}
+                className="w-full py-3.5 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-amber-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer transform hover:scale-[1.01]"
               >
                 <ExternalLink className="w-4 h-4" />
-                <span>BUY NOW (₹{pricingConfig.godPriceInr || 450}) — 3-YEAR GOD ↗</span>
+                <span>BUY NOW (₹{pricingConfig.goldPriceInr || 205}) — 365-DAY GOLD ↗</span>
               </button>
               <button
                 type="button"
                 onClick={() => {
-                  setActivatePlanTier('GOD');
+                  setActivatePlanTier('GOLD');
                   setActivateError('');
                 }}
                 className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-xs rounded-xl border border-slate-700 transition-all cursor-pointer"
@@ -1261,7 +1257,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <h3 className="text-xl font-black text-white">Membership Activated! 🎉</h3>
                 <p className="text-xs text-slate-300">
-                  Your <strong>{activatePlanTier === 'GOD' || activatePlanTier === 'GOLD' ? 'GOD Mode Pass (1,095 Days / 3 Full Years)' : (activatePlanTier === 'PLUS' ? 'Plus Plan (180 Days)' : 'Lite Plan (60 Days)')}</strong> has been activated automatically via UPI PG. Redirecting to your dashboard...
+                  Your <strong>{activatePlanTier === 'GOLD' ? 'Gold Pass (365 Days / 1 Year)' : (activatePlanTier === 'PLUS' ? 'Plus Plan (180 Days)' : 'Lite Plan (60 Days)')}</strong> has been activated automatically via UPI PG. Redirecting to your dashboard...
                 </p>
               </div>
             ) : (
@@ -1274,7 +1270,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     Payment OK. Make Student Account:-
                   </h3>
                   <p className="text-[11px] text-slate-400 mt-0.5">
-                    Paid via UPI PG ({activatePlanTier === 'GOD' || activatePlanTier === 'GOLD' ? 'GOD Plan ₹450' : (activatePlanTier === 'PLUS' ? 'Plus Plan ₹129' : 'Lite Plan ₹49')})? Enter your details below to create your student account and get your subscription instantly.
+                    Paid via UPI PG ({activatePlanTier === 'GOLD' ? 'Gold Plan ₹205' : (activatePlanTier === 'PLUS' ? 'Plus Plan ₹129' : 'Lite Plan ₹49')})? Enter your details below to create your student account and get your subscription instantly.
                   </p>
                 </div>
 

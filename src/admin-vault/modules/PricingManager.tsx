@@ -42,8 +42,6 @@ export const PricingManager: React.FC = () => {
       liteDurationDays: 60,
       plusPriceInr: 129,
       plusDurationDays: 180,
-      godPriceInr: 450,
-      godDurationDays: 1095,
       upiVpa: 'theattirebbsr@okicici',
       merchantName: 'Academic Level',
       discountBadge: 'Special Launch Offer (95% Off)',
@@ -61,16 +59,6 @@ export const PricingManager: React.FC = () => {
         'Offline Question Bank Full Synchronization',
         'Bonus 40-Coin Referral Jackpot eligibility',
         'Max 1 Class Change during active cycle'
-      ],
-      godFeatures: [
-        '3 Full Years (1,095 Days) All-Access Coverage Across 3 Classes',
-        '100% Guaranteed Physical Gift Store Redemptions (Milton bottles & Pokémon sets)',
-        'Both CBSE, ICSE & Olympiad Advanced Syllabus Bank',
-        '24/7 Nova AI Socratic Tutor with VIP Priority Pool',
-        'Exclusive GOD Scholar Crown Badge & Golden Profile Frame',
-        '3 Free Class Changes Across Academic Years',
-        'Annual Master Certificates of Academic Excellence',
-        '10 Daily Quizzes Default (15 in Exam Mode)'
       ],
       goldPriceInr: 205,
       goldDurationDays: 365,
@@ -273,34 +261,34 @@ export const PricingManager: React.FC = () => {
             </div>
           </div>
 
-          {/* GOD PLAN CARD */}
-          <div className="bg-slate-900 border-2 border-amber-500/80 rounded-3xl p-6 shadow-xl flex flex-col justify-between relative ring-2 ring-amber-500/30">
+          {/* GOLD PLAN CARD */}
+          <div className="bg-slate-900 border-2 border-amber-500/60 rounded-3xl p-6 shadow-xl flex flex-col justify-between relative ring-2 ring-amber-500/20">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
-                    👑 3-Year GOD Mode
+                    👑 1-Year Master Pass
                   </span>
-                  <h3 className="text-lg font-black text-white">AcademicLevel GOD Mode</h3>
+                  <h3 className="text-lg font-black text-white">AcademicLevel Gold</h3>
                 </div>
-                <span className="text-2xl font-black text-amber-400">₹{config.godPriceInr || 450}</span>
+                <span className="text-2xl font-black text-amber-400">₹{config.goldPriceInr || 205}</span>
               </div>
 
               <div className="space-y-3 pt-2">
                 <div>
                   <label className="block text-[11px] font-bold text-slate-300 mb-1">
-                    GOD Plan Price (INR ₹)
+                    Gold Plan Price (INR ₹)
                   </label>
                   <input
                     type="number"
                     min={1}
                     max={30000}
-                    value={config.godPriceInr || 450}
-                    onChange={e => setConfig({ ...config, godPriceInr: Number(e.target.value) })}
+                    value={config.goldPriceInr || 205}
+                    onChange={e => setConfig({ ...config, goldPriceInr: Number(e.target.value) })}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-mono font-bold focus:outline-none focus:border-amber-500"
                     required
                   />
-                  <p className="text-[10px] text-slate-400 mt-1">Default: ₹450. Complete 3-year pass (~41 paise/day). Guarantees physical gift store fulfillment!</p>
+                  <p className="text-[10px] text-slate-400 mt-1">Default: ₹205. Complete 365-day annual pass (~56 paise/day).</p>
                 </div>
 
                 <div>
@@ -310,13 +298,13 @@ export const PricingManager: React.FC = () => {
                   <input
                     type="number"
                     min={1}
-                    max={2000}
-                    value={config.godDurationDays || 1095}
-                    onChange={e => setConfig({ ...config, godDurationDays: Number(e.target.value) })}
+                    max={1000}
+                    value={config.goldDurationDays || 365}
+                    onChange={e => setConfig({ ...config, goldDurationDays: Number(e.target.value) })}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500"
                     required
                   />
-                  <p className="text-[10px] text-slate-400 mt-1">Default: 1,095 days (3 full years access).</p>
+                  <p className="text-[10px] text-slate-400 mt-1">Default: 365 days (1 full year access).</p>
                 </div>
 
                 <div>
@@ -325,8 +313,8 @@ export const PricingManager: React.FC = () => {
                   </label>
                   <textarea
                     rows={4}
-                    value={(config.godFeatures || []).join('\n')}
-                    onChange={e => setConfig({ ...config, godFeatures: e.target.value.split('\n').filter(s => s.trim()) })}
+                    value={(config.goldFeatures || []).join('\n')}
+                    onChange={e => setConfig({ ...config, goldFeatures: e.target.value.split('\n').filter(s => s.trim()) })}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-sans"
                   />
                 </div>
@@ -335,7 +323,7 @@ export const PricingManager: React.FC = () => {
 
             <div className="mt-4 pt-4 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
               <span>Student Rate:</span>
-              <span className="font-mono text-amber-300 font-bold">₹{((config.godPriceInr || 450) / (config.godDurationDays || 1095)).toFixed(2)} / day</span>
+              <span className="font-mono text-amber-300 font-bold">₹{((config.goldPriceInr || 205) / (config.goldDurationDays || 365)).toFixed(2)} / day</span>
             </div>
           </div>
         </div>
@@ -425,14 +413,14 @@ export const PricingManager: React.FC = () => {
                 </a>
               </div>
               <div className="p-3 bg-slate-950/80 rounded-xl border border-amber-500/30">
-                <span className="text-[10px] font-mono text-amber-400 font-bold block mb-1">👑 3-Year GOD Plan (₹450 - 1,095 Days):</span>
+                <span className="text-[10px] font-mono text-amber-400 font-bold block mb-1">👑 Gold Plan (₹205 - 365 Days):</span>
                 <a
-                  href="https://upipg.cit.org.in/pay/2iHAbft8ENKjzPQvkfd8?public=true"
+                  href="https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true"
                   target="_blank"
                   rel="noreferrer"
                   className="font-mono text-[11px] text-amber-300 hover:underline break-all"
                 >
-                  https://upipg.cit.org.in/pay/2iHAbft8ENKjzPQvkfd8?public=true ↗
+                  https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true ↗
                 </a>
               </div>
               <div className="p-3 bg-slate-950/80 rounded-xl border border-yellow-500/30">
