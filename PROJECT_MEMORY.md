@@ -106,8 +106,15 @@ Payments are processed via the official UPI Payment Gateway hosted at `upipg.cit
 
 ## 5. Turso Cloud "Free Forever" Quota Architecture
 
-To ensure the platform runs **100% free forever** on Turso's Starter tier (9 GB storage, 10M row writes/month, 1B row reads/month):
+The platform operates on **Turso's Current Free Plan ($0/mo)**:
+* **Total Storage**: **5 GB** (supports 50,000–100,000 active student accounts)
+* **Row Writes / Month**: **10 Million** (supports ~22,000–25,000 Daily Active Users taking quizzes)
+* **Row Reads / Month**: **500 Million** (our app uses ~0 reads during live browsing thanks to local SQLite WAL caching)
+* **Database Limit**: **100 DBs** (AcademicLevel uses only 1)
+* **Embedded Syncs**: **3 GB / month** (efficient delta-only sync)
+* **Point-in-Time Restore**: **1 day**
 
+### How the System Stays 100% Free Forever:
 1. **Zero Cloud Reads Charged**:
    * 100% of read traffic (quiz questions, dashboard stats, leaderboards, user profile lookups) hits the **in-process SQLite WAL cache** at `0.1ms`.
    * Turso is never queried for reads during live browsing; cloud reads occur only during container cold-start hydration (`pullAllFromTurso`).
