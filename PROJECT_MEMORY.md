@@ -58,13 +58,34 @@ Payments are processed via the official UPI Payment Gateway hosted at `upipg.cit
    * Gateway URL: `https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true`
 2. **AcademicLevel Plus**: ₹129 for 180 Days (6 months) unlimited pass
    * Gateway URL: `https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true`
-3. **1-Year Gold VIP**: ₹205 for 365 Days (1 full year) + Gold Badge & Priority AI
-   * Gateway URL: `https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true`
+3. **AcademicLevel GOD Mode (3-Year VIP Pass)**: ₹450 for 1,095 Days (3 Full Years)
+   * Supersedes legacy 1-Year Gold (₹205/365d) as the flagship tier.
+   * Covers 3 full academic years (~₹12.50/mo, only ~41 paise/day!).
+   * **Unit Economics & Guaranteed Physical Gift Fulfillment**:
+     * Fulfilling a ₹100–₹130 physical reward on a ₹49 plan causes severe negative unit margins.
+     * With the GOD 3-Year Plan at ₹450, a dedicated student accumulates ~20,000–25,000 coins over 2–3 years to redeem an insulated Milton bottle or authentic Pokémon set (~₹100–₹130 fulfillment + shipping cost).
+     * AcademicLevel generates a **clean ₹320 to ₹350 net profit per subscriber**, sustainably and honestly fulfilling 100% of marketing promises!
+   * Gateway URL: `https://upipg.cit.org.in/pay/2iHAbft8ENKjzPQvkfd8?public=true`
 4. **School Institutional Pack**: ₹2,499
    * Includes 40 Lite or 20 Plus A-Code vouchers + School Portal with Class Weak-Point Analytics.
    * Gateway URL: `https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true`
 
-### B. Strict 20-Minute Full Refund Policy
+### B. Daily Quiz Quotas & "⚡ Exam Mode" Governance
+To protect young learners from cognitive fatigue while supporting high-stakes Board and Olympiad exams:
+* **Classes 1 to 8 (Junior Scholars)**:
+  * Normal Limit: **5 quizzes per calendar day**.
+  * "⚡ Exam Mode": Turning ON Exam Mode immediately unlocks 5 additional quizzes (**10 quizzes total** per day).
+* **Classes 9 to 12 (Senior Scholars)**:
+  * Default Limit: **10 quizzes per calendar day** by default (eliminating parental complaints about artificial study caps during Board prep).
+  * "⚡ Exam Mode": Turning ON Exam Mode increases the cap to **15 quizzes per day**.
+* **Automatic Midnight Rollover**:
+  * Tracked via `dailyQuizCount` and `dailyQuizDate` on the learner record.
+  * When a new calendar day begins (`dailyQuizDate !== todayDate`), attempts automatically reset to 0.
+* **UI Controls**:
+  * Interactive "⚡ Exam Mode" toggle in `QuizEngine.tsx` top bar and `StudentDashboard.tsx` with live `quizzesToday / dailyLimit` counter and progress bar.
+  * Friendly fatigue prevention modal offering 1-click Exam Mode enablement when standard limit is reached.
+
+### C. Strict 20-Minute Full Refund Policy
 * **Rule**: All subscriptions are eligible for a **100% full refund strictly within 20 minutes** of transaction time for accidental purchases, duplicate payments, or incorrect tier choices.
 * **Procedure**: Users must email `academiclevels@gmail.com` within 20 minutes with their account email and bank transaction UTR reference. Requests within the 20-minute window are honored 100%.
 

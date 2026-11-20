@@ -8,7 +8,7 @@ interface PaywallGateModalProps {
   reason?: string;
   quizzesCompleted: number;
   levelsCompleted: number;
-  onSelectPlan: (tier: 'LITE' | 'PLUS') => void;
+  onSelectPlan: (tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD') => void;
   onOpenACode: () => void;
 }
 
