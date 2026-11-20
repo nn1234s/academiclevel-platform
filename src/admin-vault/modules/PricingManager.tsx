@@ -425,14 +425,14 @@ export const PricingManager: React.FC = () => {
                 </a>
               </div>
               <div className="p-3 bg-slate-950/80 rounded-xl border border-amber-500/30">
-                <span className="text-[10px] font-mono text-amber-400 font-bold block mb-1">👑 Gold Plan (₹205 - 365 Days):</span>
+                <span className="text-[10px] font-mono text-amber-400 font-bold block mb-1">👑 3-Year GOD Plan (₹450 - 1,095 Days):</span>
                 <a
-                  href="https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true"
+                  href="https://upipg.cit.org.in/pay/2iHAbft8ENKjzPQvkfd8?public=true"
                   target="_blank"
                   rel="noreferrer"
                   className="font-mono text-[11px] text-amber-300 hover:underline break-all"
                 >
-                  https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true ↗
+                  https://upipg.cit.org.in/pay/2iHAbft8ENKjzPQvkfd8?public=true ↗
                 </a>
               </div>
               <div className="p-3 bg-slate-950/80 rounded-xl border border-yellow-500/30">

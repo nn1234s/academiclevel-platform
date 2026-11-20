@@ -239,12 +239,12 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
                   ₹129 Gateway ↗
                 </a>
                 <a
-                  href="https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true"
+                  href="https://upipg.cit.org.in/pay/2iHAbft8ENKjzPQvkfd8?public=true"
                   target="_blank"
                   rel="noreferrer"
                   className="px-2.5 py-1.5 rounded-lg bg-amber-600/30 hover:bg-amber-600/50 border border-amber-500/40 text-[10px] font-bold text-amber-300 transition-colors"
                 >
-                  ₹205 Gold ↗
+                  ₹450 GOD ↗
                 </a>
                 <a
                   href="https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true"

@@ -742,15 +742,17 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div>
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
               <Zap className="w-4 h-4 text-amber-400" />
-              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'GOLD' ? '👑 1-Year Gold VIP Status' : (quota.activePlan === 'LITE' ? 'Concept Booster Status' : `${quota.activePlan} Scholar Status`)) : 'Subscription & Quota Engine'}</span>
+              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'GOD' ? '👑 3-Year GOD VIP Status' : (quota.activePlan === 'GOLD' ? '👑 1-Year Gold VIP Status' : (quota.activePlan === 'LITE' ? 'Concept Booster Status' : `${quota.activePlan} Scholar Status`))) : 'Subscription & Quota Engine'}</span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
               {quota.hasActiveSubscription
-                ? (quota.activePlan === 'GOLD'
-                    ? `👑 1-Year Gold Pass Active • Full 365 Days All-Access Pass • All Quotas Lifted (${quota.daysRemaining} days remaining)`
-                    : (quota.activePlan === 'LITE'
-                        ? `Concept Booster Active • 60 Days Unlimited Quizzes (${quota.daysRemaining} days remaining)`
-                        : `${quota.activePlan} Plan Active • Unlimited Access (${quota.daysRemaining} days remaining)`))
+                ? (quota.activePlan === 'GOD'
+                    ? `👑 3-Year GOD Pass Active • Full 1,095 Days VIP Access • Senior Exam Mode & Unlimited Practice (${quota.daysRemaining} days remaining)`
+                    : (quota.activePlan === 'GOLD'
+                        ? `👑 1-Year Gold Pass Active • Full 365 Days All-Access Pass • All Quotas Lifted (${quota.daysRemaining} days remaining)`
+                        : (quota.activePlan === 'LITE'
+                            ? `Concept Booster Active • 60 Days Unlimited Quizzes (${quota.daysRemaining} days remaining)`
+                            : `${quota.activePlan} Plan Active • Unlimited Access (${quota.daysRemaining} days remaining)`)))
                 : '60-Day Concept Booster pass expired. Upgrade to continue unlimited quizzes.'}
             </p>
           </div>
