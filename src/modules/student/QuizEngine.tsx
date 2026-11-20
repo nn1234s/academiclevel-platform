@@ -26,8 +26,7 @@ import {
   Flame,
   Atom,
   BookOpen,
-  Mail,
-  Zap
+  Mail
 } from 'lucide-react';
 
 interface QuizEngineProps {
@@ -83,21 +82,6 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
     reason: string;
     coinsEarned: number;
   } | null>(null);
-
-  // Daily Quiz Quota & Exam Mode
-  const [examMode, setExamModeState] = useState<boolean>(Boolean(learner.examModeEnabled));
-  useEffect(() => {
-    setExamModeState(Boolean(learner.examModeEnabled));
-  }, [learner.examModeEnabled]);
-
-  const dailyStatus = QuotaService.getDailyQuizStatus(learner, examMode);
-
-  const handleToggleExamMode = (targetState?: boolean) => {
-    const next = targetState !== undefined ? targetState : !examMode;
-    setExamModeState(next);
-    QuotaService.toggleExamMode(learner.id, next);
-    refreshCurrentLearner();
-  };
 
   const loadQuizQuestions = useCallback(async () => {
     setIsLoadingQuiz(true);
@@ -364,74 +348,6 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
     }
   };
 
-  // Daily Quiz Quota Enforcement Screen
-  if (dailyStatus.isLimitReached && !isCompleted) {
-    return (
-      <div className="max-w-xl mx-auto p-8 sm:p-10 text-center text-slate-100 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl space-y-6">
-        <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
-          <Zap className="w-8 h-8 text-amber-300" />
-        </div>
-
-        <div>
-          <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full">
-            Daily Quiz Target Reached ({dailyStatus.quizzesToday} / {dailyStatus.dailyLimit})
-          </span>
-          <h2 className="text-2xl font-black text-white mt-3">
-            {dailyStatus.canEnableExamMode
-              ? '⚡ Boost Your Study with Exam Mode!'
-              : 'Daily Study Milestone Crushed! 🏆'}
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto mt-2 leading-relaxed">
-            {dailyStatus.canEnableExamMode ? (
-              dailyStatus.isSeniorGrade ? (
-                <>
-                  You have completed your standard <strong>10 daily quizzes</strong> for Class {grade}. Preparing for Board Exams, Pre-Boards, or Olympiads? Turn ON <strong>⚡ Exam Mode</strong> to immediately unlock <strong>5 additional quizzes</strong> today (15 total)!
-                </>
-              ) : (
-                <>
-                  Young scholars thrive on balanced daily learning! You have completed your standard <strong>5 daily quizzes</strong>. Preparing for school tests or exams? Turn ON <strong>⚡ Exam Mode</strong> to immediately unlock <strong>5 additional quizzes</strong> today (10 total)!
-                </>
-              )
-            ) : (
-              <>
-                You have completed all <strong>{dailyStatus.dailyLimit} quizzes</strong> for today! Consistent daily practice and sleep consolidate memory much better than cramming. Take a rest, review your Mailbox diagnostic reports, or come back tomorrow for a fresh quota!
-              </>
-            )}
-          </p>
-        </div>
-
-        <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center items-center">
-          {dailyStatus.canEnableExamMode && (
-            <button
-              onClick={() => handleToggleExamMode(true)}
-              className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-950 transition-all flex items-center justify-center gap-2 cursor-pointer transform hover:scale-[1.02]"
-            >
-              <Zap className="w-4 h-4 fill-slate-950" />
-              <span>⚡ Enable Exam Mode (+5 Quizzes)</span>
-            </button>
-          )}
-
-          {onOpenMailbox && (
-            <button
-              onClick={() => onOpenMailbox()}
-              className="w-full sm:w-auto px-5 py-3.5 bg-slate-800 hover:bg-slate-700 text-indigo-300 hover:text-white font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Mail className="w-4 h-4" />
-              <span>View Mailbox Reports</span>
-            </button>
-          )}
-
-          <button
-            onClick={onFinish}
-            className="w-full sm:w-auto px-5 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs rounded-xl transition-all cursor-pointer"
-          >
-            Back to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   if (isLoadingQuiz) {
     return (
       <div className="max-w-xl mx-auto p-12 text-center text-slate-100 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl">
@@ -643,24 +559,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
           </h3>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Exam Mode Toggle Button */}
-          <button
-            onClick={() => handleToggleExamMode()}
-            title={examMode ? 'Exam Mode is ON: +5 Daily Quizzes unlocked. Click to toggle.' : 'Click to enable Exam Mode (+5 Daily Quizzes)'}
-            className={`px-2.5 py-1 text-[11px] font-bold rounded-lg flex items-center space-x-1.5 transition-all cursor-pointer ${
-              examMode
-                ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/60 text-amber-300 shadow-sm shadow-amber-500/20'
-                : 'bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Zap className={`w-3 h-3 ${examMode ? 'text-amber-400 fill-amber-400' : 'text-slate-400'}`} />
-            <span>⚡ Exam Mode: <strong className={examMode ? 'text-amber-300' : 'text-slate-300'}>{examMode ? 'ON' : 'OFF'}</strong></span>
-            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-950/80 text-slate-300 border border-slate-800">
-              {dailyStatus.quizzesToday + 1}/{dailyStatus.dailyLimit}
-            </span>
-          </button>
-
+        <div className="flex items-center space-x-3">
           <button
             onClick={() => loadQuizQuestions()}
             title="Synthesize new questions"

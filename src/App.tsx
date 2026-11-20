@@ -280,7 +280,7 @@ export const App: React.FC = () => {
   const [authModalMode, setAuthModalMode] = useState<'REGISTER' | 'LOGIN'>('REGISTER');
   const [paywallModalOpen, setPaywallModalOpen] = useState(false);
   const [acodeModalOpen, setAcodeModalOpen] = useState(false);
-  const [checkoutPlanTier, setCheckoutPlanTier] = useState<'LITE' | 'PLUS' | 'GOLD' | 'GOD' | null>(null);
+  const [checkoutPlanTier, setCheckoutPlanTier] = useState<'LITE' | 'PLUS' | 'GOLD' | null>(null);
 
   // Active quiz context
   const [activeSubjectId, setActiveSubjectId] = useState<string>('math');
@@ -865,15 +865,15 @@ export const App: React.FC = () => {
                 </>
               ) : (
                 <div className="flex items-center space-x-2 sm:space-x-3">
-                  {/* 3-Year GOD / 1-Year Gold VIP Pass Badge */}
-                  {(currentLearner?.activePlan === 'GOD' || currentLearner?.activePlan === 'GOLD') && (
+                  {/* 1-Year Gold VIP Pass Badge */}
+                  {currentLearner?.activePlan === 'GOLD' && (
                     <button
                       onClick={() => navigateTo('PROFILE')}
                       className="hidden sm:inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-400/50 text-amber-300 text-xs font-black shadow-sm cursor-pointer hover:border-amber-300 transition-all"
-                      title={currentLearner?.activePlan === 'GOD' ? "3-Year GOD VIP Pass Active (1,095 Days Access)" : "1-Year Gold VIP Pass Active (365 Days Access)"}
+                      title="1-Year Gold VIP Pass Active (365 Days Access)"
                     >
                       <Crown className="w-3.5 h-3.5 text-amber-300 flex-shrink-0" />
-                      <span>{currentLearner?.activePlan === 'GOD' ? 'GOD PASS' : 'GOLD PASS'}</span>
+                      <span>GOLD PASS</span>
                     </button>
                   )}
 

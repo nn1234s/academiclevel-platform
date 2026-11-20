@@ -27,15 +27,12 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": "2026-11-09T13:30:06.834Z",
       "createdAt": "2026-11-09T13:29:42.565Z",
-      "updatedAt": "2026-11-20T12:11:59.059Z",
+      "updatedAt": "2026-11-19T08:34:27.341Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
       "lastAiMessageDateUtc": null,
-      "bonusAiMessages": 0,
-      "dailyQuizCount": 0,
-      "dailyQuizDate": null,
-      "examModeEnabled": 0
+      "bonusAiMessages": 0
     },
     {
       "id": "usr_super_admin_001",
@@ -64,15 +61,12 @@
       "avatarFrame": "Emerald",
       "lastSpinTimestampUtc": "2026-11-09T13:57:04.753Z",
       "createdAt": "2026-11-09T13:46:57.966Z",
-      "updatedAt": "2026-11-20T12:11:59.059Z",
+      "updatedAt": "2026-11-19T08:34:27.346Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
       "lastAiMessageDateUtc": null,
-      "bonusAiMessages": 0,
-      "dailyQuizCount": 0,
-      "dailyQuizDate": null,
-      "examModeEnabled": 0
+      "bonusAiMessages": 0
     },
     {
       "id": "lrn_mw9bph4q_xacr",
@@ -101,15 +95,12 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-09T13:55:04.826Z",
-      "updatedAt": "2026-11-20T12:11:59.059Z",
+      "updatedAt": "2026-11-19T08:34:27.347Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
       "lastAiMessageDateUtc": null,
-      "bonusAiMessages": 0,
-      "dailyQuizCount": 0,
-      "dailyQuizDate": null,
-      "examModeEnabled": 0
+      "bonusAiMessages": 0
     },
     {
       "id": "lrn_special49_9861439460",
@@ -138,15 +129,12 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13 05:20:09",
-      "updatedAt": "2026-11-20T12:11:59.059Z",
+      "updatedAt": "2026-11-19T08:34:27.347Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
       "lastAiMessageDateUtc": null,
-      "bonusAiMessages": 0,
-      "dailyQuizCount": 0,
-      "dailyQuizDate": null,
-      "examModeEnabled": 0
+      "bonusAiMessages": 0
     },
     {
       "id": "lrn_prabir_alias_norm",
@@ -175,15 +163,12 @@
       "avatarFrame": null,
       "lastSpinTimestampUtc": null,
       "createdAt": "2026-11-13T06:42:32.181Z",
-      "updatedAt": "2026-11-20T12:11:59.059Z",
+      "updatedAt": "2026-11-19T08:34:27.347Z",
       "passwordHash": null,
       "passwordSalt": null,
       "dailyAiMessagesUsed": 0,
       "lastAiMessageDateUtc": null,
-      "bonusAiMessages": 0,
-      "dailyQuizCount": 0,
-      "dailyQuizDate": null,
-      "examModeEnabled": 0
+      "bonusAiMessages": 0
     }
   ],
   "al_prod_subscriptions_v1": [
@@ -514,105 +499,6 @@
     }
   ],
   "al_prod_security_audit_logs_v1": [
-    {
-      "id": "del_1795084307268_fnck",
-      "timestampUtc": "2026-11-19T10:31:47.268Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
-      "actionType": "DELETE_ACCOUNT_PURGE",
-      "targetId": "lrn_test_deletion_1795084307193",
-      "severity": "WARNING",
-      "details": "Account deletion purge executed for learner Temporary Student (delete_me_1795084307193@temp.test, ID: lrn_test_deletion_1795084307193). All associated records cascade deleted."
-    },
-    {
-      "id": "admin_cfg_1795084307279",
-      "timestampUtc": "2026-11-19T10:31:47.279Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
-      "actionType": "UPDATE_SYSTEM_CONFIG",
-      "targetId": "cfg_pricing",
-      "severity": "INFO",
-      "details": "Super-Admin updated PRICING settings."
-    },
-    {
-      "id": "admin_cfg_1795084307287",
-      "timestampUtc": "2026-11-19T10:31:47.286Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
-      "actionType": "UPDATE_SYSTEM_CONFIG",
-      "targetId": "cfg_home",
-      "severity": "INFO",
-      "details": "Super-Admin updated HOME settings."
-    },
-    {
-      "id": "admin_cfg_1795084307294",
-      "timestampUtc": "2026-11-19T10:31:47.294Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
-      "actionType": "UPDATE_SYSTEM_CONFIG",
-      "targetId": "cfg_legal",
-      "severity": "INFO",
-      "details": "Super-Admin updated LEGAL settings."
-    },
-    {
-      "id": "admin_cfg_1795084307303",
-      "timestampUtc": "2026-11-19T10:31:47.303Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
-      "actionType": "UPDATE_SYSTEM_CONFIG",
-      "targetId": "cfg_ads",
-      "severity": "INFO",
-      "details": "Super-Admin updated ADS settings."
-    },
-    {
-      "id": "del_1795086166108_v71j",
-      "timestampUtc": "2026-11-19T11:02:46.108Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
-      "actionType": "DELETE_ACCOUNT_PURGE",
-      "targetId": "lrn_test_deletion_1795086163042",
-      "severity": "WARNING",
-      "details": "Account deletion purge executed for learner Temporary Student (delete_me_1795086163042@temp.test, ID: lrn_test_deletion_1795086163042). All associated records cascade deleted."
-    },
-    {
-      "id": "admin_cfg_1795086166589",
-      "timestampUtc": "2026-11-19T11:02:46.510Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
-      "actionType": "UPDATE_SYSTEM_CONFIG",
-      "targetId": "cfg_pricing",
-      "severity": "INFO",
-      "details": "Super-Admin updated PRICING settings."
-    },
-    {
-      "id": "admin_cfg_1795086167135",
-      "timestampUtc": "2026-11-19T11:02:47.107Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
-      "actionType": "UPDATE_SYSTEM_CONFIG",
-      "targetId": "cfg_home",
-      "severity": "INFO",
-      "details": "Super-Admin updated HOME settings."
-    },
-    {
-      "id": "admin_cfg_1795086167154",
-      "timestampUtc": "2026-11-19T11:02:47.153Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
-      "actionType": "UPDATE_SYSTEM_CONFIG",
-      "targetId": "cfg_legal",
-      "severity": "INFO",
-      "details": "Super-Admin updated LEGAL settings."
-    },
-    {
-      "id": "admin_cfg_1795086167274",
-      "timestampUtc": "2026-11-19T11:02:47.274Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
-      "actionType": "UPDATE_SYSTEM_CONFIG",
-      "targetId": "cfg_ads",
-      "severity": "INFO",
-      "details": "Super-Admin updated ADS settings."
-    },
-    {
-      "id": "admin_1795170936774_ljgu",
-      "timestampUtc": "2026-11-20T10:35:36.773Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
-      "actionType": "APPROVE_UPI_PAYMENT",
-      "targetId": "sub_mwoueg6b_k2uk",
-      "severity": "INFO",
-      "details": "Approved subscription sub_mwoueg6b_k2uk (GOD 1095d) for learner test_junior_limit_1795170895701. UTR: 795170936768"
-    },
     {
       "id": "admin_del_1794675241061_kw2j",
       "timestampUtc": "2026-11-14T16:54:01.061Z",
@@ -1359,15 +1245,6 @@
       "targetId": "cfg_ads",
       "severity": "INFO",
       "details": "Super-Admin updated ADS settings."
-    },
-    {
-      "id": "admin_1795176719087_gfkv",
-      "timestampUtc": "2026-11-20T12:11:59.087Z",
-      "actorEmail": "naitiknanda1235@gmail.com",
-      "actionType": "APPROVE_UPI_PAYMENT",
-      "targetId": "sub_mwoxv9ii_uis8",
-      "severity": "INFO",
-      "details": "Approved subscription sub_mwoxv9ii_uis8 (GOD 1095d) for learner test_junior_limit_1795176719071. UTR: 795176719081"
     }
   ],
   "al_prod_system_settings_v1": [

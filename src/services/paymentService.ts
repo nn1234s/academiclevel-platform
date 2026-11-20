@@ -6,7 +6,7 @@ import { SiteConfigService } from './siteConfigService';
 import QRCode from 'qrcode';
 
 export interface PlanPricing {
-  tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD';
+  tier: 'LITE' | 'PLUS' | 'GOLD';
   name: string;
   priceInr: number;
   durationDays: number;
@@ -14,7 +14,7 @@ export interface PlanPricing {
   features: string[];
 }
 
-export const PLAN_PRICING: Record<'LITE' | 'PLUS' | 'GOLD' | 'GOD', PlanPricing> = {
+export const PLAN_PRICING: Record<'LITE' | 'PLUS' | 'GOLD', PlanPricing> = {
   LITE: {
     tier: 'LITE',
     name: 'AcademicLevel Lite',
@@ -44,26 +44,9 @@ export const PLAN_PRICING: Record<'LITE' | 'PLUS' | 'GOLD' | 'GOD', PlanPricing>
       'Max 1 Class Change during active cycle'
     ]
   },
-  GOD: {
-    tier: 'GOD',
-    name: 'AcademicLevel GOD Mode (3-Year VIP)',
-    priceInr: 450,
-    durationDays: 1095,
-    description: '3 Full Years (1,095 Days) complete academic mastery, 100% Guaranteed Physical Gift Store Redemptions & VIP features.',
-    features: [
-      '3 Full Years (1,095 Days) All-Access Coverage Across 3 Classes',
-      '100% Guaranteed Physical Gift Store Redemption Unlock',
-      'Both CBSE, ICSE & Olympiad Advanced Syllabus Bank',
-      '24/7 Nova AI Socratic Tutor with VIP Priority Pool',
-      'Exclusive GOD Scholar Crown Badge & Golden Profile Frame',
-      '3 Free Class Changes Across Academic Years',
-      'Annual Master Certificates of Academic Excellence',
-      '10 Daily Quizzes Default (15 in Exam Mode)'
-    ]
-  },
   GOLD: {
     tier: 'GOLD',
-    name: 'AcademicLevel Gold Pass (Legacy)',
+    name: 'AcademicLevel Gold Pass',
     priceInr: 205,
     durationDays: 365,
     description: '365 days (1 Full Year) complete mastery, VIP Rewards eligibility & all-access pass.',
@@ -80,7 +63,7 @@ export const PLAN_PRICING: Record<'LITE' | 'PLUS' | 'GOLD' | 'GOD', PlanPricing>
   }
 };
 
-export function getDynamicPlanPricing(tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD'): PlanPricing {
+export function getDynamicPlanPricing(tier: 'LITE' | 'PLUS' | 'GOLD'): PlanPricing {
   try {
     const cfg = SiteConfigService.getPricing();
     if (tier === 'LITE') {
@@ -101,19 +84,10 @@ export function getDynamicPlanPricing(tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD'): P
         description: `${cfg.plusDurationDays || 180} days complete mastery with Olympiad prep & priority support.`,
         features: cfg.plusFeatures && cfg.plusFeatures.length > 0 ? cfg.plusFeatures : PLAN_PRICING.PLUS.features
       };
-    } else if (tier === 'GOD') {
-      return {
-        tier: 'GOD',
-        name: 'AcademicLevel GOD Mode (3-Year VIP)',
-        priceInr: cfg.godPriceInr || 450,
-        durationDays: cfg.godDurationDays || 1095,
-        description: `${cfg.godDurationDays || 1095} days (3 Full Years) complete mastery, 100% guaranteed gift store redemption & VIP pass.`,
-        features: cfg.godFeatures && cfg.godFeatures.length > 0 ? cfg.godFeatures : PLAN_PRICING.GOD.features
-      };
     } else {
       return {
         tier: 'GOLD',
-        name: 'AcademicLevel Gold Pass (Legacy)',
+        name: 'AcademicLevel Gold Pass',
         priceInr: cfg.goldPriceInr || 205,
         durationDays: cfg.goldDurationDays || 365,
         description: `${cfg.goldDurationDays || 365} days (1 Full Year) complete mastery, VIP rewards & all-access pass.`,
@@ -121,15 +95,14 @@ export function getDynamicPlanPricing(tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD'): P
       };
     }
   } catch {
-    return PLAN_PRICING[tier] || PLAN_PRICING.GOD;
+    return PLAN_PRICING[tier];
   }
 }
 
-export const UPI_GATEWAY_URLS: Record<'LITE' | 'PLUS' | 'GOLD' | 'GOD' | 'SCHOOL', string> = {
+export const UPI_GATEWAY_URLS: Record<'LITE' | 'PLUS' | 'GOLD' | 'SCHOOL', string> = {
   LITE: 'https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true',
   PLUS: 'https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true',
-  GOLD: 'https://upipg.cit.org.in/pay/2iHAbft8ENKjzPQvkfd8?public=true',
-  GOD: 'https://upipg.cit.org.in/pay/2iHAbft8ENKjzPQvkfd8?public=true',
+  GOLD: 'https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true',
   SCHOOL: 'https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true'
 };
 
@@ -141,10 +114,10 @@ export class PaymentService {
    * Retrieves official real UPI PG payment gateway URL.
    * ₹49 (Lite) = https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true
    * ₹129 (Plus) = https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true
-   * ₹450 (GOD) = https://upipg.cit.org.in/pay/2iHAbft8ENKjzPQvkfd8?public=true
+   * ₹205 (Gold) = https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true
    * ₹2,499 (School) = https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true
    */
-  public static getGatewayUrl(tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD' | 'SCHOOL'): string {
+  public static getGatewayUrl(tier: 'LITE' | 'PLUS' | 'GOLD' | 'SCHOOL'): string {
     return UPI_GATEWAY_URLS[tier];
   }
 
@@ -158,8 +131,8 @@ export class PaymentService {
   /**
    * Retrieves official merchant QR code image path.
    */
-  public static getOfficialQrImageUrl(tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD'): string {
-    return (tier === 'GOD' || tier === 'GOLD') ? '/qr-gold-205.jpg' : (tier === 'LITE' ? '/qr-lite-49.jpg' : '/qr-plus-129.jpg');
+  public static getOfficialQrImageUrl(tier: 'LITE' | 'PLUS' | 'GOLD'): string {
+    return tier === 'GOLD' ? '/qr-gold-205.jpg' : (tier === 'LITE' ? '/qr-lite-49.jpg' : '/qr-plus-129.jpg');
   }
 
   /**
@@ -184,7 +157,7 @@ export class PaymentService {
   /**
    * Generates a standard NPCI UPI URI string for a plan tier or learner.
    */
-  public static generateUpiPaymentString(tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD', learnerId?: string): string {
+  public static generateUpiPaymentString(tier: 'LITE' | 'PLUS' | 'GOLD', learnerId?: string): string {
     const plan = getDynamicPlanPricing(tier);
     const cleanId = (learnerId || '49').replace(/[^a-zA-Z0-9]/g, '').slice(0, 8);
     return this.buildStandardUpiUri({
@@ -197,14 +170,14 @@ export class PaymentService {
    * Generates a data URL for dynamic QR code rendering pointing directly to the official UPI PG gateway.
    */
   public static async generateQrDataUrl(
-    tierOrAmount: 'LITE' | 'PLUS' | 'GOLD' | 'GOD' | number,
+    tierOrAmount: 'LITE' | 'PLUS' | 'GOLD' | number,
     learnerIdOrNote?: string
   ): Promise<string> {
     let targetUri: string;
-    if (tierOrAmount === 'LITE' || tierOrAmount === 'PLUS' || tierOrAmount === 'GOLD' || tierOrAmount === 'GOD') {
+    if (tierOrAmount === 'LITE' || tierOrAmount === 'PLUS' || tierOrAmount === 'GOLD') {
       targetUri = UPI_GATEWAY_URLS[tierOrAmount];
     } else if (typeof tierOrAmount === 'number') {
-      targetUri = tierOrAmount > 250 ? UPI_GATEWAY_URLS.GOD : (tierOrAmount > 50 ? UPI_GATEWAY_URLS.PLUS : UPI_GATEWAY_URLS.LITE);
+      targetUri = tierOrAmount > 150 ? UPI_GATEWAY_URLS.GOLD : (tierOrAmount > 50 ? UPI_GATEWAY_URLS.PLUS : UPI_GATEWAY_URLS.LITE);
     } else {
       targetUri = this.generateUpiPaymentString(tierOrAmount, learnerIdOrNote);
     }
@@ -230,7 +203,7 @@ export class PaymentService {
    */
   public static async activateGatewayPayment(
     learnerId: string,
-    tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD',
+    tier: 'LITE' | 'PLUS' | 'GOLD',
     gatewayReference?: string
   ): Promise<{ success: boolean; subscription: Subscription; error?: string }> {
     const plan = getDynamicPlanPricing(tier);
@@ -290,7 +263,7 @@ export class PaymentService {
    */
   public static async submitUpiPayment(
     learnerId: string,
-    tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD',
+    tier: 'LITE' | 'PLUS' | 'GOLD',
     payerUpiId?: string,
     utrReference?: string
   ): Promise<{ success: boolean; subscription?: Subscription; error?: string }> {

@@ -87,8 +87,7 @@ export const EntitlementManager: React.FC = () => {
               onChange={e => setTrialTier(e.target.value as any)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
             >
-              <option value="GOD">👑 GOD Plan (1,095 Days - 3-Year Pass)</option>
-              <option value="GOLD">👑 Gold Plan (365 Days - Legacy 1-Year Pass)</option>
+              <option value="GOLD">👑 Gold Plan (365 Days - 1-Year Pass)</option>
               <option value="PLUS">Plus Plan (180 Days)</option>
               <option value="LITE">Lite Plan (60 Days)</option>
             </select>
