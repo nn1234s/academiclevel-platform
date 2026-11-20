@@ -128,7 +128,7 @@ export function getDynamicPlanPricing(tier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD'): P
 export const UPI_GATEWAY_URLS: Record<'LITE' | 'PLUS' | 'GOLD' | 'GOD' | 'SCHOOL', string> = {
   LITE: 'https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true',
   PLUS: 'https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true',
-  GOLD: 'https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true',
+  GOLD: 'https://upipg.cit.org.in/pay/2iHAbft8ENKjzPQvkfd8?public=true',
   GOD: 'https://upipg.cit.org.in/pay/2iHAbft8ENKjzPQvkfd8?public=true',
   SCHOOL: 'https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true'
 };

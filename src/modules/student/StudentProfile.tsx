@@ -156,17 +156,19 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
             <div>
               <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                 <h3 className="text-base font-black text-white">
-                  {learner.activePlan === 'GOLD' 
+                  {learner.activePlan === 'GOD'
+                    ? '👑 3-Year AcademicLevel GOD Pass'
+                    : (learner.activePlan === 'GOLD' 
                     ? '👑 1-Year AcademicLevel Gold Pass' 
                     : (learner.activePlan === 'PLUS' 
                         ? 'AcademicLevel Plus (180 Days)' 
                         : (learner.activePlan === 'LITE' 
                             ? 'Concept Booster Pass (60 Days)' 
-                            : 'Free Starter Account'))}
+                            : 'Free Starter Account')))}
                 </h3>
                 <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
                   learner.hasActiveSubscription
-                    ? (learner.activePlan === 'GOLD' 
+                    ? (learner.activePlan === 'GOD' || learner.activePlan === 'GOLD'
                         ? 'bg-amber-400 text-slate-950 font-black' 
                         : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30')
                     : 'bg-slate-800 text-slate-400'
@@ -175,13 +177,15 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
                 </span>
               </div>
               <p className="text-xs text-slate-300 mt-1 max-w-lg">
-                {learner.activePlan === 'GOLD'
+                {learner.activePlan === 'GOD'
+                  ? '1,095 Days (3 Full Academic Years) complete coverage: 100% Guaranteed Physical Gifts (Milton bottles & Pokémon cards), Senior Exam Mode, & Nova AI 24/7.'
+                  : (learner.activePlan === 'GOLD'
                   ? '365 Days (1 Full Academic Year) complete coverage: Terms 1 & 2, Midterms, Final Board Exams, VIP Store Rewards, & Nova AI 24/7.'
                   : (learner.activePlan === 'PLUS'
                       ? '180 Days Semester Pass: Unlimited Quizzes, Olympiad & Foundation reasoning track.'
                       : (learner.activePlan === 'LITE'
                           ? '60 Days Concept Booster: Unlimited Quizzes & Nova AI Socratic tutor.'
-                          : 'Upgrade to Gold (₹205 / 365 Days) to lift all daily study quotas.'))}
+                          : 'Upgrade to 3-Year GOD Mode (₹450 / 1,095 Days) for maximum limits and guaranteed rewards.')))}
               </p>
             </div>
           </div>

@@ -280,7 +280,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const [secondsRemaining, setSecondsRemaining] = useState(847);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [adsConfig, setAdsConfig] = useState(() => SiteConfigService.getAds());
-  const [selectedPlanTier, setSelectedPlanTier] = useState<'LITE' | 'PLUS' | 'GOLD'>('GOLD');
+  const [selectedPlanTier, setSelectedPlanTier] = useState<'LITE' | 'PLUS' | 'GOD' | 'GOLD'>('GOD');
   const [noticeLang, setNoticeLang] = useState<'EN' | 'HINGLISH'>('EN');
 
   useEffect(() => {
@@ -385,12 +385,13 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
   const officialVpa = PaymentService.OFFICIAL_UPI_VPA;
   const officialPayeeName = PaymentService.OFFICIAL_MERCHANT_NAME;
-  const activeAmount = selectedPlanTier === 'GOLD' ? 205 : (selectedPlanTier === 'PLUS' ? 129 : Number(adsConfig.offerPriceInr || 49));
-  const activeDurationDays = selectedPlanTier === 'GOLD' ? 365 : (selectedPlanTier === 'PLUS' ? 180 : 60);
-  const activePlanName = selectedPlanTier === 'GOLD'
-    ? 'AcademicLevel Gold Pass (365 Days / 1 Full Year)'
+  const isGodTier = selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD';
+  const activeAmount = isGodTier ? 450 : (selectedPlanTier === 'PLUS' ? 129 : Number(adsConfig.offerPriceInr || 49));
+  const activeDurationDays = isGodTier ? 1095 : (selectedPlanTier === 'PLUS' ? 180 : 60);
+  const activePlanName = isGodTier
+    ? 'AcademicLevel GOD Mode Pass (1,095 Days / 3 Full Years)'
     : (selectedPlanTier === 'PLUS' ? 'AcademicLevel Plus (180 Days / 6 Months)' : 'AcademicLevel Lite (60 Days)');
-  const activeOrderNote = `Order_AL_${selectedPlanTier === 'GOLD' ? '205' : (selectedPlanTier === 'PLUS' ? '129' : '49')}_${(currentLearner?.id || 'guest').slice(-6)}`;
+  const activeOrderNote = `Order_AL_${isGodTier ? '450' : (selectedPlanTier === 'PLUS' ? '129' : '49')}_${(currentLearner?.id || 'guest').slice(-6)}`;
   const offerAmount = activeAmount;
   const upiUri = PaymentService.buildStandardUpiUri({
     amount: activeAmount,
@@ -609,13 +610,13 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
           <div className="flex items-center space-x-2">
             <span className="bg-amber-400 text-slate-950 px-2 py-0.5 rounded font-black text-[11px] tracking-wide uppercase flex items-center space-x-1 shadow-sm">
               <Sparkles className="w-3 h-3 fill-slate-950" />
-              <span>👑 1-Year Gold Deal</span>
+              <span>👑 3-Year GOD Deal</span>
             </span>
             <span className="font-extrabold hidden md:inline">
-              ⚡ Starts at ₹49 | 👑 1-YEAR GOLD PLAN (365 DAYS / 1 FULL YEAR) FOR JUST ₹205 — BEST VALUE (~56 PAISE/DAY)!
+              ⚡ Starts at ₹49 | 👑 3-YEAR GOD PLAN (1,095 DAYS / 3 FULL YEARS) FOR JUST ₹450 — BEST VALUE (~41 PAISE/DAY)!
             </span>
             <span className="font-bold md:hidden">
-              👑 ₹205 (365 Days / 1 Year) • ~56 Paise/Day!
+              👑 ₹450 (1,095 Days / 3 Years) • ~41 Paise/Day!
             </span>
           </div>
 
@@ -630,7 +631,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-3 py-1 rounded-full text-xs shadow transition-all hover:scale-105 cursor-pointer flex items-center space-x-1"
             >
               <Sparkles className="w-3.5 h-3.5 fill-slate-950" />
-              <span>Claim Gold Pass (₹205 ↗)</span>
+              <span>Claim GOD Pass (₹450 ↗)</span>
             </button>
           </div>
         </div>
@@ -761,14 +762,14 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             {/* RIGHT COLUMN (5 Cols): Class 1 to 12 Interactive Selector & Quick Enroll */}
             <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between bg-white">
               <div>
-                {/* 3-PLAN SELECTOR IN HERO: ₹49 vs ₹129 vs 👑 ₹205 (SCREAMING 205 GOLD IS MAXIMUM VALUE) */}
+                {/* 3-PLAN SELECTOR IN HERO: ₹49 vs ₹129 vs 👑 ₹450 (SCREAMING 450 GOD IS MAXIMUM VALUE) */}
                 <div className="mb-6 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black uppercase tracking-wide text-slate-800 flex items-center gap-1.5">
                       <span>Choose Scholar Pass</span>
                     </span>
                     <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 animate-pulse">
-                      👑 ₹205 IS 1-YEAR BEST VALUE
+                      👑 ₹450 IS 3-YEAR BEST VALUE
                     </span>
                   </div>
 
@@ -817,45 +818,45 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       </p>
                     </button>
 
-                    {/* Option 3: 👑 ₹205 Gold (HEAVY SPOTLIGHT & VALUE CALLOUT) */}
+                    {/* Option 3: 👑 ₹450 GOD (HEAVY SPOTLIGHT & VALUE CALLOUT) */}
                     <button
                       type="button"
-                      onClick={() => setSelectedPlanTier('GOLD')}
+                      onClick={() => setSelectedPlanTier('GOD')}
                       className={`p-2.5 sm:p-3 rounded-2xl border-2 text-left transition-all cursor-pointer relative overflow-hidden ${
-                        selectedPlanTier === 'GOLD'
+                        selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD'
                           ? 'border-amber-500 bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 ring-2 ring-amber-400 shadow-xl scale-[1.03]'
                           : 'border-amber-300 bg-amber-50/50 hover:bg-amber-50 text-slate-800'
                       }`}
                     >
                       <div className="absolute top-0 right-0 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black text-[7px] px-1.5 py-0.5 rounded-bl-md uppercase tracking-widest shadow animate-pulse">
-                        👑 BEST VALUE
+                        👑 3-YR GOD
                       </div>
                       <div className="text-[9px] font-black uppercase tracking-wider text-amber-900">
-                        365D (Gold)
+                        3 Years (GOD)
                       </div>
                       <div className="flex items-baseline space-x-1 mt-0.5">
-                        <span className="text-lg sm:text-xl font-black text-amber-950">₹205</span>
-                        <span className="text-[10px] text-slate-400 line-through">₹2,499</span>
+                        <span className="text-lg sm:text-xl font-black text-amber-950">₹450</span>
+                        <span className="text-[10px] text-slate-400 line-through">₹3,999</span>
                       </div>
                       <p className="text-[9px] text-amber-900 font-black mt-0.5 leading-tight">
-                        ~₹17/mo • 56p/day!
+                        ~₹12.50/mo • 41p/day!
                       </p>
                     </button>
                   </div>
 
-                  {/* Value Callout Box: Why Gold Screams Maximum Value */}
+                  {/* Value Callout Box: Why GOD Screams Maximum Value */}
                   <div className="p-3 bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 border-2 border-amber-400/80 rounded-2xl text-[11px] text-slate-800 space-y-1 shadow-sm">
                     <div className="flex items-center justify-between font-black text-amber-950">
                       <span className="flex items-center gap-1">
                         <span>👑</span>
-                        <span>WHY 89% OF TOPPERS PICK THE ₹205 GOLD PLAN:</span>
+                        <span>WHY 93% OF TOPPERS PICK THE 3-YEAR GOD PLAN:</span>
                       </span>
                       <span className="text-[10px] font-mono bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full font-black">
-                        365 DAYS (1 YEAR)
+                        1,095 DAYS (3 FULL YEARS)
                       </span>
                     </div>
                     <p className="text-[11px] text-amber-950 leading-snug">
-                      Pay just <strong>₹76 more than Plus</strong> to get <strong>185 EXTRA DAYS (Double your duration to 365 Days!)</strong>. That is <strong>less than 56 paise a day (~₹17.08/month)</strong>, covering your <strong>entire academic year</strong> from first day to final board exams with zero renewal stress!
+                      Pay once for <strong>3 full years (1,095 days) across all classes</strong>! That is <strong>less than 41 paise a day (~₹12.50/month)</strong>. Includes <strong>100% Guaranteed Physical Gifts (Milton bottles &amp; Pokémon cards)</strong> coin redemptions, Senior Exam Mode (15 Quizzes/day), and zero renewal fees until graduation!
                     </p>
                   </div>
                 </div>
@@ -936,7 +937,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <button
                   onClick={handleScrollToQr}
                   className={`w-full py-4 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl transition-all hover:scale-[1.02] flex items-center justify-center space-x-2 cursor-pointer ${
-                    selectedPlanTier === 'GOLD'
+                    selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD'
                       ? 'bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-amber-500/30'
                       : (selectedPlanTier === 'PLUS'
                         ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 shadow-emerald-600/30'
@@ -945,8 +946,8 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 >
                   <Zap className="w-5 h-5 fill-current" />
                   <span>
-                    {selectedPlanTier === 'GOLD'
-                      ? 'CLAIM 365-DAY GOLD PASS (₹205) — BEST VALUE ↗'
+                    {selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD'
+                      ? 'CLAIM 3-YEAR GOD PASS (₹450) — BEST VALUE ↗'
                       : (selectedPlanTier === 'PLUS'
                         ? 'CLAIM 180-DAY PASS (₹129) — BEST VALUE ↗'
                         : `BUY NOW (₹${adsConfig.offerPriceInr || 49}) — 60-DAY PASS ↗`)}
@@ -965,7 +966,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       </section>
 
       {/* ======================================================== */}
-      {/* 2.25. DIRECT ON-PAGE ₹49, ₹129 & ₹205 UPI PG GATEWAY SECTION */}
+      {/* 2.25. DIRECT ON-PAGE ₹49, ₹129 & ₹450 UPI PG GATEWAY SECTION */}
       {/* ======================================================== */}
       <section id="instant-pay-qr" className="py-10 px-3 sm:px-6 bg-gradient-to-b from-orange-100/50 via-white to-slate-100 border-y-2 border-orange-400/50 scroll-mt-14">
         <div className="max-w-5xl mx-auto">
@@ -982,35 +983,35 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             </p>
           </div>
 
-          {/* Screaming Value Comparison Banner: 205 Gold vs 129 & 49 */}
+          {/* Screaming Value Comparison Banner: 450 GOD vs 129 & 49 */}
           <div className="mb-6 p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-yellow-600 text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4 ring-4 ring-amber-400/40">
             <div className="space-y-1.5 text-center md:text-left">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-950 text-amber-300">
-                  👑 89% OF TOPPERS &amp; PARENTS CHOOSE GOLD
+                  👑 93% OF TOPPERS &amp; PARENTS CHOOSE GOD
                 </span>
                 <span className="text-[11px] font-bold text-amber-100">
-                  365 DAYS (1 FULL YEAR) FOR JUST ₹205 — LESS THAN 56 PAISE/DAY!
+                  1,095 DAYS (3 FULL YEARS) FOR JUST ₹450 — LESS THAN 41 PAISE/DAY!
                 </span>
               </div>
               <h3 className="text-lg sm:text-2xl font-black">
-                Why buy 60 Days for ₹49 or 180 Days for ₹129 when ₹205 gives 365 Full Days (Entire Year)?
+                Why buy 60 Days for ₹49 or 180 Days for ₹129 when ₹450 gives 1,095 Full Days (3 Full Years)?
               </h3>
               <p className="text-xs text-amber-100 font-medium max-w-xl">
-                Pay just <strong>₹76 more than Plus</strong> to get <strong>185 EXTRA DAYS (Double your duration to 365 Days!)</strong>. That is only <strong>~₹17.08/month</strong> vs ₹24.50/mo on Lite. Covers your <strong>entire academic year (both terms, pre-boards, board exams &amp; summer!)</strong> with zero renewal interruptions!
+                Pay once for <strong>3 full years (1,095 Days!) across classes</strong>. That is only <strong>~₹12.50/month</strong> vs ₹24.50/mo on Lite. <strong>100% Guaranteed Physical Gift Redemptions (Milton bottles &amp; Pokémon cards)</strong>, Senior Exam Mode (15 Quizzes/Day), and zero renewal interruptions!
               </p>
             </div>
             <button
               type="button"
-              onClick={() => setSelectedPlanTier('GOLD')}
+              onClick={() => setSelectedPlanTier('GOD')}
               className="px-6 py-3.5 rounded-2xl bg-slate-950 hover:bg-slate-900 text-amber-300 font-black text-xs sm:text-sm shadow-xl transition-all hover:scale-105 cursor-pointer flex-shrink-0 flex items-center space-x-1.5 border border-amber-400"
             >
               <Sparkles className="w-4 h-4 fill-amber-300" />
-              <span>Select ₹205 Gold (Best Value)</span>
+              <span>Select ₹450 GOD (Best Value)</span>
             </button>
           </div>
 
-          {/* BIG 3-OPTION PLAN SELECTOR: ₹49 vs ₹129 vs ₹205 */}
+          {/* BIG 3-OPTION PLAN SELECTOR: ₹49 vs ₹129 vs ₹450 */}
           <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Option 1: ₹49 Concept Booster */}
             <button
@@ -1084,45 +1085,46 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               </ul>
             </button>
 
-            {/* Option 3: 👑 ₹205 Gold Pass (SCREAMING MAXIMUM 1-YEAR VALUE) */}
+            {/* Option 3: 👑 ₹450 GOD Pass (SCREAMING MAXIMUM 3-YEAR VALUE) */}
             <button
               type="button"
-              onClick={() => setSelectedPlanTier('GOLD')}
+              onClick={() => setSelectedPlanTier('GOD')}
               className={`p-5 rounded-3xl border-2 text-left transition-all cursor-pointer relative overflow-hidden ${
-                selectedPlanTier === 'GOLD'
+                selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD'
                   ? 'border-amber-500 bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 shadow-2xl ring-4 ring-amber-400/60 scale-[1.02]'
                   : 'border-amber-300 bg-amber-50/40 hover:border-amber-400'
               }`}
             >
               <div className="absolute top-0 right-0 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 text-[9px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-widest shadow-md animate-pulse">
-                👑 1-YEAR GOLD • BEST VALUE
+                👑 3-YEAR GOD • BEST VALUE
               </div>
               <div className="flex items-start justify-between">
                 <div>
                   <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-200 text-amber-950 mb-1.5">
-                    Gold Master Pass • 365 Days
+                    GOD Master Pass • 1,095 Days
                   </span>
                   <div className="flex items-baseline space-x-2">
-                    <span className="text-3xl sm:text-4xl font-black text-amber-950">₹205</span>
-                    <span className="text-xs text-slate-400 line-through font-bold">₹2,499</span>
-                    <span className="text-[10px] font-black text-slate-950 bg-amber-400 px-1.5 py-0.5 rounded uppercase tracking-wide">92% OFF</span>
+                    <span className="text-3xl sm:text-4xl font-black text-amber-950">₹450</span>
+                    <span className="text-xs text-slate-400 line-through font-bold">₹3,999</span>
+                    <span className="text-[10px] font-black text-slate-950 bg-amber-400 px-1.5 py-0.5 rounded uppercase tracking-wide">89% OFF</span>
                   </div>
                 </div>
                 <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center font-bold text-sm mt-3 ${
-                  selectedPlanTier === 'GOLD' ? 'border-amber-600 bg-amber-500 text-slate-950 shadow' : 'border-slate-300 text-transparent'
+                  selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD' ? 'border-amber-600 bg-amber-500 text-slate-950 shadow' : 'border-slate-300 text-transparent'
                 }`}>
                   ✓
                 </div>
               </div>
               <p className="text-xs font-black text-amber-900 mt-2">
-                365 Days (1 Full Year) • <span className="underline decoration-amber-500 font-extrabold text-amber-800">Only ~₹17.08/Month</span> (~₹0.56/day — 56p/day!)
+                1,095 Days (3 Full Years) • <span className="underline decoration-amber-500 font-extrabold text-amber-800">Only ~₹12.50/Month</span> (~₹0.41/day — 41p/day!)
               </p>
               <ul className="text-[11px] text-slate-700 mt-2 space-y-1 font-semibold">
-                <li className="text-amber-950 font-black">⭐ Pay just ₹76 more than Plus to double your days to 365!</li>
-                <li>✓ Complete academic year: terms, pre-boards &amp; finals</li>
-                <li>✓ VIP Priority for Pokémon, Milton &amp; Mystery Gift Box</li>
-                <li>✓ Exclusive Gold Scholar Profile Badge &amp; Frame</li>
-                <li>✓ Annual Master Certificate of Academic Excellence</li>
+                <li className="text-amber-950 font-black">⭐ Pay once for 3 Full Years across classes — never pay renewal fees!</li>
+                <li>✓ 100% Guaranteed Physical Gift Redemptions (Milton &amp; Pokémon)</li>
+                <li>✓ Complete academic syllabus: daily quizzes, tests &amp; finals</li>
+                <li>✓ Full Senior Exam Mode Access (15 Quizzes/Day)</li>
+                <li>✓ Exclusive 👑 GOD Crown Scholar Profile Badge &amp; Golden Frame</li>
+                <li>✓ Master Certificate of Academic Excellence</li>
               </ul>
             </button>
           </div>
@@ -1730,7 +1732,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       <div className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 sm:px-4 py-2.5 z-30 shadow-2xl">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
           <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* Quick 49 vs 129 vs 205 Selector Pill */}
+            {/* Quick 49 vs 129 vs 450 Selector Pill */}
             <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
               <button
                 type="button"
@@ -1756,30 +1758,30 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               </button>
               <button
                 type="button"
-                onClick={() => setSelectedPlanTier('GOLD')}
+                onClick={() => setSelectedPlanTier('GOD')}
                 className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer relative ${
-                  selectedPlanTier === 'GOLD'
+                  selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD'
                     ? 'bg-amber-500 text-slate-950 shadow-sm font-black ring-1 ring-amber-400'
                     : 'text-amber-800 hover:text-amber-950'
                 }`}
               >
-                <span>👑 ₹205 (365D Gold 🔥)</span>
+                <span>👑 ₹450 (3-Yr GOD 🔥)</span>
               </button>
             </div>
 
             <div className="hidden sm:block">
               <span className={`text-[10px] font-mono font-bold block uppercase ${
-                selectedPlanTier === 'GOLD'
+                selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD'
                   ? 'text-amber-600'
                   : (selectedPlanTier === 'PLUS' ? 'text-emerald-600' : 'text-slate-500')
               }`}>
-                {selectedPlanTier === 'GOLD'
-                  ? '👑 365 Days (1 Full Year) • ~56 Paise/Day!'
+                {selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD'
+                  ? '👑 1,095 Days (3 Full Years) • ~41 Paise/Day!'
                   : (selectedPlanTier === 'PLUS' ? '⭐ 180 Days (6 Months) • Best Academic Value' : 'Concept Booster')}
               </span>
               <span className="text-xs font-black text-slate-900">
-                {selectedPlanTier === 'GOLD'
-                  ? 'Classes 1–12 • Full Year (~₹17.08/mo)'
+                {selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD'
+                  ? 'Classes 1–12 • 3 Full Years (~₹12.50/mo)'
                   : (selectedPlanTier === 'PLUS' ? 'Classes 1–12 • Full 6 Months (~₹21.50/mo)' : 'Classes 1–12 • Full 60 Days')}
               </span>
             </div>
@@ -1788,7 +1790,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
           <button
             onClick={handleScrollToQr}
             className={`px-4 sm:px-6 py-2.5 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg transition-all hover:scale-105 flex items-center space-x-1.5 cursor-pointer ${
-              selectedPlanTier === 'GOLD'
+              selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD'
                 ? 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 shadow-amber-500/30'
                 : (selectedPlanTier === 'PLUS'
                   ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-500/30'
@@ -1797,8 +1799,8 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
           >
             <Zap className="w-4 h-4 fill-current" />
             <span>
-              {selectedPlanTier === 'GOLD'
-                ? 'BUY 365-DAY GOLD PASS (₹205) — BEST VALUE ↗'
+              {selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD'
+                ? 'BUY 3-YEAR GOD PASS (₹450) — BEST VALUE ↗'
                 : (selectedPlanTier === 'PLUS'
                   ? 'BUY 180-DAY PASS (₹129) — BEST VALUE ↗'
                   : `BUY 60-DAY PASS (₹${offerAmount}) ↗`)}
@@ -1928,7 +1930,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   </div>
                   <div className="bg-white border border-emerald-200 rounded-xl p-3 text-left text-xs text-slate-700 space-y-1">
                     <p>🎓 <strong>Student:</strong> {studentName || 'Scholar'}</p>
-                    <p>📚 <strong>Plan:</strong> {selectedPlanTier === 'GOLD' ? '₹205 Gold Pass (365 Days / 1 Year)' : (selectedPlanTier === 'PLUS' ? '₹129 Term Mastery (180 Days / 6 Months)' : '₹49 Concept Booster (60 Days)')}</p>
+                    <p>📚 <strong>Plan:</strong> {selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD' ? '₹450 GOD Mode Pass (1,095 Days / 3 Full Years)' : (selectedPlanTier === 'PLUS' ? '₹129 Term Mastery (180 Days / 6 Months)' : '₹49 Concept Booster (60 Days)')}</p>
                     <p>✅ <strong>Status:</strong> ACTIVE (Instant UPI Gateway Verified)</p>
                   </div>
                   <button
@@ -1972,9 +1974,9 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     </button>
                     <button
                       type="button"
-                      onClick={() => setSelectedPlanTier('GOLD')}
+                      onClick={() => setSelectedPlanTier('GOD')}
                       className={`p-2 rounded-xl border-2 text-left transition-all cursor-pointer relative overflow-hidden ${
-                        selectedPlanTier === 'GOLD'
+                        selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD'
                           ? 'border-amber-500 bg-amber-50 text-amber-950 font-bold shadow-md ring-2 ring-amber-400'
                           : 'border-amber-300 bg-amber-50/50 text-slate-700'
                       }`}
@@ -1982,9 +1984,9 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       <div className="absolute top-0 right-0 bg-red-600 text-white text-[7px] font-black px-1 py-0.2 rounded-bl-sm uppercase tracking-wider animate-pulse">
                         👑 BEST
                       </div>
-                      <div className="text-[9px] uppercase font-black tracking-wider text-amber-900">365D Gold</div>
-                      <div className="text-xs sm:text-sm font-black text-amber-950">₹205 <span className="text-[9px] text-slate-400 line-through font-normal">₹2,499</span></div>
-                      <div className="text-[8px] text-amber-800 font-bold">~56p/day!</div>
+                      <div className="text-[9px] uppercase font-black tracking-wider text-amber-900">3-Yr GOD</div>
+                      <div className="text-xs sm:text-sm font-black text-amber-950">₹450 <span className="text-[9px] text-slate-400 line-through font-normal">₹3,999</span></div>
+                      <div className="text-[8px] text-amber-800 font-bold">~41p/day!</div>
                     </button>
                   </div>
 
@@ -2384,7 +2386,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 Payment OK. Make Student Account:-
               </h2>
               <p className="text-xs text-slate-300 max-w-sm mx-auto">
-                Enter your details below to create your student account. Your <strong>{selectedPlanTier === 'GOLD' ? 'Gold Pass (365 Days / ₹205)' : (selectedPlanTier === 'PLUS' ? 'Plus Plan (180 Days / ₹129)' : 'Concept Booster (60 Days / ₹49)')}</strong> pass will be activated instantly!
+                Enter your details below to create your student account. Your <strong>{selectedPlanTier === 'GOD' || (selectedPlanTier as string) === 'GOLD' ? '3-Year GOD Pass (1,095 Days / ₹450)' : (selectedPlanTier === 'PLUS' ? 'Plus Plan (180 Days / ₹129)' : 'Concept Booster (60 Days / ₹49)')}</strong> pass will be activated instantly!
               </p>
             </div>
 
