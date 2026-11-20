@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SuperAdminGuard } from '../core/auth/SuperAdminGuard';
 import { useAuth } from '../core/auth/AuthContext';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../core/storage/StorageRLSLayer';
+import { Learner } from '../core/types';
 import {
   Users,
   CreditCard,
@@ -16,16 +17,23 @@ import {
   ShieldCheck,
   BarChart3,
   LogOut,
-  Lock,
   ChevronRight,
   Menu,
   X,
   Award,
   FileText,
   Megaphone,
-  Coins
+  Coins,
+  Activity,
+  Search,
+  CheckCircle2,
+  Copy,
+  Check,
+  ArrowUpRight,
+  Command
 } from 'lucide-react';
 
+import { CommandCenterOverview } from './modules/CommandCenterOverview';
 import { StudentManagement } from './modules/StudentManagement';
 import { PaymentVerificationQueue } from './modules/PaymentVerificationQueue';
 import { EntitlementManager } from './modules/EntitlementManager';
@@ -43,7 +51,8 @@ import { PricingManager } from './modules/PricingManager';
 import { SiteContentManager } from './modules/SiteContentManager';
 import { AdPagesManager } from './modules/AdPagesManager';
 
-type AdminTab =
+export type AdminTab =
+  | 'OVERVIEW'
   | 'STUDENTS'
   | 'PAYMENTS'
   | 'PRICING'
@@ -65,224 +74,376 @@ interface AdminVaultShellProps {
   onExitVault: () => void;
 }
 
+interface NavCategory {
+  category: string;
+  items: {
+    id: AdminTab;
+    label: string;
+    icon: React.ReactNode;
+    badge?: string;
+    badgeColor?: string;
+  }[];
+}
+
 const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault }) => {
   const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<AdminTab>('STUDENTS');
+  const [activeTab, setActiveTab] = useState<AdminTab>('OVERVIEW');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedLearner, setSelectedLearner] = useState<Learner | null>(null);
 
-  let pendingCount = 0;
+  // Global OmniSearch Modal (Ctrl+K)
+  const [isOmniSearchOpen, setIsOmniSearchOpen] = useState(false);
+  const [omniQuery, setOmniQuery] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Real-time badge counts
+  let pendingGiftsCount = 0;
+  let allLearnersCount = 0;
   try {
-    const subs = StorageRLSLayer.getAllSubscriptionsAdmin(SUPER_ADMIN_EMAIL);
-    pendingCount = subs.filter((s: any) => s.status === 'PENDING_VERIFICATION').length;
+    const gifts = StorageRLSLayer.getAllGiftRequestsAdmin(SUPER_ADMIN_EMAIL);
+    pendingGiftsCount = gifts.filter((g: any) => g.status === 'PENDING' || g.status === 'READY_FOR_PACKING').length;
+    allLearnersCount = StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL).length;
   } catch {
-    pendingCount = 0;
+    pendingGiftsCount = 0;
   }
 
-  const navItems: { id: AdminTab; label: string; icon: React.ReactNode; badge?: string }[] = [
-    { id: 'STUDENTS', label: 'Kid Control & Delete', icon: <Users className="w-4 h-4" /> },
-    { id: 'PRICING', label: 'Modify Prices & UPI', icon: <Coins className="w-4 h-4 text-emerald-400" /> },
-    { id: 'CONTENT', label: 'Modify Home & Privacy', icon: <FileText className="w-4 h-4 text-indigo-400" /> },
-    { id: 'ADS', label: 'Modify Ad Pages & Funnels', icon: <Megaphone className="w-4 h-4 text-orange-400" /> },
-    { id: 'SCHOLARSHIPS', label: 'Worldwide Scholarships', icon: <Award className="w-4 h-4" /> },
-    { id: 'ENTITLEMENTS', label: 'Entitlement & Trials', icon: <Zap className="w-4 h-4" /> },
-    { id: 'GIFTS', label: 'Gift & Physical Product Dispatch', icon: <Truck className="w-4 h-4 text-amber-400" /> },
-    { id: 'ACODES', label: 'ACode Vouchers', icon: <KeyRound className="w-4 h-4" /> },
-    { id: 'CURRICULUM', label: 'Curriculum & Boards', icon: <BookOpen className="w-4 h-4" /> },
-    { id: 'QUESTIONS', label: 'Question Bank CRUD', icon: <Database className="w-4 h-4" /> },
-    { id: 'LEDGER', label: 'Coin Ledger Inspector', icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'REFERRALS', label: 'Referral Fraud Monitor', icon: <UserCheck className="w-4 h-4" /> },
-    { id: 'MODERATION', label: 'Safety & Moderation', icon: <ShieldAlert className="w-4 h-4" /> },
-    { id: 'AUDIT', label: 'Immutable Audit Logs', icon: <ShieldCheck className="w-4 h-4" /> },
-    { id: 'HEALTH', label: 'System Telemetry', icon: <BarChart3 className="w-4 h-4" /> },
+  // Ctrl+K Global Shortcut Listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsOmniSearchOpen(prev => !prev);
+      } else if (e.key === 'Escape') {
+        setIsOmniSearchOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleNavigateTab = (tab: AdminTab, contextLearner?: Learner) => {
+    setActiveTab(tab);
+    if (contextLearner) {
+      setSelectedLearner(contextLearner);
+    }
+    setMobileMenuOpen(false);
+  };
+
+  // OmniSearch filtered list
+  const omniResults = React.useMemo(() => {
+    if (!omniQuery.trim()) return [];
+    try {
+      const all = StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL);
+      const q = omniQuery.toLowerCase();
+      return all.filter(l =>
+        l.fullName.toLowerCase().includes(q) ||
+        l.email.toLowerCase().includes(q) ||
+        (l.phone && l.phone.includes(q)) ||
+        l.id.toLowerCase().includes(q)
+      ).slice(0, 5);
+    } catch {
+      return [];
+    }
+  }, [omniQuery]);
+
+  const navCategories: NavCategory[] = [
     {
-      id: 'PAYMENTS',
-      label: 'Manual Payments (Retired)',
-      icon: <CreditCard className="w-4 h-4 text-slate-500" />,
-      badge: 'AUTO PG'
+      category: 'Mission Command & Telemetry',
+      items: [
+        { id: 'OVERVIEW', label: 'Command HUD Overview', icon: <Activity className="w-4 h-4 text-cyan-400" />, badge: 'LIVE', badgeColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' },
+        { id: 'HEALTH', label: 'System Health & Latency', icon: <BarChart3 className="w-4 h-4 text-emerald-400" /> },
+        { id: 'AUDIT', label: 'Immutable Audit Logs', icon: <ShieldCheck className="w-4 h-4 text-indigo-400" /> },
+      ]
     },
+    {
+      category: 'Scholar & Account Control',
+      items: [
+        { id: 'STUDENTS', label: 'Kid Control & Accounts', icon: <Users className="w-4 h-4 text-blue-400" />, badge: allLearnersCount > 0 ? `${allLearnersCount}` : undefined, badgeColor: 'bg-blue-500/20 text-blue-300' },
+        { id: 'ENTITLEMENTS', label: 'Entitlements & Trials', icon: <Zap className="w-4 h-4 text-amber-400" /> },
+        { id: 'SCHOLARSHIPS', label: 'Worldwide Scholarships', icon: <Award className="w-4 h-4 text-purple-400" /> },
+        { id: 'ACODES', label: 'Institutional ACode Vouchers', icon: <KeyRound className="w-4 h-4 text-yellow-400" /> },
+      ]
+    },
+    {
+      category: 'Commerce, Rewards & Gifts',
+      items: [
+        { id: 'PRICING', label: 'Modify Prices & UPI PG', icon: <Coins className="w-4 h-4 text-emerald-400" /> },
+        { id: 'GIFTS', label: 'Physical Gift Dispatch', icon: <Truck className="w-4 h-4 text-amber-400" />, badge: pendingGiftsCount > 0 ? `${pendingGiftsCount} PENDING` : undefined, badgeColor: 'bg-amber-400 text-slate-950 animate-pulse font-black' },
+        { id: 'LEDGER', label: 'Coin Ledger & Wallets', icon: <Sparkles className="w-4 h-4 text-cyan-400" /> },
+        { id: 'PAYMENTS', label: 'Manual Payments (Retired)', icon: <CreditCard className="w-4 h-4 text-slate-500" />, badge: 'AUTO PG', badgeColor: 'bg-slate-800 text-slate-400' },
+      ]
+    },
+    {
+      category: 'Academic & Curriculum Engine',
+      items: [
+        { id: 'CURRICULUM', label: 'Curriculum & Boards', icon: <BookOpen className="w-4 h-4 text-indigo-400" /> },
+        { id: 'QUESTIONS', label: 'Question Bank CRUD', icon: <Database className="w-4 h-4 text-teal-400" /> },
+      ]
+    },
+    {
+      category: 'Governance, Funnels & Safety',
+      items: [
+        { id: 'ADS', label: 'Ad Pages & Funnels', icon: <Megaphone className="w-4 h-4 text-orange-400" /> },
+        { id: 'CONTENT', label: 'Home & Legal Content', icon: <FileText className="w-4 h-4 text-indigo-400" /> },
+        { id: 'REFERRALS', label: 'Referral Fraud Monitor', icon: <UserCheck className="w-4 h-4 text-rose-400" /> },
+        { id: 'MODERATION', label: 'Safety & Moderation', icon: <ShieldAlert className="w-4 h-4 text-red-400" /> },
+      ]
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-        {/* Top Restricted Bar */}
-        <header className="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-40">
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-            <div className="w-8 h-8 rounded-lg bg-red-950/80 border border-red-800 flex items-center justify-center text-red-400 font-bold text-xs">
-              AL
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="font-extrabold text-sm text-white tracking-wide">AcademicLevel Enterprise Control</span>
-                <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-indigo-950 border border-indigo-800 text-indigo-300">
-                  /adminservice
-                </span>
-              </div>
-              <p className="text-[10px] text-slate-400 font-mono">
-                Security Status: <span className="text-emerald-400 font-semibold">Authorized Super-Admin</span>
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <span className="hidden sm:inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Vault Secured</span>
-            </span>
-
-            <button
-              onClick={() => {
-                try {
-                  sessionStorage.removeItem('al_admin_token');
-                  sessionStorage.removeItem('al_admin_email');
-                  sessionStorage.removeItem('al_admin_passkey');
-                  localStorage.removeItem('al_admin_token');
-                  localStorage.removeItem('al_admin_email');
-                  localStorage.removeItem('al_admin_passkey');
-                } catch {}
-                logout();
-                onExitVault();
-              }}
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold rounded-xl flex items-center space-x-1.5 transition-all"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Exit Vault</span>
-            </button>
-          </div>
-        </header>
-
-        {/* Master Body Layout */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Sidebar */}
-          <aside
-            className={`fixed lg:static inset-y-0 left-0 z-30 w-64 bg-slate-900/95 lg:bg-slate-900 border-r border-slate-800 flex flex-col justify-between transform transition-transform duration-200 ease-in-out ${
-              mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-            }`}
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+      {/* Top Restricted Command Bar */}
+      <header className="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 py-2.5 flex items-center justify-between sticky top-0 z-40 shadow-xl">
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg cursor-pointer"
+            aria-label="Toggle menu"
           >
-            <div className="p-4 space-y-1 overflow-y-auto">
-              <div className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest px-3 py-2">
-                15 Vault Modules
-              </div>
-              {navItems.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveTab(item.id);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                    activeTab === item.id
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-950 font-bold'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                >
-                  {item.icon}
-                  <span className="flex-1 text-left flex items-center justify-between">
-                    <span>{item.label}</span>
-                    {item.badge && (
-                      <span className="ml-1.5 px-2 py-0.5 rounded-full text-[9px] font-mono font-black bg-amber-400 text-slate-950 shadow-sm animate-pulse">
-                        {item.badge}
-                      </span>
-                    )}
-                  </span>
-                  {activeTab === item.id && <ChevronRight className="w-3.5 h-3.5 ml-1" />}
-                </button>
-              ))}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red-600 to-rose-900 border border-red-500/40 flex items-center justify-center text-white font-black text-xs shadow-md">
+            AL
+          </div>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="font-black text-sm text-white tracking-wide">AcademicLevel Enterprise Control</span>
+              <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-indigo-950 border border-indigo-800 text-indigo-300">
+                /adminservice
+              </span>
             </div>
-
-            <div className="p-4 border-t border-slate-800 text-[10px] text-slate-500 space-y-1">
-              <p>AcademicLevel v2.15.1s</p>
-              <p>Strict Super-Admin Lock Active</p>
-            </div>
-          </aside>
-
-          {/* Main Module Content Canvas */}
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-950">
-            {/* Live Automated UPI Gateway Notification Banner */}
-            <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/60 to-indigo-950/40 border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
-              <div className="flex items-start space-x-3">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
-                  <Sparkles className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-xs sm:text-sm font-extrabold text-white flex items-center gap-2">
-                    Official Automated UPI Gateway Live
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                      ZERO MANUAL AUDIT
-                    </span>
-                  </h4>
-                  <p className="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
-                    Student passes activate automatically via real UPI PG: ₹49 Lite (60 Days) and ₹129 Plus (180 Days). Manual human payment verification is no longer required.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2 shrink-0 flex-wrap gap-y-1">
-                <a
-                  href="https://upipg.cit.org.in/pay/erNAH4FIOAgE4qMpUDmI?public=true"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-2.5 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 text-[10px] font-bold text-emerald-300 transition-colors"
-                >
-                  ₹49 Gateway ↗
-                </a>
-                <a
-                  href="https://upipg.cit.org.in/pay/floCfjhckOsPisvVeVE0?public=true"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-2.5 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-[10px] font-bold text-indigo-300 transition-colors"
-                >
-                  ₹129 Gateway ↗
-                </a>
-                <a
-                  href="https://upipg.cit.org.in/pay/YGTGmsXuO4SIz1onOC6o?public=true"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-2.5 py-1.5 rounded-lg bg-amber-600/30 hover:bg-amber-600/50 border border-amber-500/40 text-[10px] font-bold text-amber-300 transition-colors"
-                >
-                  ₹205 Gold ↗
-                </a>
-                <a
-                  href="https://upipg.cit.org.in/pay/VucCVS8VRxJC9iQWEjVv?public=true"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-2.5 py-1.5 rounded-lg bg-yellow-600/30 hover:bg-yellow-600/50 border border-yellow-500/40 text-[10px] font-bold text-yellow-300 transition-colors"
-                >
-                  ₹2,499 School ↗
-                </a>
-              </div>
-            </div>
-
-            {activeTab === 'PAYMENTS' && (
-              <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-slate-900 border border-amber-500/30 flex items-center justify-between text-xs text-amber-200">
-                  <span>ℹ️ <strong>Manual Payment Queue Retired:</strong> Real UPI PG handles all transactions instantly and automatically. This view is maintained strictly for legacy audit logs.</span>
-                </div>
-                <PaymentVerificationQueue />
-              </div>
-            )}
-            {activeTab === 'STUDENTS' && <StudentManagement />}
-            {activeTab === 'PRICING' && <PricingManager />}
-            {activeTab === 'CONTENT' && <SiteContentManager />}
-            {activeTab === 'ADS' && <AdPagesManager />}
-            {activeTab === 'SCHOLARSHIPS' && <ScholarshipManager />}
-            {activeTab === 'ENTITLEMENTS' && <EntitlementManager />}
-            {activeTab === 'ACODES' && <ACodeManager />}
-            {activeTab === 'CURRICULUM' && <CurriculumManager />}
-            {activeTab === 'QUESTIONS' && <QuestionBankManager />}
-            {activeTab === 'LEDGER' && <LedgerInspector />}
-            {activeTab === 'REFERRALS' && <ReferralMonitor />}
-            {activeTab === 'GIFTS' && <GiftFulfillment />}
-            {activeTab === 'MODERATION' && <ModerationReports />}
-            {activeTab === 'AUDIT' && <AuditLogViewer />}
-            {activeTab === 'HEALTH' && <SystemHealthAnalytics />}
-          </main>
+            <p className="text-[10px] text-slate-400 font-mono hidden sm:block">
+              Role: <span className="text-emerald-400 font-semibold">Authorized Super-Admin</span> • Engine: <span className="text-cyan-400">SQLite WAL &lt;0.1ms</span>
+            </p>
+          </div>
         </div>
+
+        <div className="flex items-center space-x-2.5">
+          {/* Universal OmniSearch Trigger Button */}
+          <button
+            type="button"
+            onClick={() => setIsOmniSearchOpen(true)}
+            className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-700/80 hover:border-indigo-500 text-slate-300 hover:text-white rounded-xl text-xs font-semibold shadow-inner transition-all cursor-pointer"
+            title="Search scholars across database (Ctrl + K)"
+          >
+            <Search className="w-3.5 h-3.5 text-indigo-400" />
+            <span>OmniSearch Scholar...</span>
+            <kbd className="px-1.5 py-0.5 text-[9px] font-mono bg-slate-800 text-slate-400 rounded border border-slate-700">
+              Ctrl K
+            </kbd>
+          </button>
+
+          <span className="hidden md:inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>100% Tenant Isolated</span>
+          </span>
+
+          <button
+            onClick={() => {
+              try {
+                sessionStorage.removeItem('al_admin_token');
+                sessionStorage.removeItem('al_admin_email');
+                sessionStorage.removeItem('al_admin_passkey');
+                localStorage.removeItem('al_admin_token');
+                localStorage.removeItem('al_admin_email');
+                localStorage.removeItem('al_admin_passkey');
+              } catch {}
+              logout();
+              onExitVault();
+            }}
+            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold rounded-xl flex items-center space-x-1.5 transition-all cursor-pointer"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Exit Vault</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Master Body Layout */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Categorized Sidebar */}
+        <aside
+          className={`fixed lg:static inset-y-0 left-0 z-30 w-72 bg-slate-900 border-r border-slate-800 flex flex-col justify-between transform transition-transform duration-200 ease-in-out ${
+            mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
+        >
+          <div className="p-3.5 space-y-4 overflow-y-auto">
+            {navCategories.map((cat, catIdx) => (
+              <div key={catIdx} className="space-y-1">
+                <div className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest px-2.5 py-1">
+                  {cat.category}
+                </div>
+                {cat.items.map(item => {
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs transition-all cursor-pointer ${
+                        isActive
+                          ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md shadow-indigo-950 font-bold'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800/70 font-medium'
+                      }`}
+                    >
+                      {item.icon}
+                      <span className="flex-1 text-left flex items-center justify-between">
+                        <span className="truncate">{item.label}</span>
+                        {item.badge && (
+                          <span className={`ml-1.5 px-2 py-0.2 rounded-full text-[9px] font-mono border ${item.badgeColor || 'bg-slate-800 text-slate-300'}`}>
+                            {item.badge}
+                          </span>
+                        )}
+                      </span>
+                      {isActive && <ChevronRight className="w-3.5 h-3.5 ml-1 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+
+          <div className="p-3.5 border-t border-slate-800 text-[10px] text-slate-500 font-mono space-y-0.5">
+            <div className="flex justify-between items-center">
+              <span>AcademicLevel v2.15.1s</span>
+              <span className="text-emerald-400 font-bold">PROD WAL</span>
+            </div>
+            <p>Strict Super-Admin Lock Active</p>
+          </div>
+        </aside>
+
+        {/* Main Content Canvas */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-950">
+          {activeTab === 'OVERVIEW' && (
+            <CommandCenterOverview onNavigateTab={handleNavigateTab} />
+          )}
+          {activeTab === 'STUDENTS' && (
+            <StudentManagement initialLearner={selectedLearner} />
+          )}
+          {activeTab === 'PRICING' && <PricingManager />}
+          {activeTab === 'CONTENT' && <SiteContentManager />}
+          {activeTab === 'ADS' && <AdPagesManager />}
+          {activeTab === 'SCHOLARSHIPS' && <ScholarshipManager />}
+          {activeTab === 'ENTITLEMENTS' && <EntitlementManager />}
+          {activeTab === 'ACODES' && <ACodeManager />}
+          {activeTab === 'CURRICULUM' && <CurriculumManager />}
+          {activeTab === 'QUESTIONS' && <QuestionBankManager />}
+          {activeTab === 'LEDGER' && <LedgerInspector />}
+          {activeTab === 'REFERRALS' && <ReferralMonitor />}
+          {activeTab === 'GIFTS' && <GiftFulfillment />}
+          {activeTab === 'MODERATION' && <ModerationReports />}
+          {activeTab === 'AUDIT' && <AuditLogViewer />}
+          {activeTab === 'HEALTH' && <SystemHealthAnalytics />}
+          {activeTab === 'PAYMENTS' && (
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-slate-900 border border-amber-500/30 flex items-center justify-between text-xs text-amber-200">
+                <span>ℹ️ <strong>Manual Payment Queue Retired:</strong> Real UPI PG handles all transactions automatically. This view is maintained strictly for legacy audit logs.</span>
+              </div>
+              <PaymentVerificationQueue />
+            </div>
+          )}
+        </main>
       </div>
+
+      {/* OMNISEARCH MODAL OVERLAY (Ctrl+K) */}
+      {isOmniSearchOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-start justify-center pt-20 p-4">
+          <div className="w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-2xl space-y-4 relative animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+              <div className="flex items-center space-x-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
+                <Command className="w-4 h-4" />
+                <span>Super-Admin Scholar OmniSearch</span>
+              </div>
+              <button
+                onClick={() => setIsOmniSearchOpen(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <input
+                autoFocus
+                type="text"
+                value={omniQuery}
+                onChange={e => setOmniQuery(e.target.value)}
+                placeholder="Type student name, email, phone, or learner ID..."
+                className="w-full bg-slate-950 border border-slate-700 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-medium"
+              />
+            </div>
+
+            <div className="space-y-2 max-h-80 overflow-y-auto">
+              {omniResults.map(l => (
+                <div
+                  key={l.id}
+                  className="p-3 bg-slate-950/80 border border-slate-800 hover:border-indigo-500/60 rounded-2xl flex items-center justify-between gap-3 text-xs transition-colors"
+                >
+                  <div className="space-y-0.5">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-black text-white">{l.fullName}</span>
+                      <span className="text-[10px] font-mono text-slate-400">Class {l.grade} ({l.board})</span>
+                      <span className={`px-2 py-0.2 rounded-full text-[9px] font-mono font-bold ${
+                        l.hasActiveSubscription
+                          ? (l.activePlan === 'GOLD' ? 'bg-amber-400 text-slate-950' : 'bg-emerald-500/20 text-emerald-300')
+                          : 'bg-slate-800 text-slate-400'
+                      }`}>
+                        {l.hasActiveSubscription ? (l.activePlan || 'ACTIVE') : 'FREE'}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-mono">
+                      {l.email} {l.phone ? `• ${l.phone}` : ''} • ID: {l.id.slice(0, 10)}...
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-1.5 shrink-0">
+                    <button
+                      onClick={() => {
+                        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                          navigator.clipboard.writeText(l.id);
+                        }
+                        setCopiedId(l.id);
+                        setTimeout(() => setCopiedId(null), 2000);
+                      }}
+                      className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg"
+                      title="Copy Learner ID"
+                    >
+                      {copiedId === l.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsOmniSearchOpen(false);
+                        handleNavigateTab('STUDENTS', l);
+                      }}
+                      className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-black flex items-center space-x-1 cursor-pointer"
+                    >
+                      <span>Control</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {omniQuery && omniResults.length === 0 && (
+                <p className="text-xs text-slate-500 text-center py-4">
+                  No scholars found matching &quot;{omniQuery}&quot;.
+                </p>
+              )}
+
+              {!omniQuery && (
+                <div className="text-center py-6 text-slate-500 text-xs">
+                  Start typing to instantly query the entire student database.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

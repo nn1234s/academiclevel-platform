@@ -31,18 +31,22 @@ import {
   Trash2
 } from 'lucide-react';
 
-export const StudentManagement: React.FC = () => {
+interface StudentManagementProps {
+  initialLearner?: Learner | null;
+}
+
+export const StudentManagement: React.FC<StudentManagementProps> = ({ initialLearner }) => {
   const [learners, setLearners] = useState<Learner[]>(() =>
     StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL)
   );
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(initialLearner ? initialLearner.fullName : '');
   const [boardFilter, setBoardFilter] = useState<string>('ALL');
   const [gradeFilter, setGradeFilter] = useState<string>('ALL');
   const [tierFilter, setTierFilter] = useState<string>('ALL');
   const [roleFilter, setRoleFilter] = useState<'ALL' | 'STUDENT' | 'TEACHER' | 'SUPER_ADMIN'>('ALL');
 
   // Selected Kid for deep control modal
-  const [controllingLearner, setControllingLearner] = useState<Learner | null>(null);
+  const [controllingLearner, setControllingLearner] = useState<Learner | null>(initialLearner || null);
 
   // Quick Grant Premium dropdown/modal state
   const [grantingForLearner, setGrantingForLearner] = useState<Learner | null>(null);
