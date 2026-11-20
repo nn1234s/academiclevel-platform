@@ -27,7 +27,7 @@ export const PremiumCenter: React.FC<PremiumCenterProps> = ({
   onRefreshLearner,
   onOpenACodeModal,
 }) => {
-  const [selectedTier, setSelectedTier] = useState<'LITE' | 'PLUS' | 'GOLD' | null>(null);
+  const [selectedTier, setSelectedTier] = useState<'LITE' | 'PLUS' | 'GOLD' | 'GOD' | null>(null);
   const [submissionSuccessUtr, setSubmissionSuccessUtr] = useState<string | null>(null);
 
   useEffect(() => {
@@ -234,33 +234,33 @@ export const PremiumCenter: React.FC<PremiumCenterProps> = ({
           </button>
         </div>
 
-        {/* Gold Plan (Crown Best Value) */}
-        <div className="bg-gradient-to-b from-amber-950/60 via-slate-900 to-slate-900 border-2 border-amber-400 rounded-3xl p-6 flex flex-col justify-between shadow-2xl relative ring-4 ring-amber-500/20">
-          <span className="absolute -top-3.5 right-6 px-3 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 tracking-widest uppercase shadow-md animate-pulse">
-            👑 1-YEAR BEST VALUE
+        {/* GOD Plan (Crown Best Value - 3 Full Years / 1,095 Days) */}
+        <div className="bg-gradient-to-b from-amber-950/70 via-purple-950/40 to-slate-900 border-2 border-amber-400 rounded-3xl p-6 flex flex-col justify-between shadow-2xl relative ring-4 ring-amber-500/30">
+          <span className="absolute -top-3.5 right-6 px-3 py-1 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-slate-950 tracking-widest uppercase shadow-md animate-pulse">
+            👑 3-YEAR GOD MODE • BEST VALUE
           </span>
           <div>
             <div className="flex justify-between items-center mb-3">
               <span className="text-xs font-black text-amber-400 flex items-center space-x-1">
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>GOLD PLAN</span>
+                <span>GOD PLAN (3-YEAR VIP)</span>
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300">
-                365 Days (1 Year)
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                1,095 Days (3 Years)
               </span>
             </div>
             <div className="flex items-baseline space-x-1 mb-2">
-              <span className="text-4xl font-black text-amber-300">₹205</span>
-              <span className="text-xs text-slate-400">/ 365 days</span>
+              <span className="text-4xl font-black text-amber-300">₹450</span>
+              <span className="text-xs text-slate-400">/ 3 years (~₹12.50/mo)</span>
             </div>
             <div className="text-[11px] font-bold text-amber-200 bg-amber-950/80 px-2.5 py-1 rounded-lg border border-amber-800/80 mb-4">
-              ~₹17.08/mo (Only ~56 paise/day!) • Complete School Year
+              ~₹12.50/mo (Only ~41 paise/day!) • 100% Guaranteed Physical Rewards
             </div>
             <p className="text-xs text-slate-300 mb-6 leading-relaxed">
-              Full 365-day master access, covering both terms, pre-boards, board exams, and VIP store rewards.
+              3 Full Years (1,095 Days) complete academic mastery across 3 classes, 100% Guaranteed Physical Gift Store Redemptions (Milton bottles &amp; Pokémon sets), and permanent God Scholar Crown badge.
             </p>
             <ul className="space-y-2.5 text-xs text-slate-200 mb-6">
-              {PLAN_PRICING.GOLD.features.map((f, i) => (
+              {PLAN_PRICING.GOD.features.map((f, i) => (
                 <li key={i} className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-amber-400 flex-shrink-0" />
                   <span>{f}</span>
@@ -270,10 +270,10 @@ export const PremiumCenter: React.FC<PremiumCenterProps> = ({
           </div>
 
           <button
-            onClick={() => setSelectedTier('GOLD')}
-            className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-950 transition-all flex items-center justify-center space-x-2 cursor-pointer transform hover:scale-[1.02]"
+            onClick={() => setSelectedTier('GOD')}
+            className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-950 transition-all flex items-center justify-center space-x-2 cursor-pointer transform hover:scale-[1.02]"
           >
-            <span>Choose Gold Plan (₹205) — 1 Year ↗</span>
+            <span>Choose GOD Plan (₹450) — 3 Full Years ↗</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

@@ -3,7 +3,7 @@ import { PlanPricing, PLAN_PRICING, PaymentService } from '../../services/paymen
 import { CheckCircle2, ShieldCheck, AlertCircle, Copy, Check, ArrowLeft, Zap, ExternalLink, QrCode, AlertTriangle, Sparkles, KeyRound } from 'lucide-react';
 
 interface UPIQRCheckoutProps {
-  planTier: 'LITE' | 'PLUS' | 'GOLD';
+  planTier: 'LITE' | 'PLUS' | 'GOLD' | 'GOD';
   learnerId: string;
   onBack: () => void;
   onSuccess: (utr: string) => void;
@@ -193,16 +193,16 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
 
         {/* Streamlined Direct Gateway Action (No QR) */}
         <div className="space-y-4">
-          {/* Screaming Gold Upgrade Banners */}
+          {/* Screaming GOD Mode Upgrade Banners */}
           {planTier === 'LITE' && (
             <div className="p-3.5 bg-gradient-to-r from-amber-950/90 via-slate-900 to-yellow-950/80 border-2 border-amber-500/60 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-xl ring-2 ring-amber-500/20">
               <div className="space-y-0.5">
                 <span className="text-[10px] font-mono font-black uppercase text-amber-400 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 fill-amber-400" />
-                  <span>👑 1-Year Gold Deal Available: ₹205 (365 Days)</span>
+                  <span>👑 3-Year GOD Mode Available: ₹450 (1,095 Days)</span>
                 </span>
                 <p className="text-slate-200 text-[11px] leading-relaxed">
-                  Pay just <strong>₹156 more</strong> to get <strong>305 EXTRA DAYS (10 full months free!)</strong>. That is only <strong>~₹17.08/month (~56 paise/day!)</strong> covering both terms &amp; final board exams!
+                  Lock in <strong>3 Full Academic Years (1,095 Days)</strong> for only <strong>~₹12.50/mo (~41 paise/day!)</strong> with <strong>100% Guaranteed Physical Gift Store Redemptions</strong> (Milton bottles &amp; Pokémon kits)!
                 </p>
               </div>
               <button
@@ -210,7 +210,7 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
                 onClick={onBack}
                 className="px-3.5 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all shrink-0 cursor-pointer"
               >
-                Upgrade to Gold (₹205) ↗
+                Upgrade to GOD (₹450) ↗
               </button>
             </div>
           )}
@@ -220,10 +220,10 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
               <div className="space-y-0.5">
                 <span className="text-[10px] font-mono font-black uppercase text-amber-400 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 fill-amber-400" />
-                  <span>👑 Upgrade to 1-Year Gold Pass: ₹205 (365 Days)</span>
+                  <span>👑 Upgrade to 3-Year GOD Mode: ₹450 (1,095 Days)</span>
                 </span>
                 <p className="text-slate-200 text-[11px] leading-relaxed">
-                  Pay just <strong>₹76 MORE</strong> than Plus to get <strong>185 EXTRA DAYS (Double your duration to 365 Days!)</strong>. Only <strong>~56 paise/day</strong>!
+                  Get <strong>6X MORE DURATION (3 Full Years / 1,095 Days)</strong> for only <strong>~41 paise/day</strong> with 100% physical store reward redemption guarantee!
                 </p>
               </div>
               <button
@@ -231,23 +231,23 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
                 onClick={onBack}
                 className="px-3.5 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all shrink-0 cursor-pointer"
               >
-                Upgrade to Gold (₹205) ↗
+                Upgrade to GOD (₹450) ↗
               </button>
             </div>
           )}
 
-          {planTier === 'GOLD' && (
-            <div className="p-3.5 bg-gradient-to-r from-amber-950/90 via-slate-900 to-yellow-950/80 border-2 border-amber-500/80 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-xl ring-4 ring-amber-500/30">
+          {(planTier === 'GOD' || planTier === 'GOLD') && (
+            <div className="p-3.5 bg-gradient-to-r from-amber-950/90 via-slate-900 to-purple-950/80 border-2 border-amber-500/80 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-xl ring-4 ring-amber-500/30">
               <div className="space-y-0.5">
                 <span className="text-[10px] font-mono font-black uppercase text-amber-400 flex items-center gap-1.5">
-                  <span>👑 1-YEAR GOLD PASS SELECTED • 365 DAYS COMPLETE ACCESS</span>
+                  <span>👑 3-YEAR GOD MODE SELECTED • 1,095 DAYS COMPLETE ACCESS</span>
                 </span>
                 <p className="text-slate-200 text-[11px] leading-relaxed font-semibold">
-                  Full academic year coverage • Only <strong>~₹17.08/month (~56 paise/day)</strong> • VIP Store Rewards &amp; Master Certificate
+                  3 Full Academic Years • Only <strong>~₹12.50/month (~41 paise/day)</strong> • 100% Guaranteed Physical Gift Store Redemption Unlock
                 </p>
               </div>
               <span className="px-3 py-1 bg-amber-400 text-slate-950 font-black text-[10px] rounded-lg shrink-0 uppercase tracking-widest">
-                BEST VALUE
+                ULTIMATE VALUE
               </span>
             </div>
           )}

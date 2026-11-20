@@ -5,14 +5,17 @@ export interface PricingConfig {
   liteDurationDays: number;
   plusPriceInr: number;
   plusDurationDays: number;
-  goldPriceInr: number;
-  goldDurationDays: number;
+  godPriceInr: number;
+  godDurationDays: number;
+  goldPriceInr?: number;
+  goldDurationDays?: number;
   upiVpa: string;
   merchantName: string;
   discountBadge: string;
   liteFeatures: string[];
   plusFeatures: string[];
-  goldFeatures: string[];
+  godFeatures: string[];
+  goldFeatures?: string[];
   updatedAt?: string;
 }
 
@@ -82,6 +85,18 @@ const DEFAULT_CONFIG: SiteConfig = {
       'Offline Question Bank Full Synchronization',
       'Bonus 40-Coin Referral Jackpot eligibility',
       'Max 1 Class Change during active cycle'
+    ],
+    godPriceInr: 450,
+    godDurationDays: 1095,
+    godFeatures: [
+      '3 Full Years (1,095 Days) All-Access Coverage Across 3 Classes',
+      '100% Guaranteed Physical Gift Store Redemption (Water Bottles, Pokémon Sets & Tech)',
+      'Both CBSE, ICSE & Olympiad Advanced Syllabus Bank',
+      '24/7 Nova AI Socratic Tutor with VIP Priority Pool',
+      'Exclusive GOD Scholar Crown Badge & Golden Profile Frame',
+      '3 Free Class Changes Across Academic Years',
+      'Annual Master Certificates of Academic Excellence',
+      '10 Daily Quizzes Default (15 in Exam Mode)'
     ],
     goldPriceInr: 205,
     goldDurationDays: 365,

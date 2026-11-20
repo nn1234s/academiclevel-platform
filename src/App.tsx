@@ -280,7 +280,7 @@ export const App: React.FC = () => {
   const [authModalMode, setAuthModalMode] = useState<'REGISTER' | 'LOGIN'>('REGISTER');
   const [paywallModalOpen, setPaywallModalOpen] = useState(false);
   const [acodeModalOpen, setAcodeModalOpen] = useState(false);
-  const [checkoutPlanTier, setCheckoutPlanTier] = useState<'LITE' | 'PLUS' | 'GOLD' | null>(null);
+  const [checkoutPlanTier, setCheckoutPlanTier] = useState<'LITE' | 'PLUS' | 'GOLD' | 'GOD' | null>(null);
 
   // Active quiz context
   const [activeSubjectId, setActiveSubjectId] = useState<string>('math');

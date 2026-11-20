@@ -60,7 +60,7 @@ export function initDatabaseSchema() {
     );
   `);
 
-  // Automated schema evolution for password fields
+  // Automated schema evolution for password fields & daily quiz quotas
   try {
     const learnerCols = db.prepare('PRAGMA table_info(learners)').all().map(c => c.name);
     if (!learnerCols.includes('passwordHash')) {
@@ -68,6 +68,15 @@ export function initDatabaseSchema() {
     }
     if (!learnerCols.includes('passwordSalt')) {
       db.exec('ALTER TABLE learners ADD COLUMN passwordSalt TEXT;');
+    }
+    if (!learnerCols.includes('dailyQuizCount')) {
+      db.exec('ALTER TABLE learners ADD COLUMN dailyQuizCount INTEGER NOT NULL DEFAULT 0;');
+    }
+    if (!learnerCols.includes('dailyQuizDate')) {
+      db.exec('ALTER TABLE learners ADD COLUMN dailyQuizDate TEXT;');
+    }
+    if (!learnerCols.includes('examModeEnabled')) {
+      db.exec('ALTER TABLE learners ADD COLUMN examModeEnabled INTEGER NOT NULL DEFAULT 0;');
     }
   } catch {}
 

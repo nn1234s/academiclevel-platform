@@ -994,7 +994,7 @@ apiRouter.patch('/students/:id', (req, res) => {
       });
     }
 
-    const { phone, parentName, parentPin, avatarFrame, quizzesCompletedCount, levelsCompletedCount } = req.body;
+    const { phone, parentName, parentPin, avatarFrame, quizzesCompletedCount, levelsCompletedCount, dailyQuizCount, dailyQuizDate, examModeEnabled } = req.body;
     const updates = [];
     const params = [];
 
@@ -1004,6 +1004,9 @@ apiRouter.patch('/students/:id', (req, res) => {
     if (avatarFrame !== undefined) { updates.push('avatarFrame = ?'); params.push(avatarFrame); }
     if (quizzesCompletedCount !== undefined) { updates.push('quizzesCompletedCount = ?'); params.push(Number(quizzesCompletedCount)); }
     if (levelsCompletedCount !== undefined) { updates.push('levelsCompletedCount = ?'); params.push(Number(levelsCompletedCount)); }
+    if (dailyQuizCount !== undefined) { updates.push('dailyQuizCount = ?'); params.push(Number(dailyQuizCount)); }
+    if (dailyQuizDate !== undefined) { updates.push('dailyQuizDate = ?'); params.push(String(dailyQuizDate)); }
+    if (examModeEnabled !== undefined) { updates.push('examModeEnabled = ?'); params.push(examModeEnabled ? 1 : 0); }
 
     if (updates.length > 0) {
       updates.push("updatedAt = datetime('now')");
@@ -1013,6 +1016,35 @@ apiRouter.patch('/students/:id', (req, res) => {
 
     const updated = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
     res.json({ success: true, learner: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// Toggle / Set Student Exam Mode
+// ==========================================
+apiRouter.post('/students/:id/exam-mode', (req, res) => {
+  try {
+    const sessionToken = req.headers['x-session-token'] || req.headers['authorization']?.replace(/^Bearer\s+/i, '');
+    const adminToken = req.headers['x-admin-token'] || req.query.adminToken;
+    const adminPasskey = req.headers['x-admin-passkey'] || req.headers['x-admin-key'] || req.query.passkey;
+    const isAdmin = (adminToken && isValidAdminSession(String(adminToken).trim())) ||
+                    (adminPasskey && isAuthorizedAdminPasskey(String(adminPasskey).trim()));
+    const isAuthorizedStudent = isValidLearnerSession(sessionToken, req.params.id);
+
+    if (!isAdmin && !isAuthorizedStudent) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized: Valid student session token or administrator authorization is required.'
+      });
+    }
+
+    const { enabled } = req.body;
+    const newStatus = enabled ? 1 : 0;
+    db.prepare("UPDATE learners SET examModeEnabled = ?, updatedAt = datetime('now') WHERE id = ?").run(newStatus, req.params.id);
+    const updated = db.prepare('SELECT * FROM learners WHERE id = ?').get(req.params.id);
+    res.json({ success: true, examModeEnabled: Boolean(newStatus), learner: updated });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -1218,8 +1250,8 @@ apiRouter.post('/payments/submit', paymentLimiter, (req, res) => {
       finalUtr = `UPI-REF-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
     }
 
-    const price = tier === 'GOLD' ? 205 : (tier === 'PLUS' ? 129 : 49);
-    const durationDays = tier === 'GOLD' ? 365 : (tier === 'PLUS' ? 180 : 60);
+    const price = tier === 'GOD' ? 450 : (tier === 'GOLD' ? 205 : (tier === 'PLUS' ? 129 : 49));
+    const durationDays = tier === 'GOD' ? 1095 : (tier === 'GOLD' ? 365 : (tier === 'PLUS' ? 180 : 60));
 
     // Check if there is already a pending subscription for this student
     const existingPending = db.prepare(`
@@ -1791,13 +1823,15 @@ apiRouter.post('/quizzes/attempt', (req, res) => {
       now
     );
 
-    // Increment quizzes completed count
+    // Increment quizzes completed count and daily quiz counter
+    const todayDate = now.slice(0, 10);
     const newQuizCount = (learner.quizzesCompletedCount || 0) + 1;
+    const newDailyCount = learner.dailyQuizDate === todayDate ? (Number(learner.dailyQuizCount) || 0) + 1 : 1;
     db.prepare(`
       UPDATE learners
-      SET quizzesCompletedCount = ?, updatedAt = ?
+      SET quizzesCompletedCount = ?, dailyQuizCount = ?, dailyQuizDate = ?, updatedAt = ?
       WHERE id = ?
-    `).run(newQuizCount, now, learnerId);
+    `).run(newQuizCount, newDailyCount, todayDate, now, learnerId);
 
     const updatedLearner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
     safeReplicateAsync('learners', updatedLearner);
@@ -3361,7 +3395,7 @@ apiRouter.post('/admin/payments/:id/approve', adminAuth, (req, res) => {
         db.prepare(`UPDATE subscriptions SET status = 'SUPERSEDED' WHERE id = ?`).run(existingActive.id);
       } catch {}
     }
-    const daysToAdd = Number(sub.durationDays) || (sub.planTier === 'GOLD' ? 365 : (sub.planTier === 'PLUS' ? 180 : 60));
+    const daysToAdd = Number(sub.durationDays) || (sub.planTier === 'GOD' ? 1095 : (sub.planTier === 'GOLD' ? 365 : (sub.planTier === 'PLUS' ? 180 : 60)));
     const expiry = new Date(baseTime + daysToAdd * 24 * 60 * 60 * 1000);
 
     db.prepare(`
@@ -4867,6 +4901,18 @@ const DEFAULT_CONFIG = {
       'Offline Question Bank Full Synchronization',
       'Bonus 40-Coin Referral Jackpot eligibility',
       'Max 1 Class Change during active cycle'
+    ],
+    godPriceInr: 450,
+    godDurationDays: 1095,
+    godFeatures: [
+      '3 Full Years (1,095 Days) All-Access Coverage Across 3 Classes',
+      '100% Guaranteed Physical Gift Store Redemption (Water Bottles, Pokémon Sets & Tech)',
+      'Both CBSE, ICSE & Olympiad Advanced Syllabus Bank',
+      '24/7 Nova AI Socratic Tutor with VIP Priority Pool',
+      'Exclusive GOD Scholar Crown Badge & Golden Profile Frame',
+      '3 Free Class Changes Across Academic Years',
+      'Annual Master Certificates of Academic Excellence',
+      '10 Daily Quizzes Default (15 in Exam Mode)'
     ],
     goldPriceInr: 205,
     goldDurationDays: 365,
