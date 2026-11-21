@@ -34,6 +34,8 @@ interface QuizEngineProps {
   grade: Grade;
   subjectId: string;
   levelNode: LevelNode;
+  chapter?: string;
+  targetCount?: number;
   learner: Learner;
   onFinish: () => void;
   onOpenNovaAi: (question: Question, chosenIndex: number) => void;
@@ -45,12 +47,15 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   grade,
   subjectId,
   levelNode,
+  chapter,
+  targetCount,
   learner,
   onFinish,
   onOpenNovaAi,
   onOpenMailbox,
 }) => {
   const { refreshCurrentLearner } = useAuth();
+  const quizContainerRef = React.useRef<HTMLDivElement>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoadingQuiz, setIsLoadingQuiz] = useState<boolean>(true);
   const [quizSource, setQuizSource] = useState<'GEMINI_LIVE' | 'CURATED_OFFLINE'>('CURATED_OFFLINE');
@@ -83,16 +88,26 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
     coinsEarned: number;
   } | null>(null);
 
+  const scrollToQuizTop = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    quizContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
   const loadQuizQuestions = useCallback(async () => {
     setIsLoadingQuiz(true);
+    const targetQCount = targetCount || (levelNode === 'FOUNDATION' ? 10 : levelNode === 'CONCEPT' ? 12 : levelNode === 'EXAM_READY' ? 15 : 20);
     try {
-      const res = await HybridQuizService.getQuestions(board, grade, subjectId, levelNode, 5);
-      setQuestions(res.questions);
+      const res = await HybridQuizService.getQuestions(board, grade, subjectId, levelNode, targetQCount, chapter);
+      const sorted = [...res.questions].sort((a, b) => (a.topicTag || '').localeCompare(b.topicTag || ''));
+      setQuestions(sorted);
       setQuizSource(res.source);
       setAiNotice(res.notice || '');
     } catch {
-      const fallback = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, 5);
-      setQuestions(fallback);
+      const fallback = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, targetQCount, chapter);
+      const sorted = [...fallback].sort((a, b) => (a.topicTag || '').localeCompare(b.topicTag || ''));
+      setQuestions(sorted);
       setQuizSource('CURATED_OFFLINE');
       setAiNotice('Loaded from verified offline syllabus bank');
     } finally {
@@ -105,8 +120,14 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       setQuestionDwellSeconds(0);
       setAnswersLog([]);
       setGeneratedReportId(null);
+      scrollToQuizTop();
     }
-  }, [board, grade, subjectId, levelNode]);
+  }, [board, grade, subjectId, levelNode, targetCount, chapter, scrollToQuizTop]);
+
+  // Auto-scroll to top whenever currentIndex changes (ensures user always views top of question)
+  useEffect(() => {
+    scrollToQuizTop();
+  }, [currentIndex, scrollToQuizTop]);
 
   useEffect(() => {
     loadQuizQuestions();
@@ -156,12 +177,22 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
     setIsAnswerSubmitted(true);
   };
 
+  const handleJumpToQuestion = (idx: number) => {
+    if (idx < 0 || idx >= questions.length || idx === currentIndex) return;
+    setCurrentIndex(idx);
+    setSelectedOption(null);
+    setIsAnswerSubmitted(false);
+    setQuestionDwellSeconds(0);
+    scrollToQuizTop();
+  };
+
   const handleNextQuestion = () => {
     if (currentIndex + 1 < questions.length) {
       setCurrentIndex(prev => prev + 1);
       setSelectedOption(null);
       setIsAnswerSubmitted(false);
       setQuestionDwellSeconds(0);
+      scrollToQuizTop();
     } else {
       // Quiz Finished
       setIsCompleted(true);
@@ -484,7 +515,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   const theme = getClassTheme(grade);
 
   return (
-    <div className="max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-100">
+    <div ref={quizContainerRef} className="max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-100">
       {/* Class Persona Header */}
       <div className={`p-4 rounded-2xl mb-6 bg-gradient-to-r ${theme.gradientHero} text-white flex items-center justify-between`}>
         <div className="flex items-center space-x-3">
@@ -581,45 +612,59 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         </div>
       </div>
 
-      {/* Progress Bar & Question Palette for Competitive Classes */}
-      {theme.quizStyle === 'COMPETITIVE_NTA' ? (
-        <div className="mb-6 p-3 bg-slate-950 rounded-2xl border border-slate-800">
-          <div className="text-[11px] font-mono text-slate-400 mb-2 flex items-center justify-between">
-            <span>Question Palette (NTA Grid):</span>
-            <span className="text-emerald-400 font-bold">Answered: {score}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            {questions.map((_, qIdx) => (
-              <span
+      {/* Interactive Question Palette & Chapter Navigator */}
+      <div className="mb-6 p-3 bg-slate-950/80 rounded-2xl border border-slate-800">
+        <div className="text-[11px] font-mono text-slate-400 mb-2 flex items-center justify-between">
+          <span className="flex items-center space-x-1.5">
+            <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Question Navigator:</span>
+          </span>
+          <span className="text-emerald-400 font-bold">Answered: {score} of {questions.length}</span>
+        </div>
+        <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar">
+          {questions.map((q, qIdx) => {
+            const isAnswered = answersLog.some(a => a.question.id === q.id);
+            const isCurr = qIdx === currentIndex;
+            return (
+              <button
                 key={qIdx}
-                className={`w-7 h-7 rounded-lg text-xs font-bold font-mono flex items-center justify-center transition-all ${
-                  qIdx === currentIndex
-                    ? 'bg-indigo-600 text-white ring-2 ring-indigo-400'
-                    : qIdx < currentIndex
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-slate-800 text-slate-400'
+                type="button"
+                onClick={() => handleJumpToQuestion(qIdx)}
+                className={`w-7 h-7 flex-shrink-0 rounded-lg text-xs font-bold font-mono flex items-center justify-center transition-all cursor-pointer ${
+                  isCurr
+                    ? 'bg-indigo-600 text-white ring-2 ring-indigo-400 shadow-md scale-105'
+                    : isAnswered
+                    ? 'bg-emerald-600 text-white hover:bg-emerald-500'
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
                 }`}
+                title={`Jump to Question ${qIdx + 1}: ${q.topicTag || 'Curriculum Focus'}`}
               >
                 {qIdx + 1}
-              </span>
-            ))}
-          </div>
+              </button>
+            );
+          })}
         </div>
-      ) : (
-        <div className="w-full bg-slate-950 rounded-full h-1.5 mb-6 overflow-hidden">
+        {/* Visual Progress Bar */}
+        <div className="w-full bg-slate-900 rounded-full h-1.5 mt-2.5 overflow-hidden">
           <div
             className="bg-indigo-500 h-1.5 rounded-full transition-all duration-300"
             style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
           />
         </div>
-      )}
+      </div>
 
-      {/* Question Text */}
+      {/* Question Text & Chapter Identification */}
       <div className="mb-6">
-        <div className="flex items-center space-x-2 mb-2">
-          <span className="text-[11px] font-medium text-slate-400 bg-slate-800 px-2.5 py-0.5 rounded-full inline-block">
-            {currentQuestion.topicTag}
+        <div className="flex flex-wrap items-center gap-2 mb-2.5">
+          <span className="text-[11px] font-bold text-indigo-300 bg-indigo-500/15 border border-indigo-500/30 px-3 py-1 rounded-full inline-flex items-center space-x-1.5">
+            <BookOpen className="w-3 h-3 text-indigo-400" />
+            <span>Chapter: {currentQuestion.topicTag || chapter || 'Curriculum Focus'}</span>
           </span>
+          {chapter && currentQuestion.topicTag && currentQuestion.topicTag !== chapter && (
+            <span className="text-[11px] font-medium text-slate-300 bg-slate-800 px-2.5 py-0.5 rounded-full inline-block">
+              {currentQuestion.topicTag}
+            </span>
+          )}
           {aiNotice && (
             <span className="text-[10px] text-slate-500 italic hidden sm:inline">
               • {aiNotice}

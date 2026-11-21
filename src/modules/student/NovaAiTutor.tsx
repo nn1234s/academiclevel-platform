@@ -1,7 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Board, Grade, Learner, Question } from '../../core/types';
 import { NovaAiService, NovaMessage, StudentAiQuota } from '../../services/novaAiService';
-import { Sparkles, Send, Bot, User, Lightbulb, RefreshCw, Coins, X, CheckCircle, Zap } from 'lucide-react';
+import {
+  Sparkles,
+  Send,
+  Bot,
+  User,
+  Lightbulb,
+  RefreshCw,
+  X,
+  CheckCircle,
+  Zap,
+  Volume2,
+  VolumeX,
+  Copy,
+  Check,
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  RotateCcw,
+  GraduationCap
+} from 'lucide-react';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 
 interface NovaAiTutorProps {
@@ -14,6 +33,189 @@ interface NovaAiTutorProps {
   learner?: Learner | null;
   onCoinsUpdated?: () => void;
 }
+
+interface PresetQuestion {
+  id: string;
+  category: 'MATH' | 'SCIENCE' | 'ENGLISH' | 'SOCIAL' | 'CS' | 'EXAM';
+  label: string;
+  prompt: string;
+}
+
+const PRESET_QUESTIONS: PresetQuestion[] = [
+  // Mathematics
+  {
+    id: 'm1',
+    category: 'MATH',
+    label: 'Quadratic Discriminant',
+    prompt: 'How do I determine the nature of roots of a quadratic equation ax² + bx + c = 0 using the discriminant D = b² - 4ac? Please show step-by-step examples.'
+  },
+  {
+    id: 'm2',
+    category: 'MATH',
+    label: 'Trigonometry Ratios (Sin, Cos, Tan)',
+    prompt: 'Can you explain trigonometric ratios sin θ, cos θ, and tan θ using an intuitive real-life right triangle ladder example?'
+  },
+  {
+    id: 'm3',
+    category: 'MATH',
+    label: 'Arithmetic Progression (AP) Formula',
+    prompt: 'How do we derive the n-th term formula aₙ = a + (n-1)d and sum of n terms Sₙ = n/2[2a + (n-1)d] in an Arithmetic Progression?'
+  },
+  {
+    id: 'm4',
+    category: 'MATH',
+    label: 'Pythagoras Theorem Proof',
+    prompt: 'Can you walk me through the visual and algebraic proof of the Pythagoras Theorem (a² + b² = c²)?'
+  },
+  {
+    id: 'm5',
+    category: 'MATH',
+    label: 'Mental Math 11x Multiplication',
+    prompt: 'What is the fast mental math shortcut to multiply any 2-digit number by 11 in your head under 3 seconds?'
+  },
+  {
+    id: 'm6',
+    category: 'MATH',
+    label: 'HCF & LCM Real World Problem',
+    prompt: 'How do I know whether a word problem requires finding the HCF (Highest Common Factor) or the LCM (Lowest Common Multiple)?'
+  },
+  {
+    id: 'm7',
+    category: 'MATH',
+    label: 'Circles Tangent Theorem',
+    prompt: 'Prove that the lengths of tangents drawn from an external point to a circle are equal. What is the board marking scheme?'
+  },
+
+  // Science
+  {
+    id: 's1',
+    category: 'SCIENCE',
+    label: "Ohm's Law & Resistance",
+    prompt: "Explain Ohm's Law (V = IR) and how resistance depends on length, cross-sectional area, and resistivity of a conductor."
+  },
+  {
+    id: 's2',
+    category: 'SCIENCE',
+    label: 'Balancing Chemical Equations',
+    prompt: 'What is a foolproof step-by-step method to balance complex chemical equations without guessing?'
+  },
+  {
+    id: 's3',
+    category: 'SCIENCE',
+    label: 'Light Refraction & Snell Law',
+    prompt: "Why does a pencil look bent in a glass of water? Explain refraction, refractive index, and Snell's Law."
+  },
+  {
+    id: 's4',
+    category: 'SCIENCE',
+    label: 'Plant vs Animal Cells',
+    prompt: 'What are the key structural differences between plant cells and animal cells (chloroplasts, cell wall, vacuoles)?'
+  },
+  {
+    id: 's5',
+    category: 'SCIENCE',
+    label: 'Newton Three Laws of Motion',
+    prompt: "Can you explain Newton's Three Laws of Motion with simple everyday examples like kicking a ball and seatbelts in cars?"
+  },
+  {
+    id: 's6',
+    category: 'SCIENCE',
+    label: 'Human Circulatory & Heart',
+    prompt: 'How does double circulation work in the human heart? Trace the flow of oxygenated and deoxygenated blood.'
+  },
+
+  // English
+  {
+    id: 'e1',
+    category: 'ENGLISH',
+    label: 'Active vs Passive Voice',
+    prompt: 'How do I convert sentences from Active Voice to Passive Voice across present, past, and continuous tenses?'
+  },
+  {
+    id: 'e2',
+    category: 'ENGLISH',
+    label: 'Direct to Indirect Speech',
+    prompt: 'What are the core reporting verb and pronoun rules for changing Direct Speech into Indirect (Reported) Speech?'
+  },
+  {
+    id: 'e3',
+    category: 'ENGLISH',
+    label: 'Formal Letter Opening & Closing',
+    prompt: 'What are impressive opening hooks and closing formal sign-offs for an official letter to a school principal or newspaper editor?'
+  },
+  {
+    id: 'e4',
+    category: 'ENGLISH',
+    label: 'Subject-Verb Concord Rules',
+    prompt: 'What are the 5 trickiest Subject-Verb Concord rules that students usually get wrong in board exams?'
+  },
+
+  // Social Science
+  {
+    id: 'so1',
+    category: 'SOCIAL',
+    label: 'Indian Constitution Preamble',
+    prompt: 'What do Sovereign, Socialist, Secular, Democratic, and Republic mean in the Preamble of the Indian Constitution?'
+  },
+  {
+    id: 'so2',
+    category: 'SOCIAL',
+    label: 'The Revolt of 1857 Causes',
+    prompt: 'What were the political, economic, military, and immediate causes of the Great Indian Revolt of 1857?'
+  },
+  {
+    id: 'so3',
+    category: 'SOCIAL',
+    label: 'Indian Monsoon Mechanism',
+    prompt: 'Explain the mechanism of the Southwest Monsoon in India, ITCZ shifts, and differential heating of land and water.'
+  },
+  {
+    id: 'so4',
+    category: 'SOCIAL',
+    label: 'Sectors of Indian Economy',
+    prompt: 'Explain Primary, Secondary, and Tertiary sectors of the Indian economy with examples and employment trends.'
+  },
+
+  // Computer Science & Coding
+  {
+    id: 'cs1',
+    category: 'CS',
+    label: 'Python For Loop & Range',
+    prompt: 'How does the Python range(start, stop, step) function work in a for loop? Give 3 practical examples.'
+  },
+  {
+    id: 'cs2',
+    category: 'CS',
+    label: 'Lists vs Tuples in Python',
+    prompt: 'What is the difference between mutable Python lists and immutable tuples? When should I use each?'
+  },
+  {
+    id: 'cs3',
+    category: 'CS',
+    label: 'Functions & Return Values',
+    prompt: 'How do functions, parameters, default arguments, and return statements work in Python?'
+  },
+
+  // Board Exam & Strategy
+  {
+    id: 'ex1',
+    category: 'EXAM',
+    label: 'Board Exam Step-Marking Key',
+    prompt: 'How do board examiners award step-marks in 5-mark subjective questions, and how can I write answers to secure full marks?'
+  },
+  {
+    id: 'ex2',
+    category: 'EXAM',
+    label: '3-Hour Exam Time Management',
+    prompt: 'How should a student allocate the 3 hours during a board exam between reading time, Section A, B, C, D, and final revision?'
+  },
+  {
+    id: 'ex3',
+    category: 'EXAM',
+    label: 'Avoid Silly Math Mistakes',
+    prompt: 'What are the top 5 careless mistakes students make in Math exams (like sign flips or unit omissions) and how can I prevent them?'
+  }
+];
 
 export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
   board,
@@ -32,6 +234,17 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
   const [showRefillModal, setShowRefillModal] = useState(false);
   const [isRefilling, setIsRefilling] = useState(false);
   const [refillStatus, setRefillStatus] = useState<{ success: boolean; text: string } | null>(null);
+  const [activePresetCategory, setActivePresetCategory] = useState<'ALL' | 'MATH' | 'SCIENCE' | 'ENGLISH' | 'SOCIAL' | 'CS' | 'EXAM'>('ALL');
+  const [showPresetDrawer, setShowPresetDrawer] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom of messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isTyping]);
 
   // Check if learner is an active subscriber with unlimited access
   const isSubscriber = Boolean(
@@ -58,7 +271,35 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
     loadQuota();
   }, [learner?.id]);
 
-  // Handle refill purchase
+  // Speech synthesis helper
+  const handleToggleSpeak = (msgId: string, text: string) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+
+    if (speakingId === msgId) {
+      window.speechSynthesis.cancel();
+      setSpeakingId(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/[*#_`]/g, '');
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.05;
+    utterance.onend = () => setSpeakingId(null);
+    utterance.onerror = () => setSpeakingId(null);
+    setSpeakingId(msgId);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleCopyText = (msgId: string, text: string) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedId(msgId);
+      setTimeout(() => setCopiedId(null), 2000);
+    }
+  };
+
   const handleBuyMessages = async (packType: 'PACK_5' | 'PACK_12') => {
     if (!learner?.id) return;
     setIsRefilling(true);
@@ -89,66 +330,72 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
     setIsRefilling(false);
   };
 
-  // Initialize tutor with age-appropriate welcome
-  useEffect(() => {
-    const initWelcome = async () => {
-      let welcomeText = '';
-      if (initialQuestion && initialChosenIndex !== null && initialChosenIndex !== undefined) {
-        setIsTyping(true);
-        welcomeText = await NovaAiService.explainMistake(
-          initialQuestion,
-          initialChosenIndex,
-          board,
-          grade
-        );
+  // Initialize tutor welcome
+  const initWelcome = () => {
+    let welcomeText = '';
+    if (initialQuestion && initialChosenIndex !== null && initialChosenIndex !== undefined) {
+      setIsTyping(true);
+      NovaAiService.explainMistake(
+        initialQuestion,
+        initialChosenIndex,
+        board,
+        grade
+      ).then(txt => {
+        setMessages([
+          {
+            id: 'msg_welcome_' + Date.now(),
+            sender: 'NOVA',
+            text: txt,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }
+        ]);
         setIsTyping(false);
-      } else {
-        if (grade <= 4) {
-          welcomeText = `✨ Hi! I'm Nova, your cheerful learning buddy! I can explain any puzzle in ${board} Class ${grade} ${activeSubject} in fun, simple steps. What would you like to explore today?`;
-        } else if (grade <= 8) {
-          welcomeText = `👋 Hello! I'm Nova, your Socratic AI guide for ${board} Class ${grade} ${activeSubject}. If you're stuck on a problem or formula, ask away and we'll break it down together step-by-step!`;
-        } else {
-          welcomeText = `🎯 Welcome! I'm Nova, your high-rigor ${board} Class ${grade} Academic Coach. I'm calibrated to ${board} official marking criteria and conceptual derivation. Which unit or topic are you working on?`;
-        }
+      });
+      return;
+    }
+
+    if (grade <= 4) {
+      welcomeText = `✨ Hi! I'm Nova, your cheerful learning buddy! I can explain any puzzle in ${board} Class ${grade} ${activeSubject} in fun, simple steps. What would you like to explore today?`;
+    } else if (grade <= 8) {
+      welcomeText = `👋 Hello! I'm Nova, your Socratic AI guide for ${board} Class ${grade} ${activeSubject}. If you're stuck on a problem or formula, ask away and we'll break it down together step-by-step!`;
+    } else {
+      welcomeText = `🎯 Welcome! I'm Nova, your high-rigor ${board} Class ${grade} Academic Coach. I'm calibrated to ${board} official marking criteria and conceptual derivation. Which unit or topic are you working on?`;
+    }
+
+    setMessages([
+      {
+        id: 'msg_welcome_' + Date.now(),
+        sender: 'NOVA',
+        text: welcomeText,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
+    ]);
+  };
 
-      setMessages([
-        {
-          id: 'msg_welcome_' + Date.now(),
-          sender: 'NOVA',
-          text: welcomeText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }
-      ]);
-    };
-
+  useEffect(() => {
     initWelcome();
   }, [board, grade, activeSubject, initialQuestion, initialChosenIndex]);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputValue.trim() || isTyping) return;
+  const executeSend = async (queryText: string) => {
+    if (!queryText.trim() || isTyping) return;
 
-    // Check if daily quota is exhausted (bypassed completely for active subscribers)
-    if (!isSubscriber && quota && quota.remainingToday <= 0) {
+    // Check if daily quota is exhausted (bypassed for active subscribers or guests)
+    if (learner && !isSubscriber && quota && quota.remainingToday <= 0) {
       setShowRefillModal(true);
       const limitMsg: NovaMessage = {
         id: 'msg_limit_' + Date.now(),
         sender: 'NOVA',
-        text: `🪙 **Daily AI Cap Reached (8/8 Free Messages Used)**\n\nYou've used your daily free quota of 8 Socratic AI queries! You can unlock 5 extra AI messages for just 10 AL Coins using the Refill button.`,
+        text: `🪙 **Daily AI Cap Reached (8/8 Free Messages Used)**\n\nYou've used your daily free quota of 8 Socratic AI queries! Unlock 5 extra AI messages for 10 AL Coins with the Refill button.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, limitMsg]);
       return;
     }
 
-    const userText = inputValue.trim();
-    setInputValue('');
-
     const userMsg: NovaMessage = {
       id: 'msg_u_' + Date.now(),
       sender: 'STUDENT',
-      text: userText,
+      text: queryText,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -156,13 +403,12 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
     setIsTyping(true);
 
     try {
-      // Send last 4 messages to keep prompts short and conserve free tier RPM/TPM caps
       const historyPayload = messages.slice(-4).map(m => ({
         role: (m.sender === 'STUDENT' ? 'user' : 'model') as 'user' | 'model',
         text: m.text.slice(0, 250)
       }));
       const response = await NovaAiService.answerStudentQuery(
-        userText,
+        queryText,
         board,
         grade,
         activeSubject,
@@ -181,7 +427,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       const fallbackMsg: NovaMessage = {
         id: 'msg_err_' + Date.now(),
         sender: 'NOVA',
-        text: `[Offline Resilience] I am currently operating in offline syllabus mode. For ${board} Class ${grade} ${activeSubject}, remember to review core definitions and foundational properties first!`,
+        text: `[Syllabus Bank Guidance] In ${board} Class ${grade} ${activeSubject}, always review foundational definitions and state your formulas first. Would you like a step-by-step example on this concept?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, fallbackMsg]);
@@ -190,12 +436,24 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
     }
   };
 
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputValue.trim() || isTyping) return;
+    const text = inputValue.trim();
+    setInputValue('');
+    executeSend(text);
+  };
+
+  const filteredPresets = PRESET_QUESTIONS.filter(p =>
+    activePresetCategory === 'ALL' ? true : p.category === activePresetCategory
+  );
+
   return (
-    <div className="flex flex-col h-[600px] max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl text-slate-100 relative">
+    <div className="flex flex-col h-[650px] max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl text-slate-100 relative">
       {/* Header */}
       <div className="bg-slate-950 p-4 border-b border-slate-800 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-900/50">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-900/50">
             <Sparkles className="w-5 h-5 animate-pulse" />
           </div>
           <div>
@@ -204,15 +462,31 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
               <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                 {board} • Class {grade}
               </span>
+              {!learner && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  Guest Preview Mode
+                </span>
+              )}
             </div>
             <p className="text-[11px] text-slate-400 flex items-center space-x-1.5 mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-              <span>Multi-Model Chain (Gemini 3.5 Flash Lite + Failover)</span>
+              <span>Multi-Model Chain (Google Gemini 3.5 Flash Lite + Socratic Engine)</span>
             </p>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
+          <button
+            onClick={() => {
+              if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
+              initWelcome();
+            }}
+            title="Restart Conversation"
+            className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+
           {learner && (
             <button
               onClick={() => {
@@ -235,13 +509,80 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
           {onClose && (
             <button
               onClick={onClose}
-              className="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              className="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors cursor-pointer"
             >
               Close
             </button>
           )}
         </div>
       </div>
+
+      {/* Preset Questions Drawer Toggle Bar */}
+      <div className="px-4 py-2 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between text-xs">
+        <div className="flex items-center space-x-1.5 text-indigo-400 font-bold">
+          <GraduationCap className="w-4 h-4 text-indigo-400" />
+          <span>Preset Question Library ({PRESET_QUESTIONS.length} Questions)</span>
+        </div>
+        <button
+          onClick={() => setShowPresetDrawer(prev => !prev)}
+          className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 font-semibold text-[11px] transition-all cursor-pointer"
+        >
+          <span>{showPresetDrawer ? 'Hide Library' : 'Browse Presets'}</span>
+          {showPresetDrawer ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+        </button>
+      </div>
+
+      {/* Expandable Preset Library */}
+      {showPresetDrawer && (
+        <div className="p-3 bg-slate-950 border-b border-slate-800 space-y-2.5 max-h-48 overflow-y-auto animate-fadeIn">
+          {/* Category Tabs */}
+          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 no-scrollbar text-[10px]">
+            {[
+              { id: 'ALL', label: 'All Subjects' },
+              { id: 'MATH', label: '📐 Math' },
+              { id: 'SCIENCE', label: '🔬 Science' },
+              { id: 'ENGLISH', label: '📚 English' },
+              { id: 'SOCIAL', label: '🌍 Social' },
+              { id: 'CS', label: '💻 Coding' },
+              { id: 'EXAM', label: '🎯 Exam Strategy' },
+            ].map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setActivePresetCategory(cat.id as any)}
+                className={`px-2.5 py-1 rounded-full whitespace-nowrap font-bold transition-all cursor-pointer ${
+                  activePresetCategory === cat.id
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-900 text-slate-400 hover:text-white'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Preset Buttons Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {filteredPresets.map(preset => (
+              <button
+                key={preset.id}
+                onClick={() => {
+                  setShowPresetDrawer(false);
+                  executeSend(preset.prompt);
+                }}
+                className="text-left p-2.5 rounded-xl bg-slate-900/90 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/50 transition-all text-xs group cursor-pointer"
+              >
+                <div className="font-bold text-white group-hover:text-indigo-300 flex items-center justify-between">
+                  <span>{preset.label}</span>
+                  <span className="text-[10px] text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Ask Nova &rarr;
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{preset.prompt}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Messages Scroll Area */}
       <div className="flex-1 p-4 overflow-y-auto space-y-4">
@@ -253,40 +594,86 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
             }`}
           >
             <div
-              className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs ${
+              className={`w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 text-xs ${
                 msg.sender === 'STUDENT'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-800 text-indigo-400 border border-slate-700'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'bg-gradient-to-tr from-indigo-900 to-purple-900 text-indigo-300 border border-indigo-700/60'
               }`}
             >
               {msg.sender === 'STUDENT' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
             </div>
 
             <div
-              className={`max-w-[80%] rounded-2xl p-3.5 text-xs leading-relaxed whitespace-pre-wrap ${
+              className={`max-w-[85%] rounded-2xl p-4 text-xs leading-relaxed whitespace-pre-wrap ${
                 msg.sender === 'STUDENT'
-                  ? 'bg-indigo-600 text-white rounded-tr-none'
-                  : 'bg-slate-950 border border-slate-800 text-slate-200 rounded-tl-none shadow-sm'
+                  ? 'bg-indigo-600 text-white rounded-tr-none shadow-md'
+                  : 'bg-slate-950 border border-slate-800 text-slate-200 rounded-tl-none shadow-lg'
               }`}
             >
               {msg.text}
+
               <div
-                className={`text-[9px] mt-1.5 ${
-                  msg.sender === 'STUDENT' ? 'text-indigo-200 text-right' : 'text-slate-500'
+                className={`text-[9px] mt-2 pt-1 border-t flex items-center justify-between ${
+                  msg.sender === 'STUDENT'
+                    ? 'text-indigo-200 border-indigo-500/30'
+                    : 'text-slate-500 border-slate-800/80'
                 }`}
               >
-                {msg.timestamp}
+                <span>{msg.timestamp}</span>
+
+                {msg.sender === 'NOVA' && (
+                  <div className="flex items-center space-x-2">
+                    {/* Read Out Loud Button */}
+                    <button
+                      onClick={() => handleToggleSpeak(msg.id, msg.text)}
+                      className="hover:text-indigo-400 transition-colors flex items-center space-x-1 cursor-pointer"
+                      title="Read explanation out loud"
+                    >
+                      {speakingId === msg.id ? (
+                        <>
+                          <VolumeX className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                          <span className="text-amber-400">Stop</span>
+                        </>
+                      ) : (
+                        <>
+                          <Volume2 className="w-3.5 h-3.5" />
+                          <span>Listen</span>
+                        </>
+                      )}
+                    </button>
+
+                    {/* Copy Button */}
+                    <button
+                      onClick={() => handleCopyText(msg.id, msg.text)}
+                      className="hover:text-indigo-400 transition-colors flex items-center space-x-1 cursor-pointer"
+                      title="Copy explanation to clipboard"
+                    >
+                      {copiedId === msg.id ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span className="text-emerald-400">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         ))}
 
         {isTyping && (
-          <div className="flex items-center space-x-2 text-slate-400 text-xs italic p-2 bg-slate-950/60 rounded-xl border border-slate-800/60 w-fit">
+          <div className="flex items-center space-x-2 text-slate-300 text-xs italic p-3 bg-slate-950/80 rounded-2xl border border-slate-800 w-fit animate-pulse">
             <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-400" />
-            <span>Nova is reasoning socratically...</span>
+            <span>Nova is reasoning socratically according to {board} marking standards...</span>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Suggested Quick Prompts */}
@@ -296,16 +683,28 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
           <span>Quick:</span>
         </span>
         <button
-          onClick={() => setInputValue(`Can you simplify the hardest concept in ${activeSubject}?`)}
-          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-colors"
+          onClick={() => executeSend(`Can you simplify the hardest concept in ${activeSubject} with an analogy?`)}
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
         >
-          Simplify hardest concept
+          💡 Simplify concept
         </button>
         <button
-          onClick={() => setInputValue(`Give me a ${board} exam-style practice problem for Class ${grade}.`)}
-          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-colors"
+          onClick={() => executeSend(`Show step-by-step mathematical derivation for the main formula in ${activeSubject}.`)}
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
         >
-          Give practice problem
+          🔍 Step-by-step derivation
+        </button>
+        <button
+          onClick={() => executeSend(`Give me 1 challenging ${board} exam-style practice problem for Class ${grade}.`)}
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+        >
+          📝 Practice question
+        </button>
+        <button
+          onClick={() => executeSend(`What are common silly mistakes students make in ${activeSubject} exams?`)}
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+        >
+          ⚠️ Common mistake traps
         </button>
       </div>
 
@@ -336,7 +735,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 setShowRefillModal(false);
                 setRefillStatus(null);
               }}
-              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-full bg-slate-800"
+              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-full bg-slate-800 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -380,7 +779,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 <div className="pt-2">
                   <button
                     onClick={() => setShowRefillModal(false)}
-                    className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all"
+                    className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all cursor-pointer"
                   >
                     Continue Learning
                   </button>
@@ -435,7 +834,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 </div>
 
                 <p className="text-[10px] text-slate-400 text-center">
-                  Need more coins? Ace your quizzes (≥ 70% score for Level mastery) or spin the daily wheel to earn coins!
+                  Need more coins? Ace your quizzes (&ge; 70% score for Level mastery) or spin the daily wheel to earn coins!
                 </p>
               </>
             )}

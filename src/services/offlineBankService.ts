@@ -13,10 +13,12 @@ export class OfflineBankService {
     grade: Grade,
     subjectId: string,
     levelNode: LevelNode,
-    count = 5
+    count = 10,
+    chapter?: string
   ): Promise<Question[]> {
     try {
-      const res = await fetch(`/api/quizzes/fetch-quiz?board=${board}&grade=${grade}&subjectId=${subjectId}&levelNode=${levelNode}&count=${count}`);
+      const url = `/api/quizzes/fetch-quiz?board=${board}&grade=${grade}&subjectId=${subjectId}&levelNode=${levelNode}&count=${count}${chapter ? `&chapter=${encodeURIComponent(chapter)}` : ''}`;
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
@@ -26,7 +28,29 @@ export class OfflineBankService {
     } catch (e) {
       console.warn('[OfflineBankService] Server question bank fetch failed, using local fallback:', e);
     }
-    return this.getQuestions(board, grade, subjectId, levelNode);
+    return this.getQuestions(board, grade, subjectId, levelNode, count, chapter);
+  }
+
+  /**
+   * Fetches the distinct curriculum chapters for this board, grade, and subject.
+   */
+  public static async fetchChapters(
+    board: Board,
+    grade: Grade,
+    subjectId: string
+  ): Promise<{ chapter: string; questionCount: number }[]> {
+    try {
+      const res = await fetch(`/api/quizzes/chapters?board=${board}&grade=${grade}&subjectId=${subjectId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.chapters) && data.chapters.length > 0) {
+          return data.chapters;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return this.getFallbackChapters(grade, subjectId);
   }
 
   private static FALLBACK_QUESTIONS: Question[] = [
@@ -326,10 +350,17 @@ export class OfflineBankService {
   ];
 
   /**
-   * Retrieves offline questions for a specific curriculum node.
-   * If exact grade match is not found, dynamically adapts fallback syllabus questions.
+   * Retrieves offline questions for a specific curriculum node or chapter.
+   * Groups and organizes questions by chapter rather than random mixed chaos.
    */
-  public static getQuestions(board: Board, grade: Grade, subjectId: string, levelNode: LevelNode): Question[] {
+  public static getQuestions(
+    board: Board,
+    grade: Grade,
+    subjectId: string,
+    levelNode: LevelNode,
+    count = 10,
+    chapter?: string
+  ): Question[] {
     // 1. Check if user added custom offline questions
     const customBank = this.readCustomQuestions();
     const all = [...this.CURATED_BANK, ...this.FALLBACK_QUESTIONS, ...customBank];
@@ -349,17 +380,27 @@ export class OfflineBankService {
 
     const targetSub = normSub(subjectId);
 
+    // Filter by chapter if provided
+    let candidatePool = all;
+    if (chapter) {
+      const chLower = chapter.toLowerCase();
+      const chMatches = all.filter(q => q.topicTag?.toLowerCase().includes(chLower));
+      if (chMatches.length > 0) {
+        candidatePool = chMatches;
+      }
+    }
+
     // Exact curriculum match: Board + Grade + Subject + LevelNode
-    let matches = all.filter(
+    let matches = candidatePool.filter(
       q => normSub(q.subjectId) === targetSub &&
            q.levelNode === levelNode &&
            q.board === board &&
            Number(q.grade) === Number(grade)
     );
 
-    // If exact node has fewer than 5, expand across other nodes for the SAME Board + Grade + Subject
-    if (matches.length < 5) {
-      const gradeMatches = all.filter(
+    // If exact node has fewer than count, expand across other nodes for the SAME Board + Grade + Subject
+    if (matches.length < count) {
+      const gradeMatches = candidatePool.filter(
         q => normSub(q.subjectId) === targetSub &&
              q.board === board &&
              Number(q.grade) === Number(grade) &&
@@ -370,7 +411,7 @@ export class OfflineBankService {
 
     // If still empty, relax board for same Grade & Subject
     if (matches.length === 0) {
-      matches = all.filter(
+      matches = candidatePool.filter(
         q => normSub(q.subjectId) === targetSub &&
              Number(q.grade) === Number(grade)
       );
@@ -378,25 +419,65 @@ export class OfflineBankService {
 
     // If still empty, match subject and node across platform
     if (matches.length === 0) {
-      matches = all.filter(q => normSub(q.subjectId) === targetSub && q.levelNode === levelNode);
+      matches = candidatePool.filter(q => normSub(q.subjectId) === targetSub && q.levelNode === levelNode);
     }
     if (matches.length === 0) {
-      matches = all.filter(q => normSub(q.subjectId) === targetSub);
+      matches = candidatePool.filter(q => normSub(q.subjectId) === targetSub);
     }
     if (matches.length === 0) {
-      matches = all;
+      matches = candidatePool;
     }
 
-    // Shuffle so student experiences varied test sets across sessions
-    const shuffled = [...matches].sort(() => 0.5 - Math.random());
+    // Crucial: Sort by chapter/topicTag so questions are organized chapter-by-chapter!
+    const organized = [...matches].sort((a, b) => {
+      const topicA = (a.topicTag || '').toLowerCase();
+      const topicB = (b.topicTag || '').toLowerCase();
+      return topicA.localeCompare(topicB);
+    });
 
-    // Always guarantee at least 5 syllabus-aligned questions
-    if (shuffled.length < 5) {
-      const generated = this.synthesizeSyntheticQuestions(board, grade, subjectId, levelNode, 5 - shuffled.length);
-      return [...shuffled, ...generated];
+    if (organized.length < count) {
+      const needed = count - organized.length;
+      const generated = this.synthesizeSyntheticQuestions(board, grade, subjectId, levelNode, needed);
+      return [...organized, ...generated];
     }
 
-    return shuffled.slice(0, 10);
+    return organized.slice(0, count);
+  }
+
+  public static getFallbackChapters(grade: Grade, subjectId: string): { chapter: string; questionCount: number }[] {
+    const norm = (subjectId || '').toLowerCase();
+    if (norm.includes('math')) {
+      if (grade <= 3) {
+        return [
+          { chapter: 'Basic Addition & Word Problems', questionCount: 20 },
+          { chapter: 'Basic Subtraction & Place Values', questionCount: 20 },
+          { chapter: 'Multiplication Tables & Grouping', questionCount: 20 },
+          { chapter: 'Basic 2D Shapes & Measurements', questionCount: 15 }
+        ];
+      }
+      if (grade <= 8) {
+        return [
+          { chapter: 'Fractions & Decimal Operations', questionCount: 25 },
+          { chapter: 'Algebraic Expressions & Identities', questionCount: 25 },
+          { chapter: 'Linear Equations in One Variable', questionCount: 20 },
+          { chapter: 'Perimeter, Area & Mensuration', questionCount: 20 }
+        ];
+      }
+      return [
+        { chapter: 'Real Numbers & Polynomials', questionCount: 50 },
+        { chapter: 'Quadratic Equations (Nature of Roots)', questionCount: 50 },
+        { chapter: 'Arithmetic Progressions (AP)', questionCount: 50 },
+        { chapter: 'Coordinate Geometry (Distance Formula)', questionCount: 50 },
+        { chapter: 'Introduction to Trigonometry', questionCount: 50 },
+        { chapter: 'Circles & Tangents', questionCount: 50 },
+        { chapter: 'Statistics & Probability', questionCount: 50 }
+      ];
+    }
+    return [
+      { chapter: 'Foundational Concepts & Principles', questionCount: 25 },
+      { chapter: 'Core Analytical Problem Solving', questionCount: 25 },
+      { chapter: 'Exam High-Yield Revision Topics', questionCount: 25 }
+    ];
   }
 
   private static synthesizeSyntheticQuestions(

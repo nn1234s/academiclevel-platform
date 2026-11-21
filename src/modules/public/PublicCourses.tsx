@@ -4,12 +4,22 @@ import { CurriculumService } from '../../services/curriculumService';
 import { ArrowRight, BookOpen, Compass } from 'lucide-react';
 
 interface PublicCoursesProps {
+  initialBoard?: Board;
+  initialGrade?: Grade;
   onSelectTrack: (board: Board, grade: Grade) => void;
 }
 
-export const PublicCourses: React.FC<PublicCoursesProps> = ({ onSelectTrack }) => {
-  const [board, setBoard] = useState<Board>('CBSE');
-  const [grade, setGrade] = useState<Grade>(10);
+export const PublicCourses: React.FC<PublicCoursesProps> = ({
+  initialBoard = 'CBSE',
+  initialGrade = 10,
+  onSelectTrack
+}) => {
+  const [board, setBoard] = useState<Board>(initialBoard);
+  const [grade, setGrade] = useState<Grade>(initialGrade);
+
+  React.useEffect(() => {
+    if (initialBoard) setBoard(initialBoard);
+  }, [initialBoard]);
 
   const subjects = CurriculumService.getSubjects(board, grade);
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
-import { KidFounderGlazeShowcase } from '../shared/KidFounderGlazeShowcase';
 import { SiteConfigService } from '../../services/siteConfigService';
 import {
   Star,
@@ -1344,15 +1343,6 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               </form>
             )}
           </div>
-        </div>
-      </section>
-
-      {/* ======================================================== */}
-      {/* 2.5. IIT BOMBAY & 9X CERTIFIED STUDENT DEVELOPER GLAZE    */}
-      {/* ======================================================== */}
-      <section className="py-10 px-3 sm:px-6 bg-slate-100/60">
-        <div className="max-w-6xl mx-auto">
-          <KidFounderGlazeShowcase theme="light" variant="full" />
         </div>
       </section>
 

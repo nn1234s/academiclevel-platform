@@ -1849,20 +1849,43 @@ apiRouter.post('/quizzes/attempt', (req, res) => {
 // ==========================================
 apiRouter.get('/quizzes/fetch-quiz', (req, res) => {
   try {
-    const { board = 'CBSE', grade = 10, subjectId = 'math', levelNode = 'FOUNDATION', count = 5 } = req.query;
-    const numCount = Math.min(25, Math.max(1, Number(count) || 5));
+    const { board = 'CBSE', grade = 10, subjectId = 'math', levelNode = 'FOUNDATION', count = 10, chapter } = req.query;
+    const numCount = Math.min(50, Math.max(1, Number(count) || 10));
 
-    let rows = db.prepare(`
-      SELECT * FROM question_bank
-      WHERE board = ? AND grade = ? AND subjectId = ? AND levelNode = ?
-      ORDER BY RANDOM() LIMIT ?
-    `).all(String(board), Number(grade), String(subjectId), String(levelNode), numCount);
+    let rows = [];
+
+    if (chapter) {
+      // 1. Chapter-specific targeted query
+      const chapterPattern = `%${String(chapter).trim()}%`;
+      rows = db.prepare(`
+        SELECT * FROM question_bank
+        WHERE board = ? AND grade = ? AND subjectId = ? AND topicTag LIKE ?
+        ORDER BY id ASC LIMIT ?
+      `).all(String(board), Number(grade), String(subjectId), chapterPattern, numCount);
+
+      if (rows.length === 0) {
+        rows = db.prepare(`
+          SELECT * FROM question_bank
+          WHERE grade = ? AND subjectId = ? AND topicTag LIKE ?
+          ORDER BY id ASC LIMIT ?
+        `).all(Number(grade), String(subjectId), chapterPattern, numCount);
+      }
+    }
+
+    // 2. Structured level query (ordered chapter-by-chapter rather than random jumble)
+    if (rows.length === 0) {
+      rows = db.prepare(`
+        SELECT * FROM question_bank
+        WHERE board = ? AND grade = ? AND subjectId = ? AND levelNode = ?
+        ORDER BY topicTag ASC, id ASC LIMIT ?
+      `).all(String(board), Number(grade), String(subjectId), String(levelNode), numCount);
+    }
 
     if (rows.length === 0) {
       rows = db.prepare(`
         SELECT * FROM question_bank
         WHERE grade = ? AND subjectId = ?
-        ORDER BY RANDOM() LIMIT ?
+        ORDER BY topicTag ASC, id ASC LIMIT ?
       `).all(Number(grade), String(subjectId), numCount);
     }
 
@@ -1870,7 +1893,7 @@ apiRouter.get('/quizzes/fetch-quiz', (req, res) => {
       rows = db.prepare(`
         SELECT * FROM question_bank
         WHERE grade = ?
-        ORDER BY RANDOM() LIMIT ?
+        ORDER BY topicTag ASC, id ASC LIMIT ?
       `).all(Number(grade), numCount);
     }
 
@@ -1890,6 +1913,37 @@ apiRouter.get('/quizzes/fetch-quiz', (req, res) => {
     }));
 
     res.json({ success: true, count: questions.length, questions });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// Curriculum Chapters & Topic Directory API
+// ==========================================
+apiRouter.get('/quizzes/chapters', (req, res) => {
+  try {
+    const { board = 'CBSE', grade = 10, subjectId = 'math' } = req.query;
+
+    let rows = db.prepare(`
+      SELECT topicTag as chapter, count(*) as questionCount
+      FROM question_bank
+      WHERE grade = ? AND subjectId = ? AND topicTag IS NOT NULL AND topicTag != ''
+      GROUP BY topicTag
+      ORDER BY topicTag ASC
+    `).all(Number(grade), String(subjectId));
+
+    if (rows.length === 0) {
+      rows = db.prepare(`
+        SELECT topicTag as chapter, count(*) as questionCount
+        FROM question_bank
+        WHERE grade = ? AND topicTag IS NOT NULL AND topicTag != ''
+        GROUP BY topicTag
+        ORDER BY topicTag ASC
+      `).all(Number(grade));
+    }
+
+    res.json({ success: true, count: rows.length, chapters: rows });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

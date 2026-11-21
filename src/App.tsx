@@ -49,6 +49,7 @@ import { ACodesRedemption } from './modules/student/ACodesRedemption';
 import { UPIQRCheckout } from './modules/student/UPIQRCheckout';
 import { WorldwideScholarships } from './modules/student/WorldwideScholarships';
 import { PokemonVaultHub } from './modules/pokemon/PokemonVaultHub';
+import { StudentMailboxModal } from './modules/student/StudentMailboxModal';
 
 // Icons
 import {
@@ -91,8 +92,6 @@ const PROTECTED_STUDENT_ROUTES: Record<string, string> = {
   '/courses': 'COURSES',
   '/levels': 'LEVELS',
   '/quiz': 'QUIZ',
-  '/nova': 'NOVA_AI',
-  '/nova-ai': 'NOVA_AI',
   '/community': 'COMMUNITY',
   '/spin': 'SPIN_WHEEL',
   '/spin-wheel': 'SPIN_WHEEL',
@@ -100,12 +99,6 @@ const PROTECTED_STUDENT_ROUTES: Record<string, string> = {
   '/referrals': 'REFERRAL',
   '/acodes': 'REFERRAL',
   '/friend-passes': 'REFERRAL',
-  '/coins': 'GIFT_STORE',
-  '/coin-mall': 'GIFT_STORE',
-  '/gifts': 'GIFT_STORE',
-  '/gift-store': 'GIFT_STORE',
-  '/mall': 'GIFT_STORE',
-  '/rewards': 'GIFT_STORE',
   '/certificates': 'CERTIFICATES',
   '/master-certificate': 'MASTER_CERT',
   '/profile': 'PROFILE',
@@ -197,6 +190,8 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
   if (p === '/sitemap' || p === '/sitemap.html') return { route: 'SITEMAP' };
   if (p === '/curriculum') return { route: isAuth ? 'COURSES' : 'PUBLIC_COURSES' };
   if (p.startsWith('/verify')) return { route: 'VERIFY_CERTIFICATE' };
+  if (p === '/nova' || p === '/nova-ai' || p === '/ai-tutor') return { route: 'NOVA_AI' };
+  if (p === '/gift-store' || p === '/store' || p === '/rewards' || p === '/coin-mall' || p === '/coins' || p === '/gifts' || p === '/mall') return { route: 'GIFT_STORE' };
   if (p === '/login' || p === '/signin') {
     return { route: isAuth ? 'DASHBOARD' : 'HOME', intendedProtected: isAuth ? undefined : 'DASHBOARD' };
   }
@@ -251,6 +246,7 @@ function getPathForRoute(route: string): string {
     case 'REFERRAL': return '/referral';
     case 'COIN_MALL':
     case 'GIFT_STORE':
+    case 'STORE':
       return '/gift-store';
     case 'CERTIFICATES': return '/certificates';
     case 'MASTER_CERT': return '/master-certificate';
@@ -292,6 +288,10 @@ export const App: React.FC = () => {
   const [activeSubjectId, setActiveSubjectId] = useState<string>('math');
   const [activeLevelNode, setActiveLevelNode] = useState<LevelNode>('FOUNDATION');
   const [activeGradeOverride, setActiveGradeOverride] = useState<Grade | null>(null);
+  const [globalMailboxOpen, setGlobalMailboxOpen] = useState<boolean>(false);
+  const [activeTargetCount, setActiveTargetCount] = useState<number>(10);
+  const [activeChapter, setActiveChapter] = useState<string | undefined>(undefined);
+  const [publicBoardFilter, setPublicBoardFilter] = useState<Board>('CBSE');
   const [dashboardOpenMailbox, setDashboardOpenMailbox] = useState<boolean>(false);
   const [dashboardActiveReportId, setDashboardActiveReportId] = useState<string | null>(null);
   const [novaQuestionContext, setNovaQuestionContext] = useState<{
@@ -398,8 +398,12 @@ export const App: React.FC = () => {
     if (extra?.subjectId) setActiveSubjectId(extra.subjectId);
     if (extra?.node) setActiveLevelNode(extra.node);
     if (extra?.grade) setActiveGradeOverride(extra.grade);
+    if (extra?.questionCount) setActiveTargetCount(extra.questionCount);
+    if (extra?.chapter !== undefined) setActiveChapter(extra.chapter);
+    if (extra?.board) setPublicBoardFilter(extra.board);
     if (extra?.openMailbox !== undefined) {
       setDashboardOpenMailbox(Boolean(extra.openMailbox));
+      setGlobalMailboxOpen(Boolean(extra.openMailbox));
     }
     if (extra?.activeReportId !== undefined) {
       setDashboardActiveReportId(extra.activeReportId || null);
@@ -910,9 +914,7 @@ export const App: React.FC = () => {
 
                   {/* Mailbox Badge */}
                   <button
-                    onClick={() => {
-                      navigateTo('DASHBOARD', { openMailbox: true });
-                    }}
+                    onClick={() => setGlobalMailboxOpen(true)}
                     title="Open Student Mailbox & Quiz Diagnostic Reports"
                     className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-bold hover:bg-purple-500/20 transition-all shadow-sm cursor-pointer relative"
                   >
@@ -1205,6 +1207,7 @@ export const App: React.FC = () => {
           )}
           {currentRoute === 'PUBLIC_COURSES' && (
             <PublicCourses
+              initialBoard={publicBoardFilter}
               onSelectTrack={(b, g) => {
                 setAuthModalMode('REGISTER');
                 setAuthModalOpen(true);
@@ -1258,6 +1261,74 @@ export const App: React.FC = () => {
             />
           )}
 
+          {/* Public / Guest Accessible Nova AI */}
+          {currentRoute === 'NOVA_AI' && !isAuthenticated && (
+            <div className="py-6 px-4">
+              <NovaAiTutor
+                board={publicBoardFilter || 'CBSE'}
+                grade={10}
+                activeSubject={activeSubjectId.toUpperCase()}
+                initialQuestion={novaQuestionContext?.q || null}
+                initialChosenIndex={novaQuestionContext?.chosenIdx ?? null}
+                onClose={() => navigateTo('HOME')}
+                learner={null}
+              />
+            </div>
+          )}
+
+          {/* Public / Guest Accessible Gift Store Showcase */}
+          {(currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' || currentRoute === 'STORE') && !isAuthenticated && (
+            <div className="py-6 px-4">
+              <div className="max-w-4xl mx-auto mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-950/60 via-slate-900 to-amber-950/60 border border-amber-500/40 text-center text-slate-200">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+                  🎁 Scholar's Physical Prize Catalog
+                </span>
+                <h2 className="text-xl sm:text-2xl font-black text-white mt-2">
+                  Earn Study Coins &amp; Claim Real Doorstep Delivery
+                </h2>
+                <p className="text-xs text-slate-300 max-w-xl mx-auto mt-1">
+                  Preview all physical rewards available to AcademicLevel students. Create a free account, complete daily quizzes, and redeem stationery, books, plushies, smartwatches, and tablets!
+                </p>
+                <button
+                  onClick={() => {
+                    setAuthModalMode('REGISTER');
+                    setAuthModalOpen(true);
+                  }}
+                  className="mt-3 px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all cursor-pointer"
+                >
+                  Create Free Account to Claim Rewards &rarr;
+                </button>
+              </div>
+              <GiftStore
+                learner={{
+                  id: 'guest_preview',
+                  email: 'guest@academiclevel.com',
+                  fullName: 'Guest Scholar',
+                  grade: 10,
+                  board: 'CBSE',
+                  role: 'STUDENT',
+                  isActive: true,
+                  quizzesCompletedCount: 0,
+                  levelsCompletedCount: 0,
+                  classChangesUsedPremium: 0,
+                  classChangesUsedPostExpiry: 0,
+                  referralCode: 'GUEST',
+                  referralQualified: false,
+                  currentStreakDays: 0,
+                  longestStreakDays: 0,
+                  streakFreezesAvailable: 0,
+                  coinBalance: 0,
+                  createdAt: new Date().toISOString()
+                }}
+                onRefreshLearner={() => {}}
+                onNavigateToPremium={() => {
+                  setAuthModalMode('REGISTER');
+                  setAuthModalOpen(true);
+                }}
+              />
+            </div>
+          )}
+
           {/* Student Authenticated Views */}
           {isAuthenticated && currentLearner && effectiveLearner && (
             <>
@@ -1285,7 +1356,7 @@ export const App: React.FC = () => {
                   learner={effectiveLearner}
                   subjectId={activeSubjectId}
                   onBack={() => navigateTo('COURSES')}
-                  onStartQuiz={node => navigateTo('QUIZ', { node })}
+                  onStartQuiz={(node, count, chapter) => navigateTo('QUIZ', { node, questionCount: count, chapter })}
                   onOpenUpgradeModal={() => setPaywallModalOpen(true)}
                 />
               )}
@@ -1296,6 +1367,8 @@ export const App: React.FC = () => {
                   grade={effectiveGrade}
                   subjectId={activeSubjectId}
                   levelNode={activeLevelNode}
+                  chapter={activeChapter}
+                  targetCount={activeTargetCount}
                   learner={effectiveLearner}
                   onFinish={() => {
                     refreshCurrentLearner();
@@ -1303,7 +1376,8 @@ export const App: React.FC = () => {
                   }}
                   onOpenMailbox={(reportId) => {
                     refreshCurrentLearner();
-                    navigateTo('DASHBOARD', { openMailbox: true, activeReportId: reportId });
+                    setGlobalMailboxOpen(true);
+                    if (reportId) setDashboardActiveReportId(reportId);
                   }}
                   onOpenNovaAi={(q, chosenIdx) => {
                     setNovaQuestionContext({ q, chosenIdx });
@@ -1476,7 +1550,7 @@ export const App: React.FC = () => {
                 <ul className="space-y-2 text-xs">
                   <li>
                     <button
-                      onClick={() => navigateTo('DASHBOARD')}
+                      onClick={() => navigateTo('NOVA_AI')}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Socratic Nova AI
@@ -1484,7 +1558,7 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('DASHBOARD')}
+                      onClick={() => navigateTo(isAuthenticated ? 'COURSES' : 'PUBLIC_COURSES')}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Daily Adaptive Quizzes
@@ -1492,7 +1566,7 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('STORE')}
+                      onClick={() => navigateTo('GIFT_STORE')}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Study Coin Rewards
@@ -1500,7 +1574,7 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('STORE')}
+                      onClick={() => navigateTo('GIFT_STORE')}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Physical Gift Store
@@ -1525,7 +1599,7 @@ export const App: React.FC = () => {
                 <ul className="space-y-2 text-xs">
                   <li>
                     <button
-                      onClick={() => navigateTo('PUBLIC_COURSES')}
+                      onClick={() => navigateTo('PUBLIC_COURSES', { board: 'CBSE' })}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       CBSE Classes 1–12
@@ -1533,7 +1607,7 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('PUBLIC_COURSES')}
+                      onClick={() => navigateTo('PUBLIC_COURSES', { board: 'ICSE' })}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       ICSE / CISCE Board
@@ -1541,7 +1615,7 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('PUBLIC_COURSES')}
+                      onClick={() => navigateTo('PUBLIC_COURSES', { board: 'IGCSE' })}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Cambridge IGCSE
@@ -1549,7 +1623,7 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('PUBLIC_COURSES')}
+                      onClick={() => navigateTo('PUBLIC_COURSES', { board: 'CBSE' })}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Olympiad &amp; Foundations
@@ -1574,7 +1648,15 @@ export const App: React.FC = () => {
                 <ul className="space-y-2 text-xs">
                   <li>
                     <button
-                      onClick={() => navigateTo('PRICING')}
+                      onClick={() => {
+                        setCheckoutPlanTier('LITE');
+                        if (!isAuthenticated) {
+                          setAuthModalMode('REGISTER');
+                          setAuthModalOpen(true);
+                        } else {
+                          setPaywallModalOpen(true);
+                        }
+                      }}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Lite Pass (₹49 / 60D)
@@ -1582,7 +1664,15 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('PRICING')}
+                      onClick={() => {
+                        setCheckoutPlanTier('PLUS');
+                        if (!isAuthenticated) {
+                          setAuthModalMode('REGISTER');
+                          setAuthModalOpen(true);
+                        } else {
+                          setPaywallModalOpen(true);
+                        }
+                      }}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Plus Pass (₹129 / 180D)
@@ -1590,7 +1680,15 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('PRICING')}
+                      onClick={() => {
+                        setCheckoutPlanTier('GOLD');
+                        if (!isAuthenticated) {
+                          setAuthModalMode('REGISTER');
+                          setAuthModalOpen(true);
+                        } else {
+                          setPaywallModalOpen(true);
+                        }
+                      }}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       1-Year Gold VIP (₹205)
@@ -1800,6 +1898,23 @@ export const App: React.FC = () => {
             setAcodeModalOpen(true);
           }}
         />
+
+        {currentLearner && (
+          <StudentMailboxModal
+            isOpen={globalMailboxOpen}
+            onClose={() => setGlobalMailboxOpen(false)}
+            learnerId={currentLearner.id}
+            initialSelectedMessageId={dashboardActiveReportId}
+            onNavigateToQuiz={(sId) => {
+              setGlobalMailboxOpen(false);
+              navigateTo('COURSES', sId ? { subjectId: sId } : undefined);
+            }}
+            onOpenNovaAi={() => {
+              setGlobalMailboxOpen(false);
+              navigateTo('NOVA_AI');
+            }}
+          />
+        )}
 
         {acodeModalOpen && currentLearner && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
