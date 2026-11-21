@@ -727,7 +727,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div>
             <h3 className="text-sm font-bold text-white flex items-center space-x-2">
               <Zap className="w-4 h-4 text-amber-400" />
-              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'GOLD' ? '👑 1-Year Gold VIP Status' : (quota.activePlan === 'LITE' ? 'Concept Booster Status' : `${quota.activePlan} Scholar Status`)) : 'Subscription & Quota Engine'}</span>
+              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'GOLD' ? '👑 1-Year Gold VIP Status' : (quota.activePlan === 'LITE' ? 'Concept Booster Status' : `${quota.activePlan} Scholar Status`)) : 'Free Student Plan (3 Levels Included)'}</span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
               {quota.hasActiveSubscription
@@ -736,7 +736,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     : (quota.activePlan === 'LITE'
                         ? `Concept Booster Active • 60 Days Unlimited Quizzes (${quota.daysRemaining} days remaining)`
                         : `${quota.activePlan} Plan Active • Unlimited Access (${quota.daysRemaining} days remaining)`))
-                : '60-Day Concept Booster pass expired. Upgrade to continue unlimited quizzes.'}
+                : (quota.isLocked
+                    ? 'Free limit of 3 curriculum levels completed. Upgrade to unlock all levels & unlimited quizzes.'
+                    : `Free student tier active. You can master up to ${quota.maxLevels} curriculum levels free.`)}
             </p>
           </div>
 
@@ -761,20 +763,16 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <div className="flex justify-between items-center text-xs mb-2">
               <span className="text-slate-400">Quizzes Completed</span>
               <span className="font-mono font-bold text-white">
-                {quota.quizzesCompleted} / {quota.hasActiveSubscription ? '∞ (Unlimited Pass)' : quota.maxQuizzes}
+                {quota.quizzesCompleted} {quota.hasActiveSubscription ? '• Unlimited Pass' : '• Practice Mode'}
               </span>
             </div>
             <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all ${
-                  quota.quizzesCompleted >= 25 && !quota.hasActiveSubscription
-                    ? 'bg-red-500'
-                    : 'bg-indigo-500'
-                }`}
+                className="h-full rounded-full transition-all bg-indigo-500"
                 style={{
                   width: quota.hasActiveSubscription
                     ? '100%'
-                    : `${Math.min(100, (quota.quizzesCompleted / quota.maxQuizzes) * 100)}%`
+                    : `${Math.min(100, Math.max(10, quota.quizzesCompleted * 10))}%`
                 }}
               />
             </div>

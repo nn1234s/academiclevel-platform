@@ -18,7 +18,8 @@ import {
   Lightbulb,
   FileText,
   Layers,
-  GraduationCap
+  GraduationCap,
+  Zap
 } from 'lucide-react';
 
 interface CourseLevelsProps {
@@ -109,6 +110,25 @@ export const CourseLevels: React.FC<CourseLevelsProps> = ({
         <p className="text-xs text-slate-300 mt-1 max-w-xl">
           Choose between <strong>4-Tier Progression Pathways</strong> (Foundation, Concept, Exam Ready, Olympiad) or <strong>Chapter-Wise Practice</strong> (Addition, Subtraction, Quadratic Equations, Trigonometry) strictly calibrated to {learner.board} marking standards.
         </p>
+
+        {/* Free Account Tier Indicator */}
+        {!quota.hasActiveSubscription && (
+          <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center space-x-2 text-amber-300">
+              <Zap className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <span>
+                <strong>Free Student Account:</strong> {quota.levelsCompleted} of {quota.maxLevels} curriculum levels completed.
+                {quota.isLocked ? ' (Free limit reached! Upgrade to unlock all levels)' : ' (First 3 levels free)'}
+              </span>
+            </div>
+            <button
+              onClick={onOpenUpgradeModal}
+              className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition-colors cursor-pointer shadow-sm"
+            >
+              Upgrade to Unlimited (₹49)
+            </button>
+          </div>
+        )}
 
         {/* View Mode Switcher */}
         <div className="mt-6 flex bg-slate-950/80 p-1 rounded-2xl border border-slate-800 w-fit">

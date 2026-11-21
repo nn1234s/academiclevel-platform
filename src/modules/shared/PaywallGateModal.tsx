@@ -48,7 +48,7 @@ export const PaywallGateModal: React.FC<PaywallGateModalProps> = ({
             Unlock Unlimited K-12 Mastery
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto mt-2">
-            {reason || 'Your 60-Day Concept Booster pass has ended. Upgrade to continue unlimited quizzes and verified certificates.'}
+            {reason || 'Free tier accounts are limited to 3 completed curriculum levels. Upgrade to Lite (₹49) or Plus (₹129) to continue unlimited learning across all grades and subjects.'}
             <br />
             <span className="text-slate-400">
               Your certificates, coin balance, and profile remain 100% safe.

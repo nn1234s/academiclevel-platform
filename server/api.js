@@ -499,39 +499,7 @@ apiRouter.post('/auth/register', authLimiter, (req, res) => {
       new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
     );
 
-    // Auto-Grant 60 Days of Unlimited Quizzes (Concept Booster / LITE Plan) on signup
-    const subId = 'sub_reg_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
-    const subExpiresAt = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString();
-    const invoiceNum = 'INV-WELCOME-' + Math.floor(100000 + Math.random() * 900000);
-
-    db.prepare(`
-      INSERT INTO subscriptions (
-        id, learnerId, planTier, status, paymentMethod,
-        amountInr, durationDays, startsAt, expiresAt,
-        verifiedByAdmin, verifiedAt, invoiceNumber, createdAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      subId, learnerId, 'LITE', 'ACTIVE', 'CONCEPT_BOOSTER_AUTO',
-      49, 60, now, subExpiresAt,
-      'SYSTEM_AUTO', now, invoiceNum, now
-    );
-
-    safeReplicateAsync('subscriptions', {
-      id: subId,
-      learnerId: learnerId,
-      planTier: 'LITE',
-      status: 'ACTIVE',
-      paymentMethod: 'CONCEPT_BOOSTER_AUTO',
-      amountInr: 49,
-      durationDays: 60,
-      startsAt: now,
-      expiresAt: subExpiresAt,
-      verifiedByAdmin: 'SYSTEM_AUTO',
-      verifiedAt: now,
-      invoiceNumber: invoiceNum,
-      createdAt: now
-    });
-
+    // Newly registered learners start on the Free Tier (limited to 3 curriculum levels)
     const newLearner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
     if (newLearner) {
       safeReplicateAsync('learners', newLearner);
@@ -539,10 +507,10 @@ apiRouter.post('/auth/register', authLimiter, (req, res) => {
     delete newLearner.passwordHash;
     delete newLearner.passwordSalt;
 
-    newLearner.hasActiveSubscription = true;
-    newLearner.activePlan = 'LITE';
-    newLearner.planTier = 'LITE';
-    newLearner.subscriptionExpiresAt = subExpiresAt;
+    newLearner.hasActiveSubscription = false;
+    newLearner.activePlan = 'FREE';
+    newLearner.planTier = 'FREE';
+    newLearner.subscriptionExpiresAt = null;
 
     res.json({ success: true, learner: newLearner, token });
   } catch (err) {
@@ -590,27 +558,7 @@ function getActiveSubscriptionForLearner(learner) {
     if (activeSub) return activeSub;
   }
 
-  // 3. Default 60-day Concept Booster pass for registered learners
-  const createdAtMs = learner.createdAt ? new Date(learner.createdAt).getTime() : Date.now();
-  const expiresAtMs = createdAtMs + 60 * 24 * 60 * 60 * 1000;
-  if (Date.now() < expiresAtMs) {
-    return {
-      id: 'sub_auto_' + learner.id,
-      learnerId: learner.id,
-      planTier: 'LITE',
-      status: 'ACTIVE',
-      paymentMethod: 'CONCEPT_BOOSTER_AUTO',
-      amountInr: 49,
-      durationDays: 60,
-      startsAt: learner.createdAt || new Date().toISOString(),
-      expiresAt: new Date(expiresAtMs).toISOString(),
-      verifiedByAdmin: 'SYSTEM_AUTO',
-      verifiedAt: learner.createdAt || new Date().toISOString(),
-      invoiceNumber: 'INV-AUTO-60D',
-      createdAt: learner.createdAt || new Date().toISOString()
-    };
-  }
-
+  // If no verified active subscription exists, learner is on Free Tier (limited to 3 levels)
   return null;
 }
 
@@ -745,7 +693,9 @@ apiRouter.post('/auth/login', authLimiter, (req, res) => {
       learner.subscriptionId = activeSub.id;
     } else {
       learner.hasActiveSubscription = false;
-      learner.activePlan = null;
+      learner.activePlan = 'FREE';
+      learner.planTier = 'FREE';
+      learner.subscriptionExpiresAt = null;
     }
 
     res.json({ success: true, learner, token, activeSub: activeSub || null });
@@ -789,7 +739,9 @@ apiRouter.get('/auth/me', (req, res) => {
       learner.subscriptionId = activeSub.id;
     } else {
       learner.hasActiveSubscription = false;
-      learner.activePlan = null;
+      learner.activePlan = 'FREE';
+      learner.planTier = 'FREE';
+      learner.subscriptionExpiresAt = null;
     }
 
     res.json({ success: true, learner, activeSub: activeSub || null });
@@ -934,7 +886,9 @@ apiRouter.get('/students/:id', (req, res) => {
       learner.subscriptionId = activeSub.id;
     } else {
       learner.hasActiveSubscription = false;
-      learner.activePlan = null;
+      learner.activePlan = 'FREE';
+      learner.planTier = 'FREE';
+      learner.subscriptionExpiresAt = null;
     }
 
     // Reconcile and ensure levelsCompletedCount is accurate across progress and quiz attempts

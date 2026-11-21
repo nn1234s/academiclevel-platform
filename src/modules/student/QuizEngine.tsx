@@ -91,8 +91,13 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   const scrollToQuizTop = useCallback(() => {
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      try {
+        if (document.documentElement) document.documentElement.scrollTop = 0;
+        if (document.body) document.body.scrollTop = 0;
+      } catch {
+        // ignore
+      }
     }
-    quizContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
   const loadQuizQuestions = useCallback(async () => {
