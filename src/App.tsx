@@ -1397,66 +1397,320 @@ export const App: React.FC = () => {
         </main>
 
         {/* ======================================================== */}
-        {/* PUBLIC FOOTER (Zero Admin Links)                         */}
+        {/* PUBLIC FOOTER (Matches Modern Minimalist Multi-Column)    */}
         {/* ======================================================== */}
-        <footer className="bg-slate-950 border-t border-slate-900 py-12 px-4 sm:px-6 lg:px-8 text-xs text-slate-500">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center space-x-2">
-                <div className="w-6 h-6 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-black text-xs">
-                  AL
+        <footer className="bg-black text-neutral-400 border-t border-neutral-800/80 pt-16 pb-12 px-4 sm:px-6 lg:px-8 text-xs">
+          <div className="max-w-7xl mx-auto">
+            {/* Top Multi-Column Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-10">
+              {/* Brand Column (2 cols wide on desktop) */}
+              <div className="lg:col-span-2 space-y-3">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white font-black text-xs shadow-md">
+                    AL
+                  </div>
+                  <div>
+                    <span className="font-black text-white text-base tracking-widest uppercase block leading-none">
+                      AcademicLevel
+                    </span>
+                    <span className="text-[10px] font-mono tracking-widest text-neutral-400 uppercase">
+                      Learn in your era
+                    </span>
+                  </div>
                 </div>
-                <span className="font-extrabold text-white text-sm">AcademicLevel</span>
+                <p className="text-xs text-neutral-400 leading-relaxed max-w-sm">
+                  India&apos;s premier AI-powered K-12 learning ecosystem. CBSE, ICSE, and Cambridge IGCSE daily interactive quizzes, Socratic Nova AI tutoring, and physical reward store.
+                </p>
+                <div className="text-[11px] text-neutral-500 space-y-0.5 font-mono">
+                  <p>Operated by ZingQuark (ZQ Technology)</p>
+                  <p>UDYAM Reg: UDYAM-OD-19-0189385</p>
+                </div>
               </div>
-              <p className="mt-1">
-                &quot;Learn in your era&quot; — India&apos;s Premier AI-Powered K-12 Ecosystem.
-              </p>
-              <p className="text-[10px] text-slate-600 mt-0.5">
-                CBSE • ICSE / CISCE • Cambridge IGCSE (Classes 1–12)
-              </p>
+
+              {/* Column 1: PLATFORM & AI */}
+              <div className="space-y-3">
+                <h4 className="text-white font-black tracking-wider text-xs uppercase">
+                  Platform &amp; AI
+                </h4>
+                <ul className="space-y-2 text-xs">
+                  <li>
+                    <button
+                      onClick={() => navigateTo('DASHBOARD')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Socratic Nova AI
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('DASHBOARD')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Daily Adaptive Quizzes
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('STORE')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Study Coin Rewards
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('STORE')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Physical Gift Store
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('INNOVATIVE_EDTECH')}
+                      className="text-amber-400 hover:text-amber-300 font-semibold transition-colors cursor-pointer text-left flex items-center gap-1"
+                    >
+                      <span>★ #1 Innovative EdTech</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Column 2: CURRICULUM */}
+              <div className="space-y-3">
+                <h4 className="text-white font-black tracking-wider text-xs uppercase">
+                  Curriculum
+                </h4>
+                <ul className="space-y-2 text-xs">
+                  <li>
+                    <button
+                      onClick={() => navigateTo('DASHBOARD')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      CBSE Classes 1–12
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('DASHBOARD')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      ICSE / CISCE Board
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('DASHBOARD')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Cambridge IGCSE
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('DASHBOARD')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Olympiad &amp; Foundations
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('FAQ')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Curriculum FAQs
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Column 3: MEMBERSHIPS */}
+              <div className="space-y-3">
+                <h4 className="text-white font-black tracking-wider text-xs uppercase">
+                  Memberships
+                </h4>
+                <ul className="space-y-2 text-xs">
+                  <li>
+                    <button
+                      onClick={() => navigateTo('PRICING')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Lite Pass (₹49 / 60D)
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('PRICING')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Plus Pass (₹129 / 180D)
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('PRICING')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      1-Year Gold VIP (₹205)
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('PRICING')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Institutional School Pack
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('PREMIUM')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Pricing Overview
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Column 4: COMPANY & LEGAL */}
+              <div className="space-y-3">
+                <h4 className="text-white font-black tracking-wider text-xs uppercase">
+                  About &amp; Legal
+                </h4>
+                <ul className="space-y-2 text-xs">
+                  <li>
+                    <button
+                      onClick={() => navigateTo('PRIVACY')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Policies &amp; Privacy
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('TERMS')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Terms of Service
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('SAFETY')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Child Safety Protocol
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('HALL_OF_FAME')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Security &amp; Bug Bounty
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('ACCOUNT_DELETION')}
+                      className="hover:text-red-400 transition-colors cursor-pointer text-left"
+                      title="Google Play Mandated Account & Data Deletion Portal (/delacc)"
+                    >
+                      Delete Account (/delacc)
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-6">
-              <button
-                onClick={() => navigateTo('INNOVATIVE_EDTECH')}
-                className="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold transition-colors cursor-pointer"
-              >
-                <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                <span>#1 Most Innovative EdTech (EdTech Century)</span>
-              </button>
-              <button onClick={() => navigateTo('PRIVACY')} className="hover:text-slate-300">
-                Policies &amp; Privacy
-              </button>
-              <button onClick={() => navigateTo('TERMS')} className="hover:text-slate-300">
-                Terms of Service
-              </button>
-              <button onClick={() => navigateTo('SAFETY')} className="hover:text-slate-300">
-                Child Safety Protocol
-              </button>
-              <button onClick={() => navigateTo('FAQ')} className="hover:text-slate-300">
-                FAQ
-              </button>
-              <button
-                onClick={() => navigateTo('ACCOUNT_DELETION')}
-                className="hover:text-red-300 text-slate-400 transition-colors"
-                title="Google Play Mandated Account & Data Deletion Portal (/delacc)"
-              >
-                Delete Account
-              </button>
-              <button
-                onClick={() => navigateTo('HALL_OF_FAME')}
-                className="hover:text-blue-300 text-blue-400 font-semibold flex items-center gap-1 transition-colors"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Security &amp; Bug Bounty</span>
-              </button>
-            </div>
+            {/* Divider Line */}
+            <div className="w-full border-t border-neutral-800 my-8 sm:my-10" />
 
-            <div className="text-right">
-              <span className="inline-block px-2.5 py-0.5 rounded-full bg-slate-900 text-[10px] text-indigo-400 font-mono border border-slate-800">
-                v2.15.1s
-              </span>
-              <p className="text-[10px] text-slate-500 mt-1">© 2020–{new Date().getFullYear()} AcademicLevel - ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385</p>
+            {/* Bottom Row: Centered Circular Outline Social Icons & Copyright */}
+            <div className="flex flex-col items-center justify-center text-center space-y-4">
+              {/* Circular Social Media Icons */}
+              <div className="flex items-center space-x-3">
+                {/* YouTube */}
+                <a
+                  href="https://youtube.com/academiclevels"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full border border-neutral-700 hover:border-white text-neutral-400 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                  title="AcademicLevel YouTube: https://youtube.com/academiclevels"
+                  aria-label="YouTube"
+                >
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  </svg>
+                </a>
+
+                {/* Instagram */}
+                <a
+                  href="https://instagram.com/academiclevels"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full border border-neutral-700 hover:border-white text-neutral-400 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                  title="AcademicLevel Instagram: https://instagram.com/academiclevels"
+                  aria-label="Instagram"
+                >
+                  <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                  </svg>
+                </a>
+
+                {/* Email Support */}
+                <a
+                  href="mailto:academiclevels@gmail.com"
+                  className="w-10 h-10 rounded-full border border-neutral-700 hover:border-white text-neutral-400 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                  title="Support Email: academiclevels@gmail.com"
+                  aria-label="Email Support"
+                >
+                  <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="20" height="16" x="2" y="4" rx="2" />
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                  </svg>
+                </a>
+
+                {/* Security & Bug Bounty */}
+                <button
+                  type="button"
+                  onClick={() => navigateTo('HALL_OF_FAME')}
+                  className="w-10 h-10 rounded-full border border-neutral-700 hover:border-white text-neutral-400 hover:text-white flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
+                  title="Security & Bug Bounty Hall of Fame"
+                  aria-label="Security"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                </button>
+
+                {/* Global Website */}
+                <button
+                  type="button"
+                  onClick={() => navigateTo('LANDING')}
+                  className="w-10 h-10 rounded-full border border-neutral-700 hover:border-white text-neutral-400 hover:text-white flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
+                  title="AcademicLevel Platform Home"
+                  aria-label="Homepage"
+                >
+                  <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" x2="22" y1="12" y2="12" />
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Copyright & Legal Subtext */}
+              <div className="space-y-1">
+                <p className="text-xs text-neutral-300 font-medium">
+                  ©Copyright. All rights reserved.
+                </p>
+                <p className="text-[10px] text-neutral-600 font-mono">
+                  © 2020–{new Date().getFullYear()} AcademicLevel • Operated by ZingQuark (ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385)
+                </p>
+              </div>
             </div>
           </div>
         </footer>
