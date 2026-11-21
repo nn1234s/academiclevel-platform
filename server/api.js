@@ -1931,52 +1931,79 @@ apiRouter.get('/quizzes/fetch-quiz', (req, res) => {
     const { board = 'CBSE', grade = 10, subjectId = 'math', levelNode = 'FOUNDATION', count = 10, chapter } = req.query;
     const numCount = Math.min(50, Math.max(1, Number(count) || 10));
 
-    let rows = [];
+    const normSubject = (s) => {
+      const lower = String(s || '').toLowerCase();
+      if (lower.includes('math')) return 'math';
+      if (lower.includes('cs') || lower.includes('comp') || lower.includes('code')) return 'cs';
+      if (lower.includes('phys')) return 'physics';
+      if (lower.includes('chem')) return 'chemistry';
+      if (lower.includes('bio')) return 'biology';
+      if (lower.includes('sci')) return 'science';
+      if (lower.includes('eng')) return 'english';
+      if (lower.includes('soc') || lower.includes('hist') || lower.includes('geog') || lower.includes('civic')) return 'social';
+      return lower;
+    };
+
+    const targetSub = normSubject(subjectId);
+    let candidatePool = [];
+
+    const normalizeQText = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
     if (chapter) {
-      // 1. Chapter-specific targeted query
-      const chapterPattern = `%${String(chapter).trim()}%`;
-      rows = db.prepare(`
+      // 1. Chapter-specific targeted query with randomized distinct rows
+      const cleanChapter = String(chapter).trim();
+      const chapterPattern = `%${cleanChapter}%`;
+      const chRows = db.prepare(`
         SELECT * FROM question_bank
-        WHERE board = ? AND grade = ? AND subjectId = ? AND topicTag LIKE ?
-        ORDER BY id ASC LIMIT ?
-      `).all(String(board), Number(grade), String(subjectId), chapterPattern, numCount);
+        WHERE grade = ? AND (subjectId = ? OR subjectId LIKE ?) AND (topicTag LIKE ? OR ? LIKE '%' || topicTag || '%')
+        ORDER BY RANDOM() LIMIT ?
+      `).all(Number(grade), targetSub, `%${targetSub}%`, chapterPattern, cleanChapter, numCount * 4);
 
-      if (rows.length === 0) {
-        rows = db.prepare(`
-          SELECT * FROM question_bank
-          WHERE grade = ? AND subjectId = ? AND topicTag LIKE ?
-          ORDER BY id ASC LIMIT ?
-        `).all(Number(grade), String(subjectId), chapterPattern, numCount);
-      }
+      candidatePool.push(...chRows);
     }
 
-    // 2. Structured level query (ordered chapter-by-chapter rather than random jumble)
-    if (rows.length === 0) {
-      rows = db.prepare(`
+    // 2. Structured level query if not enough or no chapter
+    if (candidatePool.length < numCount * 2) {
+      const levelRows = db.prepare(`
         SELECT * FROM question_bank
-        WHERE board = ? AND grade = ? AND subjectId = ? AND levelNode = ?
-        ORDER BY topicTag ASC, id ASC LIMIT ?
-      `).all(String(board), Number(grade), String(subjectId), String(levelNode), numCount);
+        WHERE grade = ? AND (subjectId = ? OR subjectId LIKE ?) AND levelNode = ?
+        ORDER BY RANDOM() LIMIT ?
+      `).all(Number(grade), targetSub, `%${targetSub}%`, String(levelNode), numCount * 4);
+      candidatePool.push(...levelRows);
     }
 
-    if (rows.length === 0) {
-      rows = db.prepare(`
+    if (candidatePool.length < numCount * 2) {
+      const subRows = db.prepare(`
         SELECT * FROM question_bank
-        WHERE grade = ? AND subjectId = ?
-        ORDER BY topicTag ASC, id ASC LIMIT ?
-      `).all(Number(grade), String(subjectId), numCount);
+        WHERE grade = ? AND (subjectId = ? OR subjectId LIKE ?)
+        ORDER BY RANDOM() LIMIT ?
+      `).all(Number(grade), targetSub, `%${targetSub}%`, numCount * 4);
+      candidatePool.push(...subRows);
     }
 
-    if (rows.length === 0) {
-      rows = db.prepare(`
+    if (candidatePool.length < numCount) {
+      const gradeRows = db.prepare(`
         SELECT * FROM question_bank
         WHERE grade = ?
-        ORDER BY topicTag ASC, id ASC LIMIT ?
-      `).all(Number(grade), numCount);
+        ORDER BY RANDOM() LIMIT ?
+      `).all(Number(grade), numCount * 4);
+      candidatePool.push(...gradeRows);
     }
 
-    const questions = rows.map(r => ({
+    // Strict deduplication pass: NEVER allow identical questions in the same quiz!
+    const seenTexts = new Set();
+    const uniqueRows = [];
+
+    for (const row of candidatePool) {
+      const norm = normalizeQText(row.text);
+      if (!seenTexts.has(norm)) {
+        seenTexts.add(norm);
+        uniqueRows.push(row);
+      }
+      if (uniqueRows.length >= numCount) break;
+    }
+
+    const questions = uniqueRows.map(r => ({
       id: r.id,
       board: r.board,
       grade: r.grade,
@@ -4499,7 +4526,7 @@ apiRouter.post('/admin/ai/test-connection', adminAuth, async (req, res) => {
 
 apiRouter.post('/ai/generate-quiz', async (req, res) => {
   try {
-    const { board = 'CBSE', grade = 10, subjectId = 'math', levelNode = 'FOUNDATION', count = 5 } = req.body;
+    const { board = 'CBSE', grade = 10, subjectId = 'math', levelNode = 'FOUNDATION', count = 10, chapter } = req.body;
     const settings = getAiSettings();
 
     if (!settings.preferLiveAi || !settings.hasApiKey) {
@@ -4510,13 +4537,14 @@ apiRouter.post('/ai/generate-quiz', async (req, res) => {
       });
     }
 
-    const safeCount = Math.min(Math.max(Number(count) || 5, 1), 10);
+    const safeCount = Math.min(Math.max(Number(count) || 10, 1), 20);
 
     const prompt = `You are an expert curriculum assessment creator for Indian education boards (CBSE, ICSE, Cambridge IGCSE) at AcademicLevel.
 Create exactly ${safeCount} challenging, high-quality Multiple Choice Questions (MCQs) for:
 - Board: ${board}
 - Class/Grade: ${grade}
 - Subject: ${subjectId}
+${chapter ? `- Targeted Chapter / Unit: ${chapter}` : ''}
 - Difficulty Level / Progression Node: ${levelNode} (FOUNDATION: core textbook concepts, CONCEPT: application & word problems, EXAM_READY: typical board exam patterns, OLYMPIAD: competitive Olympiad level).
 
 CRITICAL REQUIREMENTS:

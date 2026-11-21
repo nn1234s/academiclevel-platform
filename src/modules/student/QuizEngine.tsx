@@ -90,13 +90,29 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
 
   const scrollToQuizTop = useCallback(() => {
     if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      try {
-        if (document.documentElement) document.documentElement.scrollTop = 0;
-        if (document.body) document.body.scrollTop = 0;
-      } catch {
-        // ignore
-      }
+      const executeScroll = (smooth = false) => {
+        try {
+          if (quizContainerRef.current) {
+            const rect = quizContainerRef.current.getBoundingClientRect();
+            const headerOffset = 90; // offset for sticky header
+            const targetY = (window.pageYOffset || document.documentElement.scrollTop || 0) + rect.top - headerOffset;
+            window.scrollTo({
+              top: Math.max(0, targetY),
+              behavior: smooth ? 'smooth' : 'auto'
+            });
+          } else {
+            window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+          }
+        } catch {
+          window.scrollTo(0, 0);
+        }
+      };
+
+      // Immediate snap to top so the UI responds immediately on click
+      executeScroll(false);
+      // Re-trigger after React renders the new question content into the DOM
+      setTimeout(() => executeScroll(false), 40);
+      setTimeout(() => executeScroll(true), 150);
     }
   }, []);
 

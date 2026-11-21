@@ -1,4 +1,5 @@
 import { Question, Board, Grade, LevelNode } from '../core/types';
+import { CurriculumService } from './curriculumService';
 
 export class OfflineBankService {
   private static STORAGE_KEY = 'al_prod_offline_question_bank_v1';
@@ -445,38 +446,52 @@ export class OfflineBankService {
   }
 
   public static getFallbackChapters(grade: Grade, subjectId: string): { chapter: string; questionCount: number }[] {
+    try {
+      const list = CurriculumService.getChaptersForSubject('CBSE', grade, subjectId);
+      if (list && list.length > 0) {
+        return list.map(c => ({ chapter: c.title, questionCount: c.questionCount }));
+      }
+    } catch {
+      // fallback below
+    }
     const norm = (subjectId || '').toLowerCase();
     if (norm.includes('math')) {
       if (grade <= 3) {
         return [
-          { chapter: 'Basic Addition & Word Problems', questionCount: 20 },
-          { chapter: 'Basic Subtraction & Place Values', questionCount: 20 },
-          { chapter: 'Multiplication Tables & Grouping', questionCount: 20 },
-          { chapter: 'Basic 2D Shapes & Measurements', questionCount: 15 }
+          { chapter: 'Addition & Word Problems', questionCount: 10 },
+          { chapter: 'Subtraction & Regrouping', questionCount: 10 },
+          { chapter: 'Number Sequences & Place Value', questionCount: 10 },
+          { chapter: '2D Shapes & Spatial Sense', questionCount: 10 },
+          { chapter: 'Total Arithmetic Revision', questionCount: 10 }
         ];
       }
       if (grade <= 8) {
         return [
-          { chapter: 'Fractions & Decimal Operations', questionCount: 25 },
-          { chapter: 'Algebraic Expressions & Identities', questionCount: 25 },
-          { chapter: 'Linear Equations in One Variable', questionCount: 20 },
-          { chapter: 'Perimeter, Area & Mensuration', questionCount: 20 }
+          { chapter: 'Integers & Number Line', questionCount: 10 },
+          { chapter: 'Rational Numbers & Exponents', questionCount: 10 },
+          { chapter: 'Algebraic Expressions & Identities', questionCount: 10 },
+          { chapter: 'Linear Equations in One Variable', questionCount: 10 },
+          { chapter: 'Ratio, Proportion & Percentages', questionCount: 10 },
+          { chapter: 'Geometry & Triangles', questionCount: 10 },
+          { chapter: 'Total Arithmetic & Algebra Revision', questionCount: 10 }
         ];
       }
       return [
-        { chapter: 'Real Numbers & Polynomials', questionCount: 50 },
-        { chapter: 'Quadratic Equations (Nature of Roots)', questionCount: 50 },
-        { chapter: 'Arithmetic Progressions (AP)', questionCount: 50 },
-        { chapter: 'Coordinate Geometry (Distance Formula)', questionCount: 50 },
-        { chapter: 'Introduction to Trigonometry', questionCount: 50 },
-        { chapter: 'Circles & Tangents', questionCount: 50 },
-        { chapter: 'Statistics & Probability', questionCount: 50 }
+        { chapter: 'Real Numbers & Polynomials', questionCount: 10 },
+        { chapter: 'Linear Equations in Two Variables', questionCount: 10 },
+        { chapter: 'Quadratic Equations (Nature of Roots)', questionCount: 10 },
+        { chapter: 'Arithmetic Progressions (AP)', questionCount: 10 },
+        { chapter: 'Introduction to Trigonometry & Heights/Distances', questionCount: 10 },
+        { chapter: 'Coordinate Geometry (Distance Formula)', questionCount: 10 },
+        { chapter: 'Circles & Surface Areas', questionCount: 10 },
+        { chapter: 'Statistics & Probability', questionCount: 10 },
+        { chapter: 'Total Secondary Mathematics Revision', questionCount: 10 }
       ];
     }
     return [
-      { chapter: 'Foundational Concepts & Principles', questionCount: 25 },
-      { chapter: 'Core Analytical Problem Solving', questionCount: 25 },
-      { chapter: 'Exam High-Yield Revision Topics', questionCount: 25 }
+      { chapter: 'Foundational Concepts & Principles', questionCount: 10 },
+      { chapter: 'Core Analytical Problem Solving', questionCount: 10 },
+      { chapter: 'Exam High-Yield Revision Topics', questionCount: 10 }
     ];
   }
 
