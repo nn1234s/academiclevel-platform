@@ -151,12 +151,18 @@ export class HybridQuizService {
       }
 
       if (raceResult.success && Array.isArray(raceResult.questions) && raceResult.questions.length > 0) {
+        let finalQuestions = raceResult.questions;
+        if (finalQuestions.length < count) {
+          const needed = count - finalQuestions.length;
+          const supplement = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, needed, chapter);
+          finalQuestions = [...finalQuestions, ...supplement.filter((s: Question) => !finalQuestions.some((q: Question) => q.id === s.id))];
+        }
         return {
-          questions: raceResult.questions,
+          questions: finalQuestions.slice(0, count),
           source: 'GEMINI_LIVE',
           model: raceResult.model || 'gemini-3.5-flash-lite',
           latencyMs: Date.now() - startTime,
-          notice: 'Live AI Generated via Google Gemini 3.5 Flash Lite'
+          notice: 'Live AI Generated via Google Gemini'
         };
       }
 
