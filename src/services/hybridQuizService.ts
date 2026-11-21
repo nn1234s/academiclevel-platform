@@ -106,18 +106,19 @@ export class HybridQuizService {
     grade: Grade,
     subjectId: string,
     levelNode: LevelNode,
-    count = 5
+    count = 10,
+    chapter?: string
   ): Promise<HybridQuizResult> {
     const startTime = Date.now();
 
     // Check preference: If user explicitly opted out of live AI, jump straight to bank
-    if (!this.getPreferLiveAi()) {
-      const qList = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, count);
+    if (!this.getPreferLiveAi() || chapter) {
+      const qList = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, count, chapter);
       return {
         questions: qList,
         source: 'CURATED_OFFLINE',
         latencyMs: Date.now() - startTime,
-        notice: 'Served from Curated Syllabus Bank (Offline mode requested)'
+        notice: chapter ? `Practicing Chapter: ${chapter}` : 'Served from Curated Syllabus Bank'
       };
     }
 
@@ -126,7 +127,7 @@ export class HybridQuizService {
       const serverFetchPromise = fetch('/api/ai/generate-quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ board, grade, subjectId, levelNode, count })
+        body: JSON.stringify({ board, grade, subjectId, levelNode, count, chapter })
       }).then(async (res) => {
         if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
         return res.json();
@@ -140,7 +141,7 @@ export class HybridQuizService {
 
       if ('timeout' in raceResult) {
         console.warn('[HybridQuizService] Server AI call timed out; engaging syllabus bank fallback.');
-        const qList = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, count);
+        const qList = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, count, chapter);
         return {
           questions: qList,
           source: 'CURATED_OFFLINE',
@@ -185,7 +186,7 @@ export class HybridQuizService {
     }
 
     // Default Fallback: Instant curated offline question bank from server or local
-    const qList = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, count);
+    const qList = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, count, chapter);
     return {
       questions: qList,
       source: 'CURATED_OFFLINE',
