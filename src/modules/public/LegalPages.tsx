@@ -134,14 +134,14 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
               <li>To respond to support, protect the service, troubleshoot errors and prevent misuse.</li>
             </ul>
 
-            <h3 className="text-base font-bold text-slate-900 mt-4">Service providers and sharing</h3>
+            <h3 className="text-base font-bold text-slate-900 mt-4">Service providers, Turso Cloud Database &amp; Sharing</h3>
             <p>
-              AcademicLevel uses Render hosting and SQLite backend database services to operate the app. Information necessary for those services may be processed by the relevant provider under its own terms and privacy practices. We do not operate those providers&apos; infrastructure. We do not intentionally make learner profiles or private chat histories public. We may disclose information where required by law, to protect users or the service, or as part of a legitimate business transfer. We do not state that no third-party processing occurs.
+              AcademicLevel uses high-reliability cloud hosting and managed Turso (libSQL) database infrastructure to operate the application and securely store user accounts, completed quizzes, subscriptions, coin balances, and gift requests with encryption-at-rest. Information necessary for these services is processed under enterprise data protection standards. We do not sell or trade personal user information. We may disclose information where required by law, to protect student safety, or enforce our terms of service.
             </p>
 
             <h3 className="text-base font-bold text-slate-900 mt-4">Storage, security and retention</h3>
             <p>
-              We use account access controls and the hosting platform&apos;s security features, but no internet service can promise absolute security. Account and learning data may remain in cloud backups or local browser storage for a period needed to provide the service, resolve issues or meet legal obligations. Local data may remain on a device after sign-out until browser storage is cleared.
+              We employ strict authentication guards, role-based access controls, and Turso cloud database encryption. User account details, learning progression, and subscription records are retained while the account is active. Non-essential client preferences are stored locally in browser storage. Account deletion via our dedicated flow permanently removes all user records from active cloud database tables.
             </p>
 
             <h3 className="text-base font-bold text-slate-900 mt-4">Your choices and requests</h3>
@@ -172,9 +172,9 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
               Upon account deletion, all profile data, learning records, quiz scores, certificates, and coin balances are permanently purged from active databases, and all login sessions are immediately revoked.
             </p>
 
-            <h3 className="text-base font-bold text-slate-900 mt-4">Cookies and similar technologies</h3>
+            <h3 className="text-base font-bold text-slate-900 mt-4">Cookies and Analytics Technologies</h3>
             <p>
-              The app uses browser local storage for core functionality. Hosting, authentication or embedded service providers may use their own cookies or similar technologies. Browser settings can restrict storage, but doing so may affect sign-in or saved progress.
+              AcademicLevel uses local browser storage for essential platform functionality, session persistence, and progress caching. Non-intrusive analytics cookies or anonymous metrics may be used to evaluate page performance and platform reliability without collecting personal student identities. You may adjust cookie preferences in your browser at any time without impacting basic quiz access.
             </p>
           </section>
 
@@ -189,183 +189,7 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
             <ul className="list-disc pl-5 space-y-2">
               <li>Parents/guardians should review this policy, supervise account creation and use, and contact us about a child&apos;s account or personal information.</li>
               <li>Do not share personal contact details, school address, passwords, photos, precise location or private family information in Nova chats or public/support content.</li>
-              <li>Nova is an automated study helper, not a person, counsellor, teacher import React, { useEffect, useState } from 'react';
-import { Mail, ExternalLink, AlertCircle } from 'lucide-react';
-import { SiteConfigService } from '../../services/siteConfigService';
-
-/**
- * Updated LegalPages component to reflect Turso data storage, analytics cookies, and contact link.
- */
-interface LegalPageProps {
-  pageType: 'PRIVACY' | 'TERMS' | 'SAFETY' | 'POLICIES';
-}
-
-export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
-  const [legalConfig, setLegalConfig] = useState(() => SiteConfigService.getLegal());
-
-  useEffect(() => {
-    return SiteConfigService.subscribe(() => {
-      setLegalConfig(SiteConfigService.getLegal());
-    });
-  }, []);
-
-  useEffect(() => {
-    if (pageType === 'TERMS') {
-      document.getElementById('terms')?.scrollIntoView({ behavior: 'smooth' });
-    } else if (pageType === 'SAFETY') {
-      document.getElementById('children')?.scrollIntoView({ behavior: 'smooth' });
-    } else if (pageType === 'PRIVACY') {
-      document.getElementById('privacy')?.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, [pageType]);
-
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-16">
-      {/* Hero Header with Deep Violet Gradient */}
-      <header className="bg-gradient-to-br from-[#180928] via-[#2e1065] to-[#3b0764] text-white py-12 px-4 sm:px-6 lg:px-8 shadow-inner">
-        <div className="max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 border border-white/20 backdrop-blur-md text-xs font-bold tracking-wide text-white mb-4">
-            <span className="text-amber-400 font-extrabold">A✦</span> AcademicLevel
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">
-            Policies &amp; Privacy
-          </h1>
-          <p className="text-sm sm:text-base text-slate-200 max-w-2xl leading-relaxed">
-            Clear information for learners, parents and teachers about using AcademicLevel, how information is handled, and how to contact us.
-          </p>
-        </div>
-      </header>
-
-      {/* Main Container */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 -mt-6">
-        {/* On this page Navigation Pills */}
-        <section className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs mb-8">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3">On this page</h2>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { id: 'privacy', label: 'Privacy policy' },
-              { id: 'children', label: 'Children & student safety' },
-              { id: 'terms', label: 'Terms of use' },
-              { id: 'acceptable', label: 'Acceptable use' },
-              { id: 'ai', label: 'AI & learning disclaimer' },
-              { id: 'payments', label: 'Premium, payments & ACodes' },
-              { id: 'rewards', label: 'Coins & rewards' },
-              { id: 'refunds', label: 'Refunds & complaints' },
-              { id: 'changes', label: 'Policy changes' },
-            ].map(pill => (
-              <button
-                key={pill.id}
-                onClick={() => scrollToSection(pill.id)}
-                className="px-3.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs sm:text-sm font-semibold transition-colors border border-indigo-100 cursor-pointer"
-              >
-                {pill.label}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* Content Card */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-10 text-sm leading-relaxed text-slate-700">
-          <div className="inline-block px-3 py-1 rounded-md bg-slate-100 text-slate-600 text-xs font-semibold">
-            Privacy Policy · Effective date: {legalConfig.lastUpdatedDate || 'November 2026'}
-          </div>
-
-          {/* 1. Privacy Policy */}
-          <section id="privacy" className="space-y-4 pt-2">
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3">
-              1. {legalConfig.privacyPolicyHeading || 'Privacy Policy'}
-            </h2>
-            {legalConfig.privacySummary && (
-              <div className="p-4 bg-indigo-50/70 border border-indigo-200/80 rounded-xl text-xs sm:text-sm text-indigo-950 font-medium leading-relaxed">
-                <strong>Executive Summary:</strong> {legalConfig.privacySummary}
-              </div>
-            )}
-            <p>
-              AcademicLevel ("AcademicLevel", "we", "us"), operated by ZingQuark (ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385), provides online curriculum mastery learning, quizzes, courses, an AI study assistant called Nova, learner profiles, learning points, and paid membership subscription plans (Lite, Plus, 1‑Year Gold VIP, and Institutional School Packs) required for active curriculum progression, unlimited practice, and verifiable certificates. Contact: <a href={`mailto:${legalConfig.contactEmail || 'academiclevels@gmail.com'}`} className="text-indigo-600 hover:underline font-medium">{legalConfig.contactEmail || 'academiclevels@gmail.com'}</a>.
-            </p>
-
-            <h3 className="text-base font-bold text-slate-900 mt-4">Information the service processes</h3>
-            <ul className="list-disc pl-5 space-y-2">
-              <li><strong>Account and sign‑in information:</strong> account identifiers and the email address made available by the sign‑in service, to authenticate you and associate your learner profile with your account.</li>
-              <li><strong>Learner profile:</strong> the learner name you enter, selected class/grade, learning coins, completed levels, quiz count, course progress and Premium plan/expiry information.</li>
-              <li><strong>Learning and AI inputs:</strong> when you use Nova or generate a quiz, the app sends the relevant prompt or learning request, class, subject, course/level details and, for Nova chat, recent conversation messages needed to answer.</li>
-              <li><strong>Device storage:</strong> the app uses browser local storage to remember settings and learning progress on the device. Some profile data is also saved to your signed‑in AcademicLevel account so it can sync across devices.</li>
-              <li><strong>Support messages:</strong> if you email us, we receive the email address and the information you choose to include.</li>
-            </ul>
-
-            {/* Turso data storage note */}
-            <h3 className="text-base font-bold text-slate-900 mt-4">Data storage on Turso</h3>
-            <p>
-              All persistent user data—including learner profiles, quiz results, coin balances, and subscription status—is stored in a Turso SQL database. Turso provides encrypted-at‑rest storage and automatic backups. We retain this data for as long as the account remains active or as required by law. Deleting your account (see the Account Deletion section) triggers immediate removal of all rows associated with that account from Turso.
-            </p>
-
-            {/* Analytics cookies */}
-            <h3 className="text-base font-bold text-slate-900 mt-4">Analytics and tracking cookies</h3>
-            <p>
-              We embed lightweight analytics scripts (e.g., Plausible) to understand usage patterns and improve the platform. These scripts set first‑party cookies that record page views, navigation events, and anonymised performance metrics. No personal identifiers are stored in these cookies.
-            </p>
-            <p>
-              A cookie consent banner (see below) is shown on first visit; users may accept or reject analytics cookies. Rejecting analytics does not affect core functionality.
-            </p>
-
-            <h3 className="text-base font-bold text-slate-900 mt-4">Why information is used</h3>
-            <ul className="list-disc pl-5 space-y-1.5">
-              <li>To sign you in, maintain your learner profile and sync progress.</li>
-              <li>To provide grade‑appropriate quizzes, courses, AI study responses, certificates and learning features.</li>
-              <li>To maintain coins, plan status and ACode creation/redemption records.</li>
-              <li>To respond to support, protect the service, troubleshoot errors and prevent misuse.</li>
-            </ul>
-
-            <h3 className="text-base font-bold text-slate-900 mt-4">Service providers and sharing</h3>
-            <p>
-              AcademicLevel uses Render hosting and Turso database services to operate the app. Information necessary for those services may be processed by the relevant provider under its own terms and privacy practices. We do not intentionally make learner profiles or private chat histories public. We may disclose information where required by law, to protect users or the service, or as part of a legitimate business transfer. We do not state that no third‑party processing occurs.
-            </p>
-
-            <h3 className="text-base font-bold text-slate-900 mt-4">Storage, security and retention</h3>
-            <p>
-              We use account access controls and the hosting platform’s security features, but no internet service can promise absolute security. Account and learning data may remain in cloud backups or local browser storage for a period needed to provide the service, resolve issues or meet legal obligations. Local data may remain on a device after sign‑out until browser storage is cleared.
-            </p>
-
-            <h3 className="text-base font-bold text-slate-900 mt-4">Your choices and requests</h3>
-            <p>
-              You or your parent/guardian may ask to access, correct or delete learner information, withdraw consent where applicable, or raise a privacy concern by emailing <a href="mailto:academiclevels@gmail.com" className="text-indigo-600 hover:underline font-medium">academiclevels@gmail.com</a> with the subject "Privacy Request". Include the account email and enough detail to identify the request; do not send passwords or identity documents unless we specifically explain a safe and necessary process. We may need to verify authority before acting. We will respond within a reasonable time and handle requests under applicable law.
-            </p>
-
-            {/* Account & Data Deletion */}
-            <h3 className="text-base font-bold text-slate-900 mt-4">Account &amp; Data Deletion (Google Play &amp; DPDP Policy Compliance)</h3>
-            <p>
-              In accordance with Google Play’s Account Deletion Policy and applicable data protection regulations, users and guardians may request and execute permanent deletion of their account and all associated personal data:
-            </p>
-            <ul className="list-disc pl-5 space-y-1.5 mt-2">
-              <li><strong>In‑App Deletion:</strong> Authenticated learners can delete their account directly within the application under <strong>Profile &gt; Danger Zone &gt; Delete Account</strong>.</li>
-              <li><strong>Web Deletion Portal:</strong> Anyone who has created an account may initiate complete account and personal data deletion via our dedicated web URL at <a href="/delacc" className="text-indigo-600 hover:underline font-bold">https://academiclevel.in/delacc</a>.</li>
-            </ul>
-            <p className="mt-2 text-xs text-slate-600">
-              Upon account deletion, all profile data, learning records, quiz scores, certificates, and coin balances are permanently purged from active databases, and all login sessions are immediately revoked.
-            </p>
-
-            <h3 className="text-base font-bold text-slate-900 mt-4">Cookies and similar technologies</h3>
-            <p>
-              The app uses browser local storage for core functionality. Hosting, authentication or embedded service providers may use their own cookies or similar technologies. Browser settings can restrict storage, but doing so may affect sign‑in or saved progress.
-            </p>
-          </section>
-
-          {/* Additional sections omitted for brevity */}
-        </div>
-      </main>
-    </div>
-  );
-};
-ment or emergency service. Do not rely on it for safety, health or other urgent decisions.</li>
+              <li>Nova is an automated study helper, not a person, counsellor, teacher replacement or emergency service. Do not rely on it for safety, health or other urgent decisions.</li>
               <li>
                 If you believe a child&apos;s information has been submitted without appropriate permission, contact{' '}
                 <a href="mailto:academiclevels@gmail.com" className="text-indigo-600 hover:underline font-medium">
