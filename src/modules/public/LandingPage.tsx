@@ -356,6 +356,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         {/* Action CTAs */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button
+            onClick={() => onOpenAuth('REGISTER')}
+            className="w-full sm:w-auto px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm rounded-2xl shadow-xl shadow-emerald-950 transition-all flex items-center justify-center space-x-2 hover:scale-[1.02] cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 text-slate-950" />
+            <span>Start Free Practice (3 Levels Free)</span>
+          </button>
+
           <a
             href="/special49"
             className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-2xl shadow-xl shadow-orange-950 transition-all flex items-center justify-center space-x-2 hover:scale-[1.02] cursor-pointer"
@@ -370,6 +378,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           >
             Sign In (Existing User)
           </button>
+        </div>
+
+        {/* Free Plan Promotion Callout */}
+        <div className="mt-4 flex items-center justify-center">
+          <span className="inline-flex items-center space-x-2 px-4 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            <span>100% Free Student Account Available • Master 3 Curriculum Levels Free • No Credit Card Required</span>
+          </span>
         </div>
 
         {/* Trust Points */}
@@ -813,16 +829,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* 8. TRANSPARENT PRICING PREVIEW */}
-      <section className="max-w-4xl mx-auto px-4">
+      <section className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-10">
-          <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-400 uppercase bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">
-            Accessible Pricing for Every Indian Family
+          <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-400 uppercase bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
+            Free Starter &amp; Transparent Memberships
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-2">
-            No Exploitative Coaching Fees
+            Start 100% Free • Upgrade When Ready
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Top-tier educational AI at less than ₹1 per day.
+            Master 3 curriculum levels free on any subject, or unlock full unlimited access at less than ₹1 per day.
           </p>
         </div>
 
@@ -861,7 +877,57 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Free Starter Plan */}
+          <div className="bg-slate-900 border-2 border-emerald-500/60 rounded-3xl p-6 sm:p-7 flex flex-col justify-between shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-emerald-500 text-slate-950 text-[9px] font-black tracking-wider uppercase px-3 py-1 rounded-bl-xl shadow-xs">
+              100% FREE
+            </div>
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-bold text-emerald-300">FREE STARTER</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
+                  Lifetime Free
+                </span>
+              </div>
+              <div className="flex items-baseline space-x-1 mb-4">
+                <span className="text-4xl font-black text-white">₹0</span>
+                <span className="text-xs text-slate-400">/ forever (no card needed)</span>
+              </div>
+              <ul className="space-y-2 text-xs text-slate-300">
+                <li className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>3 Complete Curriculum Levels</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>All 12 Classes (CBSE, ICSE, IGCSE)</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Instant Socratic AI Hints</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Diagnostic Mailbox Reports</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Earn Study Coins on Every Quiz</span>
+                </li>
+              </ul>
+            </div>
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={() => onOpenAuth('REGISTER')}
+                className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 text-slate-950" />
+                <span>SIGN UP FREE (3 LEVELS) 🚀</span>
+              </button>
+            </div>
+          </div>
           {/* Lite Plan */}
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-xl">
             <div>
