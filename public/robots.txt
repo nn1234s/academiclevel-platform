@@ -1,6 +1,20 @@
 # AcademicLevel Enterprise Robots Directive
 User-agent: *
 Allow: /
+Allow: /curriculum
+Allow: /school
+Allow: /pricing
+Allow: /about
+Allow: /faq
+Allow: /privacy
+Allow: /terms
+Allow: /safety
+Allow: /halloffame
+Allow: /most-innovative-edtech
+Allow: /delacc
+Allow: /gift-store
+Allow: /sitemap
+Allow: /special49
 Allow: /advert1
 Allow: /ads
 
