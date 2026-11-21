@@ -70,6 +70,8 @@ export class ApiClient {
     parentName?: string;
     parentPin?: string;
     referredByCode?: string;
+    planTier?: string;
+    utrReference?: string;
   }): Promise<{ success: boolean; learner: Learner; token: string }> {
     return this.request('/auth/register', {
       method: 'POST',
