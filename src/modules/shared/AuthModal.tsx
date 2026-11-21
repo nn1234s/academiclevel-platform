@@ -279,7 +279,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 Create Account
               </h1>
               <p className="text-xs text-slate-400 font-medium mb-4">
-                Register your learner workspace & start curriculum practice.
+                Free student account (Master up to 3 curriculum levels free) • Upgrade anytime.
               </p>
 
               {errorMessage && (

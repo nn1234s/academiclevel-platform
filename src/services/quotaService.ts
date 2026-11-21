@@ -13,7 +13,7 @@ export interface QuotaStatus {
   levelsCompleted: number;
   maxLevels: number;
   hasActiveSubscription: boolean;
-  activePlan?: 'LITE' | 'PLUS' | 'GOLD' | 'TRIAL';
+  activePlan?: 'LITE' | 'PLUS' | 'GOLD' | 'TRIAL' | 'FREE';
   expiresAt?: string;
   daysRemaining?: number;
 }
@@ -79,9 +79,10 @@ export class QuotaService {
       };
     }
 
-    // 2. Direct check: Has active subscription already attached to learner object
+    // 2. Direct check: Has verified active subscription already attached to learner object
     const anyLearner = learner as any;
-    if (anyLearner.hasActiveSubscription || anyLearner.activeSub || (anyLearner.activePlan && anyLearner.activePlan !== 'FREE')) {
+    const hasExplicitActiveSub = Boolean(anyLearner.hasActiveSubscription) && anyLearner.activePlan && anyLearner.activePlan !== 'FREE';
+    if (hasExplicitActiveSub || (anyLearner.activeSub && anyLearner.activeSub.status === 'ACTIVE')) {
       const sub = anyLearner.activeSub;
       const plan = anyLearner.activePlan || sub?.planTier || anyLearner.planTier || 'LITE';
       const expiresAt = anyLearner.subscriptionExpiresAt || sub?.expiresAt || new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString();
@@ -93,9 +94,9 @@ export class QuotaService {
 
       return {
         isLocked: daysRemaining <= 0,
-        quizzesCompleted: learner.quizzesCompletedCount,
+        quizzesCompleted: learner.quizzesCompletedCount || 0,
         maxQuizzes: Infinity,
-        levelsCompleted: learner.levelsCompletedCount,
+        levelsCompleted: learner.levelsCompletedCount || 0,
         maxLevels: Infinity,
         hasActiveSubscription: daysRemaining > 0,
         activePlan: plan as any,
@@ -114,9 +115,9 @@ export class QuotaService {
 
       return {
         isLocked: daysRemaining <= 0,
-        quizzesCompleted: learner.quizzesCompletedCount,
+        quizzesCompleted: learner.quizzesCompletedCount || 0,
         maxQuizzes: Infinity,
-        levelsCompleted: learner.levelsCompletedCount,
+        levelsCompleted: learner.levelsCompletedCount || 0,
         maxLevels: Infinity,
         hasActiveSubscription: daysRemaining > 0,
         activePlan: activeSub.planTier,
@@ -125,24 +126,23 @@ export class QuotaService {
       };
     }
 
-    // 4. Default 60-Day Concept Booster Pass for ALL registered scholars (no free plan or 10/25 quiz limit)
-    const createdAtMs = learner.createdAt ? new Date(learner.createdAt).getTime() : Date.now();
-    const defaultExpiryMs = createdAtMs + 60 * 24 * 60 * 60 * 1000;
-    const msLeft = defaultExpiryMs - Date.now();
-    const daysRemaining = Math.min(60, Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24))));
-    const isExpired = daysRemaining <= 0;
+    // 4. Free Tier Account: Strictly limited to 3 completed curriculum levels
+    const levelsCompleted = learner.levelsCompletedCount || 0;
+    const isLocked = levelsCompleted >= FREE_TIER_MAX_LEVELS;
 
     return {
-      isLocked: isExpired,
-      reason: isExpired ? 'Your 60-Day Concept Booster pass has ended. Upgrade to continue unlimited quizzes.' : undefined,
-      quizzesCompleted: learner.quizzesCompletedCount,
+      isLocked,
+      reason: isLocked
+        ? `You have completed the free account limit of ${FREE_TIER_MAX_LEVELS} curriculum levels. Upgrade to Lite (₹49) or Plus (₹129) to unlock all levels!`
+        : undefined,
+      quizzesCompleted: learner.quizzesCompletedCount || 0,
       maxQuizzes: Infinity,
-      levelsCompleted: learner.levelsCompletedCount,
-      maxLevels: Infinity,
-      hasActiveSubscription: !isExpired,
-      activePlan: 'LITE',
-      expiresAt: new Date(defaultExpiryMs).toISOString(),
-      daysRemaining
+      levelsCompleted,
+      maxLevels: FREE_TIER_MAX_LEVELS,
+      hasActiveSubscription: false,
+      activePlan: 'FREE',
+      expiresAt: undefined,
+      daysRemaining: undefined
     };
   }
 
