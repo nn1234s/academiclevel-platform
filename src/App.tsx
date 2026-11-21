@@ -24,6 +24,7 @@ import { InnovativeEdtechPage } from './modules/public/InnovativeEdtechPage';
 import { NotFoundPika } from './modules/public/NotFoundPika';
 import { AccountDeletionPage } from './modules/public/AccountDeletionPage';
 import { SchoolPortalPage } from './modules/public/SchoolPortalPage';
+import { SitemapPage } from './modules/public/SitemapPage';
 
 // Student Modules
 import { StudentDashboard } from './modules/student/StudentDashboard';
@@ -193,6 +194,7 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
     p === '/edtech-award'
   ) return { route: 'INNOVATIVE_EDTECH' };
 
+  if (p === '/sitemap' || p === '/sitemap.html') return { route: 'SITEMAP' };
   if (p === '/curriculum') return { route: isAuth ? 'COURSES' : 'PUBLIC_COURSES' };
   if (p.startsWith('/verify')) return { route: 'VERIFY_CERTIFICATE' };
 
@@ -234,6 +236,7 @@ function getPathForRoute(route: string): string {
     case 'ACCOUNT_DELETION': return '/delacc';
     case 'HALL_OF_FAME': return '/halloffame';
     case 'INNOVATIVE_EDTECH': return '/most-innovative-edtech';
+    case 'SITEMAP': return '/sitemap';
     case 'VERIFY_CERTIFICATE': return '/verify';
     case 'DASHBOARD': return '/';
     case 'COURSES': return '/courses';
@@ -659,7 +662,8 @@ export const App: React.FC = () => {
                         currentRoute === 'FAQ' ||
                         currentRoute === 'HALL_OF_FAME' ||
                         currentRoute === 'INNOVATIVE_EDTECH' ||
-                        currentRoute === 'PRIVACY'
+                        currentRoute === 'PRIVACY' ||
+                        currentRoute === 'SITEMAP'
                           ? 'text-indigo-400 font-bold bg-indigo-500/10'
                           : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
                       }`}
@@ -779,6 +783,26 @@ export const App: React.FC = () => {
                               </p>
                               <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
                                 Privacy protection, DPDP &amp; cancellation policy
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('SITEMAP');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <Compass className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-white group-hover:text-indigo-300 transition-colors">
+                                Sitemap &amp; Directory
+                              </p>
+                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                                Public index of curriculum, plans, schools &amp; legal
                               </p>
                             </div>
                           </button>
@@ -1058,6 +1082,13 @@ export const App: React.FC = () => {
                     <FileText className="w-4 h-4 text-slate-400" />
                     <span>Terms, Privacy &amp; 20-Min Refund</span>
                   </button>
+                  <button
+                    onClick={() => navigateTo('SITEMAP')}
+                    className="w-full text-left p-2 rounded-xl text-indigo-400 font-medium hover:bg-slate-800 flex items-center space-x-2"
+                  >
+                    <Compass className="w-4 h-4 text-indigo-400" />
+                    <span>Sitemap &amp; Directory</span>
+                  </button>
                 </div>
               </div>
             ) : (
@@ -1209,6 +1240,9 @@ export const App: React.FC = () => {
           )}
           {currentRoute === 'INNOVATIVE_EDTECH' && (
             <InnovativeEdtechPage onBack={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')} />
+          )}
+          {currentRoute === 'SITEMAP' && (
+            <SitemapPage onNavigate={navigateTo} />
           )}
           {currentRoute === 'VERIFY_CERTIFICATE' && (
             <CertificateVerificationView
@@ -1484,7 +1518,7 @@ export const App: React.FC = () => {
                 <ul className="space-y-2 text-xs">
                   <li>
                     <button
-                      onClick={() => navigateTo('DASHBOARD')}
+                      onClick={() => navigateTo('PUBLIC_COURSES')}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       CBSE Classes 1–12
@@ -1492,7 +1526,7 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('DASHBOARD')}
+                      onClick={() => navigateTo('PUBLIC_COURSES')}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       ICSE / CISCE Board
@@ -1500,7 +1534,7 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('DASHBOARD')}
+                      onClick={() => navigateTo('PUBLIC_COURSES')}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Cambridge IGCSE
@@ -1508,7 +1542,7 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('DASHBOARD')}
+                      onClick={() => navigateTo('PUBLIC_COURSES')}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Olympiad &amp; Foundations
@@ -1557,7 +1591,7 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('PRICING')}
+                      onClick={() => navigateTo('SCHOOL_PORTAL')}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Institutional School Pack
@@ -1565,7 +1599,7 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('PREMIUM')}
+                      onClick={() => navigateTo('PRICING')}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Pricing Overview
@@ -1610,6 +1644,14 @@ export const App: React.FC = () => {
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Security &amp; Bug Bounty
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('SITEMAP')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Sitemap &amp; Directory
                     </button>
                   </li>
                   <li>
