@@ -261,8 +261,8 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate }) => {
         {
           label: 'AcademicLevel on Instagram',
           description: 'Daily quiz challenges, student shoutouts, and study motivation reels.',
-          externalHref: 'https://instagram.com/academiclevels',
-          pill: 'instagram.com/academiclevels'
+          externalHref: 'https://instagram.com/academiclevel1',
+          pill: 'instagram.com/academiclevel1'
         }
       ]
     }

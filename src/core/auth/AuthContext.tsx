@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Learner, Board, Grade } from '../types';
+import { Learner, Board, Grade, Subscription } from '../types';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../storage/StorageRLSLayer';
 import { ApiClient } from '../api/apiClient';
 
@@ -19,6 +19,8 @@ interface AuthContextType {
     parentName?: string;
     parentPin?: string;
     referredByCode?: string;
+    planTier?: string;
+    utrReference?: string;
   }) => Promise<{ success: boolean; error?: string }>;
   loginStudent: (email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
   loginSuperAdmin: (adminEmailInput?: string) => { success: boolean; error?: string };
@@ -207,6 +209,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     parentName?: string;
     parentPin?: string;
     referredByCode?: string;
+    planTier?: string;
+    utrReference?: string;
   }) => {
     try {
       // 1. Write to real SQLite backend REST API
@@ -257,11 +261,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     StorageRLSLayer.saveLearner(newLearner, learnerId);
 
-    // Standard new student registration defaults to free tier.
-    // Paid subscriptions are activated ONLY when the student taps the Pay Now button and completes gateway payment.
-    (newLearner as any).hasActiveSubscription = false;
-    (newLearner as any).activePlan = 'FREE';
-    (newLearner as any).planTier = 'FREE';
+    // If registered via ad page or payment gateway checkout with a selected plan:
+    const chosenPlan = (params.planTier || '').toUpperCase();
+    if (chosenPlan && ['LITE', 'PLUS', 'GOLD'].includes(chosenPlan)) {
+      const planTier = chosenPlan as 'LITE' | 'PLUS' | 'GOLD';
+      const durationDays = planTier === 'GOLD' ? 365 : (planTier === 'PLUS' ? 180 : 60);
+      const subExpiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+      (newLearner as any).hasActiveSubscription = true;
+      (newLearner as any).activePlan = planTier;
+      (newLearner as any).planTier = planTier;
+      (newLearner as any).subscriptionExpiresAt = subExpiresAt;
+
+      const sub: Subscription = {
+        id: 'sub_reg_' + Date.now().toString(36),
+        learnerId: newLearner.id,
+        planTier,
+        status: 'ACTIVE',
+        paymentMethod: 'UPI_QR',
+        amountInr: planTier === 'GOLD' ? 205 : (planTier === 'PLUS' ? 129 : 49),
+        durationDays,
+        startsAt: new Date().toISOString(),
+        expiresAt: subExpiresAt,
+        createdAt: new Date().toISOString(),
+        verifiedByAdmin: 'UPI_PG_AUTOMATED_GATEWAY',
+        verifiedAt: new Date().toISOString(),
+        invoiceNumber: `INV-${Math.floor(100000 + Math.random() * 900000)}`
+      };
+      StorageRLSLayer.saveSubscription(sub);
+    } else {
+      // Standard new student registration: Free Tier (up to 3 levels)
+      (newLearner as any).hasActiveSubscription = false;
+      (newLearner as any).activePlan = 'FREE';
+      (newLearner as any).planTier = 'FREE';
+    }
 
     StorageRLSLayer.setSession({
       learnerId: newLearner.id,

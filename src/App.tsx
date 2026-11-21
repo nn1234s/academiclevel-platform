@@ -1795,11 +1795,11 @@ export const App: React.FC = () => {
 
                 {/* Instagram */}
                 <a
-                  href="https://instagram.com/academiclevels"
+                  href="https://instagram.com/academiclevel1"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full border border-neutral-700 hover:border-white text-neutral-400 hover:text-white flex items-center justify-center transition-all hover:scale-110"
-                  title="AcademicLevel Instagram: https://instagram.com/academiclevels"
+                  title="AcademicLevel Instagram: https://instagram.com/academiclevel1"
                   aria-label="Instagram"
                 >
                   <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">

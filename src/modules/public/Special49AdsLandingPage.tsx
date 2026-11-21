@@ -468,7 +468,9 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             password: password.trim(),
             board: selectedBoard,
             grade: selectedClass,
-            parentName: parentName.trim() || 'Parent'
+            parentName: parentName.trim() || 'Parent',
+            planTier: selectedPlanTier,
+            utrReference: cleanUtr || 'UPI-PG-ACTIVE'
           });
           if (regRes.success) {
             const s = StorageRLSLayer.getCurrentSession();

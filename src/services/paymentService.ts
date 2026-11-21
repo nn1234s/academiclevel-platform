@@ -246,8 +246,16 @@ export class PaymentService {
 
     // Synchronize to backend API if server running
     try {
-      await ApiClient.submitPayment(learnerId, tier, subscription.payerUpiId || 'gateway@cit.org.in', txnRef);
-      await ApiClient.adminApprovePayment(SUPER_ADMIN_EMAIL, subId);
+      await fetch('/api/payments/activate-gateway', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          learnerId,
+          tier,
+          utrReference: txnRef,
+          payerUpiId: subscription.payerUpiId
+        })
+      }).catch(() => {});
     } catch {}
 
     return {

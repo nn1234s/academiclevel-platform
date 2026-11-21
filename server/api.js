@@ -499,7 +499,6 @@ apiRouter.post('/auth/register', authLimiter, (req, res) => {
       new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
     );
 
-    // Newly registered learners start on the Free Tier (limited to 3 curriculum levels)
     const newLearner = db.prepare('SELECT * FROM learners WHERE id = ?').get(learnerId);
     if (newLearner) {
       safeReplicateAsync('learners', newLearner);
@@ -507,10 +506,60 @@ apiRouter.post('/auth/register', authLimiter, (req, res) => {
     delete newLearner.passwordHash;
     delete newLearner.passwordSalt;
 
-    newLearner.hasActiveSubscription = false;
-    newLearner.activePlan = 'FREE';
-    newLearner.planTier = 'FREE';
-    newLearner.subscriptionExpiresAt = null;
+    // Check if registering from ad page or payment gateway checkout with a selected plan
+    const requestedPlan = req.body.planTier || req.body.selectedPlanTier;
+    const isPaidPlan = requestedPlan && ['LITE', 'PLUS', 'GOLD'].includes(String(requestedPlan).toUpperCase());
+
+    if (isPaidPlan) {
+      const planTier = String(requestedPlan).toUpperCase();
+      const durationDays = planTier === 'GOLD' ? 365 : (planTier === 'PLUS' ? 180 : 60);
+      const amountInr = planTier === 'GOLD' ? 205 : (planTier === 'PLUS' ? 129 : 49);
+      const subId = 'sub_reg_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+      const subExpiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+      const invoiceNum = 'INV-AD-' + Math.floor(100000 + Math.random() * 900000);
+      const utrRef = req.body.utrReference || req.body.cleanUtr || 'UPI-PG-ACTIVE';
+
+      db.prepare(`
+        INSERT INTO subscriptions (
+          id, learnerId, planTier, status, paymentMethod,
+          utrReference, amountInr, durationDays, startsAt, expiresAt,
+          verifiedByAdmin, verifiedAt, invoiceNumber, createdAt
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        subId, learnerId, planTier, 'ACTIVE', 'UPI_PG_AUTOMATED_GATEWAY',
+        utrRef, amountInr, durationDays, now, subExpiresAt,
+        'UPI_PG_AUTOMATED_GATEWAY', now, invoiceNum, now
+      );
+
+      safeReplicateAsync('subscriptions', {
+        id: subId,
+        learnerId: learnerId,
+        planTier: planTier,
+        status: 'ACTIVE',
+        paymentMethod: 'UPI_PG_AUTOMATED_GATEWAY',
+        utrReference: utrRef,
+        amountInr: amountInr,
+        durationDays: durationDays,
+        startsAt: now,
+        expiresAt: subExpiresAt,
+        verifiedByAdmin: 'UPI_PG_AUTOMATED_GATEWAY',
+        verifiedAt: now,
+        invoiceNumber: invoiceNum,
+        createdAt: now
+      });
+
+      newLearner.hasActiveSubscription = true;
+      newLearner.activePlan = planTier;
+      newLearner.planTier = planTier;
+      newLearner.subscriptionExpiresAt = subExpiresAt;
+      newLearner.subscriptionId = subId;
+    } else {
+      // Standard Free Account (capped at 3 levels)
+      newLearner.hasActiveSubscription = false;
+      newLearner.activePlan = 'FREE';
+      newLearner.planTier = 'FREE';
+      newLearner.subscriptionExpiresAt = null;
+    }
 
     res.json({ success: true, learner: newLearner, token });
   } catch (err) {
@@ -534,6 +583,31 @@ function getActiveSubscriptionForLearner(learner) {
   `).get(learnerId);
 
   if (activeSub) return activeSub;
+
+  // 1b. Check if subscription was associated by email
+  if (learnerEmail) {
+    activeSub = db.prepare(`
+      SELECT * FROM subscriptions 
+      WHERE (learnerId = ? OR learnerId LIKE ?) 
+        AND status = 'ACTIVE' 
+        AND (expiresAt IS NULL OR datetime(expiresAt) > datetime('now'))
+      ORDER BY createdAt DESC LIMIT 1
+    `).get(learnerEmail, `%${learnerEmail}%`);
+    if (activeSub) return activeSub;
+  }
+
+  // 1c. Check if subscription was associated by 10-digit mobile phone
+  if (learnerPhone && learnerPhone.length >= 10) {
+    const phone10 = learnerPhone.slice(-10);
+    activeSub = db.prepare(`
+      SELECT * FROM subscriptions 
+      WHERE (learnerId LIKE ? OR payerUpiId LIKE ?) 
+        AND status = 'ACTIVE' 
+        AND (expiresAt IS NULL OR datetime(expiresAt) > datetime('now'))
+      ORDER BY createdAt DESC LIMIT 1
+    `).get(`%${phone10}%`, `%${phone10}%`);
+    if (activeSub) return activeSub;
+  }
 
   // 2. Specific verified legacy account aliases (Prabir & Special49 only)
   if (learnerEmail === 'prabir2gmailc@gmail.com' || learnerEmail === 'prabir@gmail.com' || learnerId === 'lrn_mw9asujp_rzun' || learnerId === 'lrn_prabir_alias_norm') {
@@ -1230,6 +1304,57 @@ apiRouter.post('/payments/submit', paymentLimiter, (req, res) => {
       message: 'Payment submitted for verification. Our verification desk will review and activate your subscription swiftly.',
       subscription
     });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Automated Gateway Instant Activation
+apiRouter.post('/payments/activate-gateway', (req, res) => {
+  try {
+    const { learnerId, tier, utrReference, payerUpiId } = req.body;
+    if (!learnerId || !tier) {
+      return res.status(400).json({ success: false, error: 'learnerId and tier are required.' });
+    }
+
+    const rawParam = String(learnerId).trim();
+    const cleanEmail = rawParam.toLowerCase();
+    const phoneDigits = rawParam.replace(/[^0-9]/g, '');
+    const phone10 = phoneDigits.length >= 10 ? phoneDigits.slice(-10) : '';
+
+    const canonicalLearner = db.prepare(`
+      SELECT * FROM learners 
+      WHERE id = ? OR email = ? OR (phone IS NOT NULL AND phone = ?) OR email LIKE ?
+    `).get(rawParam, cleanEmail, phone10 || rawParam, `%${phone10 || '___nomatch___'}%`);
+
+    const targetLearnerId = canonicalLearner ? canonicalLearner.id : rawParam;
+    const planTier = String(tier).toUpperCase();
+    const price = planTier === 'GOLD' ? 205 : (planTier === 'PLUS' ? 129 : 49);
+    const durationDays = planTier === 'GOLD' ? 365 : (planTier === 'PLUS' ? 180 : 60);
+
+    const now = new Date();
+    const subExpiresAt = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+    const subId = 'sub_pg_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+    const invoiceNum = 'INV-PG-' + Math.floor(100000 + Math.random() * 900000);
+    const finalUtr = utrReference ? String(utrReference).trim() : `UPIPG-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    db.prepare(`
+      INSERT INTO subscriptions (
+        id, learnerId, planTier, status, paymentMethod,
+        utrReference, payerUpiId, amountInr, durationDays, startsAt, expiresAt,
+        verifiedByAdmin, verifiedAt, invoiceNumber, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      subId, targetLearnerId, planTier, 'ACTIVE', 'UPI_PG_AUTOMATED_GATEWAY',
+      finalUtr, payerUpiId || 'gateway@cit.org.in', price, durationDays, now.toISOString(), subExpiresAt,
+      'UPI_PG_AUTOMATED_GATEWAY', now.toISOString(), invoiceNum, now.toISOString()
+    );
+
+    const subscription = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(subId);
+    safeReplicateAsync('subscriptions', subscription);
+    exportDbToJsonStore();
+
+    res.json({ success: true, subscription });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
