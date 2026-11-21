@@ -197,6 +197,9 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
   if (p === '/sitemap' || p === '/sitemap.html') return { route: 'SITEMAP' };
   if (p === '/curriculum') return { route: isAuth ? 'COURSES' : 'PUBLIC_COURSES' };
   if (p.startsWith('/verify')) return { route: 'VERIFY_CERTIFICATE' };
+  if (p === '/login' || p === '/signin') {
+    return { route: isAuth ? 'DASHBOARD' : 'HOME', intendedProtected: isAuth ? undefined : 'DASHBOARD' };
+  }
 
   // 4. Protected Student Routes
   if (PROTECTED_STUDENT_ROUTES[p]) {
@@ -469,6 +472,10 @@ export const App: React.FC = () => {
             setAuthModalOpen(false);
           }}
           initialMode={authModalMode}
+          onNavigateToSpecial49={() => {
+            setAuthModalOpen(false);
+            navigateTo('SPECIAL_49_FUNNEL');
+          }}
         />
       </>
     );
@@ -1772,6 +1779,10 @@ export const App: React.FC = () => {
             }
           }}
           initialMode={authModalMode}
+          onNavigateToSpecial49={() => {
+            setAuthModalOpen(false);
+            navigateTo('SPECIAL_49_FUNNEL');
+          }}
         />
 
         <PaywallGateModal
