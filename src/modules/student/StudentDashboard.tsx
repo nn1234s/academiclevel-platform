@@ -51,6 +51,7 @@ interface StudentDashboardProps {
   onSelectGradeOverride?: (grade: Grade) => void;
   onNavigate: (module: string, extra?: any) => void;
   onOpenUpgradeModal: () => void;
+  onOpenMailbox?: (reportId?: string | null) => void;
   initialOpenMailbox?: boolean;
   initialMailboxReportId?: string | null;
 }
@@ -61,14 +62,24 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   onSelectGradeOverride,
   onNavigate,
   onOpenUpgradeModal,
+  onOpenMailbox,
   initialOpenMailbox = false,
   initialMailboxReportId = null,
 }) => {
   const { refreshCurrentLearner } = useAuth();
 
   // Student Mailbox State
-  const [isMailboxOpen, setIsMailboxOpen] = useState<boolean>(initialOpenMailbox);
+  const [isMailboxOpen, setIsMailboxOpen] = useState<boolean>(false);
   const [selectedMailboxMessageId, setSelectedMailboxMessageId] = useState<string | null>(initialMailboxReportId);
+
+  const handleOpenMailboxModal = (msgId?: string | null) => {
+    if (onOpenMailbox) {
+      onOpenMailbox(msgId || null);
+    } else {
+      setSelectedMailboxMessageId(msgId || null);
+      setIsMailboxOpen(true);
+    }
+  };
   const [unreadMailCount, setUnreadMailCount] = useState<number>(() => {
     return StorageRLSLayer.getUnreadMailboxCount(learner.id);
   });
@@ -298,10 +309,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
 
             <button
-              onClick={() => {
-                setSelectedMailboxMessageId(null);
-                setIsMailboxOpen(true);
-              }}
+              onClick={() => handleOpenMailboxModal(null)}
               className="flex items-center space-x-3 w-full justify-between pt-2 border-t border-white/10 hover:bg-white/10 p-1.5 rounded-xl transition-all cursor-pointer group text-left"
               title="Open Student Mailbox"
             >
@@ -837,10 +845,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
 
           <button
-            onClick={() => {
-              setSelectedMailboxMessageId(latestReportMsg.id);
-              setIsMailboxOpen(true);
-            }}
+            onClick={() => handleOpenMailboxModal(latestReportMsg.id)}
             className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-950 transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer"
           >
             <Mail className="w-4 h-4" />
@@ -886,10 +891,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </button>
 
         <button
-          onClick={() => {
-            setSelectedMailboxMessageId(null);
-            setIsMailboxOpen(true);
-          }}
+          onClick={() => handleOpenMailboxModal(null)}
           className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 text-left transition-all group relative overflow-hidden"
         >
           {unreadMailCount > 0 && (
@@ -1018,24 +1020,26 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         onStartQuiz={() => onNavigate('COURSES', { grade: activeGrade })}
       />
 
-      {/* Student Mailbox Modal */}
-      <StudentMailboxModal
-        isOpen={isMailboxOpen}
-        onClose={() => {
-          setIsMailboxOpen(false);
-          setUnreadMailCount(StorageRLSLayer.getUnreadMailboxCount(learner.id));
-        }}
-        learnerId={learner.id}
-        initialSelectedMessageId={selectedMailboxMessageId}
-        onNavigateToQuiz={(sId) => {
-          setIsMailboxOpen(false);
-          onNavigate('COURSES', sId ? { subjectId: sId } : undefined);
-        }}
-        onOpenNovaAi={() => {
-          setIsMailboxOpen(false);
-          onNavigate('NOVA_AI');
-        }}
-      />
+      {/* Student Mailbox Modal (Fallback if parent does not provide onOpenMailbox) */}
+      {!onOpenMailbox && (
+        <StudentMailboxModal
+          isOpen={isMailboxOpen}
+          onClose={() => {
+            setIsMailboxOpen(false);
+            setUnreadMailCount(StorageRLSLayer.getUnreadMailboxCount(learner.id));
+          }}
+          learnerId={learner.id}
+          initialSelectedMessageId={selectedMailboxMessageId}
+          onNavigateToQuiz={(sId) => {
+            setIsMailboxOpen(false);
+            onNavigate('COURSES', sId ? { subjectId: sId } : undefined);
+          }}
+          onOpenNovaAi={() => {
+            setIsMailboxOpen(false);
+            onNavigate('NOVA_AI');
+          }}
+        />
+      )}
     </div>
   );
 };

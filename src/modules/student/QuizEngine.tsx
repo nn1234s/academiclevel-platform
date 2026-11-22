@@ -93,41 +93,102 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       const executeScroll = (smooth = false) => {
         try {
           if (quizContainerRef.current) {
-            const rect = quizContainerRef.current.getBoundingClientRect();
-            const headerOffset = 90; // offset for sticky header
-            const targetY = (window.pageYOffset || document.documentElement.scrollTop || 0) + rect.top - headerOffset;
-            window.scrollTo({
-              top: Math.max(0, targetY),
-              behavior: smooth ? 'smooth' : 'auto'
+            quizContainerRef.current.scrollIntoView({
+              behavior: smooth ? 'smooth' : 'auto',
+              block: 'start'
             });
-          } else {
-            window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
           }
+          window.scrollTo({
+            top: 0,
+            behavior: smooth ? 'smooth' : 'auto'
+          });
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
         } catch {
           window.scrollTo(0, 0);
         }
       };
 
-      // Immediate snap to top so the UI responds immediately on click
+      // Immediate zero-delay snap to top so screen responds immediately
       executeScroll(false);
-      // Re-trigger after React renders the new question content into the DOM
-      setTimeout(() => executeScroll(false), 40);
-      setTimeout(() => executeScroll(true), 150);
+      if (typeof requestAnimationFrame !== 'undefined') {
+        requestAnimationFrame(() => executeScroll(false));
+      }
+      setTimeout(() => executeScroll(false), 30);
+      setTimeout(() => executeScroll(true), 100);
     }
   }, []);
 
-  const loadQuizQuestions = useCallback(async () => {
+  const sessionKey = `al_active_quiz_${learner.id}_${board}_${grade}_${subjectId}_${levelNode}_${chapter || 'all'}`;
+
+  const loadQuizQuestions = useCallback(async (forceNew = false) => {
+    // 1. Check for resumable in-progress session (prevents mid-quiz terminations on accidental refresh or mobile app switch)
+    if (!forceNew && typeof window !== 'undefined') {
+      try {
+        const savedRaw = sessionStorage.getItem(sessionKey);
+        if (savedRaw) {
+          const saved = JSON.parse(savedRaw);
+          if (saved && Array.isArray(saved.questions) && saved.questions.length > 0 && !saved.isCompleted) {
+            setQuestions(saved.questions);
+            setCurrentIndex(saved.currentIndex || 0);
+            setScore(saved.score || 0);
+            setAnswersLog(saved.answersLog || []);
+            setQuizSource(saved.quizSource || 'CURATED_OFFLINE');
+            setAiNotice('Resumed in-progress assessment');
+            setIsLoadingQuiz(false);
+            scrollToQuizTop();
+            return;
+          }
+        }
+      } catch {}
+    }
+
     setIsLoadingQuiz(true);
     const targetQCount = targetCount || (levelNode === 'FOUNDATION' ? 10 : levelNode === 'CONCEPT' ? 12 : levelNode === 'EXAM_READY' ? 15 : 20);
     try {
       const res = await HybridQuizService.getQuestions(board, grade, subjectId, levelNode, targetQCount, chapter);
-      const sorted = [...res.questions].sort((a, b) => (a.topicTag || '').localeCompare(b.topicTag || ''));
+      let loaded = [...res.questions];
+
+      // Ensure exact question count matching: If server returned fewer questions than advertised, top up immediately
+      if (loaded.length < targetQCount) {
+        const supplement = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, targetQCount * 2, chapter);
+        const existingTexts = new Set(loaded.map(q => q.text.toLowerCase().replace(/[^a-z0-9]/g, '')));
+        for (const sup of supplement) {
+          const norm = sup.text.toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (!existingTexts.has(norm)) {
+            existingTexts.add(norm);
+            loaded.push(sup);
+          }
+          if (loaded.length >= targetQCount) break;
+        }
+      }
+
+      // If still below targetCount, use offline bank generator to satisfy the exact advertised count
+      if (loaded.length < targetQCount) {
+        const localDirect = OfflineBankService.getQuestions(board, grade, subjectId, levelNode, targetQCount, chapter);
+        const existingTexts = new Set(loaded.map(q => q.text.toLowerCase().replace(/[^a-z0-9]/g, '')));
+        for (const loc of localDirect) {
+          const norm = loc.text.toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (!existingTexts.has(norm)) {
+            existingTexts.add(norm);
+            loaded.push(loc);
+          }
+          if (loaded.length >= targetQCount) break;
+        }
+      }
+
+      const sorted = loaded.slice(0, targetQCount).sort((a, b) => (a.topicTag || '').localeCompare(b.topicTag || ''));
       setQuestions(sorted);
       setQuizSource(res.source);
       setAiNotice(res.notice || '');
     } catch {
       const fallback = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, targetQCount, chapter);
-      const sorted = [...fallback].sort((a, b) => (a.topicTag || '').localeCompare(b.topicTag || ''));
+      let loaded = [...fallback];
+      if (loaded.length < targetQCount) {
+        const localDirect = OfflineBankService.getQuestions(board, grade, subjectId, levelNode, targetQCount, chapter);
+        loaded = [...loaded, ...localDirect];
+      }
+      const sorted = loaded.slice(0, targetQCount).sort((a, b) => (a.topicTag || '').localeCompare(b.topicTag || ''));
       setQuestions(sorted);
       setQuizSource('CURATED_OFFLINE');
       setAiNotice('Loaded from verified offline syllabus bank');
@@ -143,7 +204,43 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       setGeneratedReportId(null);
       scrollToQuizTop();
     }
-  }, [board, grade, subjectId, levelNode, targetCount, chapter, scrollToQuizTop]);
+  }, [board, grade, subjectId, levelNode, targetCount, chapter, scrollToQuizTop, sessionKey]);
+
+  // Persist in-progress quiz state to prevent mid-session termination on refresh or tab switch
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (questions.length > 0 && !isCompleted) {
+      try {
+        sessionStorage.setItem(
+          sessionKey,
+          JSON.stringify({
+            questions,
+            currentIndex,
+            score,
+            answersLog,
+            quizSource,
+            savedAt: Date.now()
+          })
+        );
+      } catch {}
+    } else if (isCompleted) {
+      try {
+        sessionStorage.removeItem(sessionKey);
+      } catch {}
+    }
+  }, [questions, currentIndex, score, answersLog, quizSource, isCompleted, sessionKey]);
+
+  // Prevent accidental tab close or page navigation during active quiz
+  useEffect(() => {
+    if (typeof window === 'undefined' || isCompleted || questions.length === 0) return;
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = 'Assessment in progress! Your answers will be saved in your session.';
+      return e.returnValue;
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isCompleted, questions.length]);
 
   // Auto-scroll to top whenever currentIndex changes (ensures user always views top of question)
   useEffect(() => {
@@ -515,7 +612,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
-            onClick={() => loadQuizQuestions()}
+            onClick={() => loadQuizQuestions(true)}
             className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center space-x-2"
           >
             <RefreshCw className="w-4 h-4" />
@@ -613,9 +710,9 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
 
         <div className="flex items-center space-x-3">
           <button
-            onClick={() => loadQuizQuestions()}
+            onClick={() => loadQuizQuestions(true)}
             title="Synthesize new questions"
-            className="px-2.5 py-1 text-[11px] rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center space-x-1 border border-slate-700 transition-all"
+            className="px-2.5 py-1 text-[11px] rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center space-x-1 border border-slate-700 transition-all cursor-pointer"
           >
             <RefreshCw className="w-3 h-3" />
             <span className="hidden sm:inline">New AI Set</span>
@@ -635,30 +732,43 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
 
       {/* Interactive Question Palette & Chapter Navigator */}
       <div className="mb-6 p-3 bg-slate-950/80 rounded-2xl border border-slate-800">
-        <div className="text-[11px] font-mono text-slate-400 mb-2 flex items-center justify-between">
-          <span className="flex items-center space-x-1.5">
+        <div className="text-xs text-slate-400 mb-2.5 flex flex-wrap items-center justify-between gap-2">
+          <span className="flex items-center space-x-1.5 font-semibold text-slate-300">
             <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
             <span>Question Navigator:</span>
           </span>
-          <span className="text-emerald-400 font-bold">Answered: {score} of {questions.length}</span>
+          <div className="flex items-center space-x-3 text-xs font-semibold">
+            <span className="text-slate-400">
+              Answered: <strong className="text-white">{answersLog.length}</strong> of {questions.length}
+            </span>
+            <span className="text-emerald-400">
+              Score: <strong className="text-emerald-300">{score}</strong>
+            </span>
+          </div>
         </div>
         <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar">
           {questions.map((q, qIdx) => {
-            const isAnswered = answersLog.some(a => a.question.id === q.id);
+            const logEntry = answersLog.find(a => a.question.id === q.id);
+            const isAnswered = Boolean(logEntry);
+            const isCorrect = logEntry?.isCorrect;
             const isCurr = qIdx === currentIndex;
+
+            let paletteStyle = 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700/60';
+            if (isCurr) {
+              paletteStyle = 'bg-indigo-600 text-white ring-2 ring-indigo-400 shadow-md scale-105 border border-indigo-400';
+            } else if (isAnswered) {
+              paletteStyle = isCorrect
+                ? 'bg-emerald-600 text-white border border-emerald-500 shadow-sm'
+                : 'bg-rose-600 text-white border border-rose-500 shadow-sm';
+            }
+
             return (
               <button
                 key={qIdx}
                 type="button"
                 onClick={() => handleJumpToQuestion(qIdx)}
-                className={`w-7 h-7 flex-shrink-0 rounded-lg text-xs font-bold font-mono flex items-center justify-center transition-all cursor-pointer ${
-                  isCurr
-                    ? 'bg-indigo-600 text-white ring-2 ring-indigo-400 shadow-md scale-105'
-                    : isAnswered
-                    ? 'bg-emerald-600 text-white hover:bg-emerald-500'
-                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
-                }`}
-                title={`Jump to Question ${qIdx + 1}: ${q.topicTag || 'Curriculum Focus'}`}
+                className={`w-7 h-7 flex-shrink-0 rounded-lg text-xs font-bold font-mono flex items-center justify-center transition-all cursor-pointer ${paletteStyle}`}
+                title={`Jump to Question ${qIdx + 1}: ${q.topicTag || 'Curriculum Focus'} ${isAnswered ? (isCorrect ? '(Correct)' : '(Incorrect)') : '(Unanswered)'}`}
               >
                 {qIdx + 1}
               </button>
@@ -697,34 +807,86 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         </h2>
       </div>
 
+      {/* Primary Top Action Bar: Repositioned prominently above options for immediate access on desktop & mobile */}
+      <div className="mb-4 p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+        <div className="flex items-center space-x-2 text-xs">
+          {selectedOption === null && !isAnswerSubmitted ? (
+            <span className="text-slate-400 flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
+              <span>Select an option below to answer</span>
+            </span>
+          ) : !isAnswerSubmitted ? (
+            <span className="text-indigo-300 font-semibold flex items-center space-x-2">
+              <span className="w-5 h-5 rounded-md bg-indigo-600 text-white font-bold text-[11px] flex items-center justify-center">
+                {String.fromCharCode(65 + selectedOption!)}
+              </span>
+              <span>Option {String.fromCharCode(65 + selectedOption!)} selected • Ready to submit</span>
+            </span>
+          ) : (
+            <span className="flex items-center space-x-1.5 text-xs font-semibold">
+              {Number(selectedOption) === Number(currentQuestion.correctIndex) ? (
+                <span className="text-emerald-400 flex items-center space-x-1.5 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Correct Answer! (+1 Score)</span>
+                </span>
+              ) : (
+                <span className="text-rose-400 flex items-center space-x-1.5 bg-rose-500/10 border border-rose-500/30 px-2.5 py-1 rounded-lg">
+                  <XCircle className="w-4 h-4 text-rose-400" />
+                  <span>Incorrect. See step-by-step solution below.</span>
+                </span>
+              )}
+            </span>
+          )}
+        </div>
+
+        {/* Action Button: Visible right at the top of the answer interaction area */}
+        <div className="flex items-center space-x-2">
+          {!isAnswerSubmitted ? (
+            <button
+              onClick={handleSubmitAnswer}
+              disabled={selectedOption === null || questionDwellSeconds < 1}
+              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-950 transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+            >
+              <span>{questionDwellSeconds < 1 ? 'Reading... (1s)' : 'Submit Answer'}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <button
+              onClick={handleNextQuestion}
+              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-950 transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+            >
+              <span>{currentIndex + 1 < questions.length ? 'Next Question' : 'View Results'}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Options */}
       <div className="space-y-3 mb-6">
         {currentQuestion.options.map((option, idx) => {
           let btnStyle = 'border-slate-800 bg-slate-950/60 hover:border-slate-700 text-slate-200';
-          let letterBadgeStyle = 'bg-slate-800 text-slate-300';
+          let letterBadgeStyle = 'bg-slate-800 text-slate-300 border border-slate-700';
 
-          // Class-specific playful colors for primary grades (1 to 4)
-          if (theme.quizStyle === 'PLAYFUL_BUBBLY') {
-            const letterPalette = [
-              'bg-amber-500/20 text-amber-300 border border-amber-500/40',
-              'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40',
-              'bg-sky-500/20 text-sky-300 border border-sky-500/40',
-              'bg-pink-500/20 text-pink-300 border border-pink-500/40'
-            ];
-            letterBadgeStyle = letterPalette[idx % 4];
-          }
+          const isThisSelected = selectedOption === idx;
+          const isThisCorrect = idx === Number(currentQuestion.correctIndex);
 
-          if (selectedOption === idx) {
-            btnStyle = 'border-indigo-500 bg-indigo-950/40 text-white';
-          }
-
-          if (isAnswerSubmitted) {
-            if (idx === currentQuestion.correctIndex) {
-              btnStyle = 'border-emerald-500 bg-emerald-950/40 text-emerald-200';
-            } else if (selectedOption === idx) {
-              btnStyle = 'border-red-500 bg-red-950/40 text-red-200';
+          if (!isAnswerSubmitted) {
+            if (isThisSelected) {
+              btnStyle = 'border-2 border-indigo-500 bg-indigo-950/50 text-white shadow-md shadow-indigo-950/40 ring-1 ring-indigo-500/50';
+              letterBadgeStyle = 'bg-indigo-600 text-white border-indigo-500 font-bold';
+            }
+          } else {
+            // Post-submission rigorous evaluation styles
+            if (isThisCorrect) {
+              btnStyle = 'border-2 border-emerald-500 bg-emerald-950/50 text-emerald-100 shadow-md shadow-emerald-950/40';
+              letterBadgeStyle = 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold';
+            } else if (isThisSelected) {
+              btnStyle = 'border-2 border-rose-500 bg-rose-950/50 text-rose-100 shadow-md shadow-rose-950/40';
+              letterBadgeStyle = 'bg-rose-500 text-white border-rose-400 font-bold';
             } else {
-              btnStyle = 'border-slate-800/40 bg-slate-950/20 text-slate-500 opacity-60';
+              btnStyle = 'border-slate-800/40 bg-slate-950/20 text-slate-500 opacity-40';
+              letterBadgeStyle = 'bg-slate-800/60 text-slate-500 border-slate-800';
             }
           }
 
@@ -733,20 +895,33 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
               key={idx}
               disabled={isAnswerSubmitted}
               onClick={() => handleSelectOption(idx)}
-              className={`w-full text-left p-4 rounded-2xl border text-xs sm:text-sm font-medium transition-all flex items-center justify-between ${btnStyle}`}
+              className={`w-full text-left p-4 rounded-2xl border text-xs sm:text-sm font-medium transition-all flex items-center justify-between cursor-pointer ${btnStyle}`}
             >
-              <div className="flex items-center space-x-3">
-                <span className={`w-7 h-7 rounded-xl text-xs font-mono font-bold flex items-center justify-center flex-shrink-0 ${letterBadgeStyle}`}>
+              <div className="flex items-center space-x-3 min-w-0 pr-2">
+                <span className={`w-7 h-7 rounded-xl text-xs font-mono font-bold flex items-center justify-center flex-shrink-0 transition-all ${letterBadgeStyle}`}>
                   {String.fromCharCode(65 + idx)}
                 </span>
-                <span>{option}</span>
+                <span className="break-words">{option}</span>
               </div>
-              {isAnswerSubmitted && idx === currentQuestion.correctIndex && (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-              )}
-              {isAnswerSubmitted && selectedOption === idx && idx !== currentQuestion.correctIndex && (
-                <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-              )}
+              <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
+                {isAnswerSubmitted && isThisCorrect && (
+                  <span className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Correct Answer</span>
+                  </span>
+                )}
+                {isAnswerSubmitted && isThisSelected && !isThisCorrect && (
+                  <span className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                    <XCircle className="w-3.5 h-3.5 text-rose-400" />
+                    <span>Your Answer</span>
+                  </span>
+                )}
+                {!isAnswerSubmitted && isThisSelected && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/20 px-2 py-0.5 rounded border border-indigo-500/30">
+                    Selected
+                  </span>
+                )}
+              </div>
             </button>
           );
         })}
@@ -754,17 +929,17 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
 
       {/* Explanation & Socratic Helper */}
       {isAnswerSubmitted && (
-        <div className="mb-6 p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-300 space-y-3 animate-in fade-in duration-200">
+        <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-300 space-y-3 animate-in fade-in duration-200">
           <div>
-            <span className="font-bold text-indigo-400 block mb-1">Step-by-Step Solution:</span>
-            <p className="text-slate-300 whitespace-pre-line">{currentQuestion.explanation}</p>
+            <span className="font-bold text-indigo-400 block mb-1 text-xs">Step-by-Step Solution:</span>
+            <p className="text-slate-300 whitespace-pre-line leading-relaxed">{currentQuestion.explanation}</p>
           </div>
 
-          <div className="pt-2 border-t border-slate-900 flex flex-wrap items-center justify-between gap-2">
+          <div className="pt-2.5 border-t border-slate-900 flex flex-wrap items-center justify-between gap-2">
             <span className="text-slate-400">💡 Hint / Exam Tip: {currentQuestion.hint}</span>
             <button
               onClick={() => onOpenNovaAi(currentQuestion, selectedOption!)}
-              className="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-950/40 border border-indigo-800/60 transition-all"
+              className="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-950/40 border border-indigo-800/60 transition-all cursor-pointer"
             >
               <HelpCircle className="w-4 h-4 text-indigo-400" />
               <span>Ask Nova AI Tutor to Explain Socratically</span>
@@ -776,26 +951,26 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       {/* Action Footer */}
       <div className="flex items-center justify-between pt-4 border-t border-slate-800">
         <span className="text-[11px] text-slate-500">
-          {questionDwellSeconds < 3 && !isAnswerSubmitted ? (
-            <span className="text-amber-400/80">Reading dwell guard: {3 - questionDwellSeconds}s</span>
+          {questionDwellSeconds < 1 && !isAnswerSubmitted ? (
+            <span className="text-amber-400/80">Reading dwell guard active: 1s</span>
           ) : (
-            <span>Anti-cheat timer active</span>
+            <span>Anti-cheat verification active</span>
           )}
         </span>
 
         {!isAnswerSubmitted ? (
           <button
             onClick={handleSubmitAnswer}
-            disabled={selectedOption === null || questionDwellSeconds < 3}
-            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center space-x-1.5"
+            disabled={selectedOption === null || questionDwellSeconds < 1}
+            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center space-x-1.5 cursor-pointer"
           >
-            <span>Submit Answer</span>
+            <span>{questionDwellSeconds < 1 ? 'Reading... (1s)' : 'Submit Answer'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         ) : (
           <button
             onClick={handleNextQuestion}
-            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-950 transition-all flex items-center space-x-1.5"
+            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-950 transition-all flex items-center space-x-1.5 cursor-pointer"
           >
             <span>{currentIndex + 1 < questions.length ? 'Next Question' : 'View Results'}</span>
             <ArrowRight className="w-3.5 h-3.5" />

@@ -74,7 +74,9 @@ import {
   School,
   HelpCircle,
   FileText,
-  Mail
+  Mail,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 // Code-split Super-Admin Vault Shell (unlinked from public navigation)
@@ -277,6 +279,32 @@ export const App: React.FC = () => {
     return 'HOME';
   });
 
+  // Theme state: defaults strictly to 'light' for all new sessions/users per academic design standards
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window === 'undefined') return 'light';
+    try {
+      const saved = localStorage.getItem('al_theme');
+      return saved === 'dark' ? 'dark' : 'light';
+    } catch {
+      return 'light';
+    }
+  });
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('al_theme', nextTheme);
+        if (nextTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch {}
+    }
+  };
+
   // Modal states
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'REGISTER' | 'LOGIN'>('REGISTER');
@@ -384,6 +412,13 @@ export const App: React.FC = () => {
 
   // Push URL with popstate support
   const navigateTo = (route: string, extra?: any) => {
+    // Guard active assessment: prevent accidental loss of in-progress assessment
+    if (currentRoute === 'QUIZ' && route !== 'QUIZ' && !extra?.forceExit) {
+      if (typeof window !== 'undefined' && !window.confirm('You have an active assessment in progress. Are you sure you want to exit? Your answers will be saved in your session.')) {
+        return;
+      }
+    }
+
     setCurrentRoute(route);
     setMobileMenuOpen(false);
     setActiveDropdown(null);
@@ -393,6 +428,10 @@ export const App: React.FC = () => {
       if (window.location.pathname !== targetPath) {
         window.history.pushState({}, '', targetPath);
       }
+      // Instant and reliable scroll to top on every navigation (guarantees footer links & page switches start at the top)
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     }
 
     if (extra?.subjectId) setActiveSubjectId(extra.subjectId);
@@ -916,7 +955,7 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => setGlobalMailboxOpen(true)}
                     title="Open Student Mailbox & Quiz Diagnostic Reports"
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-bold hover:bg-purple-500/20 transition-all shadow-sm cursor-pointer relative"
+                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-bold hover:bg-purple-500/25 active:scale-95 transition-all shadow-sm cursor-pointer relative z-20 touch-manipulation min-h-[36px]"
                   >
                     <Mail className="w-4 h-4 text-purple-400" />
                     <span className="hidden sm:inline">Mailbox</span>
@@ -1107,6 +1146,23 @@ export const App: React.FC = () => {
                   className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
                 >
                   Dashboard
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setGlobalMailboxOpen(true);
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-purple-300 hover:bg-slate-800 flex items-center justify-between font-semibold"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Mail className="w-4 h-4 text-purple-400" />
+                    <span>Student Mailbox</span>
+                  </div>
+                  {currentLearner && StorageRLSLayer.getUnreadMailboxCount(currentLearner.id) > 0 && (
+                    <span className="px-2 py-0.5 bg-amber-400 text-slate-950 text-[10px] font-black rounded-full animate-pulse">
+                      {StorageRLSLayer.getUnreadMailboxCount(currentLearner.id)} New
+                    </span>
+                  )}
                 </button>
                 <button
                   onClick={() => navigateTo('COURSES')}
@@ -1339,6 +1395,11 @@ export const App: React.FC = () => {
                   onSelectGradeOverride={setActiveGradeOverride}
                   onNavigate={navigateTo}
                   onOpenUpgradeModal={() => setPaywallModalOpen(true)}
+                  onOpenMailbox={(reportId) => {
+                    refreshCurrentLearner();
+                    if (reportId) setDashboardActiveReportId(reportId);
+                    setGlobalMailboxOpen(true);
+                  }}
                   initialOpenMailbox={dashboardOpenMailbox}
                   initialMailboxReportId={dashboardActiveReportId}
                 />
@@ -1372,7 +1433,7 @@ export const App: React.FC = () => {
                   learner={effectiveLearner}
                   onFinish={() => {
                     refreshCurrentLearner();
-                    navigateTo('DASHBOARD');
+                    navigateTo('DASHBOARD', { forceExit: true });
                   }}
                   onOpenMailbox={(reportId) => {
                     refreshCurrentLearner();
@@ -1721,6 +1782,14 @@ export const App: React.FC = () => {
                 <ul className="space-y-2 text-xs">
                   <li>
                     <button
+                      onClick={() => navigateTo('ABOUT')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      About AcademicLevel
+                    </button>
+                  </li>
+                  <li>
+                    <button
                       onClick={() => navigateTo('PRIVACY')}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
@@ -1737,6 +1806,14 @@ export const App: React.FC = () => {
                   </li>
                   <li>
                     <button
+                      onClick={() => navigateTo('TERMS')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      20-Minute Refund Policy
+                    </button>
+                  </li>
+                  <li>
+                    <button
                       onClick={() => navigateTo('SAFETY')}
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
@@ -1749,6 +1826,14 @@ export const App: React.FC = () => {
                       className="hover:text-white transition-colors cursor-pointer text-left"
                     >
                       Security &amp; Bug Bounty
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => navigateTo('VERIFY_CERTIFICATE')}
+                      className="hover:text-white transition-colors cursor-pointer text-left"
+                    >
+                      Certificate Verification (/verify)
                     </button>
                   </li>
                   <li>

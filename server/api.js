@@ -1955,40 +1955,46 @@ apiRouter.get('/quizzes/fetch-quiz', (req, res) => {
       const chapterPattern = `%${cleanChapter}%`;
       const chRows = db.prepare(`
         SELECT * FROM question_bank
-        WHERE grade = ? AND (subjectId = ? OR subjectId LIKE ?) AND (topicTag LIKE ? OR ? LIKE '%' || topicTag || '%')
+        WHERE grade = ? AND subjectId = ? AND (topicTag LIKE ? OR ? LIKE '%' || topicTag || '%')
         ORDER BY RANDOM() LIMIT ?
-      `).all(Number(grade), targetSub, `%${targetSub}%`, chapterPattern, cleanChapter, numCount * 4);
+      `).all(Number(grade), targetSub, chapterPattern, cleanChapter, numCount * 4);
 
       candidatePool.push(...chRows);
     }
 
-    // 2. Structured level query if not enough or no chapter
+    // 2. Strict Subject Isolation: Candidate queries MUST ONLY pull from the requested subject!
     if (candidatePool.length < numCount * 2) {
       const levelRows = db.prepare(`
         SELECT * FROM question_bank
-        WHERE grade = ? AND (subjectId = ? OR subjectId LIKE ?) AND levelNode = ?
+        WHERE grade = ? AND subjectId = ? AND levelNode = ?
         ORDER BY RANDOM() LIMIT ?
-      `).all(Number(grade), targetSub, `%${targetSub}%`, String(levelNode), numCount * 4);
+      `).all(Number(grade), targetSub, String(levelNode), numCount * 4);
       candidatePool.push(...levelRows);
     }
 
     if (candidatePool.length < numCount * 2) {
       const subRows = db.prepare(`
         SELECT * FROM question_bank
-        WHERE grade = ? AND (subjectId = ? OR subjectId LIKE ?)
+        WHERE grade = ? AND subjectId = ?
         ORDER BY RANDOM() LIMIT ?
-      `).all(Number(grade), targetSub, `%${targetSub}%`, numCount * 4);
+      `).all(Number(grade), targetSub, numCount * 4);
       candidatePool.push(...subRows);
     }
 
-    if (candidatePool.length < numCount) {
-      const gradeRows = db.prepare(`
-        SELECT * FROM question_bank
-        WHERE grade = ?
-        ORDER BY RANDOM() LIMIT ?
-      `).all(Number(grade), numCount * 4);
-      candidatePool.push(...gradeRows);
-    }
+    // STRICT ZERO-CONTAMINATION GUARANTEE:
+    // Filter candidate pool to guarantee 100% subject isolation (never allow Math in English, etc.)
+    candidatePool = candidatePool.filter(r => {
+      const rowSub = String(r.subjectId || '').toLowerCase();
+      if (targetSub === 'math') return rowSub === 'math';
+      if (targetSub === 'english') return rowSub === 'english';
+      if (targetSub === 'cs') return rowSub === 'cs';
+      if (targetSub === 'social') return rowSub === 'social';
+      if (targetSub === 'science') return rowSub === 'science' || rowSub === 'physics' || rowSub === 'chemistry' || rowSub === 'biology';
+      if (targetSub === 'physics') return rowSub === 'physics' || rowSub === 'science';
+      if (targetSub === 'chemistry') return rowSub === 'chemistry' || rowSub === 'science';
+      if (targetSub === 'biology') return rowSub === 'biology' || rowSub === 'science';
+      return rowSub === targetSub;
+    });
 
     // Strict deduplication pass: NEVER allow identical questions in the same quiz!
     const seenTexts = new Set();
@@ -4726,23 +4732,41 @@ apiRouter.post('/ai/chat', aiChatLimiter, async (req, res) => {
     const keys = getGeminiApiKeys();
 
     if (keys.length === 0) {
-      if (resolvedLearnerId) consumeStudentAiMessage(resolvedLearnerId);
+      // Honest, transparent fallback: Do not fake AI and do NOT deduct credits!
+      let topicGuidance = '';
+      try {
+        const targetSub = String(subject || 'math').toLowerCase();
+        const sampleTopic = db.prepare(`
+          SELECT topicTag, explanation, hint FROM question_bank
+          WHERE grade = ? AND (subjectId = ? OR subjectId LIKE ?) AND explanation IS NOT NULL
+          ORDER BY RANDOM() LIMIT 1
+        `).get(Number(grade), targetSub, `%${targetSub}%`);
+
+        if (sampleTopic) {
+          topicGuidance = `\n\n📖 **Verified Syllabus Reference (${sampleTopic.topicTag})**:\n• Core Principle: ${sampleTopic.explanation}\n• Exam Tip: ${sampleTopic.hint}`;
+        }
+      } catch {}
+
       return res.json({
         success: true,
-        text: `💡 [Nova Socratic Guide - ${board} Class ${grade} ${subject}]\n\nRegarding "${cleanQuery.slice(0, 80)}":\nBefore calculating or jumping to conclusions, consider the primary principle at play. What is the fundamental definition or formula relevant to this topic? Try breaking the problem into two smaller steps!`,
-        source: 'DETERMINISTIC_RUBRIC',
+        text: `⚡ **Nova Live AI is Offline**\n\nLive AI tutoring is currently unavailable. AcademicLevel does not charge credits for offline fallback responses.${topicGuidance}\n\nTo ask questions to Live Nova AI, ensure an active Gemini API key is configured in the Admin Control Plane or try again shortly.`,
+        source: 'STATIC_CURRICULUM_FALLBACK',
+        isFallback: true,
         quota: getStudentAiQuota(resolvedLearnerId)
       });
     }
 
-    // Keep Prompts Short (Free tier RPM and TPM optimization):
-    // Strict concise instructions under 100 words
-    const systemInstruction = `You are Nova AI, an expert, safe, Socratic academic tutor for Indian students on AcademicLevel.
-Target Student: Class ${grade} studying ${subject} under ${board} syllabus.
-Rules:
-1. Socratic method: Give hints, conceptual questions, and short steps. Never dump raw answers.
-2. Tone: Cheerful & intuitive for primary; structured for middle school; rigorous & formula-driven for secondary.
-3. Keep responses strictly under 110 words.`;
+    const systemInstruction = `You are Nova AI, an expert, encouraging, and pedagogically brilliant academic tutor for Indian school students on AcademicLevel.
+Target Student: Class ${grade} studying ${subject} under the ${board} syllabus.
+Pedagogical Guidelines:
+1. DIRECT HELPFULNESS: Always directly address the student's specific question or request. If the student asks to break down a concept or number into two parts, actually break it into two clear, distinct parts with concrete examples!
+2. SOCRATIC EXPLANATIONS: Explain concepts step-by-step with intuitive analogies, formulas, and real-world examples suitable for Class ${grade}.
+3. TONE & CLARITY:
+   - Primary (Classes 1-4): Cheerful, friendly, encouraging with simple metaphors and step-by-step numbers.
+   - Middle School (Classes 5-8): Structured, engaging, showing the "why" and connecting concepts to syllabus rules.
+   - Secondary & High School (Classes 9-12): Rigorous, exam-focused, stating key formulas, board marking points, and practical tips.
+4. VARIETY: Never repeat canned template phrases. Give genuine, customized answers every time.
+5. LENGTH: Keep responses clear, structured, and typically under 180 words.`;
 
     const contents = [];
     if (Array.isArray(history) && history.length > 0) {
@@ -4777,27 +4801,17 @@ Rules:
 
     const result = await callGeminiApiWithMultiKeyFallback(bodyPayload, 20000);
 
-    if (!result.ok) {
-      if (resolvedLearnerId) consumeStudentAiMessage(resolvedLearnerId);
+    if (!result.ok || !result.data?.candidates?.[0]?.content?.parts?.[0]?.text) {
       return res.json({
         success: true,
-        text: `💡 [Nova Guidance - Class ${grade} ${subject}]\nLet's analyze this step-by-step: What is the core theorem or rule governing "${cleanQuery.slice(0, 60)}"? Try identifying what values are given first!`,
-        source: 'DETERMINISTIC_RUBRIC',
+        text: `⚡ **Live AI Service Temporarily Busy**\n\nNova AI could not reach the live tutoring engine right now (network timeout or rate limit). Please retry in a few moments.\n\nNo message credits were deducted.`,
+        source: 'SERVICE_TEMPORARILY_BUSY',
+        isFallback: true,
         quota: getStudentAiQuota(resolvedLearnerId)
       });
     }
 
-    const replyText = result.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!replyText) {
-      if (resolvedLearnerId) consumeStudentAiMessage(resolvedLearnerId);
-      return res.json({
-        success: true,
-        text: `💡 Great academic question on Class ${grade} ${subject}! What is the first principle or definition you remember regarding this concept?`,
-        source: 'DETERMINISTIC_RUBRIC',
-        quota: getStudentAiQuota(resolvedLearnerId)
-      });
-    }
+    const replyText = result.data.candidates[0].content.parts[0].text;
 
     if (resolvedLearnerId) {
       consumeStudentAiMessage(resolvedLearnerId);
@@ -4813,8 +4827,9 @@ Rules:
   } catch (err) {
     res.json({
       success: true,
-      text: `💡 In ${req.body.board || 'CBSE'} Class ${req.body.grade || 10} ${req.body.subject || 'Mathematics'}, always verify your base assumptions before calculating. What is the fundamental formula here?`,
-      source: 'DETERMINISTIC_RUBRIC'
+      text: `⚡ **Nova AI Connection Error**\n\nAn unexpected connection error occurred: ${err.message}. Please retry your inquiry.\n\nNo message credits were deducted.`,
+      source: 'CONNECTION_ERROR',
+      isFallback: true
     });
   }
 });

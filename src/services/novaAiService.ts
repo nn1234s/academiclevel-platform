@@ -172,25 +172,11 @@ export class NovaAiService {
     const trimmed = query.trim();
 
     const generateDeterministicFallback = (): string => {
-      if (grade <= 4) {
-        return (
-          `🎈 Hello! In Class ${grade} ${subject}, everything is about curiosity! ` +
-          `Regarding "${trimmed}": Think of it like building with bright blocks. What is the very first step you would take?`
-        );
-      } else if (grade <= 8) {
-        return (
-          `💡 That's a sharp inquiry about "${trimmed}" in ${board} ${subject}! ` +
-          `Before giving the direct formula, let me ask: what happens to the result if you increase the primary variable? What rule did we discuss in our last module?`
-        );
-      } else {
-        return (
-          `📚 Analytical Guidance (${board} Class ${grade} — ${subject}):\n\n` +
-          `Regarding "${trimmed}":\n` +
-          `1. **Theoretical Foundation**: Start from first principles according to the official ${board} syllabus.\n` +
-          `2. **Key Derivation/Application**: Identify known variables and boundary conditions.\n` +
-          `3. **Exam Tip**: Examiners award partial step-marking for stating the governing law before calculating numerical answers.`
-        );
-      }
+      return (
+        `⚡ **Nova Live AI Offline**\n\n` +
+        `Live AI tutoring is currently offline. For ${board} Class ${grade} ${subject}, please review your textbook chapter notes, definitions, and formulas.\n\n` +
+        `*Tip: Try asking your question again once your internet connection or the AI cluster is restored.*`
+      );
     };
 
     if (!HybridQuizService.getPreferLiveAi()) {

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Award, Sparkles, ShieldCheck, CheckCircle2, Terminal, Code, Cpu, ExternalLink, X, ZoomIn } from 'lucide-react';
+import React from 'react';
+import { Award, ShieldCheck, CheckCircle2, BookOpen, GraduationCap, Sparkles } from 'lucide-react';
 
 interface KidFounderGlazeShowcaseProps {
   theme?: 'dark' | 'light';
@@ -10,109 +10,62 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
   theme = 'dark',
   variant = 'full'
 }) => {
-  const [selectedImage, setSelectedImage] = useState<{ src: string; title: string; subtitle: string } | null>(null);
-
   const isDark = theme === 'dark';
 
-  const certificates = [
+  const curriculumHighlights = [
     {
-      id: 'cert-iit-bombay',
-      title: 'IIT Bombay Mood Indigo Coding Project',
-      badge: '🏛️ IIT Bombay Certified',
-      subtitle: 'Young Animator • Playlab Module • STEM.org',
-      desc: 'Certified in competitive coding and interactive software architecture under the prestigious IIT Bombay Mood Indigo National Project.',
-      image: '/founder-certs/cert-9-iit-bombay.jpg',
-      tags: ['IIT Bombay', 'Mood Indigo', 'STEM.org Accredited'],
-      accent: 'from-amber-500/20 via-orange-500/10 to-amber-500/5',
-      borderAccent: 'border-amber-500/60'
-    },
-    {
-      id: 'cert-python-dev',
-      title: 'Python Developer Specialization',
-      badge: '🐍 Python Specialist',
-      subtitle: 'OOP • Data Structures • Tkinter GUI • Git',
-      desc: 'Mastered Object-Oriented Programming, data structures, and file handling with GUI applications using Tkinter and VS Code.',
-      image: '/founder-certs/cert-1-python-dev.jpg',
-      tags: ['OOP Architecture', 'Tkinter GUI', 'File I/O'],
+      id: 'cbse-standard',
+      title: 'CBSE & NCERT Aligned',
+      badge: '📘 National Curriculum',
+      subtitle: 'Classes 1–12 • NEP 2020 Competency Framework',
+      desc: 'Carefully indexed chapter-wise assessments calibrated to the National Curriculum Framework and latest board marking schemes.',
       accent: 'from-indigo-500/20 via-blue-500/10 to-indigo-500/5',
       borderAccent: 'border-indigo-500/60'
     },
     {
-      id: 'cert-python-dsa',
-      title: 'Intermediate Python Programmer',
-      badge: '⚡ Algorithms & DSA',
-      subtitle: 'Time Complexity • Recursion • Bit Manipulation',
-      desc: 'Formally awarded title for solving complex algorithmic challenges, recursion trees, and optimized array algorithms.',
-      image: '/founder-certs/cert-2-python-dsa.jpg',
-      tags: ['Time Complexity', 'Recursion', 'Array Algorithms'],
+      id: 'icse-standard',
+      title: 'ICSE / CISCE Standards',
+      badge: '🏛️ Rigorous Analytics',
+      subtitle: 'Application-Oriented Analytical Problem Sets',
+      desc: 'In-depth problem solving, structured step-marking rubrics, and conceptual clarity across Mathematics and Science.',
       accent: 'from-blue-500/20 via-cyan-500/10 to-blue-500/5',
       borderAccent: 'border-blue-500/60'
     },
     {
-      id: 'cert-python-game',
-      title: 'Python Game Developer',
-      badge: '🎮 Game Engine Architect',
-      subtitle: 'Pygame Library • Space Invaders • Physics',
-      desc: 'Built full 2D arcade games including Space Invaders and interactive GUI engines using Pygame and object-oriented physics.',
-      image: '/founder-certs/cert-3-python-game.jpg',
-      tags: ['Pygame Engine', 'Space Invaders', 'Game Physics'],
+      id: 'igcse-standard',
+      title: 'Cambridge IGCSE Curriculum',
+      badge: '🌐 Global Benchmark',
+      subtitle: 'Critical Thinking • Inquiry-Based Questions',
+      desc: 'Benchmarked international inquiry modules emphasizing higher-order thinking skills, experimental design, and reasoning.',
       accent: 'from-purple-500/20 via-pink-500/10 to-purple-500/5',
       borderAccent: 'border-purple-500/60'
     },
     {
-      id: 'cert-junior-web',
-      title: 'Junior Web Developer',
-      badge: '🌐 Web Applications',
-      subtitle: 'HTML5 • CSS Styling • Responsive Web UI',
-      desc: 'Engineered responsive multi-page web layouts, semantic document structures, and modern styling architectures.',
-      image: '/founder-certs/cert-4-junior-web.jpg',
-      tags: ['HTML5 Semantic', 'CSS3 Layouts', 'Responsive UI'],
+      id: 'olympiad-standard',
+      title: 'National & International Olympiads',
+      badge: '🏆 Competitive Foundation',
+      subtitle: 'IMO, NSO, NTSE & Regional Olympiads',
+      desc: 'Higher-order thinking questions (HOTS) specifically created to train speed, pattern recognition, and logical problem solving.',
+      accent: 'from-amber-500/20 via-yellow-500/10 to-amber-500/5',
+      borderAccent: 'border-amber-500/60'
+    },
+    {
+      id: 'socratic-ai',
+      title: 'Socratic Nova AI Tutoring',
+      badge: '🤖 Pedagogical AI',
+      subtitle: 'Instant Hints • Step-by-Step Guidance',
+      desc: 'Zero rote answers — Nova asks guiding Socratic questions that help students discover solutions through their own reasoning.',
       accent: 'from-emerald-500/20 via-teal-500/10 to-emerald-500/5',
       borderAccent: 'border-emerald-500/60'
     },
     {
-      id: 'cert-app-lab',
-      title: 'Junior App Lab Developer',
-      badge: '📱 Mobile App Engineer',
-      subtitle: 'Code.org App Lab • Databases • Event Driven',
-      desc: 'Designed interactive mobile user interfaces, database tables, and real-time event-driven application state logic.',
-      image: '/founder-certs/cert-6-app-lab.jpg',
-      tags: ['App Lab Engine', 'Database Integration', 'Event Driven'],
+      id: 'rewards-system',
+      title: 'Verified Study Rewards',
+      badge: '🎁 Tangible Milestones',
+      subtitle: 'Physical Merchandise & Certified Awards',
+      desc: 'Real rewards (stationery sets, smart gifts, books, and verified certificates) awarded only through genuine student effort.',
       accent: 'from-teal-500/20 via-cyan-500/10 to-teal-500/5',
       borderAccent: 'border-teal-500/60'
-    },
-    {
-      id: 'cert-game-lab',
-      title: 'Junior Game Lab Developer',
-      badge: '🕹️ 2D Game Systems',
-      subtitle: 'Code.org Game Lab • Animation • Collision',
-      desc: 'Programmed sprite animations, velocity systems, collision physics, and scoring loops for arcade shooter games.',
-      image: '/founder-certs/cert-5-game-lab.jpg',
-      tags: ['Game Lab Sprites', 'Collision Detection', 'Physics'],
-      accent: 'from-rose-500/20 via-red-500/10 to-rose-500/5',
-      borderAccent: 'border-rose-500/60'
-    },
-    {
-      id: 'cert-animator',
-      title: 'Junior Animator & Logic Builder',
-      badge: '🎬 Visual Programming',
-      subtitle: 'Play Lab • Minecraft Logic • Functions & Loops',
-      desc: 'Mastered visual programming, nested loops, conditional branches, variables, and game logic across 50+ projects.',
-      image: '/founder-certs/cert-7-animator.jpg',
-      tags: ['Visual Logic', 'Nested Loops', 'Functions'],
-      accent: 'from-violet-500/20 via-purple-500/10 to-violet-500/5',
-      borderAccent: 'border-violet-500/60'
-    },
-    {
-      id: 'cert-rising-star',
-      title: 'Rising Coding Star',
-      badge: '⭐ STEM.org Logic Star',
-      subtitle: 'STEM.org Accredited • Algorithmic Thinking',
-      desc: 'Accredited by STEM.org for rapid algorithmic problem solving, logic building, and creative computational design.',
-      image: '/founder-certs/cert-8-rising-star.jpg',
-      tags: ['STEM.org Accredited', 'Logic Building', 'Computational Thinking'],
-      accent: 'from-amber-500/20 via-yellow-500/10 to-amber-500/5',
-      borderAccent: 'border-amber-500/60'
     }
   ];
 
@@ -129,196 +82,63 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
       {/* Header Badges & Hook */}
       <div className="relative z-10 text-center max-w-4xl mx-auto space-y-4">
         <div className="inline-flex flex-wrap items-center justify-center gap-2">
-          <span className="px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md flex items-center space-x-1.5">
-            <Award className="w-3.5 h-3.5 text-slate-950" />
-            <span>IIT Bombay Certified • Developed by Student</span>
+          <span className="px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md flex items-center space-x-1.5">
+            <GraduationCap className="w-3.5 h-3.5" />
+            <span>Academic Excellence &amp; Board Verification</span>
           </span>
 
           <span className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider border ${
             isDark ? 'bg-indigo-950/80 border-indigo-700/80 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-800'
           }`}>
-            🛡️ STEM.org Accredited • Developed by Student
-          </span>
-
-          <span className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider border ${
-            isDark ? 'bg-emerald-950/80 border-emerald-700/80 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'
-          }`}>
-            ⭐ 9x Certified Engineering Boxes
+            🛡️ CBSE • ICSE • Cambridge IGCSE
           </span>
         </div>
 
         <h2 className={`text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight ${
           isDark ? 'text-white' : 'text-slate-950'
         }`}>
-          Developed by a Student for Students.{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-amber-300">
-            Certified by IIT Bombay.
+          Built for Students.{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-amber-300">
+            Calibrated to Authentic Curriculum Standards.
           </span>
         </h2>
 
         <p className={`text-xs sm:text-sm sm:leading-relaxed max-w-3xl mx-auto font-medium ${
           isDark ? 'text-slate-300' : 'text-slate-700'
         }`}>
-          Most education platforms are created by corporate executives who never sat in your child’s classroom.
-          <strong> AcademicLevel is completely different:</strong> it was developed by a <strong>student developer</strong> with 9 formal software engineering certifications in Python, Data Structures &amp; Algorithms, Game Engines, and Full-Stack Development — verified by <strong>IIT Bombay Mood Indigo</strong> and <strong>STEM.org</strong>.
+          AcademicLevel delivers structured, chapter-by-chapter mastery. Every assessment is mapped strictly to national and international education boards, empowering students to build deep conceptual intuition and genuine academic confidence.
         </p>
-
-        <div className={`p-4 rounded-2xl border text-xs italic max-w-2xl mx-auto ${
-          isDark ? 'bg-slate-950/60 border-slate-800 text-amber-300/90' : 'bg-white border-amber-200 text-amber-900'
-        }`}>
-          &quot;Adults build platforms to test and stress you out. We built AcademicLevel so studying feels like leveling up your favorite game — fast hints, instant coin rewards, and zero boring lectures.&quot;
-        </div>
       </div>
 
-      {/* 9 Individual Certificate Boxes Grid */}
+      {/* Curriculum & Academic Excellence Grid */}
       <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">
-        {certificates.map(cert => (
+        {curriculumHighlights.map(item => (
           <div
-            key={cert.id}
-            className={`rounded-2xl border transition-all duration-300 flex flex-col justify-between overflow-hidden group hover:scale-[1.02] shadow-xl ${
-              isDark
-                ? `bg-slate-950/90 ${cert.borderAccent} hover:border-amber-400`
-                : `bg-white ${cert.borderAccent} hover:border-amber-500`
+            key={item.id}
+            className={`p-5 rounded-2xl border transition-all duration-300 bg-gradient-to-br ${item.accent} ${
+              isDark ? 'border-slate-800 hover:border-indigo-500/50 bg-slate-900/60' : 'border-slate-200 hover:border-indigo-400 bg-white/80'
             }`}
           >
-            <div>
-              {/* Individual Image Preview with Zoom Overlay */}
-              <div
-                onClick={() => setSelectedImage({ src: cert.image, title: cert.title, subtitle: cert.subtitle })}
-                className="relative overflow-hidden cursor-pointer bg-slate-950 aspect-[4/3] flex items-center justify-center border-b border-slate-800/80 group"
-              >
-                <img
-                  src={cert.image}
-                  alt={cert.title}
-                  className="w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-105"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2 text-white text-xs font-bold backdrop-blur-[2px]">
-                  <ZoomIn className="w-4 h-4 text-amber-300" />
-                  <span>Click to Inspect Certificate</span>
-                </div>
-
-                <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-black/75 backdrop-blur-md text-amber-300 border border-amber-400/40">
-                  {cert.badge}
-                </span>
-              </div>
-
-              {/* Card Body */}
-              <div className="p-4 space-y-2">
-                <h3 className={`text-sm sm:text-base font-extrabold leading-snug line-clamp-1 ${
-                  isDark ? 'text-white' : 'text-slate-950'
-                }`}>
-                  {cert.title}
-                </h3>
-
-                <p className="text-[11px] font-bold text-amber-400 truncate">
-                  {cert.subtitle}
-                </p>
-
-                <p className={`text-xs leading-relaxed line-clamp-2 ${
-                  isDark ? 'text-slate-400' : 'text-slate-600'
-                }`}>
-                  {cert.desc}
-                </p>
-              </div>
+            <div className="flex items-center justify-between mb-3">
+              <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                isDark ? 'bg-slate-950/80 border-slate-700 text-indigo-300' : 'bg-slate-100 border-slate-200 text-indigo-700'
+              }`}>
+                {item.badge}
+              </span>
             </div>
 
-            {/* Tags Footer */}
-            <div className={`p-3.5 pt-2.5 border-t text-[10px] flex flex-wrap gap-1.5 ${
-              isDark ? 'border-slate-800/80 bg-slate-900/50' : 'border-slate-100 bg-slate-50'
-            }`}>
-              {cert.tags.map(t => (
-                <span
-                  key={t}
-                  className={`px-2 py-0.5 rounded-md font-mono font-medium ${
-                    isDark ? 'bg-slate-800 text-slate-300' : 'bg-white border border-slate-200 text-slate-700'
-                  }`}
-                >
-                  ✓ {t}
-                </span>
-              ))}
-            </div>
+            <h3 className={`font-black text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              {item.title}
+            </h3>
+            <p className={`text-[11px] font-semibold mt-0.5 ${isDark ? 'text-indigo-300/90' : 'text-indigo-600'}`}>
+              {item.subtitle}
+            </p>
+            <p className={`text-xs mt-2.5 leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+              {item.desc}
+            </p>
           </div>
         ))}
       </div>
-
-      {/* 9-Credential Quick Bar */}
-      <div className={`mt-10 rounded-2xl p-5 border text-center relative z-10 ${
-        isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
-      }`}>
-        <span className="text-[10px] font-mono font-bold tracking-widest uppercase text-amber-400 block mb-3">
-          🎓 Complete Verification Roster (9 Certified Credentials)
-        </span>
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 text-[11px] font-bold">
-          <span className="px-3 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
-            🏛️ IIT Bombay Mood Indigo Certified
-          </span>
-          <span className="px-3 py-1 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-300">
-            🐍 Python Developer (OOP &amp; Data Structures)
-          </span>
-          <span className="px-3 py-1 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-300">
-            ⚡ Intermediate Python Programmer (DSA &amp; Recursion)
-          </span>
-          <span className="px-3 py-1 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300">
-            🎮 Python Game Developer (Pygame Engine)
-          </span>
-          <span className="px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
-            🌐 Junior Web Developer (HTML5/CSS3)
-          </span>
-          <span className="px-3 py-1 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-300">
-            📱 Junior App Lab Developer (Databases)
-          </span>
-          <span className="px-3 py-1 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300">
-            🕹️ Junior Game Lab Developer (Physics)
-          </span>
-          <span className="px-3 py-1 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-300">
-            🎬 Junior Animator (Visual Programming)
-          </span>
-          <span className="px-3 py-1 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-yellow-300">
-            ⭐ Rising Coding Star (STEM.org)
-          </span>
-        </div>
-      </div>
-
-      {/* Interactive Modal Zoom */}
-      {selectedImage && (
-        <div
-          onClick={() => setSelectedImage(null)}
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in"
-        >
-          <div
-            onClick={e => e.stopPropagation()}
-            className="max-w-2xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 shadow-2xl relative space-y-4"
-          >
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full bg-slate-800"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="space-y-1">
-              <span className="px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950">
-                Verified Certificate Credentials
-              </span>
-              <h3 className="text-xl font-black text-white">{selectedImage.title}</h3>
-              <p className="text-xs text-amber-300 font-medium">{selectedImage.subtitle}</p>
-            </div>
-
-            <div className="rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center max-h-[70vh]">
-              <img
-                src={selectedImage.src}
-                alt={selectedImage.title}
-                className="w-full h-auto max-h-[70vh] object-contain"
-              />
-            </div>
-
-            <p className="text-[11px] text-slate-400 text-center">
-              Student privacy protected. All certifications verified by STEM.org and respective institutional issuing authorities.
-            </p>
-          </div>
-        </div>
-      )}
     </section>
   );
 };

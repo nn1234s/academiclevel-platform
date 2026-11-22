@@ -57,8 +57,10 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
   const loadMessages = () => {
     const local = StorageRLSLayer.getMailboxMessages(learnerId);
     setMessages(local);
-    if (!selectedMessageId && local.length > 0) {
-      setSelectedMessageId(initialSelectedMessageId || local[0].id);
+    if (initialSelectedMessageId) {
+      setSelectedMessageId(initialSelectedMessageId);
+    } else if (!selectedMessageId && local.length > 0) {
+      setSelectedMessageId(local[0].id);
     }
   };
 
@@ -66,6 +68,9 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
     if (!isOpen) return;
 
     loadMessages();
+    if (initialSelectedMessageId) {
+      setSelectedMessageId(initialSelectedMessageId);
+    }
 
     // Fetch from backend in background
     ApiClient.getMailboxMessages(learnerId)
@@ -217,8 +222,9 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
             )}
             <button
               onClick={onClose}
-              className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+              className="p-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/30 transition-all flex items-center justify-center cursor-pointer shadow-sm active:scale-95 min-w-[40px] min-h-[40px]"
               aria-label="Close Mailbox"
+              title="Close Mailbox"
             >
               <X className="w-5 h-5" />
             </button>

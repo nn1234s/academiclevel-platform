@@ -73,14 +73,20 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
     }
 
     // Determine target rotation
-    // 4 slices: 0: 2 coins (90 deg), 1: 3 coins (180 deg), 2: 5 coins (270 deg), 3: 40 coins jackpot (360 deg)
-    let sliceAngle = 45; // 2 coins
-    if (result.coinsAwarded === 3) sliceAngle = 135;
-    else if (result.coinsAwarded === 5) sliceAngle = 225;
-    else if (result.coinsAwarded === 40) sliceAngle = 315;
+    // 4 slices:
+    // Slice 1: 2 Coins (Top quadrant, center at 0° / 360°)
+    // Slice 2: 3 Coins (Right quadrant, center at 90°)
+    // Slice 3: 5 Coins (Bottom quadrant, center at 180°)
+    // Slice 4: 40 Coins Jackpot (Left quadrant, center at 270°)
+    let centerAngle = 0; // 2 coins default
+    if (result.coinsAwarded === 3) centerAngle = 90;
+    else if (result.coinsAwarded === 5) centerAngle = 180;
+    else if (result.coinsAwarded === 40) centerAngle = 270;
 
     const fullSpins = 5 * 360; // 5 full revolutions
-    const targetDeg = wheelRotationDeg + fullSpins + (360 - sliceAngle);
+    // Add a subtle organic landing offset within the safe center zone (+-8 degrees)
+    const jitter = Math.floor((Math.random() - 0.5) * 16);
+    const targetDeg = wheelRotationDeg + fullSpins + ((360 - centerAngle + jitter) % 360);
 
     setWheelRotationDeg(targetDeg);
 
@@ -106,12 +112,13 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
   return (
     <div className="max-w-xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-center text-slate-100">
       <div className="mb-4">
-        <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
-          24-Hour UTC Cooldown Economy
+        <span className="text-[11px] font-bold tracking-wider text-amber-300 uppercase bg-amber-500/15 border border-amber-500/30 px-3.5 py-1 rounded-full inline-flex items-center space-x-1.5 shadow-sm">
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <span>Daily Scholar Reward Wheel</span>
         </span>
-        <h2 className="text-2xl font-extrabold text-white mt-2">Daily Study Coin Wheel</h2>
-        <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-          Spin every 24 hours to earn free Study Coins for avatar frames, streak freezes, and gift rewards.
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-2.5 tracking-tight">Daily Study Coin Wheel</h2>
+        <p className="text-xs sm:text-sm text-slate-300 mt-1.5 max-w-sm mx-auto leading-relaxed">
+          Spin every 24 hours to earn free Study Coins for awesome avatar frames, streak freezes, and real doorstep rewards!
         </p>
       </div>
 
@@ -180,8 +187,8 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
             </p>
           </div>
         </div>
-        <span className="text-[10px] font-mono text-amber-400 font-bold bg-amber-500/10 px-2 py-1 rounded">
-          {qualifiedReferralsCount} Qualified
+        <span className="text-xs font-bold text-amber-300 bg-amber-500/15 border border-amber-500/30 px-3 py-1 rounded-xl">
+          {qualifiedReferralsCount} Friends Invited
         </span>
       </div>
 
@@ -222,7 +229,7 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
         <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-slate-400 flex items-center justify-center space-x-2">
           <Clock className="w-4 h-4 text-indigo-400" />
           <span>Next daily spin unlocks in:</span>
-          <span className="font-mono font-bold text-white">{formatCooldown(cooldownRemainingMs)}</span>
+          <span className="font-bold text-amber-300 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">{formatCooldown(cooldownRemainingMs)}</span>
         </div>
       )}
     </div>

@@ -42,11 +42,35 @@ interface PresetQuestion {
 }
 
 const PRESET_QUESTIONS: PresetQuestion[] = [
-  // Mathematics
+  // Mathematics (Primary, Middle & Secondary)
+  {
+    id: 'm_add',
+    category: 'MATH',
+    label: 'Addition & Regrouping (Carry Over)',
+    prompt: 'How does carrying over work in multi-digit addition? Can you explain it visually using tens and ones place value blocks with an example like 47 + 38?'
+  },
+  {
+    id: 'm_sub',
+    category: 'MATH',
+    label: 'Subtraction Across Zeros',
+    prompt: 'How do I subtract when there are zeros in the minuend, such as 500 - 267? Please walk me through step-by-step regrouping.'
+  },
+  {
+    id: 'm_div',
+    category: 'MATH',
+    label: 'Long Division & Remainders',
+    prompt: 'What is the step-by-step method to solve long division (Divide, Multiply, Subtract, Bring down)? How do I check if my quotient and remainder are correct?'
+  },
+  {
+    id: 'm_frac',
+    category: 'MATH',
+    label: 'Fractions with Different Denominators',
+    prompt: 'How do I add and subtract fractions with unlike denominators like 2/3 + 4/5? Walk me through finding the LCM and simplifying.'
+  },
   {
     id: 'm1',
     category: 'MATH',
-    label: 'Quadratic Discriminant',
+    label: 'Quadratic Discriminant & Roots',
     prompt: 'How do I determine the nature of roots of a quadratic equation ax² + bx + c = 0 using the discriminant D = b² - 4ac? Please show step-by-step examples.'
   },
   {
@@ -176,7 +200,31 @@ const PRESET_QUESTIONS: PresetQuestion[] = [
     prompt: 'Explain Primary, Secondary, and Tertiary sectors of the Indian economy with examples and employment trends.'
   },
 
-  // Computer Science & Coding
+  // Computer Science & Coding (Scratch, App Inventor, Thunkable, Web, Python, SQL)
+  {
+    id: 'cs_scratch',
+    category: 'CS',
+    label: 'Scratch Loops & Sprite Animation',
+    prompt: 'How do "Repeat" blocks, "Forever" loops, and "Next Costume" blocks work together in Scratch to make an animated walking sprite character?'
+  },
+  {
+    id: 'cs_appinventor',
+    category: 'CS',
+    label: 'MIT App Inventor Button Events',
+    prompt: 'How do Button.Click events, TextBoxes, and TextToSpeech components work in MIT App Inventor when creating an interactive Android app?'
+  },
+  {
+    id: 'cs_thunkable',
+    category: 'CS',
+    label: 'Thunkable Screen Navigation',
+    prompt: 'How do you configure navigation between multiple screens and pass variables in Thunkable mobile app builder?'
+  },
+  {
+    id: 'cs_web',
+    category: 'CS',
+    label: 'HTML5 & CSS Flexbox Center',
+    prompt: 'What is semantic HTML5, and what are the exact CSS flexbox properties needed to perfectly center any element horizontally and vertically?'
+  },
   {
     id: 'cs1',
     category: 'CS',
@@ -194,6 +242,12 @@ const PRESET_QUESTIONS: PresetQuestion[] = [
     category: 'CS',
     label: 'Functions & Return Values',
     prompt: 'How do functions, parameters, default arguments, and return statements work in Python?'
+  },
+  {
+    id: 'cs_sql',
+    category: 'CS',
+    label: 'SQL SELECT, WHERE & GROUP BY',
+    prompt: 'Can you explain how to query relational tables using SELECT, WHERE, ORDER BY, and GROUP BY with realistic student database examples?'
   },
 
   // Board Exam & Strategy
