@@ -1717,6 +1717,81 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       </section>
 
       {/* ======================================================== */}
+      {/* 8.5 COMPREHENSIVE FOOTER & LEGAL DIRECTORY              */}
+      {/* ======================================================== */}
+      <footer className="bg-slate-950 text-neutral-400 border-t border-slate-800 pt-12 pb-24 px-4 sm:px-6 lg:px-8 text-xs">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-6">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-500 to-indigo-600 flex items-center justify-center text-white font-black text-xs shadow-md">
+                AL
+              </div>
+              <div>
+                <span className="font-black text-white text-sm tracking-wider uppercase block leading-none">
+                  AcademicLevel
+                </span>
+                <span className="text-[10px] font-mono tracking-widest text-slate-400 uppercase">
+                  Learn in your era • Special Offer
+                </span>
+              </div>
+            </div>
+
+            <div className="text-[11px] text-slate-400 font-mono space-y-0.5 sm:text-right">
+              <p>Operated by ZingQuark (ZQ Technology)</p>
+              <p>UDYAM Reg: UDYAM-OD-19-0189385 • Contact: academiclevels@gmail.com</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-xs">
+            <div className="space-y-2">
+              <h4 className="text-white font-bold uppercase text-[11px] tracking-wider">Curriculum</h4>
+              <ul className="space-y-1.5 text-slate-400">
+                <li><a href="/curriculum" className="hover:text-white transition-colors">CBSE Classes 1–12</a></li>
+                <li><a href="/curriculum" className="hover:text-white transition-colors">ICSE Board</a></li>
+                <li><a href="/curriculum" className="hover:text-white transition-colors">Cambridge IGCSE</a></li>
+                <li><a href="/faq" className="hover:text-white transition-colors">Curriculum FAQs</a></li>
+              </ul>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-white font-bold uppercase text-[11px] tracking-wider">Memberships</h4>
+              <ul className="space-y-1.5 text-slate-400">
+                <li><a href="/special49" className="hover:text-white transition-colors">Special ₹49 Pass</a></li>
+                <li><a href="/pricing" className="hover:text-white transition-colors">Plus Pass (₹129)</a></li>
+                <li><a href="/pricing" className="hover:text-white transition-colors">1-Year Gold VIP (₹205)</a></li>
+                <li><a href="/school" className="hover:text-white transition-colors">School Portal</a></li>
+              </ul>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-white font-bold uppercase text-[11px] tracking-wider">Features</h4>
+              <ul className="space-y-1.5 text-slate-400">
+                <li><a href="/nova-ai" className="hover:text-white transition-colors">Socratic Nova AI</a></li>
+                <li><a href="/gift-store" className="hover:text-white transition-colors">Scholar's Gift Store</a></li>
+                <li><a href="/verify" className="hover:text-white transition-colors">Verify Certificate</a></li>
+                <li><a href="/sitemap" className="hover:text-white transition-colors">Sitemap Directory</a></li>
+              </ul>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-white font-bold uppercase text-[11px] tracking-wider">Legal &amp; Safety</h4>
+              <ul className="space-y-1.5 text-slate-400">
+                <li><a href="/privacy" className="hover:text-white transition-colors">Policies &amp; Privacy</a></li>
+                <li><a href="/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="/terms" className="hover:text-white transition-colors">20-Min Refund Policy</a></li>
+                <li><a href="/safety" className="hover:text-white transition-colors">Child Safety Protocol</a></li>
+                <li><a href="/delacc" className="hover:text-red-400 transition-colors">Delete Account (/delacc)</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-800/80 text-center text-slate-400 text-[11px]">
+            &copy; {new Date().getFullYear()} AcademicLevel (ZingQuark). All rights reserved.
+          </div>
+        </div>
+      </footer>
+
+      {/* ======================================================== */}
       {/* 9. STICKY BOTTOM ENROLLMENT BAR                          */}
       {/* ======================================================== */}
       <div className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 sm:px-4 py-2.5 z-30 shadow-2xl">

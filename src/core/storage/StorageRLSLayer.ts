@@ -446,9 +446,12 @@ class StorageRLSLayerClass {
     const all = this.readRaw<Subscription[]>(STORAGE_KEYS.SUBSCRIPTIONS, []);
     const cleanPhone = (learnerId || '').replace(/[^0-9]/g, '');
     const phone10 = cleanPhone.length >= 10 ? cleanPhone.slice(-10) : '';
+    const learner = this.getLearnerById(learnerId, learnerId);
+    const cleanEmail = (learner?.email || '').trim().toLowerCase();
 
     return all.filter(s => 
       s.learnerId === learnerId || 
+      (cleanEmail && s.learnerId.toLowerCase() === cleanEmail) ||
       (phone10 && s.learnerId.includes(phone10)) ||
       (phone10 && s.payerUpiId && s.payerUpiId.includes(phone10))
     );

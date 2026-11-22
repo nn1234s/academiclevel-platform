@@ -33,7 +33,7 @@ export class QuotaService {
     );
     if (primary) return primary;
 
-    // Fallback: check only verified legacy aliases
+    // Comprehensive fallback: check all cached subscriptions by ID, email, and mobile phone
     try {
       const allSubs = StorageRLSLayer.getAllCachedSubscriptions();
       const cleanPhone = phone ? phone.replace(/[^0-9]/g, '').slice(-10) : '';
@@ -42,7 +42,9 @@ export class QuotaService {
       const matched = allSubs.find(s => {
         if (s.status !== 'ACTIVE' || !s.expiresAt || new Date(s.expiresAt).getTime() <= now) return false;
         if (s.learnerId === learnerId) return true;
-        // Specific verified legacy accounts only
+        if (cleanEmail && (s.learnerId.toLowerCase() === cleanEmail || s.learnerId.toLowerCase().includes(cleanEmail))) return true;
+        if (cleanPhone && (s.learnerId.includes(cleanPhone) || (s.payerUpiId && s.payerUpiId.includes(cleanPhone)))) return true;
+        // Specific verified legacy accounts
         if (cleanEmail === 'prabir2gmailc@gmail.com' && (s.learnerId === 'lrn_mw9asujp_rzun' || s.learnerId === 'lrn_prabir_alias_norm')) return true;
         if (cleanPhone === '9861439460' && s.learnerId === 'lrn_special49_9861439460') return true;
         return false;

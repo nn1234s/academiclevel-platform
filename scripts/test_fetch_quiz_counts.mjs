@@ -7,11 +7,15 @@ const testCases = [
   { grade: 10, subjectId: 'math', levelNode: 'OLYMPIAD', count: 15 },
   { grade: 10, subjectId: 'cs', levelNode: 'FOUNDATION', count: 10 },
   { grade: 10, subjectId: 'science', levelNode: 'FOUNDATION', count: 10 },
+  { grade: 10, subjectId: 'english', levelNode: 'FOUNDATION', count: 10 },
+  { grade: 10, subjectId: 'social', levelNode: 'FOUNDATION', count: 10 },
   { grade: 1, subjectId: 'math', chapter: 'Addition', count: 10 },
+  { grade: 1, subjectId: 'english', levelNode: 'FOUNDATION', count: 10 },
+  { grade: 6, subjectId: 'cs', chapter: 'App Inventor', count: 10 },
   { grade: 10, subjectId: 'math', chapter: 'Trigonometry', count: 10 }
 ];
 
-console.log('Testing /api/quizzes/fetch-quiz query logic for exact count matching:');
+console.log('Testing /api/quizzes/fetch-quiz query logic for exact count matching across all subjects:');
 
 let allPassed = true;
 
@@ -73,5 +77,5 @@ if (!allPassed) {
   console.error('Some count tests failed!');
   process.exit(1);
 } else {
-  console.log('All query count tests PASSED flawlessly!');
+  console.log('\nAll query count tests PASSED flawlessly across all subjects and grades!');
 }
