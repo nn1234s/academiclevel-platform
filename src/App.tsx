@@ -76,7 +76,9 @@ import {
   FileText,
   Mail,
   Sun,
-  Moon
+  Moon,
+  AlertTriangle,
+  ArrowRight
 } from 'lucide-react';
 
 // Code-split Super-Admin Vault Shell (unlinked from public navigation)
@@ -327,6 +329,10 @@ export const App: React.FC = () => {
     chosenIdx: number;
   } | null>(null);
 
+  // Incomplete Quiz Exit Protection Modal (Item B)
+  const [quizExitModalOpen, setQuizExitModalOpen] = useState(false);
+  const [pendingQuizExit, setPendingQuizExit] = useState<{ route: string; extra?: any } | null>(null);
+
   // Mobile drawer
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -412,11 +418,11 @@ export const App: React.FC = () => {
 
   // Push URL with popstate support
   const navigateTo = (route: string, extra?: any) => {
-    // Guard active assessment: prevent accidental loss of in-progress assessment
+    // Guard active assessment: prevent accidental loss of in-progress assessment via in-app exit confirmation modal
     if (currentRoute === 'QUIZ' && route !== 'QUIZ' && !extra?.forceExit) {
-      if (typeof window !== 'undefined' && !window.confirm('You have an active assessment in progress. Are you sure you want to exit? Your answers will be saved in your session.')) {
-        return;
-      }
+      setPendingQuizExit({ route, extra });
+      setQuizExitModalOpen(true);
+      return;
     }
 
     setCurrentRoute(route);
@@ -1444,6 +1450,10 @@ export const App: React.FC = () => {
                     setNovaQuestionContext({ q, chosenIdx });
                     navigateTo('NOVA_AI');
                   }}
+                  onExitQuiz={() => {
+                    setPendingQuizExit({ route: 'DASHBOARD' });
+                    setQuizExitModalOpen(true);
+                  }}
                 />
               )}
 
@@ -1484,7 +1494,7 @@ export const App: React.FC = () => {
                 <WeeklyChallenges
                   learner={currentLearner}
                   onRefreshLearner={() => refreshCurrentLearner()}
-                  onLaunchChallenge={subj => navigateTo('QUIZ', { node: 'OLYMPIAD' })}
+                  onLaunchChallenge={subj => navigateTo('QUIZ', { subjectId: subj, node: 'OLYMPIAD', questionCount: 15 })}
                 />
               )}
 
@@ -1983,6 +1993,69 @@ export const App: React.FC = () => {
             setAcodeModalOpen(true);
           }}
         />
+
+        {/* INCOMPLETE QUIZ EXIT PROTECTION MODAL (Item B) */}
+        {quizExitModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl text-slate-100 space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white">Exit Active Assessment?</h3>
+                  <p className="text-xs text-slate-400">
+                    {effectiveLearner?.board} Class {effectiveGrade} • {activeSubjectId.toUpperCase()} ({activeLevelNode})
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 text-xs text-slate-300 space-y-2 leading-relaxed">
+                <div className="flex items-start space-x-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Your progress is safely saved</strong> in this browser session. You can return anytime to resume where you left off.
+                  </span>
+                </div>
+                <div className="flex items-start space-x-2 pt-2 border-t border-slate-800/80 text-amber-300">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Incomplete attempts do NOT grant rewards:</strong> No level completion status, XP, or Study Coins will be awarded until all questions are answered.
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
+                <button
+                  onClick={() => {
+                    setQuizExitModalOpen(false);
+                    setPendingQuizExit(null);
+                  }}
+                  className="flex-1 py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                  <span>Continue Assessment</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setQuizExitModalOpen(false);
+                    const target = pendingQuizExit;
+                    setPendingQuizExit(null);
+                    if (target) {
+                      navigateTo(target.route, { ...target.extra, forceExit: true });
+                    } else {
+                      navigateTo('DASHBOARD', { forceExit: true });
+                    }
+                  }}
+                  className="py-3 px-4 bg-slate-800 hover:bg-rose-950/60 text-slate-300 hover:text-rose-300 border border-slate-700 hover:border-rose-800/50 font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4 text-rose-400" />
+                  <span>Leave Assessment</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {currentLearner && (
           <StudentMailboxModal

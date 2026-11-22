@@ -26,7 +26,8 @@ import {
   Flame,
   Atom,
   BookOpen,
-  Mail
+  Mail,
+  LogOut
 } from 'lucide-react';
 
 interface QuizEngineProps {
@@ -40,6 +41,7 @@ interface QuizEngineProps {
   onFinish: () => void;
   onOpenNovaAi: (question: Question, chosenIndex: number) => void;
   onOpenMailbox?: (reportId?: string) => void;
+  onExitQuiz?: () => void;
 }
 
 export const QuizEngine: React.FC<QuizEngineProps> = ({
@@ -53,6 +55,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   onFinish,
   onOpenNovaAi,
   onOpenMailbox,
+  onExitQuiz,
 }) => {
   const { refreshCurrentLearner } = useAuth();
   const quizContainerRef = React.useRef<HTMLDivElement>(null);
@@ -90,32 +93,32 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
 
   const scrollToQuizTop = useCallback(() => {
     if (typeof window !== 'undefined') {
-      const executeScroll = (smooth = false) => {
+      const executeScroll = () => {
         try {
           if (quizContainerRef.current) {
-            quizContainerRef.current.scrollIntoView({
-              behavior: smooth ? 'smooth' : 'auto',
-              block: 'start'
+            const rect = quizContainerRef.current.getBoundingClientRect();
+            const headerOffset = 90; // offset for sticky navigation header
+            const targetY = (window.pageYOffset || document.documentElement.scrollTop || 0) + rect.top - headerOffset;
+            window.scrollTo({
+              top: Math.max(0, targetY),
+              left: 0,
+              behavior: 'auto'
             });
+          } else {
+            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
           }
-          window.scrollTo({
-            top: 0,
-            behavior: smooth ? 'smooth' : 'auto'
-          });
-          document.documentElement.scrollTop = 0;
-          document.body.scrollTop = 0;
         } catch {
           window.scrollTo(0, 0);
         }
       };
 
       // Immediate zero-delay snap to top so screen responds immediately
-      executeScroll(false);
+      executeScroll();
       if (typeof requestAnimationFrame !== 'undefined') {
-        requestAnimationFrame(() => executeScroll(false));
+        requestAnimationFrame(executeScroll);
       }
-      setTimeout(() => executeScroll(false), 30);
-      setTimeout(() => executeScroll(true), 100);
+      setTimeout(executeScroll, 30);
+      setTimeout(executeScroll, 120);
     }
   }, []);
 
@@ -277,7 +280,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       setAntiCheatViolations(prev => prev + 1);
     }
 
-    const isCorrect = selectedOption === currentQuestion.correctIndex;
+    const isCorrect = selectedOption === Number(currentQuestion.correctIndex);
     if (isCorrect) {
       setScore(prev => prev + 1);
     }
@@ -727,6 +730,17 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
           <div className="text-xs font-bold text-emerald-400 bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-900/50">
             Score: {score}
           </div>
+
+          {onExitQuiz && (
+            <button
+              onClick={onExitQuiz}
+              title="Exit Assessment"
+              className="px-2.5 py-1 text-[11px] rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 flex items-center space-x-1 border border-rose-500/30 transition-all cursor-pointer font-bold active:scale-95"
+            >
+              <LogOut className="w-3 h-3 text-rose-400" />
+              <span>Exit</span>
+            </button>
+          )}
         </div>
       </div>
 

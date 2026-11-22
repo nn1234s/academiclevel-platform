@@ -78,15 +78,21 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
     // Slice 2: 3 Coins (Right quadrant, center at 90°)
     // Slice 3: 5 Coins (Bottom quadrant, center at 180°)
     // Slice 4: 40 Coins Jackpot (Left quadrant, center at 270°)
-    let centerAngle = 0; // 2 coins default
-    if (result.coinsAwarded === 3) centerAngle = 90;
-    else if (result.coinsAwarded === 5) centerAngle = 180;
-    else if (result.coinsAwarded === 40) centerAngle = 270;
+    let centerAngle = 0; // 2 coins default (Slice 1: Top, 0°)
+    if (result.coinsAwarded === 3) centerAngle = 90; // Slice 2: Right, 90°
+    else if (result.coinsAwarded === 5) centerAngle = 180; // Slice 3: Bottom, 180°
+    else if (result.coinsAwarded === 40) centerAngle = 270; // Slice 4: Left, 270°
 
-    const fullSpins = 5 * 360; // 5 full revolutions
-    // Add a subtle organic landing offset within the safe center zone (+-8 degrees)
+    // Safe organic landing offset within the core slice quadrant (+-8 degrees)
     const jitter = Math.floor((Math.random() - 0.5) * 16);
-    const targetDeg = wheelRotationDeg + fullSpins + ((360 - centerAngle + jitter) % 360);
+    const desiredNormalized = ((360 - centerAngle + jitter) % 360 + 360) % 360;
+    const currentNormalized = ((wheelRotationDeg % 360) + 360) % 360;
+    let delta = desiredNormalized - currentNormalized;
+    if (delta <= 0) {
+      delta += 360;
+    }
+    const fullSpins = 5 * 360; // 5 full revolutions forward
+    const targetDeg = wheelRotationDeg + fullSpins + delta;
 
     setWheelRotationDeg(targetDeg);
 
