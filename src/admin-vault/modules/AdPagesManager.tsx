@@ -39,7 +39,7 @@ export const AdPagesManager: React.FC = () => {
   const handleResetDefaults = () => {
     const defaults: AdsConfig = {
       mainHeading: 'Score 95%+ in School Exams Without Expensive Tuitions',
-      subHeading: 'CBSE & ICSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Nova StudyGirl AI Tutor & Real Study Coin Rewards.',
+      subHeading: 'CBSE & ICSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Nova StudyGirl AI Tutor, Chapter Study Material Worksheets & Real Study Coin Rewards.',
       offerPriceInr: 49,
       originalPriceInr: 999,
       discountPercent: 95,

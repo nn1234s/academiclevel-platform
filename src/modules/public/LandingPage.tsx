@@ -470,6 +470,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   <span>3,600+ Syllabus-Verified Questions</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Full Study Material &amp; Printable Worksheets (Classes 1–12)</span>
+                </div>
               </div>
 
               <div className="pt-2 space-y-2">

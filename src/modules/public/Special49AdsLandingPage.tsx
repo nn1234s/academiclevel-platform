@@ -34,7 +34,11 @@ import {
   QrCode,
   Copy,
   AlertCircle,
-  AlertTriangle
+  AlertTriangle,
+  FileText,
+  Printer,
+  Download,
+  Scissors
 } from 'lucide-react';
 import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
@@ -42,7 +46,8 @@ import { PaymentService } from '../../services/paymentService';
 import { UTRValidator } from '../../core/security/utrValidator';
 import { UPIQRCheckout } from '../student/UPIQRCheckout';
 import { CLASS_THEMES } from '../../core/theme/classThemes';
-import { Grade, Board } from '../../core/types';
+import { Grade, Board, Learner } from '../../core/types';
+import { PracticeWorksheetViewer } from '../student/PracticeWorksheetViewer';
 import { ReCaptchaWidget } from '../shared/ReCaptchaWidget';
 import { WhatsDifferentFromChatGPT } from '../shared/WhatsDifferentFromChatGPT';
 
@@ -309,8 +314,39 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
   const [createdLearnerId, setCreatedLearnerId] = useState<string | null>(null);
   const [showAllReviewsModal, setShowAllReviewsModal] = useState(false);
   const [showPostPaymentPopup, setShowPostPaymentPopup] = useState(false);
+  const [showWorksheetPreviewModal, setShowWorksheetPreviewModal] = useState(false);
   const utrInputRef = useRef<HTMLInputElement>(null);
   const modalUtrInputRef = useRef<HTMLInputElement>(null);
+
+  const handleScrollToStudyMaterial = () => {
+    const el = document.getElementById('study-material-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const previewLearner: Learner = currentLearner || ({
+    id: 'preview_visitor_01',
+    fullName: studentName.trim() || 'Scholar Student',
+    email: emailOrPhone.trim().includes('@') ? emailOrPhone.trim() : 'student@special49.academiclevel.in',
+    board: selectedBoard,
+    grade: selectedClass,
+    role: 'STUDENT',
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    quizzesCompletedCount: 0,
+    levelsCompletedCount: 0,
+    hasActiveSubscription: true,
+    activePlan: selectedPlanTier,
+    referralCode: 'SPECIAL49',
+    referralQualified: false,
+    currentStreakDays: 1,
+    longestStreakDays: 1,
+    streakFreezesAvailable: 1,
+    coinBalance: 100,
+    classChangesUsedPremium: 0,
+    classChangesUsedPostExpiry: 0
+  } as Learner);
 
   const handleUpiAppTap = () => {
     try {
@@ -627,6 +663,14 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             </div>
 
             <button
+              onClick={handleScrollToStudyMaterial}
+              className="bg-white/20 hover:bg-white/30 text-white font-extrabold px-3 py-1 rounded-full text-xs shadow-xs transition-all cursor-pointer flex items-center space-x-1 border border-white/30 hover:scale-105"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>📚 Get Study Material</span>
+            </button>
+
+            <button
               onClick={handleScrollToQr}
               className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-3 py-1 rounded-full text-xs shadow transition-all hover:scale-105 cursor-pointer flex items-center space-x-1"
             >
@@ -654,9 +698,14 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-black/30 backdrop-blur-md text-[#ffea79] border border-white/20">
                       Special 49 Offer
                     </span>
-                    <span className="text-xs font-bold text-white/90">
-                      Class 1 to 12 • All Boards
-                    </span>
+                    <button
+                      type="button"
+                      onClick={handleScrollToStudyMaterial}
+                      className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#ffea79] text-slate-950 flex items-center space-x-1 shadow-sm hover:scale-105 transition-all cursor-pointer"
+                    >
+                      <FileText className="w-3 h-3 text-slate-950" />
+                      <span>Study Material Included</span>
+                    </button>
                   </div>
 
                   <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-snug text-white">
@@ -682,6 +731,14 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       <div className="flex items-center space-x-2">
                         <span className="text-[#ffe066] text-sm leading-none">▶</span>
                         <span>3,600+ Curated Question Bank</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-[#ffea79]">
+                        <span className="text-sm leading-none">▶</span>
+                        <span>📚 Full Study Material &amp; Printable Worksheets (Classes 1–12)</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-[#ffea79]">
+                        <span className="text-sm leading-none">▶</span>
+                        <span>✍️ Rough Work Scratchpad + Detachable NCERT Solutions</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <span className="text-[#ffe066] text-sm leading-none">▶</span>
@@ -858,6 +915,21 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     <p className="text-[11px] text-amber-950 leading-snug">
                       Pay just <strong>₹76 more than Plus</strong> to get <strong>185 EXTRA DAYS (Double your duration to 365 Days!)</strong>. That is <strong>less than 56 paise a day (~₹17.08/month)</strong>, covering your <strong>entire academic year</strong> from first day to final board exams with zero renewal stress!
                     </p>
+                  </div>
+
+                  {/* Study Material Included Callout */}
+                  <div className="flex items-center justify-between px-3 py-1.5 bg-indigo-50 border border-indigo-200 rounded-xl text-[10px] text-indigo-900 font-bold">
+                    <span className="flex items-center space-x-1.5">
+                      <FileText className="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" />
+                      <span>Includes Full Class 1–12 Study Material &amp; Printable Worksheets</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleScrollToStudyMaterial}
+                      className="text-indigo-700 underline font-extrabold hover:text-indigo-900 cursor-pointer"
+                    >
+                      View Details →
+                    </button>
                   </div>
                 </div>
 
@@ -1396,6 +1468,229 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       </section>
 
       {/* ======================================================== */}
+      {/* 3.5 GET STUDY MATERIAL & PRINTABLE WORKSHEETS (CLASSES 1-12) */}
+      {/* ======================================================== */}
+      <section id="study-material-section" className="py-16 px-4 bg-gradient-to-b from-amber-50/40 via-white to-indigo-50/30 border-y border-amber-200/70 scroll-mt-14">
+        <div className="max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="inline-flex items-center space-x-1.5 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 shadow-xs">
+              <FileText className="w-4 h-4 text-amber-600" />
+              <span>Comprehensive Study Material &amp; Worksheets</span>
+            </span>
+
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+              Get Chapter-Wise Study Material &amp; Printable Worksheets
+            </h2>
+
+            <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
+              Every Special Offer scholar gets 100% full access to our curated study material vault across Classes 1 to 12 (CBSE, ICSE &amp; Cambridge). 1-click printable vector PDFs for screen-free desk practice, dedicated student rough work scratchpads, and detachable step-by-step NCERT solutions.
+            </p>
+          </div>
+
+          {/* 4 Feature Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-3">
+                <Printer className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-extrabold text-slate-900">1-Click Vector PDF Print</h3>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                Crystal-clear 300 DPI typography formatted for standard A4 paper. Perfect for screen-free study sessions at home.
+              </p>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+                <FileText className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-extrabold text-slate-900">Student Scratchpad Workspace</h3>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                Dedicated margin area on every printed worksheet for formula notes, step calculations, and rough work.
+              </p>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-extrabold text-slate-900">Detachable NCERT Solutions</h3>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                Full board step-marking solutions printed at the bottom with a tear-off fold line so students don&apos;t peek early.
+              </p>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all">
+              <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-3">
+                <Download className="w-5 h-5" />
+              </div>
+              <h3 className="text-sm font-extrabold text-slate-900">Offline HTML Specimen</h3>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                Download interactive HTML practice sheets to study and practice on any computer or tablet even without internet.
+              </p>
+            </div>
+          </div>
+
+          {/* Interactive Class Material Showcase Card */}
+          <div className="mt-10 bg-white border-2 border-indigo-200 rounded-3xl p-6 sm:p-8 shadow-xl">
+            {/* Class Tabs */}
+            <div className="flex items-center justify-between flex-wrap gap-2 mb-6 pb-4 border-b border-slate-200">
+              <div>
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-700">
+                  Select Class to Inspect Material
+                </span>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                  Class {selectedClass} Comprehensive Study Material Pack
+                </h3>
+              </div>
+
+              {/* Class Buttons Quick Bar */}
+              <div className="flex flex-wrap gap-1.5">
+                {([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as Grade[]).map(c => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setSelectedClass(c)}
+                    className={`w-8 h-8 rounded-xl font-black text-xs transition-all cursor-pointer ${
+                      selectedClass === c
+                        ? 'bg-indigo-600 text-white shadow-md scale-105'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Subject Coverage Badges */}
+            <div className="mb-6">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                Included Chapter Worksheets for Class {selectedClass}:
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {syllabus.subjects.map((sub, sIdx) => (
+                  <span
+                    key={sIdx}
+                    className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 border border-indigo-200 text-indigo-800 flex items-center space-x-1.5 shadow-2xs"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>{sub}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Simulated Printed Paper Worksheet Preview */}
+            <div className="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-5 sm:p-7 relative overflow-hidden font-sans">
+              <div className="flex items-center justify-between pb-3 border-b-2 border-slate-400 text-xs">
+                <div>
+                  <span className="font-mono font-black text-slate-900 text-sm tracking-wider uppercase">
+                    ACADEMICLEVEL • CHAPTER WORKSHEET SPECIMEN
+                  </span>
+                  <p className="text-[10px] text-slate-500 font-mono">
+                    Board: {selectedBoard} • Class: {selectedClass} • Target: {syllabus.targetExams}
+                  </p>
+                </div>
+                <div className="text-right font-mono text-[11px] text-slate-600">
+                  <span>Time Allowed: <strong>25 Mins</strong></span>
+                  <span className="block text-emerald-700 font-bold">Vector 300 DPI PDF Ready</span>
+                </div>
+              </div>
+
+              {/* Student Metadata Row */}
+              <div className="py-2.5 border-b border-slate-300 text-xs flex flex-wrap justify-between gap-3 font-mono text-slate-600">
+                <span>Student Name: <strong className="underline text-slate-900">{studentName.trim() || '____________________'}</strong></span>
+                <span>Date: <strong>{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</strong></span>
+                <span>Max Score: <strong>10 Marks</strong></span>
+              </div>
+
+              {/* Two-Column Problem + Scratchpad */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 py-4">
+                {/* Left: Problem Statement */}
+                <div className="md:col-span-8 space-y-3">
+                  <div className="flex items-start space-x-2">
+                    <span className="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                      Q1
+                    </span>
+                    <div>
+                      <p className="text-sm font-extrabold text-slate-900">
+                        {syllabus.sampleQuestion.q}
+                      </p>
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        [CBSE / ICSE Board Specimen &amp; Chapter Revision Standard • 2 Marks]
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Rough Work Workspace */}
+                <div className="md:col-span-4 bg-amber-50/60 border border-amber-200/90 rounded-xl p-3 flex flex-col justify-between min-h-[90px]">
+                  <div className="flex items-center justify-between text-[10px] font-mono font-bold text-amber-800 uppercase border-b border-amber-200 pb-1">
+                    <span>✍️ Rough Work Scratchpad</span>
+                    <span className="text-[9px] text-amber-600">Step Margin</span>
+                  </div>
+                  <div className="text-[10px] font-mono text-slate-400 italic py-2">
+                    Space for formulas, step calculations, and diagrams...
+                  </div>
+                  <div className="text-[9px] text-slate-400 text-right font-mono">
+                    Page 1 of 4
+                  </div>
+                </div>
+              </div>
+
+              {/* Tear-off Detachable Solution Strip */}
+              <div className="mt-2 pt-3 border-t-2 border-dashed border-slate-400 relative">
+                <div className="flex items-center space-x-2 text-[11px] font-mono font-bold text-slate-500 uppercase mb-2">
+                  <Scissors className="w-4 h-4 text-slate-600" />
+                  <span>Detachable Answer Key &amp; NCERT Step Solution (Cut along dashed line)</span>
+                </div>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs space-y-1">
+                  <div className="font-bold text-emerald-900 flex items-center space-x-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <span>Verified Answer: {syllabus.sampleQuestion.a}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-700 pl-5">
+                    <strong>NCERT Step-by-Step Marking Breakdown:</strong> {syllabus.sampleQuestion.explanation}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* CTAs */}
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
+              <div className="text-xs text-slate-600">
+                <span className="font-bold text-slate-900 block">
+                  All 12 Classes Included in the Special Offer
+                </span>
+                <span>Get complete downloadable worksheets for all subjects with instant access.</span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setShowWorksheetPreviewModal(true)}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-white hover:bg-slate-50 border-2 border-indigo-400 text-indigo-700 font-extrabold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-2 cursor-pointer"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Preview Full Generator &amp; Print PDF</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleScrollToQr}
+                  className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-black text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer hover:scale-105"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Unlock Study Material (Starts ₹49) ↗</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================== */}
       {/* 4. SECTION 2 (IMAGE 2): IMMERSIVE & INTERACTIVE (6 CARDS) */}
       {/* ======================================================== */}
       <section className="py-16 px-4 bg-slate-50">
@@ -1627,6 +1922,16 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   <td className="p-4 font-black text-emerald-700 bg-orange-50/30">3,600+ Class-wise Verified Questions</td>
                 </tr>
                 <tr>
+                  <td className="p-4 font-bold text-slate-900">Study Material &amp; Worksheets</td>
+                  <td className="p-4 text-slate-600">Photocopied xerox sheets (₹500–₹1,000 extra)</td>
+                  <td className="p-4 font-black text-emerald-700 bg-orange-50/30">
+                    <span className="flex items-center gap-1.5">
+                      <FileText className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                      <span>Full Access to Class 1–12 Printable Worksheets, Scratchpads &amp; NCERT Solutions Included Free</span>
+                    </span>
+                  </td>
+                </tr>
+                <tr>
                   <td className="p-4 font-bold text-slate-900">Doubt Clearing Availability</td>
                   <td className="p-4 text-slate-600">Fixed 1-hour batch slots only</td>
                   <td className="p-4 font-black text-emerald-700 bg-orange-50/30">24/7 Nova AI 3.5 Flash Lite Interactive Study Tutor</td>
@@ -1683,6 +1988,10 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               {
                 q: 'Which classes are supported in this offer?',
                 a: 'All classes from Class 1 all the way to Class 12 are supported across CBSE, ICSE, and State Board curriculums.'
+              },
+              {
+                q: 'Do I get chapter study material and printable worksheets with this offer?',
+                a: 'Yes, 100%! Every enrollment includes access to our Comprehensive Study Material & Practice Worksheet Center across Classes 1 to 12. You can download and print high-resolution vector PDF worksheets with dedicated student rough work scratchpads and detachable step-by-step NCERT solutions anytime for school exams, revisions, and homework.'
               },
               {
                 q: 'Which devices can my child use?',
@@ -2592,6 +2901,14 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             )}
           </div>
         </div>
+      )}
+
+      {/* PRACTICE WORKSHEETS MODAL PREVIEW */}
+      {showWorksheetPreviewModal && (
+        <PracticeWorksheetViewer
+          learner={previewLearner}
+          onClose={() => setShowWorksheetPreviewModal(false)}
+        />
       )}
 
     </div>
