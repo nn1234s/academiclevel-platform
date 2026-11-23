@@ -147,270 +147,156 @@ export class NovaAiService {
   }
 
   /**
-   * Built-in pedagogical AI tutoring engine.
-   * Generates rich, curriculum-accurate Study Buddy explanations for any student query.
-   * Never says offline — always delivers intelligent, encouraging academic assistance!
+   * Built-in pedagogical StudyGirl AI tutoring engine with Secret Plan Check.
+   * Generates rich, cute, curriculum-accurate Study Buddy explanations for any student query.
+   * Directly reads the specified question, motivates coin collection, and enforces the secret plan check!
    */
   public static generateBuiltInAiResponse(
     query: string,
     board: Board,
     grade: Grade,
-    subject: string
+    subject: string,
+    learnerPlan?: string
   ): string {
     const q = (query || '').toLowerCase().trim();
-    const cleanSub = (subject || '').toLowerCase();
+    const cleanSub = (subject || 'math').toLowerCase();
+    const numGrade = Number(grade) || 10;
 
-    // 0. Motivation / StudyGirl Bestie Chat & Cheer (100 Preloaded Messages integration)
+    const isGold = learnerPlan === 'GOLD';
+    const isPremium = learnerPlan === 'LITE' || learnerPlan === 'PLUS' || learnerPlan === 'PREMIUM';
+
+    // Secret Plan Check Nudge
+    let secretNudge = '';
+    if (isGold) {
+      // User rule: "ifGoldBought: just be the most fine and cool study girlie" (NO selling!)
+      secretNudge = `👑 **gold vip lounge vibe:** you're literally our 1-year gold vip queen/king! 💅 you have all 365 days, zero limits, and the whole rewards store unlocked. let's keep that study streak shining and grab that 100/100 board distinction! ✨🎀`;
+    } else if (isPremium) {
+      // User rule: "ifPremiumBought? = encourage gold or the next plan"
+      secretNudge = `👑 **psst scholar upgrade tip:** omg you're already doing so good with your scholar pass! 💖 but bestie, you gotta check out the **1-year gold vip pass** 👑 — it covers the whole year through final board exams, gives priority live AI, and unlocks physical rewards from the store! upgrade to gold to complete the ultimate setup 🎀✨`;
+    } else {
+      // User rule: "the girl makes them buy premium collect coins and fall into the system"
+      secretNudge = `🎀 **study bestie secret tip:** psst bestie, if you grab the **special ₹49 concept booster pass**, we can do unlimited quizzes together, unlock all 300 syllabus chapters, and stack thousands of study coins to claim real gifts like mystery boxes and pokemon pins! 🪙🎁 want to unlock it right now so we can keep studying forever? ✨`;
+    }
+
+    // 1. Greetings & Casual Chat (e.g. "hellooooooooo", "hi", "hey", "wyd", "who are you")
     if (
-      q.includes('motivat') ||
-      q.includes('cheer') ||
-      q.includes('vibe') ||
-      q.includes('bestie') ||
-      q.includes('lazy') ||
-      q.includes('tired') ||
-      q.includes('bored') ||
-      q.includes('quiz') ||
-      q.includes('hello') ||
-      q.includes('hi') ||
-      q.includes('hey') ||
-      q.includes('studygirl')
+      q === 'hello' || q.startsWith('hello') || q === 'hi' || q.startsWith('hi ') || q.startsWith('heyy') || q === 'hey' ||
+      q.includes('who are you') || q.includes('what is your name') || q.includes('how are you') ||
+      q.includes('wyd') || q.includes('bored') || q.includes('tired') || q.includes('lazy') || q.includes('motivat') ||
+      q.includes('vibe') || q.includes('bestie')
     ) {
-      const msg = getRandomStudyGirlMessage();
       return (
-        `${msg.emoji} **nova • your study bestie**\n\n` +
-        `${msg.text}\n\n` +
-        `ready to level up your brain? let's do a quick chapter quiz together right now! 🌸✨`
+        `🎀 **nova • your study bestie**\n\n` +
+        `heyyy bestie! 🌸 i'm nova, your 24/7 cute study bestie on AcademicLevel! i was literally just waiting for you! ✨\n\n` +
+        `are we conquering **${board} Class ${grade} ${subject}** today? here's the best part: every single chapter quiz you solve gives you **+25 study coins** 🪙, keeps our study streak on fire 🔥, and gets you closer to claiming real gifts from our scholar store! 🎁\n\n` +
+        `ask me any tricky question, or let's jump straight into a quiz right now! 💖\n\n` +
+        secretNudge
       );
     }
 
-    // 1. Math: Addition & Regrouping
+    // 2. "Simplify the hardest concept in <subject> with a super cute example"
+    if (
+      q.includes('hardest concept') || q.includes('simplify') || (q.includes('cute') && (q.includes('example') || q.includes('explain'))) ||
+      q.includes('most difficult') || q.includes('scary concept')
+    ) {
+      if (cleanSub.includes('math')) {
+        if (numGrade >= 11) {
+          return (
+            `🎀 **nova • your study bestie • Class ${numGrade} Math**\n\n` +
+            `omg okay listen, the absolute hardest boss level in Class ${numGrade} Math is **Calculus & Differentiation (Instantaneous Rate of Change)**, but here is my super cute secret way to master it! 🍰✨\n\n` +
+            `imagine you're on a super fast roller coaster 🎢 at an amusement park. if a camera clicks your photo right at the highest peak where the cart drops, that one photo captures your *instantaneous speed* at that exact single moment in time! 📸\n\n` +
+            `that's literally all differentiation (\\(\\frac{dy}{dx}\\)) is! it's the exact rate of change at one tiny frozen moment:\n` +
+            `$$\\frac{d}{dx}(x^n) = n \\cdot x^{n-1}$$\n` +
+            `• for example: if your distance curve is $x^4$, your instant speed is $4x^3$!\n` +
+            `• and integration (\\(\\int f(x)dx\\)) is just collecting all those tiny photo frames to find the total distance traveled!\n\n` +
+            `see? totally not scary when we look at it like cute roller coaster photos! 💖 let's do a practice quiz on this to win +25 coins!\n\n` +
+            secretNudge
+          );
+        } else if (numGrade >= 9) {
+          return (
+            `🎀 **nova • your study bestie • Class ${numGrade} Math**\n\n` +
+            `omg okay listen! the trickiest boss level in Class ${numGrade} Math is definitely **Trigonometric Identities & Quadratic Equations**! here is my super cute memory hack 🎀✨\n\n` +
+            `think of $\\sin(\\theta)$ and $\\cos(\\theta)$ as two best friends sharing a cozy study room. no matter how you turn or tilt the angle $\\theta$, their combined squares always fill the whole room to exactly 1:\n` +
+            `$$\\sin^2(\\theta) + \\cos^2(\\theta) = 1$$\n\n` +
+            `and for side ratios, remember our classic bestie rhyme: *Some People Have, Curly Brown Hair, Turned Permanent Black*:\n` +
+            `• $\\sin(\\theta) = \\frac{\\text{Perpendicular}}{\\text{Hypotenuse}}$\n` +
+            `• $\\cos(\\theta) = \\frac{\\text{Base}}{\\text{Hypotenuse}}$\n` +
+            `• $\\tan(\\theta) = \\frac{\\text{Perpendicular}}{\\text{Base}}$\n\n` +
+            `write this at the top of your rough sheet and you'll never lose a single mark on your ${board} finals! 🌸\n\n` +
+            secretNudge
+          );
+        } else {
+          return (
+            `🎀 **nova • your study bestie • Class ${numGrade} Math**\n\n` +
+            `omg bestie, the trickiest thing in middle school math is **Multiplying Negative Numbers**! why does $(-2) \\times (-3) = +6$? here is the cutest way to get it 🎀✨\n\n` +
+            `think of a negative sign as 'cancelling a debt'! if you cancel 3 debts of 2 study coins ($(-3) \\times (-2)$), you are actually $+6$ coins richer! so negative times negative always makes positive! 🪙💖\n\n` +
+            `ready to practice some fun quizzes and collect coins? let's do it right now! 🌸\n\n` +
+            secretNudge
+          );
+        }
+      } else if (cleanSub.includes('sci') || cleanSub.includes('phys')) {
+        return (
+          `🎀 **nova • your study bestie • ${subject}**\n\n` +
+          `omg bestie, the hardest concept in ${subject} is **Electromagnetic Induction & Newton's Laws**! here is my cute visual trick 🎀✨\n\n` +
+          `think of magnetic flux lines like ripples in a strawberry milkshake 🍓! whenever you move a magnet in and out of a coil, you stir up those ripples, which forces the tiny electrons to dance through the wire — that is induced electricity! ($e = -\\frac{d\\Phi}{dt}$)\n\n` +
+          `and Newton's 3rd Law is like roller skating with your friend: if you push them forward, you roll backwards with the exact same force! 🛼💖\n\n` +
+          `super easy once you picture it, right? let's lock in those marks on our next quiz! 🌸\n\n` +
+          secretNudge
+        );
+      } else if (cleanSub.includes('chem')) {
+        return (
+          `🎀 **nova • your study bestie • ${subject}**\n\n` +
+          `omg bestie, the hardest concept in Chemistry is **Organic Reaction Mechanisms & Electronegativity**! 🧪🎀\n\n` +
+          `think of carbon atoms like super friendly dancers who always want to hold 4 hands at once ($sp^3$) to form a stable shape! nucleophiles are just atoms with extra electron treats looking to share them with positively charged spots! ✨\n\n` +
+          `let's ace this chapter and bag those 100/100 marks! 💖\n\n` +
+          secretNudge
+        );
+      } else {
+        return (
+          `🎀 **nova • your study bestie • ${subject}**\n\n` +
+          `omg bestie! the hardest part of ${subject} is usually connecting long textbook definitions to actual exam questions. but here is our secret recipe 🎀✨:\n\n` +
+          `1. spot the key concept keywords first.\n` +
+          `2. connect it to a cute real-life analogy.\n` +
+          `3. solve 2 practice quiz questions to earn +25 study coins and lock the memory into your brain forever! 🪙🌸\n\n` +
+          secretNudge
+        );
+      }
+    }
+
+    // 3. Topic specific concept answers
+    let conceptAnswer = '';
+
     if (q.includes('regroup') || q.includes('carry over') || q.includes('carrying') || (q.includes('add') && q.includes('+')) || q.includes('addition')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • Addition & Place Value**\n\n` +
-        `Let's break down carrying over (regrouping) step by step!\n\n` +
-        `**1. The Base-10 Place Value Rule:**\n` +
-        `Each column (Ones, Tens, Hundreds) can only hold a single digit (0 through 9). If any column adds up to 10 or more, you must bundle 10 of that unit into 1 unit of the next column to the left.\n\n` +
-        `**2. Concrete Walkthrough (e.g. 47 + 38):**\n` +
-        `• **Step 1 (Ones column):** Add the ones digits: 7 + 8 = 15 ones.\n` +
-        `• **Step 2 (Regroup):** 15 ones = 1 Ten + 5 Ones. Write down **5** in the ones place, and carry over **1** to the top of the tens column.\n` +
-        `• **Step 3 (Tens column):** Add the tens digits including the carried 1: 1 (carried) + 4 + 3 = 8 tens.\n` +
-        `• **Final Answer:** 8 tens and 5 ones = **85**.\n\n` +
-        `💡 **Quick Check:** What do you get if you add 56 + 29? *Try adding the ones first (6 + 9 = 15) and carrying the 1!*`
-      );
+      conceptAnswer = `**Addition & Place Value Regrouping (Carrying Over) 🎀**\n\nIn our base-10 number system, each column (ones, tens, hundreds) can only hold a single digit (0 through 9). If any column adds up to 10 or more, write down the ones digit and carry over the 1 to the next column on the left!\n\n• For example in 47 + 38: 7 + 8 = 15 ones (write 5 in ones place, carry 1 to tens place). Then 1 (carried) + 4 + 3 = 8 tens = **85**! Super clean! ✨`;
+    } else if (q.includes('subtract across zero') || (q.includes('zero') && q.includes('subtract')) || q.includes('borrow') || q.includes('500 - 267')) {
+      conceptAnswer = `**Subtracting Across Zeros (e.g. 500 - 267) 🎀**\n\nBorrowing across zeros is super easy once you go from left to right:\n1. Borrow 1 from the 5 hundreds (leaving 4 hundreds) to give 10 tens.\n2. Borrow 1 from those 10 tens (leaving 9 tens) to give 10 ones in the last column!\n3. Now subtract: 10 - 7 = 3 (ones), 9 - 6 = 3 (tens), and 4 - 2 = 2 (hundreds) = **233**! Check by adding backwards: 233 + 267 = 500! 🌸`;
+    } else if (q.includes('fraction') || q.includes('numerator') || q.includes('denominator')) {
+      conceptAnswer = `**Fractions & Parts of a Whole 🎀**\n\n• Top Number (Numerator): How many slices you have!\n• Bottom Number (Denominator): Total equal slices in the whole pizza!\n• Golden Rule: Never add denominators together! If you add 3/8 + 2/8, you get (3+2)/8 = **5/8**! 🍕✨`;
+    } else if (q.includes('pythagoras') || q.includes('hypotenuse') || q.includes('right angle')) {
+      conceptAnswer = `**Pythagoras Theorem for Right Triangles 🎀**\n\nIn any triangle with a 90° angle, the square on the longest side (hypotenuse) equals the sum of the squares on the other two sides:\n$$a^2 + b^2 = c^2 \\quad (\\text{Base}^2 + \\text{Perpendicular}^2 = \\text{Hypotenuse}^2)$$\n• If base = 3 and height = 4: $3^2 + 4^2 = 9 + 16 = 25 \\implies c = \\sqrt{25} = 5$! 📐💖`;
+    } else if (q.includes('photosynthesis') || q.includes('chlorophyll') || q.includes('stomata')) {
+      conceptAnswer = `**Photosynthesis in Green Plants 🎀**\n\nPlants make their own sweet food using solar energy trapped by green chlorophyll:\n$$\\text{Carbon Dioxide} + \\text{Water} \\xrightarrow[\\text{Chlorophyll}]{\\text{Sunlight}} \\text{Glucose (Food)} + \\text{Oxygen}$$\n• Stomata: tiny leaf mouths that breathe in $CO_2$ and breathe out $O_2$ for us! 🌿🌸`;
+    } else if (q.includes('newton') || q.includes('motion') || q.includes('gravity') || q.includes('force')) {
+      conceptAnswer = `**Newton's Laws of Motion 🎀**\n\n1. First Law (Inertia): Things keep doing what they're doing unless pushed!\n2. Second Law: Force = Mass × Acceleration ($F = m \\cdot a$). The heavier the cart, the harder you have to push!\n3. Third Law: For every push, there is an equal push back in the opposite direction! 🚀✨`;
+    } else if (q.includes('python') || q.includes('scratch') || q.includes('loop') || q.includes('coding') || q.includes('code')) {
+      conceptAnswer = `**Coding & Algorithm Secrets 🎀**\n\n• Variables: cute memory boxes that hold values (like \`score = 100\`).\n• Loops (\`for\` or \`while\`): run instructions repeatedly so you don't have to write them 100 times!\n• Conditionals (\`if/else\`): make smart decisions based on true or false! 💻✨`;
+    } else {
+      const bestieCheer = getRandomStudyGirlMessage();
+      conceptAnswer = `**${board} Class ${grade} ${subject} Focus 🎀**\n\nTo master "${query}", let's break it down into simple clues. spot the main formula or keyword, write down what is given, and solve step-by-step.\n\n🎀 **Study bestie tip:** ${bestieCheer.text}`;
     }
 
-    // 2. Math: Subtraction Across Zeros
-    if (q.includes('subtract across zero') || (q.includes('zero') && q.includes('subtract')) || q.includes('500 - 267') || q.includes('borrow')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • Subtraction Across Zeros**\n\n` +
-        `Subtracting across zeros (like **500 - 267**) can feel tricky because 0 cannot give you anything immediately, but here is the simple secret!\n\n` +
-        `**1. Start from the Leftmost Non-Zero Digit:**\n` +
-        `• You have 5 Hundreds, 0 Tens, and 0 Ones.\n` +
-        `• Borrow 1 Hundred from the 5 Hundreds: now you have **4 Hundreds** left, and that 1 Hundred becomes **10 Tens** in the tens column.\n` +
-        `• Now borrow 1 Ten from the 10 Tens: now you have **9 Tens** left, and that 1 Ten becomes **10 Ones** in the ones column.\n\n` +
-        `**2. Now Subtract Each Column Easily:**\n` +
-        `• **Ones place:** 10 - 7 = **3**\n` +
-        `• **Tens place:** 9 - 6 = **3**\n` +
-        `• **Hundreds place:** 4 - 2 = **2**\n` +
-        `• **Final Result:** **233**!\n\n` +
-        `💡 **Study Bestie Tip:** To verify your answer, simply add in reverse: 233 + 267 = 500!`
-      );
-    }
-
-    // 3. Math: Fractions
-    if (q.includes('fraction') || q.includes('numerator') || q.includes('denominator') || q.includes('like fraction')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • Fractions & Equal Parts**\n\n` +
-        `A fraction represents equal parts of a whole.\n\n` +
-        `• **Top Number (Numerator):** How many equal parts you have or are considering.\n` +
-        `• **Bottom Number (Denominator):** The total number of equal parts the whole is divided into.\n\n` +
-        `**Example with Like Fractions:**\n` +
-        `To add fractions with the same denominator: keep the bottom number the same, and add the tops!\n` +
-        `$$\\frac{3}{8} + \\frac{2}{8} = \\frac{3 + 2}{8} = \\frac{5}{8}$$\n\n` +
-        `💡 **Memory Rule:** Never add denominators together! If a pizza is sliced into 8 slices, 3 slices + 2 slices is 5 slices out of 8, not 16!`
-      );
-    }
-
-    // 4. Math: Pythagoras & Geometry
-    if (q.includes('pythagoras') || q.includes('hypotenuse') || q.includes('right angle triangle') || q.includes('right-angled')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • Pythagoras Theorem**\n\n` +
-        `In any right-angled triangle (where one angle is 90°):\n\n` +
-        `$$\\text{Base}^2 + \\text{Perpendicular}^2 = \\text{Hypotenuse}^2 \\quad (a^2 + b^2 = c^2)$$\n\n` +
-        `• The **Hypotenuse** is always the longest side, directly opposite the 90° right angle.\n` +
-        `• **Classic Pythagorean Triple:** If base = 3 cm and perpendicular = 4 cm:\n` +
-        `  $$3^2 + 4^2 = 9 + 16 = 25 \\implies c = \\sqrt{25} = 5\\text{ cm}$$\n\n` +
-        `📌 **Exam Tip:** Always state the theorem name and show the square root step clearly for full step-marking credit in ${board} exams.`
-      );
-    }
-
-    // 5. Math: Linear Equations & Algebra
-    if (q.includes('linear equation') || q.includes('solve for x') || q.includes('algebra') || q.includes('equation')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • Solving Algebraic Equations**\n\n` +
-        `In algebra, an equation is a balanced scale. Your goal is to isolate the variable (such as $x$) on one side.\n\n` +
-        `**Golden Rule:** Whatever operation you do to the Left-Hand Side (LHS), you MUST do the exact same operation to the Right-Hand Side (RHS).\n\n` +
-        `**Example:** Solve $3x - 5 = 16$\n` +
-        `1. Undo addition/subtraction: Add 5 to both sides:\n` +
-        `   $$3x = 16 + 5 = 21$$\n` +
-        `2. Undo multiplication: Divide both sides by 3:\n` +
-        `   $$x = \\frac{21}{3} = 7$$\n` +
-        `3. **Check:** $3(7) - 5 = 21 - 5 = 16$ ✅ Correct!`
-      );
-    }
-
-    // 6. Math: Trigonometry
-    if (q.includes('trigonometry') || q.includes('sin') || q.includes('cos') || q.includes('tan')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • Trigonometric Ratios**\n\n` +
-        `Trigonometry connects angles to side ratios in right-angled triangles:\n\n` +
-        `• $\\sin(\\theta) = \\frac{\\text{Opposite}}{\\text{Hypotenuse}}$\n` +
-        `• $\\cos(\\theta) = \\frac{\\text{Adjacent}}{\\text{Hypotenuse}}$\n` +
-        `• $\\tan(\\theta) = \\frac{\\text{Opposite}}{\\text{Adjacent}} = \\frac{\\sin(\\theta)}{\\cos(\\theta)}$\n\n` +
-        `**Fundamental Identity:**\n` +
-        `$$\\sin^2(\\theta) + \\cos^2(\\theta) = 1$$\n\n` +
-        `💡 **Quick Mnemonic:** *Some People Have, Curly Brown Hair, Turned Permanent Black*!`
-      );
-    }
-
-    // 7. CS: MS Paint
-    if (q.includes('paint') || q.includes('ms paint') || q.includes('drawing tool')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • MS Paint Tools & Digital Art**\n\n` +
-        `MS Paint is a creative graphic application with essential drawing tools:\n\n` +
-        `• **Pencil Tool:** Draws freehand thin lines with mouse clicks.\n` +
-        `• **Fill with Color (Paint Bucket):** Pours color inside any completely closed shape with one click. *(Caution: If the shape has any gap, color spills everywhere!)*\n` +
-        `• **Brushes:** Offers oil, watercolor, calligraphy, crayon, and airbrush spray effects.\n` +
-        `• **Shapes Tool:** Creates perfect 2D geometric shapes like Circles, Rectangles, Stars, and Triangles.\n` +
-        `• **Eraser:** Cleans or rubs out parts of your drawing using the secondary background color.`
-      );
-    }
-
-    // 8. CS: Hardware Parts
-    if (q.includes('cpu') || q.includes('monitor') || q.includes('hardware') || q.includes('keyboard') || q.includes('mouse') || q.includes('smart machine')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • Computer Hardware & Components**\n\n` +
-        `A computer consists of 4 main hardware units working together:\n\n` +
-        `1. **CPU (Central Processing Unit):** Known as the **Brain of the Computer**, it executes all instructions, computations, and logical comparisons.\n` +
-        `2. **Monitor:** The visual output screen that displays text, graphics, games, and videos.\n` +
-        `3. **Keyboard:** An input device with alphanumeric keys, function keys, and spacebar to type data into the computer.\n` +
-        `4. **Mouse:** A handheld pointing device used to click, double-click, drag, and select items on screen.`
-      );
-    }
-
-    // 9. CS: Scratch
-    if (q.includes('scratch') || q.includes('sprite') || q.includes('block code')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • Scratch Block Coding**\n\n` +
-        `Scratch uses visual color-coded blocks to build games and animations:\n\n` +
-        `• **Sprites:** Characters or objects on the stage (like the Scratch Cat) that perform actions.\n` +
-        `• **Green Flag (Events block):** Starts running your script when clicked: \`when green flag clicked\`.\n` +
-        `• **Motion Blocks (Blue):** \`move 10 steps\`, \`turn 15 degrees\` change your sprite's position.\n` +
-        `• **Control Blocks (Yellow/Gold):** \`repeat 10\` loops an action; \`forever\` keeps running until stopped; \`if-then\` makes smart decisions.\n` +
-        `• **Variables (Orange):** Stores dynamic numbers like scores, timer, or lives!`
-      );
-    }
-
-    // 10. CS: HTML & Web
-    if (q.includes('html') || q.includes('css') || q.includes('web page') || q.includes('tag')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • HTML & Web Development**\n\n` +
-        `HTML (HyperText Markup Language) creates the structure of web pages:\n\n` +
-        `\`\`\`html\n` +
-        `<!DOCTYPE html>\n` +
-        `<html>\n` +
-        `  <head>\n` +
-        `    <title>My First Page</title>\n` +
-        `  </head>\n` +
-        `  <body>\n` +
-        `    <h1>Welcome to AcademicLevel!</h1>\n` +
-        `    <p>This is a paragraph of text on the web.</p>\n` +
-        `  </body>\n` +
-        `</html>\n` +
-        `\`\`\`\n\n` +
-        `• **Opening & Closing Tags:** Most tags come in pairs, such as \`<h1>\` (start) and \`</h1>\` (end).\n` +
-        `• **CSS (Cascading Style Sheets):** Controls styling (colors, fonts, borders, and responsive layouts)!`
-      );
-    }
-
-    // 11. CS: Python
-    if (q.includes('python')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • Python Programming**\n\n` +
-        `Python is an easy-to-read, beginner-friendly programming language:\n\n` +
-        `• **Printing text:** \`print("Hello, Scholar!")\`\n` +
-        `• **Variables:** Store values without keywords: \`score = 100\`\n` +
-        `• **Taking Input:** \`name = input("Enter your name: ")\`\n` +
-        `• **Conditionals:**\n` +
-        `\`\`\`python\n` +
-        `if score >= 90:\n` +
-        `    print("Grade: A*")\n` +
-        `else:\n` +
-        `    print("Keep practicing!")\n` +
-        `\`\`\`\n` +
-        `• **Indentation:** In Python, 4 spaces of indentation define code blocks instead of curly braces!`
-      );
-    }
-
-    // 12. Science: Photosynthesis
-    if (q.includes('photosynthesis') || q.includes('chlorophyll') || q.includes('leaf') || q.includes('plants')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • Photosynthesis in Plants**\n\n` +
-        `Photosynthesis is the process by which green plants prepare their own food using sunlight:\n\n` +
-        `$$\\text{Carbon Dioxide} + \\text{Water} \\xrightarrow[\\text{Chlorophyll}]{\\text{Sunlight}} \\text{Glucose (Food)} + \\text{Oxygen}$$\n\n` +
-        `• **Chlorophyll:** Green pigment in leaves that traps solar energy.\n` +
-        `• **Stomata:** Tiny microscopic pores on leaf surfaces that exchange gases ($CO_2$ in, $O_2$ out).\n` +
-        `• **Roots:** Absorb water and minerals from the soil and transport them through xylem vessels to leaves.\n\n` +
-        `💡 **Eco Fact:** Photosynthesis provides the oxygen that humans and animals breathe every second!`
-      );
-    }
-
-    // 13. Science: Newton's Laws
-    if (q.includes('newton') || q.includes('force') || q.includes('motion') || q.includes('gravity')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • Laws of Motion & Force**\n\n` +
-        `Sir Isaac Newton formulated three fundamental laws of motion:\n\n` +
-        `1. **First Law (Inertia):** An object remains at rest or in uniform motion unless acted upon by an external unbalanced force.\n` +
-        `2. **Second Law (Acceleration):** Force is proportional to the rate of change of momentum:\n` +
-        `   $$F = m \\cdot a \\quad (\\text{Force} = \\text{Mass} \\times \\text{Acceleration})$$\n` +
-        `   *SI Unit: Newton (N) or $\\text{kg}\\cdot\\text{m}/\\text{s}^2$*\n` +
-        `3. **Third Law (Action & Reaction):** For every action, there is an equal and opposite reaction.\n\n` +
-        `📌 **Example:** A rocket moves upward because hot exhaust gases are pushed downward with immense force!`
-      );
-    }
-
-    // 14. Civics & Social: Constitution
-    if (q.includes('constitution') || q.includes('democracy') || q.includes('government') || q.includes('parliament')) {
-      return (
-        `✨ **nova • your study bestie 🎀 • Indian Democratic Architecture**\n\n` +
-        `India is a Sovereign, Socialist, Secular, Democratic Republic governed by the Constitution of India (adopted on 26th January 1950).\n\n` +
-        `**Three Pillars of Government:**\n` +
-        `1. **Legislature (Parliament):** Makes laws. Comprises President, Lok Sabha (House of the People), and Rajya Sabha (Council of States).\n` +
-        `2. **Executive:** Implements laws. Headed by the Prime Minister and Council of Ministers.\n` +
-        `3. **Judiciary (Supreme Court & High Courts):** Interprets laws and protects Fundamental Rights.\n\n` +
-        `💡 **Key Civics Concept:** The Indian Constitution guarantees 6 Fundamental Rights to all citizens, including the Right to Equality and Right to Freedom.`
-      );
-    }
-
-    // 15. General Cute StudyGirl Bestie Answer for ANY other question
-    const randomBestieMsg = getRandomStudyGirlMessage();
     return (
-      `✨ **nova • your study bestie 🎀 • ${cleanSub ? cleanSub.toUpperCase() : 'STUDY SESSION'}**\n\n` +
-      `hey bestie! let's solve "${query}" together for **${board} Class ${grade}** 🌸\n\n` +
-      `**1. here is the core idea:**\n` +
-      `in ${cleanSub || 'your syllabus'}, we break down big questions into simple clues. identify what is given and what we need to find.\n\n` +
-      `**2. simple step-by-step secret:**\n` +
-      `• step 1: spot the main keywords and formula.\n` +
-      `• step 2: plug in numbers carefully.\n` +
-      `• step 3: double check your units and final answer!\n\n` +
-      `🎀 **study bestie reminder:** ${randomBestieMsg.text}\n\n` +
-      `ready to level up your score? let's take a quick quiz together right now! 💖`
+      `🎀 **nova • your study bestie • ${subject.toUpperCase()}**\n\n` +
+      `hey bestie! here is your breakdown for "${query}" 💖:\n\n` +
+      `${conceptAnswer}\n\n` +
+      `ready to test your understanding? complete a quick chapter quiz right now to earn **+25 Study Coins** 🪙 and level up your mastery bar! 🌸\n\n` +
+      secretNudge
     );
   }
 
   /**
    * Interactive Study Buddy chat reply
-   * Tries Live Gemini AI first; falls back instantly to built-in pedagogical engine.
+   * Tries Live Gemini AI first; falls back instantly to built-in StudyGirl engine.
    * NEVER says it is offline!
    */
   public static async answerStudentQuery(
@@ -419,12 +305,13 @@ export class NovaAiService {
     grade: Grade,
     subject: string,
     history?: { role: 'user' | 'model'; text: string }[],
-    learnerId?: string
+    learnerId?: string,
+    learnerPlan?: string
   ): Promise<string> {
     const trimmed = query.trim();
 
     const generateDeterministicFallback = (): string => {
-      return this.generateBuiltInAiResponse(trimmed, board, grade, subject);
+      return this.generateBuiltInAiResponse(trimmed, board, grade, subject, learnerPlan);
     };
 
     if (!HybridQuizService.getPreferLiveAi()) {
@@ -436,7 +323,7 @@ export class NovaAiService {
       const serverCall = fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: trimmed, board, grade, subject, history, learnerId })
+        body: JSON.stringify({ query: trimmed, board, grade, subject, history, learnerId, learnerPlan })
       }).then(async (r) => {
         if (r.status === 429) {
           const errData = await r.json().catch(() => ({}));

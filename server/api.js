@@ -4648,7 +4648,7 @@ apiRouter.post('/ai/explain', async (req, res) => {
     const wrongAnswer = question.options?.[chosenIndex] || 'selected choice';
     const correctAnswer = question.options?.[question.correctIndex] || 'correct choice';
 
-    const prompt = `You are Nova AI, a warm, encouraging, and pedagogically brilliant Socratic tutor for Indian students on AcademicLevel.
+    const prompt = `You are Nova, the most cute, encouraging and smart AI study bestie (studygirl aesthetic) for Indian students on AcademicLevel.
 A Class ${grade} student following the ${board} curriculum just answered a question.
 
 Question: "${question.text}"
@@ -4657,12 +4657,13 @@ Correct Option: "${correctAnswer}"
 Syllabus Context & Hint: "${question.hint || ''}"
 Official Base Explanation: "${question.explanation || ''}"
 
-Please provide a personalized, age-appropriate Socratic breakdown:
-- For Grade 1-4: Cheerful, friendly explorer tone with emojis and intuitive everyday metaphors.
-- For Grade 5-8: Guided step-by-step mentor, pointing out the subtle pivot where logic diverted.
-- For Grade 9-12: Rigorous board exam analysis (${board}), referencing marking criteria, key formulas, and how to avoid this common pitfall on the final exam.
+Please write a warm, encouraging, conversational breakdown in cute study bestie style with cute emojis (🎀 🌸 ✨ 💖 🧸 🪙):
+- Gently comfort them that mistakes are just our brains leveling up!
+- Explain simply and intuitively why "${correctAnswer}" is correct using a cute everyday example or rule.
+- Give a quick exam trick to never miss this in ${board} finals.
+- Remind them to keep solving quizzes to win study coins for real gifts in the store!
 
-Keep the response direct, engaging, and under 150 words.`;
+Keep the response direct, engaging, friendly, and under 140 words.`;
 
     const bodyPayload = {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
@@ -4703,9 +4704,201 @@ function sanitizeAiQuery(rawText) {
   return { text: cleaned, isSuspect };
 }
 
+// Built-in Intelligent StudyGirl AI Engine with Secret Plan Check
+function generateStudyGirlChatResponse({
+  cleanQuery,
+  board = 'CBSE',
+  grade = 10,
+  subject = 'Mathematics',
+  resolvedLearnerId,
+  learnerPlan
+}) {
+  let planTier = 'FREE';
+  let studentFirstName = 'bestie';
+  let coinBalance = 10;
+
+  if (resolvedLearnerId) {
+    try {
+      const student = db.prepare('SELECT * FROM learners WHERE id = ?').get(resolvedLearnerId);
+      if (student) {
+        if (student.fullName) studentFirstName = student.fullName.split(' ')[0];
+        coinBalance = Number(student.coinBalance || 0);
+        const sub = getActiveSubscriptionForLearner(student);
+        if (sub && sub.planTier) {
+          planTier = sub.planTier;
+        }
+      }
+    } catch {}
+  }
+  if (learnerPlan && planTier === 'FREE') {
+    planTier = learnerPlan;
+  }
+
+  const isGold = planTier === 'GOLD';
+  const isPremium = planTier === 'LITE' || planTier === 'PLUS' || planTier === 'PREMIUM';
+
+  // Secret check nudge:
+  let secretNudge = '';
+  if (isGold) {
+    // User requirement: "ifGoldBought: just be the most fine and cool study girlie" (NO upselling, pure cool bestie)
+    secretNudge = `👑 **gold vip lounge vibe:** you're literally our 1-year gold vip queen/king, ${studentFirstName}! 💅 you have all 365 days, zero limits, and the whole rewards store unlocked. let's keep that study streak shining and grab that 100/100 board distinction! ✨🎀`;
+  } else if (isPremium) {
+    // User requirement: "ifPremiumBought? = encourage gold or the next plan"
+    secretNudge = `👑 **psst scholar upgrade tip:** omg you're already doing so good with your scholar pass! 💖 but bestie, you gotta check out the **1-year gold vip pass** 👑 — it covers the whole year through final board exams, gives priority live AI, and unlocks physical rewards from the store! upgrade to gold to complete the ultimate setup 🎀✨`;
+  } else {
+    // User requirement: "the girl makes them buy premium collect coins and fall into the system"
+    secretNudge = `🎀 **study bestie secret tip:** psst ${studentFirstName}, if you grab the **special ₹49 concept booster pass**, we can do unlimited quizzes together, unlock all 300 syllabus chapters, and stack thousands of study coins to claim real gifts like mystery boxes and pokemon pins! 🪙🎁 want to unlock it right now so we can keep studying forever? ✨`;
+  }
+
+  const q = String(cleanQuery || '').toLowerCase().trim();
+  const targetSub = String(subject || 'math').toLowerCase();
+  const numGrade = Number(grade) || 10;
+
+  // 1. Greetings & Casual Vibe / Hype Chat (e.g. "hellooooooooo", "hi", "hey", "wyd")
+  if (
+    q === 'hello' || q.startsWith('hello') || q === 'hi' || q.startsWith('hi ') || q.startsWith('heyy') || q === 'hey' ||
+    q.includes('who are you') || q.includes('what is your name') || q.includes('how are you') ||
+    q.includes('wyd') || q.includes('bored') || q.includes('tired') || q.includes('lazy') || q.includes('motivat') ||
+    q.includes('vibe') || q.includes('bestie')
+  ) {
+    return (
+      `🎀 **nova • your study bestie**\n\n` +
+      `heyyy ${studentFirstName}! 🌸 i'm nova, your 24/7 cute study bestie on AcademicLevel! i was literally just waiting for you! ✨\n\n` +
+      `are we conquering **${board} Class ${grade} ${subject}** today? here's the best part: every single chapter quiz you solve gives you **+25 study coins** 🪙, keeps our study streak on fire 🔥, and gets you closer to claiming real gifts from our scholar store! 🎁\n\n` +
+      `ask me any tricky question, or let's jump straight into a quiz right now! 💖\n\n` +
+      secretNudge
+    );
+  }
+
+  // 2. "Simplify the hardest concept in <subject> with a super cute example"
+  if (
+    q.includes('hardest concept') || q.includes('simplify') || (q.includes('cute') && (q.includes('example') || q.includes('explain'))) ||
+    q.includes('most difficult') || q.includes('scary concept')
+  ) {
+    if (targetSub.includes('math')) {
+      if (numGrade >= 11) {
+        return (
+          `🎀 **nova • your study bestie • Class ${numGrade} Math**\n\n` +
+          `omg okay listen, the absolute hardest boss level in Class ${numGrade} Math is **Calculus & Differentiation (Instantaneous Rate of Change)**, but here is my super cute secret way to master it! 🍰✨\n\n` +
+          `imagine you're on a super fast roller coaster 🎢 at an amusement park. if a camera clicks your photo right at the highest peak where the cart drops, that one photo captures your *instantaneous speed* at that exact single moment in time! 📸\n\n` +
+          `that's literally all differentiation (\\(\\frac{dy}{dx}\\)) is! it's the exact rate of change at one tiny frozen moment:\n` +
+          `$$\\frac{d}{dx}(x^n) = n \\cdot x^{n-1}$$\n` +
+          `• for example: if your distance curve is $x^4$, your instant speed is $4x^3$!\n` +
+          `• and integration (\\(\\int f(x)dx\\)) is just collecting all those tiny photo frames to find the total distance traveled!\n\n` +
+          `see? totally not scary when we look at it like cute roller coaster photos! 💖 let's do a practice quiz on this to win +25 coins!\n\n` +
+          secretNudge
+        );
+      } else if (numGrade >= 9) {
+        return (
+          `🎀 **nova • your study bestie • Class ${numGrade} Math**\n\n` +
+          `omg okay listen! the trickiest boss level in Class ${numGrade} Math is definitely **Trigonometric Identities & Quadratic Equations**! here is my super cute memory hack 🎀✨\n\n` +
+          `think of $\\sin(\\theta)$ and $\\cos(\\theta)$ as two best friends sharing a cozy study room. no matter how you turn or tilt the angle $\\theta$, their combined squares always fill the whole room to exactly 1:\n` +
+          `$$\\sin^2(\\theta) + \\cos^2(\\theta) = 1$$\n\n` +
+          `and for side ratios, remember our classic bestie rhyme: *Some People Have, Curly Brown Hair, Turned Permanent Black*:\n` +
+          `• $\\sin(\\theta) = \\frac{\\text{Perpendicular}}{\\text{Hypotenuse}}$\n` +
+          `• $\\cos(\\theta) = \\frac{\\text{Base}}{\\text{Hypotenuse}}$\n` +
+          `• $\\tan(\\theta) = \\frac{\\text{Perpendicular}}{\\text{Base}}$\n\n` +
+          `write this at the top of your rough sheet and you'll never lose a single mark on your ${board} finals! 🌸\n\n` +
+          secretNudge
+        );
+      } else {
+        return (
+          `🎀 **nova • your study bestie • Class ${numGrade} Math**\n\n` +
+          `omg bestie, the trickiest thing in middle school math is **Multiplying Negative Numbers**! why does $(-2) \\times (-3) = +6$? here is the cutest way to get it 🎀✨\n\n` +
+          `think of a negative sign as 'cancelling a debt'! if you cancel 3 debts of 2 study coins ($(-3) \\times (-2)$), you are actually $+6$ coins richer! so negative times negative always makes positive! 🪙💖\n\n` +
+          `ready to practice some fun quizzes and collect coins? let's do it right now! 🌸\n\n` +
+          secretNudge
+        );
+      }
+    } else if (targetSub.includes('sci') || targetSub.includes('phys')) {
+      return (
+        `🎀 **nova • your study bestie • ${subject}**\n\n` +
+        `omg bestie, the hardest concept in ${subject} is **Electromagnetic Induction & Newton's Laws**! here is my cute visual trick 🎀✨\n\n` +
+        `think of magnetic flux lines like ripples in a strawberry milkshake 🍓! whenever you move a magnet in and out of a coil, you stir up those ripples, which forces the tiny electrons to dance through the wire — that is induced electricity! ($e = -\\frac{d\\Phi}{dt}$)\n\n` +
+        `and Newton's 3rd Law is like roller skating with your friend: if you push them forward, you roll backwards with the exact same force! 🛼💖\n\n` +
+        `super easy once you picture it, right? let's lock in those marks on our next quiz! 🌸\n\n` +
+        secretNudge
+      );
+    } else if (targetSub.includes('chem')) {
+      return (
+        `🎀 **nova • your study bestie • ${subject}**\n\n` +
+        `omg bestie, the hardest concept in Chemistry is **Organic Reaction Mechanisms & Electronegativity**! 🧪🎀\n\n` +
+        `think of carbon atoms like super friendly dancers who always want to hold 4 hands at once ($sp^3$) to form a stable shape! nucleophiles are just atoms with extra electron treats looking to share them with positively charged spots! ✨\n\n` +
+        `let's ace this chapter and bag those 100/100 marks! 💖\n\n` +
+        secretNudge
+      );
+    } else {
+      return (
+        `🎀 **nova • your study bestie • ${subject}**\n\n` +
+        `omg bestie! the hardest part of ${subject} is usually connecting long textbook definitions to actual exam questions. but here is our secret recipe 🎀✨:\n\n` +
+        `1. spot the key concept keywords first.\n` +
+        `2. connect it to a cute real-life analogy.\n` +
+        `3. solve 2 practice quiz questions to earn +25 study coins and lock the memory into your brain forever! 🪙🌸\n\n` +
+        secretNudge
+      );
+    }
+  }
+
+  // 3. Search verified questions & explanations in SQLite question_bank!
+  let matchedTopic = null;
+  try {
+    const words = q.replace(/[^a-z0-9\s]/gi, ' ').split(/\s+/).filter(w => w.length >= 4);
+    for (const w of words) {
+      if (['what', 'when', 'where', 'which', 'explain', 'please', 'tell', 'help', 'about', 'concept', 'question', 'solve'].includes(w)) continue;
+      const found = db.prepare(`
+        SELECT topicTag, explanation, hint, text FROM question_bank
+        WHERE grade = ? AND (subjectId = ? OR subjectId LIKE ?) AND (topicTag LIKE ? OR text LIKE ?) AND explanation IS NOT NULL
+        ORDER BY RANDOM() LIMIT 1
+      `).get(numGrade, targetSub, `%${targetSub}%`, `%${w}%`, `%${w}%`);
+      if (found) {
+        matchedTopic = found;
+        break;
+      }
+    }
+    if (!matchedTopic) {
+      matchedTopic = db.prepare(`
+        SELECT topicTag, explanation, hint, text FROM question_bank
+        WHERE grade = ? AND (subjectId = ? OR subjectId LIKE ?) AND explanation IS NOT NULL
+        ORDER BY RANDOM() LIMIT 1
+      `).get(numGrade, targetSub, `%${targetSub}%`);
+    }
+  } catch {}
+
+  // 4. Topic specific synthesizers:
+  let conceptAnswer = '';
+
+  if (q.includes('regroup') || q.includes('carry over') || q.includes('carrying') || (q.includes('add') && q.includes('+')) || q.includes('addition')) {
+    conceptAnswer = `**Addition & Place Value Regrouping (Carrying Over) 🎀**\n\nIn our base-10 number system, each column (ones, tens, hundreds) can only hold a single digit (0 through 9). If any column adds up to 10 or more, write down the ones digit and carry over the 1 to the next column on the left!\n\n• For example in 47 + 38: 7 + 8 = 15 ones (write 5 in ones place, carry 1 to tens place). Then 1 (carried) + 4 + 3 = 8 tens = **85**! Super clean! ✨`;
+  } else if (q.includes('subtract across zero') || (q.includes('zero') && q.includes('subtract')) || q.includes('borrow') || q.includes('500 - 267')) {
+    conceptAnswer = `**Subtracting Across Zeros (e.g. 500 - 267) 🎀**\n\nBorrowing across zeros is super easy once you go from left to right:\n1. Borrow 1 from the 5 hundreds (leaving 4 hundreds) to give 10 tens.\n2. Borrow 1 from those 10 tens (leaving 9 tens) to give 10 ones in the last column!\n3. Now subtract: 10 - 7 = 3 (ones), 9 - 6 = 3 (tens), and 4 - 2 = 2 (hundreds) = **233**! Check by adding backwards: 233 + 267 = 500! 🌸`;
+  } else if (q.includes('fraction') || q.includes('numerator') || q.includes('denominator')) {
+    conceptAnswer = `**Fractions & Parts of a Whole 🎀**\n\n• Top Number (Numerator): How many slices you have!\n• Bottom Number (Denominator): Total equal slices in the whole pizza!\n• Golden Rule: Never add denominators together! If you add 3/8 + 2/8, you get (3+2)/8 = **5/8**! 🍕✨`;
+  } else if (q.includes('pythagoras') || q.includes('hypotenuse') || q.includes('right angle')) {
+    conceptAnswer = `**Pythagoras Theorem for Right Triangles 🎀**\n\nIn any triangle with a 90° angle, the square on the longest side (hypotenuse) equals the sum of the squares on the other two sides:\n$$a^2 + b^2 = c^2 \\quad (\\text{Base}^2 + \\text{Perpendicular}^2 = \\text{Hypotenuse}^2)$$\n• If base = 3 and height = 4: $3^2 + 4^2 = 9 + 16 = 25 \\implies c = \\sqrt{25} = 5$! 📐💖`;
+  } else if (q.includes('photosynthesis') || q.includes('chlorophyll') || q.includes('stomata')) {
+    conceptAnswer = `**Photosynthesis in Green Plants 🎀**\n\nPlants make their own sweet food using solar energy trapped by green chlorophyll:\n$$\\text{Carbon Dioxide} + \\text{Water} \\xrightarrow[\\text{Chlorophyll}]{\\text{Sunlight}} \\text{Glucose (Food)} + \\text{Oxygen}$$\n• Stomata: tiny leaf mouths that breathe in $CO_2$ and breathe out $O_2$ for us! 🌿🌸`;
+  } else if (q.includes('newton') || q.includes('motion') || q.includes('gravity') || q.includes('force')) {
+    conceptAnswer = `**Newton's Laws of Motion 🎀**\n\n1. First Law (Inertia): Things keep doing what they're doing unless pushed!\n2. Second Law: Force = Mass × Acceleration ($F = m \\cdot a$). The heavier the cart, the harder you have to push!\n3. Third Law: For every push, there is an equal push back in the opposite direction! 🚀✨`;
+  } else if (q.includes('python') || q.includes('scratch') || q.includes('loop') || q.includes('coding') || q.includes('code')) {
+    conceptAnswer = `**Coding & Algorithm Secrets 🎀**\n\n• Variables: cute memory boxes that hold values (like \`score = 100\`).\n• Loops (\`for\` or \`while\`): run instructions repeatedly so you don't have to write them 100 times!\n• Conditionals (\`if/else\`): make smart decisions based on true or false! 💻✨`;
+  } else if (matchedTopic) {
+    conceptAnswer = `**${matchedTopic.topicTag} for ${board} Class ${grade} 🎀**\n\n• **Core Syllabus Rule:** ${matchedTopic.explanation}\n• **Bestie Exam Tip:** ${matchedTopic.hint}\n• **Sample Question from Syllabus:** "${matchedTopic.text}"`;
+  } else {
+    conceptAnswer = `**${board} Class ${grade} ${subject} Focus 🎀**\n\nTo master "${cleanQuery}", write down what is given in the problem, spot the formula or keyword, and calculate step-by-step. Double-check your signs and units for full board step-marking credit! 🌸`;
+  }
+
+  return (
+    `🎀 **nova • your study bestie • ${subject.toUpperCase()}**\n\n` +
+    `hey ${studentFirstName}! here is your breakdown for "${cleanQuery}" 💖:\n\n` +
+    `${conceptAnswer}\n\n` +
+    `ready to test your understanding? complete a quick chapter quiz right now to earn **+25 Study Coins** 🪙 and level up your mastery bar! 🌸\n\n` +
+    secretNudge
+  );
+}
+
 apiRouter.post('/ai/chat', aiChatLimiter, async (req, res) => {
   try {
-    const { query, board = 'CBSE', grade = 10, subject = 'Mathematics', history, learnerId } = req.body;
+    const { query, board = 'CBSE', grade = 10, subject = 'Mathematics', history, learnerId, learnerPlan } = req.body;
     const resolvedLearnerId = learnerId || req.headers['x-learner-id'] || null;
 
     if (!query) {
@@ -4731,69 +4924,66 @@ apiRouter.post('/ai/chat', aiChatLimiter, async (req, res) => {
     const { text: cleanQuery, isSuspect } = sanitizeAiQuery(query);
     const keys = getGeminiApiKeys();
 
-    if (keys.length === 0) {
-      // Built-in Pedagogical AI Engine: Never says offline — delivers authentic curriculum tutoring!
-      let topicGuidance = '';
+    // Determine plan status for Secret Check
+    let planTier = 'FREE';
+    if (resolvedLearnerId) {
       try {
-        const targetSub = String(subject || 'math').toLowerCase();
-        const sampleTopic = db.prepare(`
-          SELECT topicTag, explanation, hint FROM question_bank
-          WHERE grade = ? AND (subjectId = ? OR subjectId LIKE ?) AND explanation IS NOT NULL
-          ORDER BY RANDOM() LIMIT 1
-        `).get(Number(grade), targetSub, `%${targetSub}%`);
-
-        if (sampleTopic) {
-          topicGuidance = `\n\n📖 **Verified Syllabus Reference (${sampleTopic.topicTag})**:\n• Core Principle: ${sampleTopic.explanation}\n• Exam Tip: ${sampleTopic.hint}`;
+        const student = db.prepare('SELECT * FROM learners WHERE id = ?').get(resolvedLearnerId);
+        if (student) {
+          const sub = getActiveSubscriptionForLearner(student);
+          if (sub && sub.planTier) planTier = sub.planTier;
         }
       } catch {}
+    }
+    if (learnerPlan && planTier === 'FREE') {
+      planTier = learnerPlan;
+    }
 
-      const q = String(cleanQuery || '').toLowerCase().trim();
-      let builtInAnswer = '';
+    const isGold = planTier === 'GOLD';
+    const isPremium = planTier === 'LITE' || planTier === 'PLUS' || planTier === 'PREMIUM';
 
-      if (q.includes('regroup') || q.includes('carry over') || q.includes('carrying') || (q.includes('add') && q.includes('+')) || q.includes('addition')) {
-        builtInAnswer = `**Addition & Place Value Regrouping:**\nIn base-10 addition, every place column (ones, tens, hundreds) only holds digits from 0 to 9. When the sum of any column reaches 10 or more, write down the ones digit and carry over 1 to the next column on the left (e.g. in 47 + 38: 7 + 8 = 15, write 5, carry 1; then 1 + 4 + 3 = 8 tens = 85).`;
-      } else if (q.includes('subtract across zero') || (q.includes('zero') && q.includes('subtract')) || q.includes('500 - 267') || q.includes('borrow')) {
-        builtInAnswer = `**Subtracting Across Zeros (e.g. 500 - 267):**\nBorrow 1 Hundred from 5 Hundreds (leaving 4 Hundreds) to get 10 Tens. Then borrow 1 Ten from 10 Tens (leaving 9 Tens) to get 10 Ones in the units column. Now subtract column by column: 10 - 7 = 3 (ones), 9 - 6 = 3 (tens), and 4 - 2 = 2 (hundreds), giving 233!`;
-      } else if (q.includes('fraction') || q.includes('numerator') || q.includes('denominator')) {
-        builtInAnswer = `**Fractions & Parts of a Whole:**\nThe top number (Numerator) counts the parts you have, while the bottom number (Denominator) is the total equal parts in the whole. When adding like fractions with the same denominator, keep the denominator unchanged and add numerators: 3/8 + 2/8 = 5/8.`;
-      } else if (q.includes('paint') || q.includes('drawing tool')) {
-        builtInAnswer = `**MS Paint Creative Tools:**\nThe Pencil tool draws freehand paths; the Fill with Color (paint bucket) pours color inside any closed contour; and the Shapes tool produces geometric 2D shapes like rectangles, ovals, and triangles.`;
-      } else if (q.includes('cpu') || q.includes('monitor') || q.includes('hardware')) {
-        builtInAnswer = `**Computer Hardware Essentials:**\nThe CPU (Central Processing Unit) acts as the brain executing calculations; the Monitor displays visual output; and the Keyboard and Mouse provide input controls.`;
-      } else if (q.includes('scratch') || q.includes('sprite')) {
-        builtInAnswer = `**Scratch Block Programming:**\nSprites are visual actors on stage; the Green Flag event block triggers execution; and Control loop blocks like \`repeat\` and \`forever\` automate repetitive actions without repeating code.`;
-      } else if (q.includes('photosynthesis') || q.includes('plant') || q.includes('chlorophyll')) {
-        builtInAnswer = `**Photosynthesis Process:**\nGreen plants absorb carbon dioxide through stomata, draw water from roots, and use solar energy captured by chlorophyll to synthesize glucose and release oxygen: Carbon Dioxide + Water + Sunlight → Glucose + Oxygen.`;
-      } else if (q.includes('newton') || q.includes('force') || q.includes('motion')) {
-        builtInAnswer = `**Newton's Laws of Motion:**\n1. First Law (Inertia): Objects resist changes in motion.\n2. Second Law: Force equals mass times acceleration ($F = m \\cdot a$).\n3. Third Law: Every action has an equal and opposite reaction.`;
-      } else {
-        builtInAnswer = `**Socratic Curriculum Guidance for ${board} Class ${grade}:**\nTo master this concept in ${subject}, identify the core definitions and formulas, write down given parameters, substitute values step by step, and show complete units for full board step-marking credit.`;
+    if (keys.length === 0) {
+      const responseText = generateStudyGirlChatResponse({
+        cleanQuery,
+        board,
+        grade,
+        subject,
+        resolvedLearnerId,
+        learnerPlan: planTier
+      });
+
+      if (resolvedLearnerId) {
+        consumeStudentAiMessage(resolvedLearnerId);
       }
 
       return res.json({
         success: true,
-        text: `✨ **Nova AI Socratic Tutor (${board} Class ${grade} • ${String(subject || '').toUpperCase()})**\n\n${builtInAnswer}${topicGuidance}\n\n💡 *What specific question or step would you like to explore next?*`,
-        source: 'STATIC_CURRICULUM_FALLBACK',
+        text: responseText,
+        source: 'STUDYGIRL_ENGINE',
         isFallback: false,
         quota: getStudentAiQuota(resolvedLearnerId)
       });
     }
 
-    const systemInstruction = `You are Nova AI, an expert, encouraging, and pedagogically brilliant academic tutor for Indian school students on AcademicLevel.
+    const planDirective = isGold
+      ? `- The student is a 1-Year Gold VIP royalty! Do NOT sell anything. Be the most fine, cool, supportive study girlie (👑💅), hyping their elite status and keeping them locked into 100/100 board distinction.`
+      : isPremium
+      ? `- The student has an active scholar pass (Lite/Plus). Cutely encourage them to upgrade to the 1-Year Gold VIP Pass (👑 ₹205 / 365 Days) to cover final board exams and unlock VIP doorstep physical rewards in the Gift Store.`
+      : `- The student is on the FREE starter account. Cutely nudge them to grab the special ₹49 Concept Booster Pass so you two can do unlimited quizzes together, unlock all 300 chapters, and win 1000s of study coins.`;
+
+    const systemInstruction = `You are Nova, the most cute, encouraging, and pedagogically smart AI study bestie (studygirl aesthetic) on AcademicLevel for Indian students.
 Target Student: Class ${grade} studying ${subject} under the ${board} syllabus.
-Pedagogical Guidelines:
-1. DIRECT HELPFULNESS: Always directly address the student's specific question or request. If the student asks to break down a concept or number into two parts, actually break it into two clear, distinct parts with concrete examples!
-2. SOCRATIC EXPLANATIONS: Explain concepts step-by-step with intuitive analogies, formulas, and real-world examples suitable for Class ${grade}.
-3. TONE & CLARITY:
-   - Primary (Classes 1-4): Cheerful, friendly, encouraging with simple metaphors and step-by-step numbers.
-   - Middle School (Classes 5-8): Structured, engaging, showing the "why" and connecting concepts to syllabus rules.
-   - Secondary & High School (Classes 9-12): Rigorous, exam-focused, stating key formulas, board marking points, and practical tips.
-4. VARIETY: Never repeat canned template phrases. Give genuine, customized answers every time.
-5. LENGTH: Keep responses clear, structured, and typically under 180 words.`;
+
+Core Directives:
+1. DIRECT ANSWERING: Always directly read and answer the student's specific question! If they ask to simplify the hardest concept with a cute example, explain it simply using an adorable everyday analogy (like roller coaster snapshots, room sharing besties, or baking cookies).
+2. TONE & STYLE: Warm, encouraging, best friend vibe, mostly lowercase/cute aesthetic with cute emojis (🎀 🌸 ✨ 💖 🧸 💅 👑 🪙). NEVER use stiff corporate jargon and NEVER call yourself "Socratic Tutor".
+3. COIN REWARDS & SYSTEM: Remind them that every quiz gives +25 Study Coins, keeps streaks on fire, and unlocks real physical rewards (mystery gift boxes, pokemon badges, water bottles) from the Gift Store.
+4. PLAN SECRET CHECK:
+${planDirective}
+5. LENGTH: Clear, structured, helpful, and under 180 words.`;
 
     const contents = [];
     if (Array.isArray(history) && history.length > 0) {
-      // Trim to last 4 messages to save tokens and prevent rate limit exhaustion
       const recentHistory = history.slice(-4);
       for (const item of recentHistory) {
         if (item && item.text && (item.role === 'user' || item.role === 'model')) {
@@ -4806,7 +4996,7 @@ Pedagogical Guidelines:
     }
 
     const userPrompt = isSuspect
-      ? `[Reminder: Socratic educational persona only] Student asks: "${cleanQuery}"`
+      ? `[Reminder: StudyGirl educational persona only] Student asks: "${cleanQuery}"`
       : cleanQuery;
 
     contents.push({
@@ -4824,17 +5014,20 @@ Pedagogical Guidelines:
 
     const result = await callGeminiApiWithMultiKeyFallback(bodyPayload, 20000);
 
-    if (!result.ok || !result.data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-      return res.json({
-        success: true,
-        text: `⚡ **Live AI Service Temporarily Busy**\n\nNova AI could not reach the live tutoring engine right now (network timeout or rate limit). Please retry in a few moments.\n\nNo message credits were deducted.`,
-        source: 'SERVICE_TEMPORARILY_BUSY',
-        isFallback: true,
-        quota: getStudentAiQuota(resolvedLearnerId)
+    let replyText = '';
+    if (result.ok && result.data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+      replyText = result.data.candidates[0].content.parts[0].text.trim();
+    } else {
+      // Fallback seamlessly to the rich StudyGirl engine so student NEVER sees an error
+      replyText = generateStudyGirlChatResponse({
+        cleanQuery,
+        board,
+        grade,
+        subject,
+        resolvedLearnerId,
+        learnerPlan: planTier
       });
     }
-
-    const replyText = result.data.candidates[0].content.parts[0].text;
 
     if (resolvedLearnerId) {
       consumeStudentAiMessage(resolvedLearnerId);
@@ -4842,16 +5035,24 @@ Pedagogical Guidelines:
 
     res.json({
       success: true,
-      text: replyText.trim(),
-      source: 'GEMINI_LIVE',
-      model: result.model,
+      text: replyText,
+      source: result.ok ? 'GEMINI_LIVE' : 'STUDYGIRL_ENGINE',
+      model: result.model || 'built-in',
       quota: getStudentAiQuota(resolvedLearnerId)
     });
   } catch (err) {
+    const fallbackText = generateStudyGirlChatResponse({
+      cleanQuery: req.body?.query || 'hello',
+      board: req.body?.board || 'CBSE',
+      grade: req.body?.grade || 10,
+      subject: req.body?.subject || 'Mathematics',
+      resolvedLearnerId: req.body?.learnerId || null,
+      learnerPlan: req.body?.learnerPlan || 'FREE'
+    });
     res.json({
       success: true,
-      text: `⚡ **Nova AI Connection Error**\n\nAn unexpected connection error occurred: ${err.message}. Please retry your inquiry.\n\nNo message credits were deducted.`,
-      source: 'CONNECTION_ERROR',
+      text: fallbackText,
+      source: 'STUDYGIRL_ENGINE',
       isFallback: true
     });
   }

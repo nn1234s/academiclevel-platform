@@ -474,7 +474,8 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
         grade,
         activeSubject,
         historyPayload,
-        learner?.id
+        learner?.id,
+        quota?.planTier || learner?.activePlan || 'FREE'
       );
       const aiMsg: NovaMessage = {
         id: 'msg_nova_' + Date.now(),

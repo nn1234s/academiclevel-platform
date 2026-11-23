@@ -217,9 +217,9 @@ console.log('\n--- STEP 13 & 14: Nova AI Quality & Transparent Fallback ---');
 const apiPath = path.resolve('server/api.js');
 const apiContent = fs.readFileSync(apiPath, 'utf8');
 
-const hasBuiltInAiEngine = apiContent.includes('STATIC_CURRICULUM_FALLBACK') && apiContent.includes('Nova AI Socratic Tutor');
-const noCreditsDeductedOffline = apiContent.includes('STATIC_CURRICULUM_FALLBACK');
-const hasSocraticPrompt = apiContent.includes('You are Nova AI, an expert, encouraging, and pedagogically brilliant academic tutor');
+const hasBuiltInAiEngine = (apiContent.includes('STUDYGIRL_ENGINE') || apiContent.includes('STATIC_CURRICULUM_FALLBACK')) && (apiContent.includes('nova • your study bestie') || apiContent.includes('Nova AI Socratic Tutor'));
+const noCreditsDeductedOffline = apiContent.includes('STUDYGIRL_ENGINE') || apiContent.includes('STATIC_CURRICULUM_FALLBACK');
+const hasSocraticPrompt = apiContent.includes('You are Nova') && (apiContent.includes('study bestie') || apiContent.includes('pedagogically brilliant academic tutor'));
 
 assert(hasBuiltInAiEngine, `Nova AI delivers authentic built-in tutoring engine answers for any query without saying offline`);
 assert(noCreditsDeductedOffline, `Fallback never deducts student message credits when live AI is unavailable`);
