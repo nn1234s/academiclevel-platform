@@ -71,7 +71,7 @@ const DEFAULT_CONFIG: SiteConfig = {
     liteFeatures: [
       'Unlimited Quizzes & Adaptive Assessments',
       'Full Access to All Syllabus Chapters',
-      'Nova AI Socratic Tutor 24/7',
+      'Nova StudyGirl AI Buddy 24/7',
       'Level Mastery Certificates',
       'Max 1 Class Change during active cycle'
     ],
@@ -92,16 +92,16 @@ const DEFAULT_CONFIG: SiteConfig = {
       'Exclusive Gold Scholar Profile Badge & Frame',
       'Olympiad, NTSE & National Foundation Track',
       'Annual Master Certificate of Academic Excellence',
-      '24/7 Nova AI Socratic Tutor with Priority Pool',
+      '24/7 Nova StudyGirl AI Buddy with Priority Pool',
       'Max 2 Class Changes during active cycle'
     ]
   },
   home: {
     heroTitle: 'Master Your School Curriculum with Adaptive AI Quizzes',
-    heroSubtitle: 'CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant Socratic guidance, verifiable certificates, and an earnable Study Coin economy.',
+    heroSubtitle: 'CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant friendly StudyGirl guidance, verifiable certificates, and an earnable Study Coin economy.',
     announcementActive: true,
     announcementText: '🚀 3,600+ Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
-    statsStudents: 'Nova AI Socratic Tutor',
+    statsStudents: 'Nova StudyGirl AI Buddy',
     statsQuizzes: '3,600+ Questions',
     statsPassRate: 'CBSE • ICSE • IGCSE',
     bannerCtaText: 'Start Free Practice Now'
@@ -117,7 +117,7 @@ const DEFAULT_CONFIG: SiteConfig = {
   },
   ads: {
     mainHeading: 'Score 95%+ in School Exams Without Expensive Tuitions',
-    subHeading: 'CBSE & ICSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Socratic Nova AI Tutor & Real Study Coin Rewards.',
+    subHeading: 'CBSE & ICSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Nova StudyGirl AI Buddy & Real Study Coin Rewards.',
     offerPriceInr: 49,
     originalPriceInr: 999,
     discountPercent: 95,

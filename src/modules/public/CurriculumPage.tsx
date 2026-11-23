@@ -112,7 +112,7 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
         'All 12 Classes covered from Primary to Senior Secondary',
         'Mathematics, Science (Physics/Chemistry/Biology), Computer Science, English & Social',
         'Complete Chapter-Wise Syllabi: Calibrated topics, practice tests, and Olympiad HOTS',
-        '100% verified question bank with step-by-step Socratic explanations'
+        '100% verified question bank with step-by-step Study Buddy explanations'
       ],
       tagColor: 'bg-indigo-50 border-indigo-200 text-indigo-700'
     },
@@ -124,7 +124,7 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
         'Rigorous analytical problem sets tailored to CISCE standards',
         'Detailed step-marking rubrics and theoretical question banks',
         'Complete coverage of Classes 1–10 (ICSE) and Classes 11–12 (ISC)',
-        'Socratic Nova AI tutoring to break down complex proofs and equations'
+        'Nova StudyGirl AI tutoring to break down complex proofs and equations'
       ],
       tagColor: 'bg-blue-50 border-blue-200 text-blue-700'
     },
@@ -158,7 +158,7 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
       subtitle: 'Select any Board (CBSE, ICSE, Cambridge) or Olympiad track to explore syllabus nodes and test drive real sample questions.',
       features: [
         '3,600+ Syllabus-Verified Questions across all boards and classes',
-        'Socratic Nova AI Tutor available 24/7 for instant guided help',
+        'Nova StudyGirl AI Tutor available 24/7 for instant friendly help',
         '3 Full Curriculum Levels 100% Free for every registered learner',
         'Physical rewards: books, stationery, plushies, and certificates'
       ],
@@ -424,7 +424,7 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
               Sign Up Now &amp; Unlock 3 Full Levels for FREE!
             </h3>
             <p className="text-xs text-slate-600 max-w-xl leading-relaxed">
-              Do not get stuck on boring PDFs. Enjoy 1-on-1 Socratic Nova AI hints, earn real Study Coins on every question, and redeem them for real gifts. No credit card required.
+              Do not get stuck on boring PDFs. Enjoy 1-on-1 Nova StudyGirl AI hints, earn real Study Coins on every question, and redeem them for real gifts. No credit card required.
             </p>
           </div>
 
@@ -573,7 +573,7 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
           </div>
           <div className="flex items-center space-x-1.5">
             <Check className="w-4 h-4 text-emerald-600" />
-            <span>Socratic Nova AI Guidance</span>
+            <span>Nova StudyGirl AI Guidance</span>
           </div>
           <div className="flex items-center space-x-1.5">
             <Check className="w-4 h-4 text-emerald-600" />

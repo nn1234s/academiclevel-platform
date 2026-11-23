@@ -204,7 +204,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                 )}
               </div>
               <p className="text-[11px] text-slate-500">
-                AI Diagnostic Performance Reports, Socratic Insights &amp; Platform Notifications
+                AI Diagnostic Performance Reports, Study Buddy Insights &amp; Platform Notifications
               </p>
             </div>
           </div>

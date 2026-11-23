@@ -197,13 +197,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   const aiPlatformEngines = [
     {
-      title: 'Nova Socratic AI Tutor',
+      title: 'Nova StudyGirl AI Buddy',
       category: 'Autonomous AI Guidance',
       badge: '24/7 Available',
-      highlight: 'Socratic Problem Solver',
-      desc: 'Guides students through difficult math & science questions step-by-step with patient hints rather than giving raw answers away.',
-      gradient: 'from-blue-600 to-indigo-700',
-      icon: '🧠',
+      highlight: 'Friendly Study Bestie',
+      desc: 'Guides students through difficult math & science questions step-by-step with cute, patient hints rather than giving raw answers away.',
+      gradient: 'from-pink-500 via-rose-500 to-indigo-600',
+      icon: '🎀',
     },
     {
       title: '3,600+ Questions Bank Engine',
@@ -338,7 +338,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {homeConfig.heroSubtitle || (
               <>
                 Live Interaction. Deeper Learning. Stronger Results. <br className="hidden sm:inline" />
-                <span className="text-indigo-600 font-semibold">India’s Smartest AI Socratic Engine</span> knows your gaps and solves them fast. All subjects, one platform, real academic progress.
+                <span className="text-indigo-600 font-semibold">India’s Smartest AI Study Buddy</span> knows your gaps and solves them fast. All subjects, one platform, real academic progress.
               </>
             )}
           </p>
@@ -351,7 +351,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="w-6 h-6 rounded-full bg-amber-500 border border-white flex items-center justify-center text-[9px] text-white font-bold">3.6K</div>
             <div className="w-6 h-6 rounded-full bg-emerald-500 border border-white flex items-center justify-center text-[10px] text-white font-bold">★</div>
           </div>
-          <span>Interactive <strong className="text-slate-900">AI Quizzes &amp; Socratic Tutor</strong> for Classes 1–12</span>
+          <span>Interactive <strong className="text-slate-900">AI Quizzes &amp; Study Buddy</strong> for Classes 1–12</span>
         </div>
 
         {/* Action CTAs */}
@@ -422,7 +422,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </h2>
 
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Accelerate K-12 academic growth with our autonomous AI curriculum. Bridge learning gaps before term exams with daily AI diagnostic quizzes, 1-on-1 Socratic feedback, and real-time concept clarity with zero human delays.
+                Accelerate K-12 academic growth with our autonomous AI curriculum. Bridge learning gaps before term exams with daily AI diagnostic quizzes, 1-on-1 friendly StudyGirl feedback, and real-time concept clarity with zero human delays.
               </p>
 
               {/* 3 Pillars */}
@@ -464,7 +464,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Nova AI Socratic Problem Solver</span>
+                  <span>Nova StudyGirl AI Problem Solver</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
@@ -503,7 +503,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             Most Elite AI Quiz Platform
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto">
-            AcademicLevel replaces rigid classroom schedules with an autonomous, 24/7 Socratic AI quiz engine tailored precisely to your syllabus, strengths, and pace.
+            AcademicLevel replaces rigid classroom schedules with an autonomous, 24/7 adaptive AI quiz engine tailored precisely to your syllabus, strengths, and pace.
           </p>
 
           {/* 4 Stats Grid */}
@@ -514,11 +514,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
             <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
               <div className="text-2xl sm:text-3xl font-black text-indigo-600">100% AI</div>
-              <div className="text-xs text-slate-500 font-medium mt-1">Autonomous Socratic Tutoring</div>
+              <div className="text-xs text-slate-500 font-medium mt-1">Autonomous Study Buddy Tutoring</div>
             </div>
             <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
               <div className="text-2xl sm:text-3xl font-black text-emerald-600">24/7 Instant</div>
-              <div className="text-xs text-slate-500 font-medium mt-1">Socratic Doubts Solved</div>
+              <div className="text-xs text-slate-500 font-medium mt-1">Study Doubts Solved</div>
             </div>
             <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
               <div className="text-2xl sm:text-3xl font-black text-rose-600">98.6%</div>
@@ -730,7 +730,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <span className="text-[10px] font-mono font-bold uppercase text-indigo-700 block">Classes 5 to 8</span>
             <h3 className="font-extrabold text-slate-900 text-base">Interactive Quest Tracks</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Gamified chapter sidebars, streak progression flames, Socratic reasoning prompts, and friendly peer challenges.
+              Gamified chapter sidebars, streak progression flames, friendly study buddy tips, and cheerful peer challenges.
             </p>
           </div>
 
@@ -763,7 +763,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
             <div className="px-5 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
               <div className="text-2xl font-black text-emerald-600">24/7</div>
-              <div className="text-[11px] text-slate-500 font-medium">Nova AI Socratic Tutor</div>
+              <div className="text-[11px] text-slate-500 font-medium">Nova StudyGirl AI Buddy</div>
             </div>
             <div className="px-5 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
               <div className="text-2xl font-black text-amber-500 flex items-center justify-center gap-1">
@@ -905,7 +905,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Instant Socratic AI Hints</span>
+                  <span>Instant Friendly StudyGirl Hints</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -952,7 +952,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <span>Nova AI Socratic Tutor 24/7</span>
+                  <span>Nova StudyGirl AI Buddy 24/7</span>
                 </li>
               </ul>
             </div>

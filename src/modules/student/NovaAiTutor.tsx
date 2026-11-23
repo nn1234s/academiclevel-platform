@@ -22,6 +22,7 @@ import {
   GraduationCap
 } from 'lucide-react';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
+import { STUDYGIRL_100_MESSAGES, getRandomStudyGirlMessage } from '../../data/studygirlMessages';
 
 interface NovaAiTutorProps {
   board: Board;
@@ -408,13 +409,8 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       return;
     }
 
-    if (grade <= 4) {
-      welcomeText = `✨ Hi! I'm Nova, your cheerful learning buddy! I can explain any puzzle in ${board} Class ${grade} ${activeSubject} in fun, simple steps. What would you like to explore today?`;
-    } else if (grade <= 8) {
-      welcomeText = `👋 Hello! I'm Nova, your Socratic AI guide for ${board} Class ${grade} ${activeSubject}. If you're stuck on a problem or formula, ask away and we'll break it down together step-by-step!`;
-    } else {
-      welcomeText = `🎯 Welcome! I'm Nova, your high-rigor ${board} Class ${grade} Academic Coach. I'm calibrated to ${board} official marking criteria and conceptual derivation. Which unit or topic are you working on?`;
-    }
+    const randomMsg = getRandomStudyGirlMessage();
+    welcomeText = `🎀 hey bestie! i'm nova, your cute study buddy ✨\n\n${randomMsg.text}\n\nwhat chapter or puzzle are we solving today? ask me anything or click below to start a quiz! 🌸💖`;
 
     setMessages([
       {
@@ -424,6 +420,17 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ]);
+  };
+
+  const handleTriggerBestieCheer = () => {
+    const msg = getRandomStudyGirlMessage();
+    const bestieMsg: NovaMessage = {
+      id: 'msg_bestie_' + Date.now(),
+      sender: 'NOVA',
+      text: `${msg.emoji} **study bestie message #${msg.id} • ${msg.tag}**\n\n${msg.text}\n\nlet's crush a quiz together right now! click any chapter quiz to start 🌸💖`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    setMessages(prev => [...prev, bestieMsg]);
   };
 
   useEffect(() => {
@@ -439,7 +446,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       const limitMsg: NovaMessage = {
         id: 'msg_limit_' + Date.now(),
         sender: 'NOVA',
-        text: `🪙 **Daily AI Cap Reached (8/8 Free Messages Used)**\n\nYou've used your daily free quota of 8 Socratic AI queries! Unlock 5 extra AI messages for 10 AL Coins with the Refill button.`,
+        text: `🪙 **daily free ai messages reached!**\n\nyou did so many questions today bestie! unlock 5 extra study buddy chats for just 10 AL Coins with the refill button 🌸✨`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, limitMsg]);
@@ -478,10 +485,11 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       setMessages(prev => [...prev, aiMsg]);
       loadQuota();
     } catch {
+      const bestieCheer = getRandomStudyGirlMessage();
       const fallbackMsg: NovaMessage = {
         id: 'msg_err_' + Date.now(),
         sender: 'NOVA',
-        text: `[Syllabus Bank Guidance] In ${board} Class ${grade} ${activeSubject}, always review foundational definitions and state your formulas first. Would you like a step-by-step example on this concept?`,
+        text: `🎀 hey bestie! ${bestieCheer.text}\n\nready to test your brain? let's take a quiz and stack up those coins! 🌸`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, fallbackMsg]);
@@ -505,26 +513,29 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
   return (
     <div className="flex flex-col h-[650px] max-w-3xl mx-auto bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl text-slate-900 relative">
       {/* Header */}
-      <div className="bg-slate-50 p-4 border-b border-slate-200 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-pink-50 via-rose-50 to-indigo-50 p-4 border-b border-pink-200/60 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-900/20">
-            <Sparkles className="w-5 h-5 animate-pulse" />
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-500 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-pink-900/20 text-lg">
+            🎧
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h3 className="font-bold text-sm text-slate-900">Nova AI Socratic Tutor</h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                {board} • Class {grade}
+              <h3 className="font-black text-sm text-slate-900 flex items-center gap-1.5">
+                <span>nova</span>
+                <span className="text-[11px] font-normal text-slate-500">• your study bestie 🎀</span>
+              </h3>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-100 text-pink-700 border border-pink-200">
+                Class {grade} {board}
               </span>
               {!learner && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  Guest Preview Mode
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                  Guest Mode
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-slate-500 flex items-center space-x-1.5 mt-0.5">
+            <p className="text-[11px] text-slate-600 flex items-center space-x-1.5 mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping inline-block" />
-              <span>Multi-Model Chain (Google Gemini 3.5 Flash Lite + Socratic Engine)</span>
+              <span>100+ cute study brain boosts preloaded • works offline 🌸</span>
             </p>
           </div>
         </div>
@@ -723,42 +734,39 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
 
         {isTyping && (
           <div className="flex items-center space-x-2 text-slate-600 text-xs italic p-3 bg-white rounded-2xl border border-slate-200 shadow-xs w-fit animate-pulse">
-            <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-600" />
-            <span>Nova is reasoning socratically according to {board} marking standards...</span>
+            <RefreshCw className="w-3.5 h-3.5 animate-spin text-pink-500" />
+            <span>nova is preparing a cute, simple explanation for you... 🎀✨</span>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Suggested Quick Prompts */}
-      <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 flex items-center space-x-2 overflow-x-auto text-[11px] no-scrollbar">
-        <span className="text-slate-500 flex-shrink-0 flex items-center space-x-1">
-          <Lightbulb className="w-3 h-3 text-amber-500" />
-          <span>Quick:</span>
-        </span>
+      <div className="px-4 py-2 bg-gradient-to-r from-pink-50/60 via-purple-50/60 to-indigo-50/60 border-t border-pink-100 flex items-center space-x-2 overflow-x-auto text-[11px] no-scrollbar">
         <button
-          onClick={() => executeSend(`Can you simplify the hardest concept in ${activeSubject} with an analogy?`)}
-          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs"
+          onClick={handleTriggerBestieCheer}
+          className="whitespace-nowrap px-3 py-1.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold transition-all cursor-pointer shadow-xs flex items-center space-x-1 active:scale-95 shrink-0"
+          title="100 preloaded brain study motivation messages"
         >
-          💡 Simplify concept
+          <span>🎀 bestie study vibe (100 inside)</span>
         </button>
         <button
-          onClick={() => executeSend(`Show step-by-step mathematical derivation for the main formula in ${activeSubject}.`)}
-          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs"
+          onClick={() => executeSend(`can you simplify the hardest concept in ${activeSubject || 'this chapter'} with a super cute example?`)}
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs shrink-0"
         >
-          🔍 Step-by-step derivation
+          💡 simplify concept
         </button>
         <button
-          onClick={() => executeSend(`Give me 1 challenging ${board} exam-style practice problem for Class ${grade}.`)}
-          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs"
+          onClick={() => executeSend(`give me a fun brain study tip to remember formulas easily!`)}
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs shrink-0"
         >
-          📝 Practice question
+          🧠 brain memory hack
         </button>
         <button
-          onClick={() => executeSend(`What are common silly mistakes students make in ${activeSubject} exams?`)}
-          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs"
+          onClick={() => executeSend(`what's a silly mistake students make in ${activeSubject || 'our syllabus'} exams?`)}
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs shrink-0"
         >
-          ⚠️ Common mistake traps
+          ⚠️ silly mistakes to avoid
         </button>
       </div>
 
@@ -768,7 +776,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
           type="text"
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
-          placeholder={`Ask Nova anything about ${board} Class ${grade} ${activeSubject}...`}
+          placeholder={`ask your study bestie anything or get motivation... 🎀`}
           className="flex-1 bg-slate-50 border border-slate-300 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none"
         />
         <button

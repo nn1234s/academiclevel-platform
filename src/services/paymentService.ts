@@ -24,7 +24,7 @@ export const PLAN_PRICING: Record<'LITE' | 'PLUS' | 'GOLD', PlanPricing> = {
     features: [
       'Unlimited Quizzes & Adaptive Assessments',
       'Full Access to All Syllabus Chapters',
-      'Nova AI Socratic Tutor 24/7',
+      'Nova StudyGirl AI Buddy 24/7',
       'Level Mastery Certificates',
       'Max 1 Class Change during active cycle'
     ]
@@ -57,7 +57,7 @@ export const PLAN_PRICING: Record<'LITE' | 'PLUS' | 'GOLD', PlanPricing> = {
       'Exclusive Gold Scholar Profile Badge & Frame',
       'Olympiad, NTSE & National Foundation Track',
       'Annual Master Certificate of Academic Excellence',
-      '24/7 Nova AI Socratic Tutor with Priority Pool',
+      '24/7 Nova StudyGirl AI Buddy with Priority Pool',
       'Max 2 Class Changes during active cycle'
     ]
   }

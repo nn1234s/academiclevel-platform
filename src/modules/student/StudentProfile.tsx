@@ -180,7 +180,7 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
                   : (learner.activePlan === 'PLUS'
                       ? '180 Days Semester Pass: Unlimited Quizzes, Olympiad & Foundation reasoning track.'
                       : (learner.activePlan === 'LITE'
-                          ? '60 Days Concept Booster: Unlimited Quizzes & Nova AI Socratic tutor.'
+                          ? '60 Days Concept Booster: Unlimited Quizzes & Nova StudyGirl AI Buddy.'
                           : 'Upgrade to Gold (₹205 / 365 Days) to lift all daily study quotas.'))}
               </p>
             </div>

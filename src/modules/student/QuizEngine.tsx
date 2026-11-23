@@ -984,7 +984,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
               className="text-indigo-700 hover:text-indigo-800 font-semibold flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition-all cursor-pointer"
             >
               <HelpCircle className="w-4 h-4 text-indigo-600" />
-              <span>{isHinglish ? 'Nova AI se easy hint lo (Socratic)' : 'Ask Nova AI Tutor to Explain Socratically'}</span>
+              <span>{isHinglish ? 'Nova Study Buddy se easy hint lo' : 'Ask Nova AI Study Buddy to Explain'}</span>
             </button>
           </div>
         </div>
