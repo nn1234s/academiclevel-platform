@@ -399,39 +399,32 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
           </div>
         )}
 
-        {/* 4. PAYMENT GATEWAY ACTIVATION CALLOUT */}
+        {/* 4. BEG FOR FREE SIGNUP CALLOUT (DIRECTLY TIED TO SAMPLE QUESTION EXPERIENCE) */}
         <div className="mt-8 p-6 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border-2 border-amber-300 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="space-y-1 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start space-x-2">
-              <span className="text-xs font-black uppercase text-amber-800 tracking-wider flex items-center gap-1.5">
-                <Crown className="w-3.5 h-3.5 text-amber-600" />
-                <span>Special ₹49 Introductory Offer</span>
+              <span className="text-xs font-black uppercase text-amber-800 tracking-wider">
+                🚀 Want to solve the full 12,000 Questions?
               </span>
               <span className="text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
-                Instant UPI Activation
+                100% Free
               </span>
             </div>
             <h3 className="text-lg sm:text-xl font-black text-slate-900">
-              Upgrade to Premium Student Account
+              Sign Up Now &amp; Unlock 3 Full Levels for FREE!
             </h3>
             <p className="text-xs text-slate-600 max-w-xl leading-relaxed">
-              Unlock unlimited quizzes across all 12 classes, Socratic Nova AI, official verified certificates, and physical reward store redemption.
+              Do not get stuck on boring PDFs. Enjoy 1-on-1 Socratic Nova AI hints, earn real Study Coins on every question, and redeem them for real gifts. No credit card required.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full sm:w-auto">
             <button
-              onClick={() => {
-                if (onSelectPlan) {
-                  onSelectPlan('LITE');
-                } else {
-                  onNavigate('PRICING');
-                }
-              }}
-              className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-orange-900/20 transition-all flex items-center justify-center space-x-2 hover:scale-[1.02] cursor-pointer"
+              onClick={onOpenRegister}
+              className="w-full sm:w-auto px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center space-x-2 hover:scale-[1.02] cursor-pointer"
             >
-              <Crown className="w-4 h-4 text-amber-200" />
-              <span>PROCEED TO PAYMENT GATEWAY (SPECIAL ₹49 PLAN) &rarr;</span>
+              <Sparkles className="w-4 h-4 text-white" />
+              <span>CREATE FREE ACCOUNT (FREE 3 LEVELS)</span>
             </button>
           </div>
         </div>

@@ -956,24 +956,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
               </ul>
             </div>
-            <div className="mt-6 space-y-2">
+            <div className="mt-6">
               <button
                 type="button"
                 onClick={() => handleBuyNow('LITE')}
-                className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs rounded-xl shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs rounded-xl shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center space-x-1.5 cursor-pointer hover:scale-[1.01]"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>BUY NOW (₹{pricingConfig.litePriceInr || 49}) — UPI PG ↗</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setActivatePlanTier('LITE');
-                  setActivateError('');
-                }}
-                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 font-bold text-xs rounded-xl border border-slate-300 transition-all cursor-pointer"
-              >
-                Paid on UPI PG? Create Account &amp; Activate Pass
               </button>
             </div>
           </div>
@@ -1019,24 +1009,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
               </ul>
             </div>
-            <div className="mt-6 space-y-2">
+            <div className="mt-6">
               <button
                 type="button"
                 onClick={() => handleBuyNow('PLUS')}
-                className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-indigo-900/20 transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-indigo-900/20 transition-all flex items-center justify-center space-x-1.5 cursor-pointer hover:scale-[1.01]"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>BUY NOW (₹{pricingConfig.plusPriceInr || 129}) — 180-DAY ↗</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setActivatePlanTier('PLUS');
-                  setActivateError('');
-                }}
-                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 font-bold text-xs rounded-xl border border-slate-300 transition-all cursor-pointer"
-              >
-                Paid on UPI PG? Create Account &amp; Activate Pass
               </button>
             </div>
           </div>
@@ -1092,7 +1072,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
               </ul>
             </div>
-            <div className="mt-6 space-y-2">
+            <div className="mt-6">
               <button
                 type="button"
                 onClick={() => handleBuyNow('GOLD')}
@@ -1100,16 +1080,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>BUY NOW (₹{pricingConfig.goldPriceInr || 205}) — 365-DAY GOLD ↗</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setActivatePlanTier('GOLD');
-                  setActivateError('');
-                }}
-                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 font-bold text-xs rounded-xl border border-slate-300 transition-all cursor-pointer"
-              >
-                Paid on UPI PG? Create Account &amp; Activate Pass
               </button>
             </div>
           </div>

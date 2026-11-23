@@ -27,7 +27,8 @@ import {
   Atom,
   BookOpen,
   Mail,
-  LogOut
+  LogOut,
+  ArrowLeft
 } from 'lucide-react';
 
 interface QuizEngineProps {
@@ -680,35 +681,48 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
 
       {/* Header bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-200">
-        <div className="space-y-1">
-          <div className="flex items-center space-x-2">
-            <span className="text-[10px] font-mono font-bold tracking-wider text-indigo-700 uppercase">
-              {board} • Class {grade} • {subjectId.toUpperCase()} • {levelNode}
-            </span>
+        <div className="flex items-center space-x-3">
+          {onExitQuiz && (
+            <button
+              onClick={onExitQuiz}
+              title="Return / Exit Assessment (Requires Parent PIN)"
+              className="px-3 py-1.5 text-xs rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 flex items-center space-x-1 border border-rose-200 transition-all cursor-pointer font-bold active:scale-95 shadow-xs"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-rose-600" />
+              <span>Back</span>
+            </button>
+          )}
 
-            {/* Hybrid Source Badge */}
-            {quizSource === 'GEMINI_LIVE' ? (
-              <span
-                title="Synthesized dynamically by Google Gemini 2.5 Flash"
-                className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 border border-purple-200 text-purple-700"
-              >
-                <Sparkles className="w-3 h-3 text-purple-600 animate-pulse" />
-                <span>Live Gemini AI</span>
+          <div className="space-y-1">
+            <div className="flex items-center space-x-2">
+              <span className="text-[10px] font-mono font-bold tracking-wider text-indigo-700 uppercase">
+                {board} • Class {grade} • {subjectId.toUpperCase()} • {levelNode}
               </span>
-            ) : (
-              <span
-                title="Curated, 100% board syllabus verified offline bank"
-                className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 border border-emerald-200 text-emerald-800"
-              >
-                <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                <span>Verified Syllabus Bank</span>
-              </span>
-            )}
+
+              {/* Hybrid Source Badge */}
+              {quizSource === 'GEMINI_LIVE' ? (
+                <span
+                  title="Synthesized dynamically by Google Gemini 2.5 Flash"
+                  className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 border border-purple-200 text-purple-700"
+                >
+                  <Sparkles className="w-3 h-3 text-purple-600 animate-pulse" />
+                  <span>Live Gemini AI</span>
+                </span>
+              ) : (
+                <span
+                  title="Curated, 100% board syllabus verified offline bank"
+                  className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 border border-emerald-200 text-emerald-800"
+                >
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                  <span>Verified Syllabus Bank</span>
+                </span>
+              )}
+            </div>
+
+            <h3 className="text-sm font-bold text-slate-900">
+              Question {currentIndex + 1} of {questions.length}
+            </h3>
           </div>
-
-          <h3 className="text-sm font-bold text-slate-900">
-            Question {currentIndex + 1} of {questions.length}
-          </h3>
         </div>
 
         <div className="flex items-center space-x-3">

@@ -339,6 +339,11 @@ export const App: React.FC = () => {
   const [pendingQuizExit, setPendingQuizExit] = useState<{ route: string; extra?: any } | null>(null);
   const [exitPinInput, setExitPinInput] = useState('');
   const [exitPinError, setExitPinError] = useState('');
+  const currentRouteRef = useRef(currentRoute);
+
+  useEffect(() => {
+    currentRouteRef.current = currentRoute;
+  }, [currentRoute]);
 
   // Mobile drawer
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -406,9 +411,21 @@ export const App: React.FC = () => {
     }
   }, [isAuthenticated, pendingRedirectRoute, currentRoute]);
 
-  // Synchronize URL popstate (browser back/forward)
+  // Synchronize URL popstate (browser back/forward) & Guard Active Quiz
   useEffect(() => {
-    const handlePopState = () => {
+    const handlePopState = (e: PopStateEvent) => {
+      // If student clicks Back while an assessment is active, STOP them and show emergency popup
+      if (currentRouteRef.current === 'QUIZ') {
+        try {
+          window.history.pushState({ inQuiz: true }, '', window.location.pathname);
+        } catch {}
+        setPendingQuizExit({ route: 'DASHBOARD' });
+        setExitPinInput('');
+        setExitPinError('');
+        setQuizExitModalOpen(true);
+        return;
+      }
+
       const { route, intendedProtected } = resolveRouteFromPath(window.location.pathname, isAuthenticated);
       if (intendedProtected && !isAuthenticated) {
         setPendingRedirectRoute(intendedProtected);
@@ -419,9 +436,28 @@ export const App: React.FC = () => {
         setCurrentRoute(route);
       }
     };
+
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [isAuthenticated]);
+
+  // Push history checkpoint and block accidental tab closing when inside active QUIZ
+  useEffect(() => {
+    if (currentRoute === 'QUIZ') {
+      try {
+        window.history.pushState({ inQuiz: true }, '', window.location.pathname);
+      } catch {}
+
+      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = 'Was this an internet error? Leaving will void your active quiz!';
+        return e.returnValue;
+      };
+
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }
+  }, [currentRoute]);
 
   // Push URL with popstate support
   const navigateTo = (route: string, extra?: any) => {
