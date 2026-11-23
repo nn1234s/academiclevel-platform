@@ -31,6 +31,7 @@ const KNOWN_ADMIN_PASS_HASHES = new Set([
   '0e89f223e226ae63268cf39152ab75722e811b89d29efb22a852f1667bd22ae0',
   '7d54032d8471e847c1aeb6c4293f77341e97dc2be05e5ea5a2ba393f9c63b48f',
   'ae34d5a89d38fe522141810d3ea99895b42a83dfb766f918b584f5b23b6b2e0d',
+  '558972415c578b557b4d89a1c6e40b0e142c0425b737f891943a0d63710c098c',
 ]);
 
 async function computeSha256(text: string): Promise<string> {
