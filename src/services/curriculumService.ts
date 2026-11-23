@@ -164,8 +164,27 @@ export class CurriculumService {
   /**
    * Retrieves organized, real syllabus chapters for a given Subject x Grade x Board.
    * Ensures questions are categorized by chapter (Addition, Subtraction, Multiplication, Algebra, etc.).
+   * Calibrated strictly to 3 questions per chapter practice as requested by the user.
    */
   public static getChaptersForSubject(board: Board, grade: Grade, subjectId: string): {
+    id: string;
+    title: string;
+    description: string;
+    questionCount: number;
+    estimatedMinutes: number;
+    topics: string[];
+    badge: string;
+  }[] {
+    const rawChapters = this.getRawChaptersForSubject(board, grade, subjectId);
+    // User requirement: "make chapters just 3 questions and each should be unique"
+    return rawChapters.map(ch => ({
+      ...ch,
+      questionCount: 3,
+      estimatedMinutes: 5
+    }));
+  }
+
+  private static getRawChaptersForSubject(board: Board, grade: Grade, subjectId: string): {
     id: string;
     title: string;
     description: string;

@@ -596,27 +596,28 @@ export const App: React.FC = () => {
         {/* ======================================================== */}
         <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 sm:px-8 py-2.5 sm:py-3.5 shadow-xs">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            {/* Brand Logo */}
-            <div
-              onClick={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
-              className="flex items-center space-x-2.5 cursor-pointer group shrink-0"
-              title="AcademicLevel"
-            >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-extrabold text-base shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0">
-                AL
-              </div>
-              {!isAuthenticated && (
-                <div className="hidden sm:block">
-                  <span className="font-extrabold text-base tracking-tight text-slate-900 block leading-none">
-                    AcademicLevel
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-medium">Learn in your era</span>
+            {/* Brand Logo & Desktop Nav grouped closely together */}
+            <div className="flex items-center space-x-3.5 lg:space-x-5 min-w-0">
+              <div
+                onClick={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
+                className="flex items-center space-x-2.5 cursor-pointer group shrink-0"
+                title="AcademicLevel"
+              >
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-extrabold text-base shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0">
+                  AL
                 </div>
-              )}
-            </div>
+                {!isAuthenticated && (
+                  <div className="hidden sm:block">
+                    <span className="font-extrabold text-base tracking-tight text-slate-900 block leading-none">
+                      AcademicLevel
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-medium">Learn in your era</span>
+                  </div>
+                )}
+              </div>
 
-            {/* Desktop Navigation Links with Clean Dropdowns */}
-            <nav ref={navContainerRef} className="hidden lg:flex items-center space-x-1.5 text-xs font-semibold">
+              {/* Desktop Navigation Links with Clean Dropdowns */}
+              <nav ref={navContainerRef} className="hidden lg:flex items-center space-x-1.5 text-xs font-semibold">
               {!isAuthenticated ? (
                 <>
                   {/* Direct Link: Home */}
@@ -1031,9 +1032,10 @@ export const App: React.FC = () => {
                 </>
               )}
             </nav>
+          </div>
 
-            {/* User Profile / Auth Action Buttons */}
-            <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+          {/* User Profile / Auth Action Buttons */}
+          <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
               {/* Language Switcher Pill */}
               <button
                 onClick={() => setShowPromptModal(true)}

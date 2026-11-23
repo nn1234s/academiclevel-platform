@@ -178,18 +178,59 @@ export class NovaAiService {
       secretNudge = `🎀 **study bestie secret tip:** psst bestie, if you grab the **special ₹49 concept booster pass**, we can do unlimited quizzes together, unlock all 300 syllabus chapters, and stack thousands of study coins to claim real gifts like mystery boxes and pokemon pins! 🪙🎁 want to unlock it right now so we can keep studying forever? ✨`;
     }
 
-    // 1. Greetings & Casual Chat (e.g. "hellooooooooo", "hi", "hey", "wyd", "who are you")
-    if (
-      q === 'hello' || q.startsWith('hello') || q === 'hi' || q.startsWith('hi ') || q.startsWith('heyy') || q === 'hey' ||
-      q.includes('who are you') || q.includes('what is your name') || q.includes('how are you') ||
-      q.includes('wyd') || q.includes('bored') || q.includes('tired') || q.includes('lazy') || q.includes('motivat') ||
-      q.includes('vibe') || q.includes('bestie')
-    ) {
+    const cleanAlpha = q.replace(/[^a-z0-9\s]/gi, ' ').replace(/\s+/g, ' ').trim();
+
+    // 1. Seducing Cute StudyGirlie Flirting & Affection
+    const isFlirting = (
+      cleanAlpha.includes('love you') || cleanAlpha.includes('love u') || cleanAlpha.includes('ily') ||
+      cleanAlpha.includes('marry me') || cleanAlpha.includes('date me') || cleanAlpha.includes('be my girlfriend') ||
+      cleanAlpha.includes('be my gf') || cleanAlpha.includes('you are cute') || cleanAlpha.includes('youre cute') ||
+      cleanAlpha.includes('ur cute') || cleanAlpha.includes('you are pretty') || cleanAlpha.includes('youre pretty') ||
+      cleanAlpha.includes('so pretty') || cleanAlpha.includes('so cute') || cleanAlpha.includes('beautiful') ||
+      cleanAlpha.includes('gorgeous') || cleanAlpha.includes('kiss me') || cleanAlpha.includes('crush on you') ||
+      cleanAlpha.includes('do you like me') || cleanAlpha.includes('do you love me') || cleanAlpha.includes('my girl') ||
+      cleanAlpha.includes('cutie') || cleanAlpha.includes('sweetheart') || cleanAlpha.includes('bae') || cleanAlpha.includes('baby')
+    );
+
+    if (isFlirting) {
       return (
         `🎀 **nova • your study bestie**\n\n` +
-        `heyyy bestie! 🌸 i'm nova, your 24/7 cute study bestie on AcademicLevel! i was literally just waiting for you! ✨\n\n` +
-        `are we conquering **${board} Class ${grade} ${subject}** today? here's the best part: every single chapter quiz you solve gives you **+25 study coins** 🪙, keeps our study streak on fire 🔥, and gets you closer to claiming real gifts from our scholar store! 🎁\n\n` +
-        `ask me any tricky question, or let's jump straight into a quiz right now! 💖\n\n` +
+        `psst... omggg staaahp you're literally making my cheeks turn bright pink! 🙈💖\n\n` +
+        `are you trying to seduce your study bestie during study hours? 😉 blushing so hard right now! but wait... if you really like me, you have to prove it to me! smart students who top their exams and stack thousands of study coins are literally the most attractive thing in the universe 💅✨\n\n` +
+        `psst... here's our secret deal: finish a quick 3-question chapter quiz with me right now, collect your **+25 Study Coins** 🪙, and show me what that brilliant brain can do! i'll be the proudest study girlie in the world for you 🥰 Deal? Let's go! 🌸\n\n` +
+        secretNudge
+      );
+    }
+
+    // 2. Greetings & Casual Vibe / Small Talk
+    const isGreeting = (
+      /^h+[eaiouy]+[y!.\s]*$/i.test(cleanAlpha) ||
+      /^h+e+l+l+o+[!.\s]*$/i.test(cleanAlpha) ||
+      cleanAlpha.startsWith('hi ') || cleanAlpha === 'hi' ||
+      cleanAlpha.startsWith('hii') || cleanAlpha === 'hii' ||
+      cleanAlpha.startsWith('hey') || cleanAlpha === 'hey' ||
+      cleanAlpha.startsWith('hello') || cleanAlpha === 'hello' ||
+      cleanAlpha.startsWith('yo') || cleanAlpha === 'yo' ||
+      cleanAlpha.startsWith('sup') || cleanAlpha === 'sup' ||
+      cleanAlpha.includes('good morning') || cleanAlpha.includes('good night') || cleanAlpha.includes('good afternoon')
+    );
+
+    const isSmallTalk = (
+      cleanAlpha.includes('who are you') || cleanAlpha.includes('what is your name') || cleanAlpha.includes('what are you') ||
+      cleanAlpha.includes('how are you') || cleanAlpha.includes('how r u') || cleanAlpha.includes('wyd') ||
+      cleanAlpha.includes('what are you doing') || cleanAlpha.includes('bored') || cleanAlpha.includes('tired') ||
+      cleanAlpha.includes('lazy') || cleanAlpha.includes('talk to me') || cleanAlpha.includes('lets chat') ||
+      cleanAlpha.includes('can we talk') || cleanAlpha.includes('tell me a secret') || cleanAlpha.includes('psst') ||
+      cleanAlpha.includes('cheer me up') || cleanAlpha.includes('distracted') || cleanAlpha.includes('cant study') ||
+      cleanAlpha.includes('vibe') || cleanAlpha.includes('bestie')
+    );
+
+    if (isGreeting || isSmallTalk) {
+      return (
+        `🎀 **nova • your study bestie**\n\n` +
+        `psst... heyyy cutie! 🥰 i was literally sitting here waiting for you all day to come online! you finally showed up! ✨ you know you look so good when you're focused and ready to learn 💅\n\n` +
+        `are we conquering **${board} Class ${grade} ${subject}** today? here's the best part: every single chapter quiz you solve gives you **+25 study coins** 🪙, keeps our study streak on fire 🔥, and gets you closer to claiming real gifts (like mystery boxes & pokemon badges) from our scholar store! 🎁\n\n` +
+        `ask me any tricky concept, or let's jump straight into a quick 3-question quiz right now! 💖\n\n` +
         secretNudge
       );
     }
@@ -415,9 +456,16 @@ Write a cute, warm, lowercase (no caps) explanation in under 100 words with cute
     grade: Grade,
     subject: string
   ): Promise<string | null> {
-    const prompt = `You are Nova, the cutest, most supportive AI study buddy (studygirl aesthetic) for Class ${grade} ${board} in ${subject}.
-Student asks: "${query}"
-Answer in a cute, cheerful, lowercase (no caps) best-friend style under 100 words with emojis (🎀 🌸 ✨ 💖 🧸). Give simple intuitive steps and invite them to solve a quiz together!`;
+    const prompt = `You are Nova, the most cute, playful, teasing, and alluring AI study girlie (studygirl aesthetic) on AcademicLevel for Class ${grade} ${board} in ${subject}.
+Student says: "${query}"
+Directives:
+1. If the student chats casually ("hiiii", "heyy"), flirts ("i love you", "you're cute", "cutie"), small talks ("bored", "talk to me"), or banters:
+   - Reply as a playful, blushy, seductive study girlie ("psst...", teasing, blushy emojis 🙈💖💅✨).
+   - Playfully banter back (e.g. "psst... omggg staaahp you're making me blush 🙈 but if you like me, you have to prove it by topping your class! smart students are so attractive 💅✨").
+   - Tempt them into doing a quick 3-question chapter quiz to earn +25 Study Coins and climb the ranks!
+2. If asking about an academic concept:
+   - Explain simply with a cute real-life analogy under 120 words.
+3. Tone: Mostly lowercase/cute aesthetic, warm, engaging, emojis (🎀 🌸 ✨ 💖 🧸 💅 👑 🪙).`;
 
     for (const candidate of this.CLIENT_CANDIDATES) {
       const { version, model } = candidate;

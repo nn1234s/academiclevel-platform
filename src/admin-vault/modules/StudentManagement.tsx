@@ -41,9 +41,23 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ initialLea
   );
   const [search, setSearch] = useState(initialLearner ? initialLearner.fullName : '');
   const [boardFilter, setBoardFilter] = useState<string>('ALL');
+  const [countryFilter, setCountryFilter] = useState<string>('ALL');
   const [gradeFilter, setGradeFilter] = useState<string>('ALL');
   const [tierFilter, setTierFilter] = useState<string>('ALL');
   const [roleFilter, setRoleFilter] = useState<'ALL' | 'STUDENT' | 'TEACHER' | 'SUPER_ADMIN'>('ALL');
+
+  const getCountryFlag = (country?: string) => {
+    if (!country) return '🇮🇳';
+    const c = country.toLowerCase();
+    if (c.includes('united kingdom') || c.includes('uk') || c.includes('britain') || c.includes('england')) return '🇬🇧';
+    if (c.includes('emirates') || c.includes('uae') || c.includes('dubai')) return '🇦🇪';
+    if (c.includes('singapore')) return '🇸🇬';
+    if (c.includes('australia')) return '🇦🇺';
+    if (c.includes('canada')) return '🇨🇦';
+    if (c.includes('united states') || c.includes('usa') || c.includes('us') || c.includes('america')) return '🇺🇸';
+    if (c.includes('qatar')) return '🇶🇦';
+    return '🇮🇳';
+  };
 
   // Selected Kid for deep control modal
   const [controllingLearner, setControllingLearner] = useState<Learner | null>(initialLearner || null);
@@ -340,12 +354,16 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ initialLea
       l.fullName.toLowerCase().includes(term) ||
       l.email.toLowerCase().includes(term) ||
       (l.phone && l.phone.toLowerCase().includes(term)) ||
+      (l.schoolName && l.schoolName.toLowerCase().includes(term)) ||
+      (l.country && l.country.toLowerCase().includes(term)) ||
+      (l.city && l.city.toLowerCase().includes(term)) ||
       l.referralCode.toLowerCase().includes(term) ||
       l.id.toLowerCase().includes(term);
 
     const matchesBoard = boardFilter === 'ALL' || l.board === boardFilter;
     const matchesGrade = gradeFilter === 'ALL' || l.grade.toString() === gradeFilter;
     const matchesRole = roleFilter === 'ALL' || (l.role || 'STUDENT') === roleFilter;
+    const matchesCountry = countryFilter === 'ALL' || (l.country || 'India') === countryFilter;
 
     const subInfo = getSubInfo(l.id);
     let matchesTier = true;
@@ -355,8 +373,10 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ initialLea
     else if (tierFilter === 'PENDING') matchesTier = Boolean(subInfo.isPending);
     else if (tierFilter === 'SUSPENDED') matchesTier = !l.isActive;
 
-    return matchesSearch && matchesBoard && matchesGrade && matchesTier && matchesRole;
+    return matchesSearch && matchesBoard && matchesGrade && matchesTier && matchesRole && matchesCountry;
   });
+
+  const distinctCountries = Array.from(new Set(learners.map(l => l.country || 'India'))).filter(Boolean);
 
   return (
     <div className="space-y-6 text-slate-100">
@@ -378,6 +398,10 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ initialLea
           <div className="bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl text-center">
             <span className="text-[10px] text-slate-400 block font-medium">Students</span>
             <span className="text-sm font-extrabold text-white">{learners.filter(l => (l.role || 'STUDENT') === 'STUDENT').length} Kids</span>
+          </div>
+          <div className="bg-slate-950 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-center">
+            <span className="text-[10px] text-emerald-400 block font-medium">Worldwide Reach</span>
+            <span className="text-sm font-extrabold text-emerald-300">{distinctCountries.length} Countries 🌍</span>
           </div>
           <div className="bg-slate-950 border border-amber-500/30 px-3 py-1.5 rounded-xl text-center">
             <span className="text-[10px] text-amber-400 block font-medium">Teachers</span>
@@ -421,11 +445,27 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ initialLea
             <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-500" />
             <input
               type="text"
-              placeholder="Find kid or teacher by name, email, school, ID..."
+              placeholder="Find kid or teacher by name, email, school, country, ID..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none"
             />
+          </div>
+
+          {/* Country / Worldwide Filter */}
+          <div>
+            <select
+              value={countryFilter}
+              onChange={e => setCountryFilter(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-emerald-300 font-semibold focus:outline-none focus:border-emerald-500"
+            >
+              <option value="ALL">🌍 All Countries (Worldwide)</option>
+              {distinctCountries.map(c => (
+                <option key={c} value={c}>
+                  {getCountryFlag(c)} {c}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Role Filter */}
@@ -453,22 +493,6 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ initialLea
               <option value="CBSE">CBSE</option>
               <option value="ICSE">ICSE / CISCE</option>
               <option value="IGCSE">Cambridge IGCSE</option>
-            </select>
-          </div>
-
-          {/* Class Filter */}
-          <div>
-            <select
-              value={gradeFilter}
-              onChange={e => setGradeFilter(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
-            >
-              <option value="ALL">All Classes (1 to 12)</option>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
-                <option key={g} value={g.toString()}>
-                  Class {g}
-                </option>
-              ))}
             </select>
           </div>
 
@@ -544,6 +568,17 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ initialLea
                               Code: <strong className="text-indigo-300">{learner.referralCode}</strong>
                               {learner.phone ? ` • 📞 ${learner.phone}` : ''}
                             </p>
+                            <div className="flex items-center space-x-1.5 mt-1 flex-wrap">
+                              <span className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                                <span>{getCountryFlag(learner.country)}</span>
+                                <span>{learner.city ? `${learner.city}, ` : ''}{learner.country || 'India'}</span>
+                              </span>
+                              {learner.schoolName && (
+                                <span className="text-[10px] text-slate-400 truncate max-w-[200px]" title={learner.schoolName}>
+                                  🏫 {learner.schoolName}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </td>

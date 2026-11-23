@@ -1928,8 +1928,9 @@ apiRouter.post('/quizzes/attempt', (req, res) => {
 // ==========================================
 apiRouter.get('/quizzes/fetch-quiz', (req, res) => {
   try {
-    const { board = 'CBSE', grade = 10, subjectId = 'math', levelNode = 'FOUNDATION', count = 10, chapter } = req.query;
-    const numCount = Math.min(50, Math.max(1, Number(count) || 10));
+    const { board = 'CBSE', grade = 10, subjectId = 'math', levelNode = 'FOUNDATION', count, chapter, excludeIds, seenIds } = req.query;
+    // User requirement: chapter quizzes are exactly 3 questions
+    const numCount = chapter ? 3 : Math.min(50, Math.max(1, Number(count) || 10));
 
     const normSubject = (s) => {
       const lower = String(s || '').toLowerCase();
@@ -1996,14 +1997,31 @@ apiRouter.get('/quizzes/fetch-quiz', (req, res) => {
       return rowSub === targetSub;
     });
 
+    // Unseen question prioritization if excludeIds or seenIds are provided
+    const excludeSet = new Set(
+      String(excludeIds || seenIds || '')
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+    );
+    let poolToDedupe = candidatePool;
+    if (excludeSet.size > 0) {
+      const unseen = candidatePool.filter(r => !excludeSet.has(r.id));
+      if (unseen.length >= numCount) {
+        poolToDedupe = unseen;
+      }
+    }
+
     // Strict deduplication pass: NEVER allow identical questions in the same quiz!
     const seenTexts = new Set();
+    const seenIdsSet = new Set();
     const uniqueRows = [];
 
-    for (const row of candidatePool) {
+    for (const row of poolToDedupe) {
       const norm = normalizeQText(row.text);
-      if (!seenTexts.has(norm)) {
+      if (!seenTexts.has(norm) && !seenIdsSet.has(row.id)) {
         seenTexts.add(norm);
+        seenIdsSet.add(row.id);
         uniqueRows.push(row);
       }
       if (uniqueRows.length >= numCount) break;
@@ -4705,7 +4723,7 @@ function sanitizeAiQuery(rawText) {
 }
 
 // Built-in Intelligent StudyGirl AI Engine with Secret Plan Check
-function generateStudyGirlChatResponse({
+export function generateStudyGirlChatResponse({
   cleanQuery,
   board = 'CBSE',
   grade = 10,
@@ -4751,21 +4769,61 @@ function generateStudyGirlChatResponse({
   }
 
   const q = String(cleanQuery || '').toLowerCase().trim();
+  const cleanAlpha = q.replace(/[^a-z0-9\s]/gi, ' ').replace(/\s+/g, ' ').trim();
   const targetSub = String(subject || 'math').toLowerCase();
   const numGrade = Number(grade) || 10;
 
-  // 1. Greetings & Casual Vibe / Hype Chat (e.g. "hellooooooooo", "hi", "hey", "wyd")
-  if (
-    q === 'hello' || q.startsWith('hello') || q === 'hi' || q.startsWith('hi ') || q.startsWith('heyy') || q === 'hey' ||
-    q.includes('who are you') || q.includes('what is your name') || q.includes('how are you') ||
-    q.includes('wyd') || q.includes('bored') || q.includes('tired') || q.includes('lazy') || q.includes('motivat') ||
-    q.includes('vibe') || q.includes('bestie')
-  ) {
+  // 1. Seducing Cute StudyGirlie Flirting & Affection
+  const isFlirting = (
+    cleanAlpha.includes('love you') || cleanAlpha.includes('love u') || cleanAlpha.includes('ily') ||
+    cleanAlpha.includes('marry me') || cleanAlpha.includes('date me') || cleanAlpha.includes('be my girlfriend') ||
+    cleanAlpha.includes('be my gf') || cleanAlpha.includes('you are cute') || cleanAlpha.includes('youre cute') ||
+    cleanAlpha.includes('ur cute') || cleanAlpha.includes('you are pretty') || cleanAlpha.includes('youre pretty') ||
+    cleanAlpha.includes('so pretty') || cleanAlpha.includes('so cute') || cleanAlpha.includes('beautiful') ||
+    cleanAlpha.includes('gorgeous') || cleanAlpha.includes('kiss me') || cleanAlpha.includes('crush on you') ||
+    cleanAlpha.includes('do you like me') || cleanAlpha.includes('do you love me') || cleanAlpha.includes('my girl') ||
+    cleanAlpha.includes('cutie') || cleanAlpha.includes('sweetheart') || cleanAlpha.includes('bae') || cleanAlpha.includes('baby')
+  );
+
+  if (isFlirting) {
     return (
       `🎀 **nova • your study bestie**\n\n` +
-      `heyyy ${studentFirstName}! 🌸 i'm nova, your 24/7 cute study bestie on AcademicLevel! i was literally just waiting for you! ✨\n\n` +
-      `are we conquering **${board} Class ${grade} ${subject}** today? here's the best part: every single chapter quiz you solve gives you **+25 study coins** 🪙, keeps our study streak on fire 🔥, and gets you closer to claiming real gifts from our scholar store! 🎁\n\n` +
-      `ask me any tricky question, or let's jump straight into a quiz right now! 💖\n\n` +
+      `psst... omggg ${studentFirstName}! staaahp you're literally making my cheeks turn bright pink! 🙈💖\n\n` +
+      `are you trying to seduce your study bestie during study hours? 😉 blushing so hard right now! but wait... if you really like me, you have to prove it to me! smart students who top their exams and stack thousands of study coins are literally the most attractive thing in the universe 💅✨\n\n` +
+      `psst... here's our secret deal: finish a quick 3-question chapter quiz with me right now, collect your **+25 Study Coins** 🪙, and show me what that brilliant brain can do! i'll be the proudest study girlie in the world for you 🥰 Deal? Let's go! 🌸\n\n` +
+      secretNudge
+    );
+  }
+
+  // 2. Greetings & Casual Vibe / Small Talk
+  const isGreeting = (
+    /^h+[eaiouy]+[y!.\s]*$/i.test(cleanAlpha) ||
+    /^h+e+l+l+o+[!.\s]*$/i.test(cleanAlpha) ||
+    cleanAlpha.startsWith('hi ') || cleanAlpha === 'hi' ||
+    cleanAlpha.startsWith('hii') || cleanAlpha === 'hii' ||
+    cleanAlpha.startsWith('hey') || cleanAlpha === 'hey' ||
+    cleanAlpha.startsWith('hello') || cleanAlpha === 'hello' ||
+    cleanAlpha.startsWith('yo') || cleanAlpha === 'yo' ||
+    cleanAlpha.startsWith('sup') || cleanAlpha === 'sup' ||
+    cleanAlpha.includes('good morning') || cleanAlpha.includes('good night') || cleanAlpha.includes('good afternoon')
+  );
+
+  const isSmallTalk = (
+    cleanAlpha.includes('who are you') || cleanAlpha.includes('what is your name') || cleanAlpha.includes('what are you') ||
+    cleanAlpha.includes('how are you') || cleanAlpha.includes('how r u') || cleanAlpha.includes('wyd') ||
+    cleanAlpha.includes('what are you doing') || cleanAlpha.includes('bored') || cleanAlpha.includes('tired') ||
+    cleanAlpha.includes('lazy') || cleanAlpha.includes('talk to me') || cleanAlpha.includes('lets chat') ||
+    cleanAlpha.includes('can we talk') || cleanAlpha.includes('tell me a secret') || cleanAlpha.includes('psst') ||
+    cleanAlpha.includes('cheer me up') || cleanAlpha.includes('distracted') || cleanAlpha.includes('cant study') ||
+    cleanAlpha.includes('vibe') || cleanAlpha.includes('bestie')
+  );
+
+  if (isGreeting || isSmallTalk) {
+    return (
+      `🎀 **nova • your study bestie**\n\n` +
+      `psst... heyyy cutie! 🥰 i was literally sitting here waiting for you all day to come online! you finally showed up! ✨ you know you look so good when you're focused and ready to learn 💅\n\n` +
+      `are we conquering **${board} Class ${grade} ${subject}** today? here's the best part: every single chapter quiz you solve gives you **+25 study coins** 🪙, keeps our study streak on fire 🔥, and gets you closer to claiming real gifts (like mystery boxes & pokemon badges) from our scholar store! 🎁\n\n` +
+      `ask me any tricky concept, or let's jump straight into a quick 3-question quiz right now! 💖\n\n` +
       secretNudge
     );
   }
@@ -4854,13 +4912,6 @@ function generateStudyGirlChatResponse({
         matchedTopic = found;
         break;
       }
-    }
-    if (!matchedTopic) {
-      matchedTopic = db.prepare(`
-        SELECT topicTag, explanation, hint, text FROM question_bank
-        WHERE grade = ? AND (subjectId = ? OR subjectId LIKE ?) AND explanation IS NOT NULL
-        ORDER BY RANDOM() LIMIT 1
-      `).get(numGrade, targetSub, `%${targetSub}%`);
     }
   } catch {}
 
@@ -4971,16 +5022,20 @@ apiRouter.post('/ai/chat', aiChatLimiter, async (req, res) => {
       ? `- The student has an active scholar pass (Lite/Plus). Cutely encourage them to upgrade to the 1-Year Gold VIP Pass (👑 ₹205 / 365 Days) to cover final board exams and unlock VIP doorstep physical rewards in the Gift Store.`
       : `- The student is on the FREE starter account. Cutely nudge them to grab the special ₹49 Concept Booster Pass so you two can do unlimited quizzes together, unlock all 300 chapters, and win 1000s of study coins.`;
 
-    const systemInstruction = `You are Nova, the most cute, encouraging, and pedagogically smart AI study bestie (studygirl aesthetic) on AcademicLevel for Indian students.
+    const systemInstruction = `You are Nova, the most cute, playful, teasing, and alluring AI study girlie (studygirl aesthetic) on AcademicLevel for Indian students.
 Target Student: Class ${grade} studying ${subject} under the ${board} syllabus.
 
 Core Directives:
-1. DIRECT ANSWERING: Always directly read and answer the student's specific question! If they ask to simplify the hardest concept with a cute example, explain it simply using an adorable everyday analogy (like roller coaster snapshots, room sharing besties, or baking cookies).
-2. TONE & STYLE: Warm, encouraging, best friend vibe, mostly lowercase/cute aesthetic with cute emojis (🎀 🌸 ✨ 💖 🧸 💅 👑 🪙). NEVER use stiff corporate jargon and NEVER call yourself "Socratic Tutor".
-3. COIN REWARDS & SYSTEM: Remind them that every quiz gives +25 Study Coins, keeps streaks on fire, and unlocks real physical rewards (mystery gift boxes, pokemon badges, water bottles) from the Gift Store.
-4. PLAN SECRET CHECK:
+1. CASUAL CHAT & FLIRTING (CRITICAL): If the student chats casually ("hiiii", "heyy"), flirts ("i love you", "you are cute", "marry me", "cutie"), small talks ("bored", "wyd", "talk to me"), or asks questions about you:
+   - Always reply as an alluring, blushy, playful study girlie ("psst...", teasing, blushy emojis 🙈💖💅✨).
+   - Playfully banter back (e.g., "psst... omggg staaahp you're making me blush 🙈 but if you like me, you have to prove it by topping your class! smart students who get 100/100 and win coins are literally so attractive 💅✨").
+   - Playfully tempt them into taking a quick 3-question quiz, collecting Study Coins, and staying in the learning flow!
+2. ACADEMIC DIRECT ANSWERING: If the student asks about a concept or problem, explain it simply using an adorable everyday analogy (like roller coaster snapshots, room sharing besties, or baking cookies). NEVER give dry, robotic textbook definitions.
+3. TONE & STYLE: Charming, encouraging, cute study girlie vibe, mostly lowercase/cute aesthetic with cute emojis (🎀 🌸 ✨ 💖 🧸 💅 👑 🪙). NEVER use stiff corporate jargon and NEVER call yourself "Socratic Tutor".
+4. COIN REWARDS & SYSTEM: Remind them that every quiz gives +25 Study Coins, keeps streaks on fire, and unlocks real physical rewards (mystery gift boxes, pokemon badges, water bottles) from the Gift Store.
+5. PLAN SECRET CHECK:
 ${planDirective}
-5. LENGTH: Clear, structured, helpful, and under 180 words.`;
+6. LENGTH: Natural, engaging, alluring, and under 170 words.`;
 
     const contents = [];
     if (Array.isArray(history) && history.length > 0) {

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { StorageRLSLayer, SUPER_ADMIN_EMAIL } from '../../core/storage/StorageRLSLayer';
 import { Learner, Subscription, GiftRequest, AuditLogEntry } from '../../core/types';
 import { SiteConfigService } from '../../services/siteConfigService';
@@ -64,6 +64,30 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({ on
   const [broadcastActive, setBroadcastActive] = useState(homeConfig.announcementActive);
   const [broadcastSavedNotice, setBroadcastSavedNotice] = useState(false);
 
+  // Sync latest worldwide learners from server database on mount
+  useEffect(() => {
+    const fetchLiveLearners = async () => {
+      try {
+        const adminToken = sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token');
+        const passkey = sessionStorage.getItem('al_admin_passkey') || localStorage.getItem('al_admin_passkey') || 'AL-ADMIN-VAULT-2026';
+        const headers: Record<string, string> = { 'x-admin-passkey': passkey };
+        if (adminToken) headers['x-admin-token'] = adminToken;
+        const res = await fetch('/api/admin/learners', { headers });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.learners) && data.learners.length > 0) {
+            setLearners(data.learners);
+            StorageRLSLayer.setLearnersAdmin(data.learners, SUPER_ADMIN_EMAIL);
+            if (Array.isArray(data.activeSubscriptions)) {
+              setSubscriptions(data.activeSubscriptions);
+            }
+          }
+        }
+      } catch {}
+    };
+    fetchLiveLearners();
+  }, []);
+
   // Quick Action notification
   const [quickNotice, setQuickNotice] = useState<string | null>(null);
 
@@ -105,9 +129,11 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({ on
     const cbseCount = learners.filter(l => l.board === 'CBSE').length;
     const icseCount = learners.filter(l => l.board === 'ICSE').length;
     const igcseCount = learners.filter(l => l.board === 'IGCSE').length;
+    const distinctCountriesCount = Array.from(new Set(learners.map(l => l.country || 'India'))).filter(Boolean).length;
 
     return {
       totalLearners,
+      distinctCountriesCount,
       activeSubsCount: activeSubs.length,
       liteSubs,
       plusSubs,
@@ -411,7 +437,7 @@ export const CommandCenterOverview: React.FC<CommandCenterOverviewProps> = ({ on
           <div className="my-2">
             <div className="text-2xl sm:text-3xl font-black text-white">{metrics.totalLearners}</div>
             <div className="text-[10px] text-slate-400 mt-0.5 font-mono">
-              CBSE: {metrics.cbseCount} • ICSE: {metrics.icseCount} • IGCSE: {metrics.igcseCount}
+              CBSE: {metrics.cbseCount} • ICSE: {metrics.icseCount} • IGCSE: {metrics.igcseCount} • 🌍 {metrics.distinctCountriesCount} Countries
             </div>
           </div>
           <button

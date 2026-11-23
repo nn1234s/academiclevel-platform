@@ -150,14 +150,56 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
     }
 
     setIsLoadingQuiz(true);
-    const targetQCount = targetCount || (levelNode === 'FOUNDATION' ? 10 : levelNode === 'CONCEPT' ? 12 : levelNode === 'EXAM_READY' ? 15 : 20);
+    // User requirement: chapter quizzes are strictly 3 questions, and each question must be unique
+    const targetQCount = chapter ? 3 : (targetCount || (levelNode === 'FOUNDATION' ? 10 : levelNode === 'CONCEPT' ? 12 : levelNode === 'EXAM_READY' ? 15 : 20));
+    const seenKey = `al_seen_q_${learner.id}_${board}_${grade}_${subjectId}_${chapter || 'all'}`;
+
+    const pickUniqueQuestions = (candidatePool: Question[]): Question[] => {
+      let seenIds: string[] = [];
+      try {
+        const raw = sessionStorage.getItem(seenKey);
+        if (raw) seenIds = JSON.parse(raw);
+      } catch {}
+
+      // Strict deduplication by normalized text and ID
+      const seenSet = new Set<string>();
+      const deduped: Question[] = [];
+      for (const q of candidatePool) {
+        const norm = (q.text || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (!seenSet.has(norm) && !seenSet.has(q.id)) {
+          seenSet.add(norm);
+          seenSet.add(q.id);
+          deduped.push(q);
+        }
+      }
+
+      // Prioritize unseen questions for this chapter/session
+      const unseen = deduped.filter(q => !seenIds.includes(q.id));
+      let selected: Question[] = [];
+      if (unseen.length >= targetQCount) {
+        selected = unseen.sort(() => Math.random() - 0.5).slice(0, targetQCount);
+      } else {
+        const needed = targetQCount - unseen.length;
+        const seenCandidates = deduped.filter(q => seenIds.includes(q.id)).sort(() => Math.random() - 0.5);
+        selected = [...unseen, ...seenCandidates.slice(0, needed)];
+        seenIds = []; // reset rotation cycle
+      }
+
+      try {
+        const updatedSeen = Array.from(new Set([...seenIds, ...selected.map(q => q.id)]));
+        sessionStorage.setItem(seenKey, JSON.stringify(updatedSeen));
+      } catch {}
+
+      return selected;
+    };
+
     try {
-      const res = await HybridQuizService.getQuestions(board, grade, subjectId, levelNode, targetQCount, chapter);
+      const res = await HybridQuizService.getQuestions(board, grade, subjectId, levelNode, targetQCount * 2, chapter);
       let loaded = [...res.questions];
 
       // Ensure exact question count matching: If server returned fewer questions than advertised, top up immediately
       if (loaded.length < targetQCount) {
-        const supplement = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, targetQCount * 2, chapter);
+        const supplement = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, targetQCount * 3, chapter);
         const existingTexts = new Set(loaded.map(q => q.text.toLowerCase().replace(/[^a-z0-9]/g, '')));
         for (const sup of supplement) {
           const norm = sup.text.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -165,13 +207,13 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
             existingTexts.add(norm);
             loaded.push(sup);
           }
-          if (loaded.length >= targetQCount) break;
+          if (loaded.length >= targetQCount * 2) break;
         }
       }
 
       // If still below targetCount, use offline bank generator to satisfy the exact advertised count
       if (loaded.length < targetQCount) {
-        const localDirect = OfflineBankService.getQuestions(board, grade, subjectId, levelNode, targetQCount, chapter);
+        const localDirect = OfflineBankService.getQuestions(board, grade, subjectId, levelNode, targetQCount * 3, chapter);
         const existingTexts = new Set(loaded.map(q => q.text.toLowerCase().replace(/[^a-z0-9]/g, '')));
         for (const loc of localDirect) {
           const norm = loc.text.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -179,23 +221,23 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
             existingTexts.add(norm);
             loaded.push(loc);
           }
-          if (loaded.length >= targetQCount) break;
+          if (loaded.length >= targetQCount * 2) break;
         }
       }
 
-      const sorted = loaded.slice(0, targetQCount).sort((a, b) => (a.topicTag || '').localeCompare(b.topicTag || ''));
-      setQuestions(sorted);
+      const finalSelection = pickUniqueQuestions(loaded);
+      setQuestions(finalSelection);
       setQuizSource(res.source);
       setAiNotice(res.notice || '');
     } catch {
-      const fallback = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, targetQCount, chapter);
+      const fallback = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, targetQCount * 2, chapter);
       let loaded = [...fallback];
       if (loaded.length < targetQCount) {
-        const localDirect = OfflineBankService.getQuestions(board, grade, subjectId, levelNode, targetQCount, chapter);
+        const localDirect = OfflineBankService.getQuestions(board, grade, subjectId, levelNode, targetQCount * 2, chapter);
         loaded = [...loaded, ...localDirect];
       }
-      const sorted = loaded.slice(0, targetQCount).sort((a, b) => (a.topicTag || '').localeCompare(b.topicTag || ''));
-      setQuestions(sorted);
+      const finalSelection = pickUniqueQuestions(loaded);
+      setQuestions(finalSelection);
       setQuizSource('CURATED_OFFLINE');
       setAiNotice('Loaded from verified offline syllabus bank');
     } finally {

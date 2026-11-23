@@ -21,6 +21,11 @@ export interface Learner {
   isActive: boolean;
   createdAt: string;
 
+  // Geographic & School Context
+  country?: string;
+  city?: string;
+  schoolName?: string;
+
   // Quota & Gate enforcement
   quizzesCompletedCount: number;
   levelsCompletedCount: number;

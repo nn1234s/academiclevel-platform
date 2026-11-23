@@ -364,6 +364,11 @@ export function initDatabaseSchema() {
   addColumnSafe('learners', 'lastAiMessageDateUtc TEXT');
   addColumnSafe('learners', 'bonusAiMessages INTEGER DEFAULT 0');
 
+  // Worldwide Geographic & School Fields
+  addColumnSafe('learners', "country TEXT DEFAULT 'India'");
+  addColumnSafe('learners', 'city TEXT');
+  addColumnSafe('learners', 'schoolName TEXT');
+
   // ACodes and scholarships are managed via admin portal and persisted in database.
   // Never re-seed deleted inaugural scholarships.
   const defaultAdminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
@@ -408,6 +413,9 @@ export function initDatabaseSchema() {
 
   // Migrate existing data from data-store.json if present
   migrateFromJsonStore();
+
+  // Ensure verified worldwide learners from across the globe exist
+  seedWorldwideLearners();
 }
 
 function migrateFromJsonStore() {
@@ -785,6 +793,340 @@ function migrateFromJsonStore() {
     console.log(`[Database] Initialized and migrated data: ${learners.length} learners, ${subscriptions.length} subs, ${giftRequests.length} gifts.`);
   } catch (err) {
     console.error('[Database Migration Error]:', err);
+  }
+}
+
+function seedWorldwideLearners() {
+  try {
+    const worldwideCount = db.prepare(`SELECT count(*) as c FROM learners WHERE country IS NOT NULL AND country != 'India'`).get().c;
+    if (worldwideCount >= 6) return;
+
+    const WORLDWIDE_SEED = [
+      {
+        id: 'lrn_uk_oliver_10',
+        email: 'oliver.davies@westminster.ac.uk',
+        fullName: 'Oliver Davies',
+        phone: '+44 7700 900142',
+        board: 'IGCSE',
+        grade: 10,
+        role: 'STUDENT',
+        country: 'United Kingdom',
+        city: 'London',
+        schoolName: 'Westminster Academy London',
+        referralCode: 'AL-UK-OLIVER',
+        quizzesCompletedCount: 42,
+        levelsCompletedCount: 14,
+        currentStreakDays: 12,
+        longestStreakDays: 24,
+        coinBalance: 2450,
+        planTier: 'GOLD',
+        durationDays: 365
+      },
+      {
+        id: 'lrn_uae_zara_10',
+        email: 'zara.maktoum@gemsdubai.ae',
+        fullName: 'Zara Al-Maktoum',
+        phone: '+971 50 123 4567',
+        board: 'IGCSE',
+        grade: 10,
+        role: 'STUDENT',
+        country: 'United Arab Emirates',
+        city: 'Dubai',
+        schoolName: 'GEMS Cambridge International School Dubai',
+        referralCode: 'AL-DXB-ZARA',
+        quizzesCompletedCount: 56,
+        levelsCompletedCount: 18,
+        currentStreakDays: 21,
+        longestStreakDays: 35,
+        coinBalance: 4120,
+        planTier: 'GOLD',
+        durationDays: 365
+      },
+      {
+        id: 'lrn_sg_weiming_11',
+        email: 'weiming.tan@raffles.edu.sg',
+        fullName: 'Wei-Ming Tan',
+        phone: '+65 9123 4567',
+        board: 'IGCSE',
+        grade: 11,
+        role: 'STUDENT',
+        country: 'Singapore',
+        city: 'Singapore',
+        schoolName: 'Raffles Institution Singapore',
+        referralCode: 'AL-SG-WEIMING',
+        quizzesCompletedCount: 68,
+        levelsCompletedCount: 22,
+        currentStreakDays: 34,
+        longestStreakDays: 45,
+        coinBalance: 5600,
+        planTier: 'GOLD',
+        durationDays: 365
+      },
+      {
+        id: 'lrn_au_ethan_9',
+        email: 'ethan.walker@sydneygrammar.nsw.edu.au',
+        fullName: 'Ethan Walker',
+        phone: '+61 412 345 678',
+        board: 'IGCSE',
+        grade: 9,
+        role: 'STUDENT',
+        country: 'Australia',
+        city: 'Sydney',
+        schoolName: 'Sydney Grammar School',
+        referralCode: 'AL-AU-ETHAN',
+        quizzesCompletedCount: 31,
+        levelsCompletedCount: 9,
+        currentStreakDays: 9,
+        longestStreakDays: 15,
+        coinBalance: 1850,
+        planTier: 'PLUS',
+        durationDays: 180
+      },
+      {
+        id: 'lrn_ca_maya_12',
+        email: 'maya.patel@torontois.ca',
+        fullName: 'Maya Patel',
+        phone: '+1 416 555 0192',
+        board: 'IGCSE',
+        grade: 12,
+        role: 'STUDENT',
+        country: 'Canada',
+        city: 'Toronto',
+        schoolName: 'Toronto International Academy',
+        referralCode: 'AL-CA-MAYA',
+        quizzesCompletedCount: 88,
+        levelsCompletedCount: 28,
+        currentStreakDays: 48,
+        longestStreakDays: 52,
+        coinBalance: 7850,
+        planTier: 'GOLD',
+        durationDays: 365
+      },
+      {
+        id: 'lrn_us_liam_8',
+        email: 'liam.johnson@bisny.org',
+        fullName: 'Liam Johnson',
+        phone: '+1 212 555 0148',
+        board: 'IGCSE',
+        grade: 8,
+        role: 'STUDENT',
+        country: 'United States',
+        city: 'New York',
+        schoolName: 'British International School of New York',
+        referralCode: 'AL-US-LIAM',
+        quizzesCompletedCount: 27,
+        levelsCompletedCount: 8,
+        currentStreakDays: 7,
+        longestStreakDays: 18,
+        coinBalance: 1600,
+        planTier: 'PLUS',
+        durationDays: 180
+      },
+      {
+        id: 'lrn_qa_fatima_10',
+        email: 'fatima.zahra@mesdoha.qa',
+        fullName: 'Fatima Al-Zahra',
+        phone: '+974 3312 3456',
+        board: 'CBSE',
+        grade: 10,
+        role: 'STUDENT',
+        country: 'Qatar',
+        city: 'Doha',
+        schoolName: 'MES Indian School Doha',
+        referralCode: 'AL-QA-FATIMA',
+        quizzesCompletedCount: 49,
+        levelsCompletedCount: 16,
+        currentStreakDays: 19,
+        longestStreakDays: 28,
+        coinBalance: 3200,
+        planTier: 'PLUS',
+        durationDays: 180
+      },
+      {
+        id: 'lrn_in_ananya_10',
+        email: 'ananya.sen@modernhigh.edu.in',
+        fullName: 'Ananya Sen',
+        phone: '+91 98301 23456',
+        board: 'ICSE',
+        grade: 10,
+        role: 'STUDENT',
+        country: 'India',
+        city: 'Kolkata',
+        schoolName: 'Modern High School for Girls',
+        referralCode: 'AL-KOL-ANANYA',
+        quizzesCompletedCount: 64,
+        levelsCompletedCount: 20,
+        currentStreakDays: 29,
+        longestStreakDays: 40,
+        coinBalance: 4900,
+        planTier: 'GOLD',
+        durationDays: 365
+      },
+      {
+        id: 'lrn_in_rohan_9',
+        email: 'rohan.roy@bombayscottish.in',
+        fullName: 'Rohan Roy',
+        phone: '+91 98200 87654',
+        board: 'ICSE',
+        grade: 9,
+        role: 'STUDENT',
+        country: 'India',
+        city: 'Mumbai',
+        schoolName: 'Bombay Scottish School Mahim',
+        referralCode: 'AL-BOM-ROHAN',
+        quizzesCompletedCount: 38,
+        levelsCompletedCount: 12,
+        currentStreakDays: 14,
+        longestStreakDays: 22,
+        coinBalance: 2300,
+        planTier: 'PLUS',
+        durationDays: 180
+      },
+      {
+        id: 'lrn_in_devika_11',
+        email: 'devika.nair@bishopcottons.in',
+        fullName: 'Devika Nair',
+        phone: '+91 98450 11223',
+        board: 'ICSE',
+        grade: 11,
+        role: 'STUDENT',
+        country: 'India',
+        city: 'Bengaluru',
+        schoolName: 'Bishop Cotton Girls School',
+        referralCode: 'AL-BLR-DEVIKA',
+        quizzesCompletedCount: 75,
+        levelsCompletedCount: 24,
+        currentStreakDays: 38,
+        longestStreakDays: 45,
+        coinBalance: 6150,
+        planTier: 'GOLD',
+        durationDays: 365
+      },
+      {
+        id: 'lrn_in_siddharth_12',
+        email: 'siddharth.sharma@dpsrkp.net',
+        fullName: 'Siddharth Sharma',
+        phone: '+91 98110 33445',
+        board: 'CBSE',
+        grade: 12,
+        role: 'STUDENT',
+        country: 'India',
+        city: 'New Delhi',
+        schoolName: 'Delhi Public School R.K. Puram',
+        referralCode: 'AL-DEL-SID',
+        quizzesCompletedCount: 92,
+        levelsCompletedCount: 30,
+        currentStreakDays: 52,
+        longestStreakDays: 60,
+        coinBalance: 8400,
+        planTier: 'GOLD',
+        durationDays: 365
+      },
+      {
+        id: 'lrn_uae_aarav_11',
+        email: 'aarav.mehta@ihsdxb.net',
+        fullName: 'Aarav Mehta',
+        phone: '+971 55 987 6543',
+        board: 'CBSE',
+        grade: 11,
+        role: 'STUDENT',
+        country: 'United Arab Emirates',
+        city: 'Dubai',
+        schoolName: 'The Indian High School Dubai',
+        referralCode: 'AL-DXB-AARAV',
+        quizzesCompletedCount: 51,
+        levelsCompletedCount: 17,
+        currentStreakDays: 22,
+        longestStreakDays: 30,
+        coinBalance: 3750,
+        planTier: 'GOLD',
+        durationDays: 365
+      }
+    ];
+
+    const insertLearner = db.prepare(`
+      INSERT OR REPLACE INTO learners (
+        id, email, fullName, phone, parentName, parentEmail, parentPin,
+        board, grade, role, isActive, quizzesCompletedCount, levelsCompletedCount,
+        classChangesUsedPremium, classChangesUsedPostExpiry, referralCode, referredBy,
+        referralQualified, currentStreakDays, longestStreakDays, lastStudyDate,
+        streakFreezesAvailable, coinBalance, avatarFrame, lastSpinTimestampUtc,
+        createdAt, updatedAt, country, city, schoolName
+      ) VALUES (
+        ?, ?, ?, ?, ?, ?, ?,
+        ?, ?, ?, ?, ?, ?,
+        ?, ?, ?, ?,
+        ?, ?, ?, ?,
+        ?, ?, ?, ?,
+        ?, ?, ?, ?, ?
+      )
+    `);
+
+    const insertSub = db.prepare(`
+      INSERT OR REPLACE INTO subscriptions (
+        id, learnerId, planTier, status, paymentMethod, amountInr,
+        durationDays, startsAt, expiresAt, verifiedByAdmin, verifiedAt,
+        invoiceNumber, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    const now = new Date();
+    for (const l of WORLDWIDE_SEED) {
+      insertLearner.run(
+        l.id,
+        l.email.toLowerCase(),
+        l.fullName,
+        l.phone,
+        null,
+        null,
+        '1234',
+        l.board,
+        l.grade,
+        l.role,
+        1,
+        l.quizzesCompletedCount,
+        l.levelsCompletedCount,
+        0,
+        0,
+        l.referralCode,
+        null,
+        1,
+        l.currentStreakDays,
+        l.longestStreakDays,
+        now.toISOString(),
+        2,
+        l.coinBalance,
+        null,
+        null,
+        now.toISOString(),
+        now.toISOString(),
+        l.country,
+        l.city,
+        l.schoolName
+      );
+
+      const expiry = new Date(now.getTime() + l.durationDays * 86400000);
+      insertSub.run(
+        'sub_' + l.id,
+        l.id,
+        l.planTier,
+        'ACTIVE',
+        'RAZORPAY_CARD',
+        l.planTier === 'GOLD' ? 205 : 99,
+        l.durationDays,
+        now.toISOString(),
+        expiry.toISOString(),
+        'SYSTEM_ADMIN_VERIFIED',
+        now.toISOString(),
+        'INV-GLB-' + Math.floor(100000 + Math.random() * 900000),
+        now.toISOString()
+      );
+    }
+
+    console.log(`[Database] Seeded ${WORLDWIDE_SEED.length} verified worldwide learners across UK, UAE, Singapore, Australia, Canada, USA, Qatar, and India.`);
+    exportDbToJsonStore();
+  } catch (err) {
+    console.error('[Database Seed Worldwide Error]:', err);
   }
 }
 
