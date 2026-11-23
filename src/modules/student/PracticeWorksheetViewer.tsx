@@ -93,7 +93,7 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
       margin: 14mm 16mm;
     }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: 'Google Sans Flex', 'Google Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: #111827;
       background: #ffffff;
       line-height: 1.45;
@@ -462,7 +462,7 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
   <meta charset="UTF-8">
   <title>AcademicLevel Practice Worksheet - Class ${grade} ${board}</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; color: #1e293b; }
+    body { font-family: 'Google Sans Flex', 'Google Sans', Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; color: #1e293b; }
     h1 { color: #312e81; border-bottom: 2px solid #4338ca; padding-bottom: 8px; font-size: 20px; }
     .meta { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 20px; }
     .question { margin-bottom: 16px; padding: 12px; border-bottom: 1px solid #cbd5e1; }

@@ -28,7 +28,11 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Google Sans Flex"', '"Google Sans"', '"Google Sans Text"', '"Product Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Google Sans"', '"Google Sans Flex"', '"Product Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        heading: ['"Google Sans"', '"Google Sans Flex"', '"Product Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        flex: ['"Google Sans Flex"', '"Google Sans"', 'sans-serif'],
+        body: ['"Google Sans Flex"', '"Google Sans Text"', '"Google Sans"', 'sans-serif'],
       },
       animation: {
         'spin-slow': 'spin 8s linear infinite',

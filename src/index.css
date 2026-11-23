@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,700&family=Google+Sans+Flex:opsz,wght@9..144,100..1000&family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,7 +7,29 @@
 @layer base {
   body {
     @apply bg-slate-50 text-slate-900 font-sans transition-colors duration-150;
+    font-family: 'Google Sans Flex', 'Google Sans', 'Google Sans Text', 'Product Sans', system-ui, -apple-system, sans-serif;
+    font-optical-sizing: auto;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-heading, .font-display {
+    font-family: 'Google Sans', 'Google Sans Flex', 'Product Sans', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.015em;
+  }
+
+  button, .btn, [role="button"], .tab-item {
+    font-family: 'Google Sans', 'Google Sans Flex', 'Product Sans', sans-serif;
+  }
+
+  p, span, li, label, input, textarea, select {
+    font-family: 'Google Sans Flex', 'Google Sans', 'Google Sans Text', sans-serif;
+    font-optical-sizing: auto;
+  }
+
+  code, pre, kbd, samp, .font-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
   }
 }
 
