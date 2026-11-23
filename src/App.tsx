@@ -7,6 +7,8 @@ import { ErrorBoundary } from './modules/shared/ErrorBoundary';
 import { PaywallGateModal } from './modules/shared/PaywallGateModal';
 import { AuthModal } from './modules/shared/AuthModal';
 import { StudyCoinIcon } from './modules/shared/StudyCoinIcon';
+import { useLanguage } from './core/i18n/LanguageContext';
+import { LanguagePreferenceModal } from './modules/shared/LanguagePreferenceModal';
 
 // Public Pages
 import { LandingPage } from './modules/public/LandingPage';
@@ -80,7 +82,8 @@ import {
   Moon,
   AlertTriangle,
   ArrowRight,
-  XOctagon
+  XOctagon,
+  Globe
 } from 'lucide-react';
 
 // Code-split Super-Admin Vault Shell (unlinked from public navigation)
@@ -279,6 +282,7 @@ function getPathForRoute(route: string): string {
 
 export const App: React.FC = () => {
   const { currentLearner, isAuthenticated, isAuthLoading, isSuperAdmin, logout, refreshCurrentLearner } = useAuth();
+  const { t, language, toggleLanguage, setShowPromptModal } = useLanguage();
 
   // Pending redirect for unauthenticated deep link return-to-page
   const [pendingRedirectRoute, setPendingRedirectRoute] = useState<string | null>(null);
@@ -977,7 +981,7 @@ export const App: React.FC = () => {
                       currentRoute === 'DASHBOARD' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    Dashboard
+                    {t('nav_dashboard')}
                   </button>
                   <button
                     onClick={() => navigateTo('COURSES')}
@@ -985,7 +989,7 @@ export const App: React.FC = () => {
                       currentRoute === 'COURSES' || currentRoute === 'LEVELS' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    Courses
+                    {t('nav_courses')}
                   </button>
                   <button
                     onClick={() => navigateTo('NOVA_AI')}
@@ -993,7 +997,7 @@ export const App: React.FC = () => {
                       currentRoute === 'NOVA_AI' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    Nova AI Tutor
+                    {t('nav_nova_ai')}
                   </button>
                   <button
                     onClick={() => navigateTo('COMMUNITY')}
@@ -1010,7 +1014,7 @@ export const App: React.FC = () => {
                     }`}
                   >
                     <Gift className="w-3.5 h-3.5 text-amber-500" />
-                    <span>Gift Store</span>
+                    <span>{t('nav_gift_store')}</span>
                   </button>
                   <button
                     onClick={() => navigateTo('CERTIFICATES')}
@@ -1018,14 +1022,26 @@ export const App: React.FC = () => {
                       currentRoute === 'CERTIFICATES' || currentRoute === 'MASTER_CERT' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    Certificates
+                    {t('nav_certificates')}
                   </button>
                 </>
               )}
             </nav>
 
             {/* User Profile / Auth Action Buttons */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              {/* Language Switcher Pill */}
+              <button
+                onClick={() => setShowPromptModal(true)}
+                className="flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200 shadow-2xs cursor-pointer"
+                title={language === 'hi' ? 'UI भाषा बदलें (Hinglish/English)' : 'Change UI Language (English/Hinglish)'}
+                aria-label="Change UI Language"
+              >
+                <Globe className="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" />
+                <span className="text-[11px] font-bold">
+                  {language === 'hi' ? '🇮🇳 Hinglish' : '🇬🇧 English'}
+                </span>
+              </button>
               {!isAuthenticated ? (
                 <>
                   <button
@@ -1399,7 +1415,17 @@ export const App: React.FC = () => {
                   className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
                 >
                   <User className="w-4 h-4 text-slate-500" />
-                  <span>Student Profile & Parent PIN</span>
+                  <span>Student Profile &amp; Parent PIN</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setShowPromptModal(true);
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-indigo-700 hover:bg-indigo-50 flex items-center space-x-2 font-bold"
+                >
+                  <Globe className="w-4 h-4 text-indigo-600" />
+                  <span>{language === 'hi' ? '🇮🇳 भाषा: Hinglish (बदलें)' : '🇬🇧 Language: English (Change)'}</span>
                 </button>
                 <button
                   onClick={() => {
@@ -2209,10 +2235,14 @@ export const App: React.FC = () => {
               {/* Scary Heading */}
               <div className="text-center space-y-1">
                 <h3 className="text-xl sm:text-2xl font-black text-rose-700 tracking-tight leading-snug">
-                  Was this a internet error? Or have you left on Purpose?
+                  {language === 'hi'
+                    ? 'Was this a internet error? Or have you left on Purpose? (क्या यह इंटरनेट एरर था या आपने जानबूझकर छोड़ा?)'
+                    : 'Was this a internet error? Or have you left on Purpose?'}
                 </h3>
                 <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                  Exiting will void your quiz attempt, and unearned XP &amp; Study Coins will be lost!
+                  {language === 'hi'
+                    ? 'बीच में क्विज़ छोड़ने से यह attempt कैंसल हो जाएगा और स्टडी कॉइन्स नहीं मिलेंगे!'
+                    : 'Exiting will void your quiz attempt, and unearned XP & Study Coins will be lost!'}
                 </p>
               </div>
 
@@ -2220,10 +2250,12 @@ export const App: React.FC = () => {
               <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 space-y-3">
                 <div className="text-center">
                   <span className="text-xs font-bold text-rose-800 uppercase tracking-wide block">
-                    Parent Security Check
+                    {language === 'hi' ? 'पेरेंट सिक्योरिटी चेक (Parent PIN)' : 'Parent Security Check'}
                   </span>
                   <p className="text-xs text-rose-700 mt-0.5">
-                    Enter parent pin to exit or return to quiz
+                    {language === 'hi'
+                      ? 'Enter parent pin to exit or return to quiz (पेरेंट पिन दर्ज करें या वापस लौटें)'
+                      : 'Enter parent pin to exit or return to quiz'}
                   </p>
                 </div>
                 <div className="space-y-1.5">
@@ -2317,6 +2349,9 @@ export const App: React.FC = () => {
             />
           </div>
         )}
+
+        {/* User Language Selection Modal */}
+        <LanguagePreferenceModal />
       </div>
     </ErrorBoundary>
   );

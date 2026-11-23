@@ -44,6 +44,7 @@ import {
 } from 'lucide-react';
 import { StudentMailboxModal } from './StudentMailboxModal';
 import { MailboxMessage } from '../../core/types';
+import { useLanguage } from '../../core/i18n/LanguageContext';
 
 interface StudentDashboardProps {
   learner: Learner;
@@ -67,6 +68,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   initialMailboxReportId = null,
 }) => {
   const { refreshCurrentLearner } = useAuth();
+  const { t, isHinglish } = useLanguage();
 
   // Student Mailbox State
   const [isMailboxOpen, setIsMailboxOpen] = useState<boolean>(false);
@@ -267,7 +269,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
 
             <h1 className="text-2xl sm:text-4xl font-black mt-2 leading-tight drop-shadow-sm">
-              Welcome back, {learner.fullName.split(' ')[0]}! {theme.mascot.emoji}
+              {isHinglish ? 'स्वागत है' : 'Welcome back'}, {learner.fullName.split(' ')[0]}! {theme.mascot.emoji}
             </h1>
 
             <p className="text-xs sm:text-sm text-white/95 mt-2 leading-relaxed max-w-xl font-medium">
@@ -286,15 +288,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           {/* Quick Metrics Pod */}
           <div className="flex flex-row lg:flex-col items-center sm:items-end justify-between gap-3 bg-black/30 backdrop-blur-md p-4 rounded-3xl border border-white/20 min-w-[200px] shadow-xl">
             <div className="flex items-center space-x-3 w-full justify-between">
-              <span className="text-xs font-bold text-white/80">Study Streak:</span>
+              <span className="text-xs font-bold text-white/80">{isHinglish ? 'पढ़ाई स्ट्रीक:' : 'Study Streak:'}</span>
               <div className="flex items-center space-x-1 font-black text-amber-300">
                 <Flame className="w-4 h-4 fill-amber-300" />
-                <span>{learner.currentStreakDays} Days</span>
+                <span>{learner.currentStreakDays} {isHinglish ? 'दिन' : 'Days'}</span>
               </div>
             </div>
 
             <div className="flex items-center space-x-3 w-full justify-between pt-2 border-t border-white/10">
-              <span className="text-xs font-bold text-white/80">Study Coins:</span>
+              <span className="text-xs font-bold text-white/80">{isHinglish ? 'स्टडी कॉइन्स:' : 'Study Coins:'}</span>
               <div className="flex items-center space-x-1.5 font-black text-amber-300">
                 <StudyCoinIcon className="w-4 h-4" glow />
                 <span>{learner.coinBalance.toLocaleString()}</span>
@@ -302,9 +304,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
 
             <div className="flex items-center space-x-3 w-full justify-between pt-2 border-t border-white/10">
-              <span className="text-xs font-bold text-white/80">Questions Bank:</span>
+              <span className="text-xs font-bold text-white/80">{isHinglish ? 'सिलेबस बैंक:' : 'Questions Bank:'}</span>
               <span className="font-mono text-xs font-bold bg-white/20 px-2 py-0.5 rounded-full text-white">
-                1,000 Quizzes
+                300 Quizzes
               </span>
             </div>
 
@@ -649,7 +651,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
               <div className="bg-white border border-amber-300 p-3.5 rounded-2xl text-center min-w-[100px] shadow-xs">
                 <span className="text-[10px] font-mono font-bold text-amber-700 uppercase block">Board Syllabus</span>
-                <span className="text-2xl font-black text-amber-700 font-mono mt-0.5 block">1,000</span>
+                <span className="text-2xl font-black text-amber-700 font-mono mt-0.5 block">300</span>
                 <span className="text-[9px] text-slate-500 font-mono">Curated Questions</span>
               </div>
             </div>
@@ -683,7 +685,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
               <div className="bg-white border border-amber-200 p-3.5 rounded-2xl text-center min-w-[110px] shadow-xs">
                 <span className="text-[10px] font-mono font-bold text-amber-700 uppercase block">Senior Bank</span>
-                <span className="text-2xl font-black text-amber-700 font-mono mt-0.5 block">1,000</span>
+                <span className="text-2xl font-black text-amber-700 font-mono mt-0.5 block">300</span>
                 <span className="text-[9px] text-slate-500 font-mono">Advanced Questions</span>
               </div>
             </div>
@@ -918,21 +920,23 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </button>
       </div>
 
-      {/* 6. Class-Tailored Curriculum Subjects Grid (1,000 Questions per Class) */}
+      {/* 6. Class-Tailored Curriculum Subjects Grid (300 Questions per Class) */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <div className="flex items-center space-x-2">
               <span className="text-lg">{theme.mascot.emoji}</span>
               <h2 className="text-lg font-bold text-slate-900">
-                Course Catalogue: {learner.board} Class {activeGrade}
+                {isHinglish ? 'कोर्स कैटलॉग:' : 'Course Catalogue:'} {learner.board} Class {activeGrade}
               </h2>
               <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase ${theme.pillColor}`}>
-                1,000 Quizzes Loaded
+                300 Quizzes Loaded
               </span>
             </div>
             <p className="text-xs text-slate-600 mt-0.5">
-              Select any subject to practice complete syllabus chapters with interactive quizzes and Nova AI.
+              {isHinglish
+                ? 'अपने सिलेबस चैप्टर्स के इंटरैक्टिव क्विज़ हल करने के लिए कोई भी विषय चुनें.'
+                : 'Select any subject to practice complete syllabus chapters with interactive quizzes and Nova AI.'}
             </p>
           </div>
 
