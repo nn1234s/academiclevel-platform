@@ -681,7 +681,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       </div>
                       <div className="flex items-center space-x-2">
                         <span className="text-[#ffe066] text-sm leading-none">▶</span>
-                        <span>12,000+ Curated Question Bank</span>
+                        <span>3,600+ Curated Question Bank</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <span className="text-[#ffe066] text-sm leading-none">▶</span>
@@ -1517,7 +1517,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-md">
               <span className="text-3xl sm:text-4xl font-black text-slate-900 block font-mono">
-                12,000+
+                3,600+
               </span>
               <span className="text-xs text-slate-600 mt-2 block font-semibold">
                 Preloaded questions across Cls 1–12 in case AI doesn&apos;t work.
@@ -1624,7 +1624,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <tr>
                   <td className="p-4 font-bold text-slate-900">Practice Question Bank</td>
                   <td className="p-4 text-slate-600">Limited worksheets (100–200 Qs)</td>
-                  <td className="p-4 font-black text-emerald-700 bg-orange-50/30">12,000+ Class-wise Verified Questions</td>
+                  <td className="p-4 font-black text-emerald-700 bg-orange-50/30">3,600+ Class-wise Verified Questions</td>
                 </tr>
                 <tr>
                   <td className="p-4 font-bold text-slate-900">Doubt Clearing Availability</td>

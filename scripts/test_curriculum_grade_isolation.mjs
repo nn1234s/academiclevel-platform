@@ -48,14 +48,14 @@ if (!currServiceCode.includes('ch_math_add_p') || !currServiceCode.includes('ch_
   console.error('❌ FAIL: curriculumService.ts does not have Grade 1-2 Math chapters (Addition, Subtraction)');
   process.exit(1);
 }
-if (!currServiceCode.includes('MS Paint & Creative Drawing Tools')) {
-  console.error('❌ FAIL: curriculumService.ts does not have Grade 1-2 CS chapters (MS Paint)');
+if (currServiceCode.includes('Computer Science & Coding') || currServiceCode.includes('Accountancy & Business')) {
+  console.error('❌ FAIL: curriculumService.ts contains non-bank subjects that should be removed');
   process.exit(1);
 }
 if (!currServiceCode.includes('Regional Languages & Festivals of India') || !currServiceCode.includes('My Body Parts & 5 Sense Organs')) {
   console.error('❌ FAIL: curriculumService.ts does not have Grade 1-2 EVS chapters (Body Parts, Plants, Regional Languages)');
   process.exit(1);
 }
-console.log('✅ PASS: curriculumService.ts has class-wise dynamic chapters for Math, CS, and EVS/SS.');
+console.log('✅ PASS: curriculumService.ts has class-wise dynamic chapters strictly matching question bank subjects.');
 
 console.log('\n🎉 ALL GRADE 1 & CHAPTER ISOLATION TESTS PASSED 100%!');

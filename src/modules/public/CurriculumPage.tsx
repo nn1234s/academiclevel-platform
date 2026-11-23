@@ -44,7 +44,7 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
     return 'CBSE';
   });
 
-  const [selectedGrade, setSelectedGrade] = useState<Grade>(10);
+  const [selectedGrade, setSelectedGrade] = useState<Grade>(1);
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>('math');
 
   // Interactive sample question state
@@ -60,6 +60,16 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
     else if (track === 'CAMBRIDGE') setActiveBoard('IGCSE');
     else if (track === 'CBSE' || track === 'OLYMPIAD' || track === 'ALL') setActiveBoard('CBSE');
   }, [track]);
+
+  // Keep selected subject valid when grade or board changes
+  useEffect(() => {
+    const validSubs = CurriculumService.getSubjects(activeBoard, selectedGrade);
+    if (!validSubs.some(s => s.id === selectedSubjectId)) {
+      if (validSubs.length > 0) {
+        setSelectedSubjectId(validSubs[0].id);
+      }
+    }
+  }, [activeBoard, selectedGrade, selectedSubjectId]);
 
   // Load sample questions whenever board, grade, or subject changes
   useEffect(() => {
@@ -147,7 +157,7 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
       title: 'Full Curriculum & Grade Progression Directory',
       subtitle: 'Select any Board (CBSE, ICSE, Cambridge) or Olympiad track to explore syllabus nodes and test drive real sample questions.',
       features: [
-        '12,000 Syllabus-Verified Questions across all boards and classes',
+        '3,600+ Syllabus-Verified Questions across all boards and classes',
         'Socratic Nova AI Tutor available 24/7 for instant guided help',
         '3 Full Curriculum Levels 100% Free for every registered learner',
         'Physical rewards: books, stationery, plushies, and certificates'
@@ -268,7 +278,7 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
               Try a Real {track === 'ALL' ? 'CBSE' : track} Sample Question
             </h2>
             <p className="text-xs text-slate-600 mt-0.5">
-              Select your Class and Subject below to preview authentic questions from our 12,000-question syllabus bank.
+              Select your Class and Subject below to preview authentic questions from our 3,600+ question syllabus bank.
             </p>
           </div>
 
@@ -404,7 +414,7 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
           <div className="space-y-1 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start space-x-2">
               <span className="text-xs font-black uppercase text-amber-800 tracking-wider">
-                🚀 Want to solve the full 12,000 Questions?
+                🚀 Want to solve the full 3,600+ Questions?
               </span>
               <span className="text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
                 100% Free

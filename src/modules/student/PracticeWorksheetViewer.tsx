@@ -526,7 +526,7 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
                 </span>
               </div>
               <p className="text-xs text-slate-500">
-                Calibrated 12,000-question curriculum bank for Classes 1 to 12 with rough work & solutions
+                Calibrated 3,600-question curriculum bank for Classes 1 to 12 with rough work & solutions
               </p>
             </div>
           </div>
@@ -839,7 +839,7 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
           <div className="flex items-center space-x-2 text-slate-600">
             <CheckCircle className="w-4 h-4 text-emerald-600" />
             <span>
-              Dynamic practice worksheet generated from 12,000-question SQLite bank for <strong>Class {grade} {board}</strong>
+              Dynamic practice worksheet generated from 3,600-question SQLite bank for <strong>Class {grade} {board}</strong>
             </span>
           </div>
 

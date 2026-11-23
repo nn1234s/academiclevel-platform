@@ -10,11 +10,11 @@ let allPassed = true;
 console.log('--- TEST 1: Database Total & Data Integrity ---');
 const totalRows = db.prepare('SELECT count(*) as count FROM question_bank').get().count;
 console.log(`Total question bank records: ${totalRows}`);
-if (totalRows !== 12000) {
-  console.error(`FAIL: Expected 12000 records, got ${totalRows}`);
+if (totalRows !== 3600) {
+  console.error(`FAIL: Expected 3600 records, got ${totalRows}`);
   allPassed = false;
 } else {
-  console.log('PASS: Exactly 12,000 records found.');
+  console.log('PASS: Exactly 3,600 master records found.');
 }
 
 const emptyTexts = db.prepare("SELECT count(*) as count FROM question_bank WHERE text IS NULL OR trim(text) = ''").get().count;
@@ -26,29 +26,29 @@ if (emptyTexts > 0 || invalidIndex > 0) {
   console.log('PASS: 0 empty question texts and 0 invalid correctIndex values.');
 }
 
-// TEST 2: Strict Subject Coverage Across ALL 12 Grades
+// TEST 2: Strict Subject Coverage Across ALL 12 Grades (300 per grade)
 console.log('\n--- TEST 2: Subject Coverage Across ALL 12 Grades ---');
 for (let g = 1; g <= 12; g++) {
   const subs = db.prepare('SELECT subjectId, count(*) as count FROM question_bank WHERE grade = ? GROUP BY subjectId').all(g);
   const subMap = Object.fromEntries(subs.map(s => [s.subjectId, s.count]));
-  const hasMath = (subMap['math'] || 0) >= 300;
-  const hasCs = (subMap['cs'] || 0) >= 250;
-  const hasEnglish = (subMap['english'] || 0) >= 150;
-  const hasSocial = (subMap['social'] || 0) >= 100;
-  const hasScience = (subMap['science'] || 0) >= 200 || ((subMap['physics'] || 0) + (subMap['chemistry'] || 0) + (subMap['biology'] || 0)) >= 199;
+  let gradeOk = false;
+  if (g <= 10) {
+    gradeOk = (subMap['math'] || 0) === 75 && (subMap['english'] || 0) === 75 && (subMap['science'] || 0) === 75 && (subMap['social'] || 0) === 75;
+  } else {
+    gradeOk = (subMap['math'] || 0) === 50 && (subMap['physics'] || 0) === 50 && (subMap['chemistry'] || 0) === 50 && (subMap['biology'] || 0) === 50 && (subMap['english'] || 0) === 50 && (subMap['humanities'] || subMap['social'] || 0) === 50;
+  }
 
-  const gradeOk = hasMath && hasCs && hasEnglish && hasSocial && hasScience;
   if (!gradeOk) {
-    console.error(`FAIL: Grade ${g} missing required subject counts:`, subMap);
+    console.error(`FAIL: Grade ${g} missing required subject counts (expected 300):`, subMap);
     allPassed = false;
   } else {
-    console.log(`PASS: Grade ${g.toString().padStart(2, ' ')} has full subject coverage: Math(${subMap['math']}), CS(${subMap['cs']}), Science/Phy/Chem/Bio, English(${subMap['english']}), Social(${subMap['social']})`);
+    console.log(`PASS: Grade ${g.toString().padStart(2, ' ')} has full calibrated subject coverage:`, subMap);
   }
 }
 
 // TEST 3: Strict Zero-Contamination Subject Isolation
 console.log('\n--- TEST 3: Strict Zero-Contamination Subject Isolation ---');
-const testSubjects = ['english', 'math', 'cs', 'science', 'social'];
+const testSubjects = ['english', 'math', 'science', 'social'];
 for (const s of testSubjects) {
   const rows = db.prepare(`
     SELECT DISTINCT subjectId FROM question_bank

@@ -34,7 +34,7 @@ export const WhatsDifferentFromChatGPT: React.FC<WhatsDifferentFromChatGPTProps>
     {
       feature: 'Curriculum & Syllabus Alignment',
       chatgpt: 'Hallucinates formulas; gives US/UK college-level answers out of Indian syllabus.',
-      academiclevel: '100% strictly aligned with CBSE, ICSE & IGCSE (Classes 1–12) with 12,000 verified NCERT questions.',
+      academiclevel: '100% strictly aligned with CBSE, ICSE & IGCSE (Classes 1–12) with 3,600+ verified NCERT questions.',
       icon: BookOpen,
       highlight: true
     },

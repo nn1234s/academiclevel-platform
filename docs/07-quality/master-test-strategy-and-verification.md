@@ -21,7 +21,7 @@ AcademicLevel enforces a four-tier automated testing strategy designed to preven
              /---------\
             /           \   Tier 2: Advertised Question Count Matching Suite
            /-------------\
-          /               \  Tier 1: 12k Database & Subject Isolation Suite
+          /               \  Tier 1: 3,600 Database & Subject Isolation Suite
          /─────────────────\
 ```
 
@@ -33,7 +33,7 @@ AcademicLevel enforces a four-tier automated testing strategy designed to preven
 * **Script:** [`scripts/test_quality_recovery_suite.mjs`](../../scripts/test_quality_recovery_suite.mjs)
 * **Execution:** `node scripts/test_quality_recovery_suite.mjs`
 * **Test Scope:**
-  - Verifies exactly 12,000 distinct questions in `question_bank`.
+  - Verifies exactly 3,600 distinct questions in `question_bank`.
   - Verifies 0 empty question texts and 0 invalid `correctIndex` values (must be 0, 1, 2, or 3).
   - Verifies full subject allocations across all 12 classes (Math: 300, CS: 250, Science: 200, English: 150, Social: 100).
   - Verifies 100% strict subject isolation (zero cross-subject contamination).

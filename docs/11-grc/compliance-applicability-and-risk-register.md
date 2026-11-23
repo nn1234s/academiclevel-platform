@@ -45,7 +45,7 @@
 
 | Risk ID | Risk Description | Likelihood | Impact | Severity | Owner | Mitigation Strategy | Residual Risk | Status |
 | :--- | :--- | :---: | :---: | :---: | :--- | :--- | :---: | :--- |
-| **RSK-0001** | Third-party Google Gemini API rate limits or service degradation impacting live quiz generation | Medium | Moderate | Medium | AI Architect | Auto-fallback to verified 12k SQLite Question Bank ensures zero student-facing downtime. | Low | **MITIGATED** |
+| **RSK-0001** | Third-party Google Gemini API rate limits or service degradation impacting live quiz generation | Medium | Moderate | Medium | AI Architect | Auto-fallback to verified 3,600 SQLite Question Bank ensures zero student-facing downtime. | Low | **MITIGATED** |
 | **RSK-0002** | Fraudulent student submission of fictitious 12-digit UTR numbers for subscription activation | High | Moderate | Medium | Super-Admin | Subscriptions remain in `PENDING_VERIFICATION` until manual super-admin verification against bank statements. | Low | **MITIGATED** |
 | **RSK-0003** | Cloud container restart causing local SQLite database state divergence | Low | High | Medium | SRE Lead | Dual-layer persistence: WAL SQLite disk storage combined with asynchronous Turso Cloud synchronization every 5 minutes. | Low | **MITIGATED** |
 | **RSK-0004** | Discrepancy between advertised card question counts and served assessment items | Low | High | High | QA Lead | Exact count matching enforcement in `QuizEngine.tsx` and automated behavioral test suite in CI. | Low | **RESOLVED** |

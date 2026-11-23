@@ -54,4 +54,4 @@ A 12-digit numeric bank transaction reference code provided by students upon com
 The client-side Row-Level Security abstraction enforcing data isolation per student in browser `localStorage`, with automated bi-directional synchronization to the Express SQLite backend.
 
 ### Hybrid Quiz Service
-The runtime orchestration layer that attempts dynamic live AI question generation via Google Gemini with a timeout race-guard, automatically falling back to the 12,000-question SQLite syllabus bank on timeout or failure.
+The runtime orchestration layer that attempts dynamic live AI question generation via Google Gemini with a timeout race-guard, automatically falling back to the 3,600-question SQLite master syllabus bank on timeout or failure.

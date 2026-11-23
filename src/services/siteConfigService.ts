@@ -100,9 +100,9 @@ const DEFAULT_CONFIG: SiteConfig = {
     heroTitle: 'Master Your School Curriculum with Adaptive AI Quizzes',
     heroSubtitle: 'CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant Socratic guidance, verifiable certificates, and an earnable Study Coin economy.',
     announcementActive: true,
-    announcementText: '🚀 12,000 Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
+    announcementText: '🚀 3,600+ Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
     statsStudents: 'Nova AI Socratic Tutor',
-    statsQuizzes: '12,000+ Questions',
+    statsQuizzes: '3,600+ Questions',
     statsPassRate: 'CBSE • ICSE • IGCSE',
     bannerCtaText: 'Start Free Practice Now'
   },

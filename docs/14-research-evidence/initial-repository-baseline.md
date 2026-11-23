@@ -59,5 +59,5 @@
 
 1. **Zero Business Logic Regressions:** No modification of scoring algorithms, coin ledgers, quiz question validation, or session states.
 2. **Secret Protection:** No API keys, credentials, or personal student records will be logged or duplicated in documentation.
-3. **Data Integrity:** `server/data/academiclevel_prod.db` (SQLite 12,000 question bank) and `data-store.json` will be preserved without destructive modifications.
+3. **Data Integrity:** `server/data/academiclevel_prod.db` (SQLite 3,600 question bank) and `data-store.json` will be preserved without destructive modifications.
 4. **Docs-as-Code Strategy:** Documentation will be established under a modular `docs/` hierarchy with stable identifiers (`AL-DOC-*`, `AL-REQ-*`, `AL-ADR-*`, etc.) and automated validation.

@@ -1,12 +1,13 @@
 import { Question, Board, Grade, LevelNode } from '../core/types';
 import { CurriculumService } from './curriculumService';
+import curatedBankJson from '../data/curatedQuestionBank.json';
 
 export class OfflineBankService {
   private static STORAGE_KEY = 'al_prod_offline_question_bank_v1';
-  private static CURATED_BANK: Question[] = [];
+  private static CURATED_BANK: Question[] = (curatedBankJson as unknown as Question[]) || [];
 
   /**
-   * Fetches questions dynamically from the secure SQLite server question bank (12,000 questions),
+   * Fetches questions dynamically from the secure SQLite server question bank (3,600+ questions),
    * preventing client bundle bloat and protecting question keys from browser extraction.
    */
   public static async fetchServerQuestions(
@@ -591,11 +592,18 @@ export class OfflineBankService {
       if (lower.includes('bio')) return 'biology';
       if (lower.includes('sci')) return 'science';
       if (lower.includes('eng')) return 'english';
+      if (lower.includes('hum')) return 'humanities';
       if (lower.includes('hist') || lower.includes('civic') || lower.includes('geog') || lower.includes('soc')) return 'social';
       return lower;
     };
 
     const targetSub = normSub(subjectId);
+    const subMatch = (rowSub: string) => {
+      const nRow = normSub(rowSub);
+      if (nRow === targetSub) return true;
+      if ((nRow === 'social' || nRow === 'humanities') && (targetSub === 'social' || targetSub === 'humanities')) return true;
+      return false;
+    };
 
     // Filter by chapter if provided
     let candidatePool = all;
@@ -609,17 +617,17 @@ export class OfflineBankService {
 
     // Exact curriculum match: Board + Grade + Subject + LevelNode
     let matches = candidatePool.filter(
-      q => normSub(q.subjectId) === targetSub &&
+      q => subMatch(q.subjectId) &&
            q.levelNode === levelNode &&
-           q.board === board &&
+           (q.board === board || q.board === 'CBSE') &&
            Number(q.grade) === Number(grade)
     );
 
     // If exact node has fewer than count, expand across other nodes for the SAME Board + Grade + Subject
     if (matches.length < count) {
       const gradeMatches = candidatePool.filter(
-        q => normSub(q.subjectId) === targetSub &&
-             q.board === board &&
+        q => subMatch(q.subjectId) &&
+             (q.board === board || q.board === 'CBSE') &&
              Number(q.grade) === Number(grade) &&
              !matches.some(m => m.id === q.id)
       );
@@ -629,7 +637,7 @@ export class OfflineBankService {
     // If still empty, relax board for same Grade & Subject
     if (matches.length === 0) {
       matches = candidatePool.filter(
-        q => normSub(q.subjectId) === targetSub &&
+        q => subMatch(q.subjectId) &&
              Number(q.grade) === Number(grade)
       );
     }

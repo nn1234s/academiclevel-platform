@@ -206,7 +206,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       icon: '🧠',
     },
     {
-      title: '12,000 Questions Bank Engine',
+      title: '3,600+ Questions Bank Engine',
       category: 'Curriculum-Mapped Bank',
       badge: 'Classes 1–12',
       highlight: 'CBSE • ICSE • Cambridge',
@@ -348,7 +348,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="mt-6 inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm">
           <div className="flex -space-x-2">
             <div className="w-6 h-6 rounded-full bg-indigo-500 border border-white flex items-center justify-center text-[10px] text-white font-bold">AI</div>
-            <div className="w-6 h-6 rounded-full bg-amber-500 border border-white flex items-center justify-center text-[10px] text-white font-bold">12K</div>
+            <div className="w-6 h-6 rounded-full bg-amber-500 border border-white flex items-center justify-center text-[9px] text-white font-bold">3.6K</div>
             <div className="w-6 h-6 rounded-full bg-emerald-500 border border-white flex items-center justify-center text-[10px] text-white font-bold">★</div>
           </div>
           <span>Interactive <strong className="text-slate-900">AI Quizzes &amp; Socratic Tutor</strong> for Classes 1–12</span>
@@ -468,7 +468,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>12,000 Syllabus-Verified Questions</span>
+                  <span>3,600+ Syllabus-Verified Questions</span>
                 </div>
               </div>
 
@@ -509,7 +509,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* 4 Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto pt-6">
             <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
-              <div className="text-2xl sm:text-3xl font-black text-amber-600">12,000+</div>
+              <div className="text-2xl sm:text-3xl font-black text-amber-600">3,600+</div>
               <div className="text-xs text-slate-500 font-medium mt-1">Verified Questions</div>
             </div>
             <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
@@ -773,7 +773,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="text-[11px] text-slate-500 font-medium">Verified Learner Rating</div>
             </div>
             <div className="px-5 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
-              <div className="text-2xl font-black text-indigo-600">12,000+</div>
+              <div className="text-2xl font-black text-indigo-600">3,600+</div>
               <div className="text-[11px] text-slate-500 font-medium">Curriculum AI Quizzes</div>
             </div>
           </div>

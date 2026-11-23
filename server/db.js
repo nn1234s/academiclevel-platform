@@ -594,7 +594,7 @@ function migrateFromJsonStore() {
       );
     });
 
-    // 6. Seed Question Bank in SQLite if empty (Preserving exactly 12,000 questions)
+    // 6. Seed Question Bank in SQLite if empty (Preserving exactly 3,600 master questions)
     try {
       const qbCount = db.prepare('SELECT count(*) as c FROM question_bank').get().c;
       if (qbCount === 0) {
@@ -737,7 +737,7 @@ function migrateFromJsonStore() {
           heroTitle: 'Master Your School Curriculum with Adaptive AI Quizzes',
           heroSubtitle: 'CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant Socratic guidance, verifiable certificates, and an earnable Study Coin economy.',
           announcementActive: true,
-          announcementText: '🚀 12,000 Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
+          announcementText: '🚀 3,600+ Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
           statsStudents: '10,000+',
           statsQuizzes: '500,000+',
           statsPassRate: '99.4%',

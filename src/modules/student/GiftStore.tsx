@@ -1028,7 +1028,7 @@ ${recipientName.trim()}`;
 
               <h3 className="font-bold text-white text-base">Class Practice Worksheets &amp; PDF</h3>
               <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                Generate curriculum practice worksheets from the 12,000-question bank for all classes (1–12), with rough work workspace and detachable step-by-step solutions.
+                Generate curriculum practice worksheets from the 3,600-question bank for all classes (1–12), with rough work workspace and detachable step-by-step solutions.
               </p>
 
               <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-mono">

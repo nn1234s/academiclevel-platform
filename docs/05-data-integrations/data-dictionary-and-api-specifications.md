@@ -139,7 +139,7 @@ erDiagram
 | `expiresAt` | `TEXT` | No | ISO 8601 | Operational | Access expiry timestamp |
 
 ### Table: `question_bank`
-*12,000 curriculum assessment items.*
+*3,600 curriculum assessment items.*
 
 | Column | Type | Nullable | Constraints / Defaults | Description |
 | :--- | :--- | :--- | :--- | :--- |

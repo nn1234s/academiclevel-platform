@@ -22,7 +22,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, onOpenRe
           Honest &amp; Accessible Pricing
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 mt-2">
-          Unlock the complete 12,000 question syllabus bank and 24/7 Nova AI Socratic tutor.
+          Unlock the complete 3,600+ question syllabus bank and 24/7 Nova AI Socratic tutor.
         </p>
       </div>
 

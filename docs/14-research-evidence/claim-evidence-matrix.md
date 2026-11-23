@@ -12,7 +12,7 @@
 
 | Claim ID | System Feature / Technical Claim | Implementation Source | Verification Evidence / Test Run | Empirical Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **CLM-0001** | Question Bank contains 12,000 distinct items with full coverage across Classes 1–12 | `server/data/academiclevel_prod.db`, `src/data/curatedQuestionBank.json` | `scripts/test_quality_recovery_suite.mjs` (Test 1 & 2): Exactly 12,000 rows, 0 null texts, 0 invalid indices | **VERIFIED — IMPLEMENTED** |
+| **CLM-0001** | Question Bank contains 3,600 distinct items with full coverage across Classes 1–12 | `server/data/academiclevel_prod.db`, `src/data/curatedQuestionBank.json` | `scripts/test_quality_recovery_suite.mjs` (Test 1 & 2): Exactly 3,600 rows, 0 null texts, 0 invalid indices | **VERIFIED — IMPLEMENTED** |
 | **CLM-0002** | Zero cross-subject contamination (Math, CS, Science, English, Social strictly isolated) | `server/api.js` (lines 1984–1997) | `scripts/test_quality_recovery_suite.mjs` (Test 3): 100% pure subject extraction across test grades | **VERIFIED — IMPLEMENTED** |
 | **CLM-0003** | Advertised question count matches reality (Foundation=10, Concept=12, Exam=15, Olympiad=15) | `CourseLevels.tsx`, `QuizEngine.tsx`, `curriculumService.ts` | `scripts/test_fetch_quiz_counts.mjs` (12 test runs across CBSE, ICSE, IGCSE) & `test_student_behavioral_suite.mjs` (Step 5) | **VERIFIED — IMPLEMENTED** |
 | **CLM-0004** | Quiz answer feedback integrity (Emerald for correct, Rose for wrong, score integrity) | `QuizEngine.tsx` (lines 280–295, 866–927) | `scripts/test_student_behavioral_suite.mjs` (Step 6 & 7): True evaluated correct, False evaluated wrong, no false score increment | **VERIFIED — IMPLEMENTED** |

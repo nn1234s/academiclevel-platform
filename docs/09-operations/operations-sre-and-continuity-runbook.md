@@ -18,7 +18,7 @@ The `/api/health` endpoint serves as the liveness and readiness probe for cloud 
   "uptimeSeconds": 84210,
   "database": {
     "engine": "SQLite WAL + Turso Cloud",
-    "questionBankCount": 12000,
+    "questionBankCount": 3600,
     "cloudSyncConfigured": true
   },
   "timestamp": "2026-11-23T02:00:00.000Z"

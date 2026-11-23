@@ -13,20 +13,29 @@ export class CurriculumService {
     },
     {
       id: 'science',
-      name: 'Science & Discovery',
+      name: 'Science / EVS',
       icon: '🔬',
       color: 'from-emerald-600 to-teal-600',
-      description: 'Environmental Science, Natural World, Matter, Living Organisms & Energy.',
+      description: 'Environmental Science, Natural World, Matter, Living Organisms, Energy & Everyday Science.',
       grades: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       boards: ['CBSE', 'ICSE', 'IGCSE']
     },
     {
-      id: 'evs',
-      name: 'EVS & Social Studies',
-      icon: '🌱',
-      color: 'from-emerald-600 to-amber-600',
-      description: 'Body Parts, Plants, Animals, Our Planet Earth, Regional Languages & Indian Culture.',
-      grades: [1, 2, 3, 4, 5],
+      id: 'social',
+      name: 'Social Science / General Knowledge',
+      icon: '🌍',
+      color: 'from-amber-600 to-orange-600',
+      description: 'History, Civics, Geography, Economics, Cultural Heritage & General Knowledge.',
+      grades: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      boards: ['CBSE', 'ICSE', 'IGCSE']
+    },
+    {
+      id: 'english',
+      name: 'English',
+      icon: '📚',
+      color: 'from-sky-600 to-cyan-600',
+      description: 'Grammar mechanics, vocabulary enrichment, critical comprehension & literary composition.',
+      grades: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
       boards: ['CBSE', 'ICSE', 'IGCSE']
     },
     {
@@ -57,39 +66,12 @@ export class CurriculumService {
       boards: ['CBSE', 'ICSE', 'IGCSE']
     },
     {
-      id: 'social',
-      name: 'Social Sciences',
-      icon: '🌍',
-      color: 'from-amber-600 to-orange-600',
-      description: 'History, Civics, Geography, Economics & Global Human Societies.',
-      grades: [5, 6, 7, 8, 9, 10],
-      boards: ['CBSE', 'ICSE', 'IGCSE']
-    },
-    {
-      id: 'english',
-      name: 'English Language & Reading',
-      icon: '📚',
-      color: 'from-sky-600 to-cyan-600',
-      description: 'Grammar mechanics, vocabulary enrichment, critical comprehension & composition.',
-      grades: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-      boards: ['CBSE', 'ICSE', 'IGCSE']
-    },
-    {
-      id: 'commerce',
-      name: 'Accountancy & Business',
-      icon: '📊',
-      color: 'from-cyan-600 to-blue-700',
-      description: 'Financial Statements, Partnership Accounting, Business Management & Finance.',
+      id: 'humanities',
+      name: 'Integrated Humanities',
+      icon: '🏛️',
+      color: 'from-amber-700 to-yellow-600',
+      description: 'History, Geography, Political Science, Economics & Global Human Societies.',
       grades: [11, 12],
-      boards: ['CBSE', 'ICSE']
-    },
-    {
-      id: 'cs',
-      name: 'Computer Science & Coding',
-      icon: '💻',
-      color: 'from-indigo-600 to-slate-800',
-      description: 'Scratch, MIT App Inventor, Thunkable, Web Development & Python Programming.',
-      grades: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
       boards: ['CBSE', 'ICSE', 'IGCSE']
     }
   ];
@@ -524,250 +506,7 @@ export class CurriculumService {
       ];
     }
 
-    // 2. COMPUTER SCIENCE & CODING CHAPTERS (MS Paint, Scratch, App Inventor, Thunkable, Web, Python, JS, SQL)
-    if (sId.includes('cs') || sId.includes('comp') || sId.includes('code')) {
-      if (grade <= 2) {
-        return [
-          {
-            id: 'ch_cs_paint_p',
-            title: 'MS Paint & Creative Drawing Tools',
-            description: 'Drawing and coloring in MS Paint: Pencil, Eraser, Fill with Color paint bucket, Brushes, and 2D Shapes tool.',
-            questionCount: 10,
-            estimatedMinutes: 10,
-            topics: ['MS Paint Pencil & Eraser', 'Fill with Color (Paint Bucket)', 'Drawing Shapes & Brushes'],
-            badge: 'MS Paint'
-          },
-          {
-            id: 'ch_cs_parts_p',
-            title: 'Computer Parts & Hardware Devices',
-            description: 'Identifying essential computer hardware: Monitor, CPU (brain of computer), Keyboard, Mouse, and Printer.',
-            questionCount: 10,
-            estimatedMinutes: 10,
-            topics: ['Monitor Screen & Display', 'CPU System Unit', 'Mouse Clicking & Keyboard Keys'],
-            badge: 'Computer Parts'
-          },
-          {
-            id: 'ch_cs_smart_p',
-            title: 'Smart Machines & Safe Computer Habits',
-            description: 'Understanding computers as smart machines, starting up and shutting down, mouse pointer, and gentle computer handling.',
-            questionCount: 10,
-            estimatedMinutes: 10,
-            topics: ['Smart Machines in Daily Life', 'Mouse Pointer & Cursor', 'Do\'s and Don\'ts with Computers'],
-            badge: 'Digital Basics'
-          }
-        ];
-      }
-      if (grade <= 4) {
-        return [
-          {
-            id: 'ch_cs_paint_art',
-            title: 'MS Paint & Digital Art Tools',
-            description: 'Advanced MS Paint techniques: Color palette selection, zooming, resizing, crop, and creating pixel artwork.',
-            questionCount: 10,
-            estimatedMinutes: 12,
-            topics: ['MS Paint Color Palette & Picker', 'Selection & Crop Tools', 'Creating Digital Drawings'],
-            badge: 'MS Paint'
-          },
-          {
-            id: 'ch_cs_scratch_jr',
-            title: 'Scratch Junior & Block Coding Basics',
-            description: 'Introduction to block coding: drag-and-drop movement, turn blocks, start on green flag, and sprite actions.',
-            questionCount: 10,
-            estimatedMinutes: 12,
-            topics: ['Green Flag Start Block', 'Move Steps & Turn Blocks', 'Costume & Sound Blocks'],
-            badge: 'Scratch'
-          },
-          {
-            id: 'ch_cs_io_devices',
-            title: 'Input, Output & Storage Devices',
-            description: 'Distinguishing input devices (keyboard, mouse, mic) from output devices (monitor, printer, speaker) and storage (USB, hard drive).',
-            questionCount: 10,
-            estimatedMinutes: 12,
-            topics: ['Input Devices vs Output Devices', 'Storage Media & Pendrives', 'Computer Memory Basics'],
-            badge: 'Hardware'
-          },
-          {
-            id: 'ch_cs_seq_p',
-            title: 'Sequences & Algorithmic Thinking',
-            description: 'Step-by-step instructions, ordering commands to solve a maze, debugging erroneous sequences, and repeat commands.',
-            questionCount: 10,
-            estimatedMinutes: 12,
-            topics: ['Algorithm Sequences', 'Debugging Missing Steps', 'Repeating Simple Actions'],
-            badge: 'Logic & Thinking'
-          }
-        ];
-      }
-      if (grade <= 6) {
-        return [
-          {
-            id: 'ch_cs_scratch_loops',
-            title: 'Scratch Game Programming & Loops',
-            description: 'Repeat 10 loops, forever loops, repeat-until conditions, key pressed events, and broadcast message handling.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['Repeat & Forever Loops', 'When Key Pressed Events', 'Broadcast & Receive Messages'],
-            badge: 'Scratch'
-          },
-          {
-            id: 'ch_cs_scratch_vars',
-            title: 'Scratch Variables & Game Mechanics',
-            description: 'Creating score variables, incrementing counters by 1, setting timer clocks, and game over conditions.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['Score Variables', 'Timer Mechanics', 'Game Win/Lose Conditions'],
-            badge: 'Game Variables'
-          },
-          {
-            id: 'ch_cs_html_intro',
-            title: 'HTML Web Page Basics',
-            description: 'HTML skeleton structure, tags: <h1>-<h6> headings, <p> paragraphs, <a> hyperlinks with href, and <img> with src/alt.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['HTML Page Skeleton', 'Headings & Paragraphs', 'Links & Image Tags'],
-            badge: 'HTML'
-          },
-          {
-            id: 'ch_cs_cyber_safe',
-            title: 'Cyber Safety & Internet Ethics',
-            description: 'Safe browsing habits, creating strong passwords, identifying phishing scams, and digital etiquette.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['Password Security', 'Safe Web Browsing', 'Cyber Etiquette'],
-            badge: 'Cyber Safety'
-          }
-        ];
-      }
-      if (grade <= 8) {
-        return [
-          {
-            id: 'ch_cs_html_web',
-            title: 'HTML & CSS Web Development',
-            description: 'HTML structure, tags, forms, tables, and CSS styling (colors, fonts, box model, margins and padding).',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['HTML Form Controls & Tables', 'CSS Selectors & Colors', 'Box Model & Page Layouts'],
-            badge: 'HTML & CSS'
-          },
-          {
-            id: 'ch_cs_py_basics_m',
-            title: 'Python Programming Basics',
-            description: 'Python syntax, print(), input(), integer/float/string variables, if-elif-else decisions, and while/for loops.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['Print, Input & Variables', 'If-Elif-Else Conditions', 'For Loops & Lists'],
-            badge: 'Python'
-          },
-          {
-            id: 'ch_cs_app_inv',
-            title: 'MIT App Inventor & Mobile Apps',
-            description: 'Designer View vs Blocks Editor, Button click event handlers, Text-to-Speech component, and mobile screen layouts.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['Designer vs Blocks Editor', 'Button Click Events', 'TextToSpeech & Media Components'],
-            badge: 'App Inventor'
-          },
-          {
-            id: 'ch_cs_thunkable',
-            title: 'Thunkable Mobile App Development',
-            description: 'Cross-platform app creation: screen navigation, mobile accelerometer/camera sensors, and data storage in apps.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['Screen Navigation', 'Mobile Sensors & Logic', 'App Block Event Handlers'],
-            badge: 'Thunkable'
-          }
-        ];
-      }
-      if (grade <= 10) {
-        return [
-          {
-            id: 'ch_cs_py_algo',
-            title: 'Python Programming & Algorithms',
-            description: 'Python syntax, data types, if-elif-else, while loops, for loops with range, lists, tuples, and string functions.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['Control Flow & Loops', 'List Methods & Slicing', 'String Manipulation & Functions'],
-            badge: 'Python'
-          },
-          {
-            id: 'ch_cs_js_fund',
-            title: 'JavaScript Programming Fundamentals',
-            description: 'Variables (let, const), data types, functions, if-else logic, for loops, arrays (push, pop), and DOM element selection.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['Variables & Data Types', 'DOM getElementById & Events', 'Array Methods & Loops'],
-            badge: 'JavaScript'
-          },
-          {
-            id: 'ch_cs_html5_css',
-            title: 'HTML5 & Responsive Web Design',
-            description: 'Semantic tags (<header>, <nav>, <section>, <footer>), forms (<input type="text/email/submit">), and CSS Flexbox.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['Semantic Elements', 'HTML Form Controls', 'CSS Flexbox Layouts'],
-            badge: 'HTML5 & CSS'
-          },
-          {
-            id: 'ch_cs_net_cyber',
-            title: 'Computer Networks & Cyber Ethics',
-            description: 'LAN vs WAN, IP vs MAC addresses, network topologies (star, bus), cyber safety, phishing, and digital footprints.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['Network Types & Topologies', 'IP & MAC Addresses', 'Cyber Safety & Ethics'],
-            badge: 'Networks & Cyber'
-          }
-        ];
-      }
-      // Grades 11-12
-      return [
-        {
-          id: 'ch_cs_py_data_sr',
-          title: 'Python Core & Data Structures (Lists, Tuples, Dictionaries)',
-          description: 'Mutable vs immutable types, list operations, tuple packing/unpacking, dictionary methods (keys, values, items), and sets.',
-          questionCount: 10,
-          estimatedMinutes: 15,
-          topics: ['List Comprehensions & Slicing', 'Dictionary Operations', 'Tuples & Sets Immobility'],
-          badge: 'Python Data Structures'
-        },
-        {
-          id: 'ch_cs_py_func_io',
-          title: 'Python Functions, Recursion & File I/O',
-          description: 'User-defined functions, default/keyword arguments, recursion, text and binary file reading/writing (open, with open, read, write).',
-          questionCount: 10,
-          estimatedMinutes: 15,
-          topics: ['Function Definitions & Scope', 'File Handling (open, read, write)', 'CSV & Text File Parsing'],
-          badge: 'Python File I/O'
-        },
-        {
-          id: 'ch_cs_py_oop',
-          title: 'Object-Oriented Programming (OOP) in Python',
-          description: 'Classes, objects, constructor __init__, instance vs class variables, inheritance, and encapsulation.',
-          questionCount: 10,
-          estimatedMinutes: 15,
-          topics: ['Class & Object Creation', '__init__ Constructor', 'Inheritance & Methods'],
-          badge: 'Python OOP'
-        },
-        {
-          id: 'ch_cs_sql_db',
-          title: 'SQL & Relational Database Management',
-          description: 'RDBMS concepts, Primary Key, Foreign Key, SQL queries: SELECT, WHERE, ORDER BY, GROUP BY, aggregate functions (COUNT, SUM, AVG).',
-          questionCount: 10,
-          estimatedMinutes: 15,
-          topics: ['SELECT Queries & Filtering', 'Aggregate Functions & GROUP BY', 'Primary & Foreign Key Constraints'],
-          badge: 'SQL & Databases'
-        },
-        {
-          id: 'ch_cs_logic_net',
-          title: 'Boolean Logic, Gates & Computer Networks',
-          description: 'Logic gates (AND, OR, NOT, NAND, NOR, XOR), De Morgan laws, OSI & TCP/IP models, routing protocols, and web technologies.',
-          questionCount: 10,
-          estimatedMinutes: 15,
-          topics: ['Boolean Algebra & Truth Tables', 'Logic Gate Diagrams', 'TCP/IP Model & Protocols'],
-          badge: 'Logic & Networks'
-        }
-      ];
-    }
-
-    // 3. SCIENCE & NATURAL WORLD CHAPTERS
+    // 2. SCIENCE & NATURAL WORLD CHAPTERS
     if (sId.includes('sci') || sId.includes('phys') || sId.includes('chem') || sId.includes('bio')) {
       if (grade <= 2) {
         return [

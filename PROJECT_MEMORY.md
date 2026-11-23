@@ -14,7 +14,7 @@
 * **Primary Branches**: `main` (production release) & `dev` (integration)
 * **Mission**: High-performance, adaptive school curriculum mastery platform for **CBSE, ICSE, and Cambridge IGCSE (Classes 1 to 12)** with:
   * 24/7 Socratic Nova AI Tutor
-  * Adaptive AI Quizzes & 12,000+ question curated offline syllabus banks
+  * Adaptive AI Quizzes & 3,600+ question curated master syllabus banks
   * Automated post-quiz diagnostic performance reports delivered to an in-app student mailbox
   * Verifiable QR-coded annual certificates
   * Earnable Study Coin economy redeemable for real physical gifts & digital cards

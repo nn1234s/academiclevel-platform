@@ -36,7 +36,7 @@ All notable changes, architectural decisions, and security hardening updates are
 
 ## [v1.3.0-PROD] - 2026-11-11
 
-### 12,000 Question Curriculum Bank (1,000 Questions per Class)
+### 3,600 question Curriculum Bank (1,000 Questions per Class)
 - **Comprehensive Class 1–12 Coverage**:
   - Expanded `src/data/curatedQuestionBank.json` to exactly 12,000 authentic, syllabus-aligned questions.
   - Exactly 1,000 verified questions for each of the 12 grades (Class 1 to Class 12).

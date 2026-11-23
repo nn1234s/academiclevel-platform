@@ -45,7 +45,7 @@ C4Container
     
     Container(spa, "Single-Page Application (SPA)", "React 18, Vite 6, Tailwind CSS", "Responsive student and admin interface running in the browser")
     Container(api, "Backend API Server", "Node.js 22, Express 5", "REST API handling auth, payments, gamification, and assessment orchestration")
-    ContainerDb(sqlite, "Local Database", "SQLite in WAL Mode (DatabaseSync)", "Embedded high-concurrency database storing 12k question bank, users, and ledgers")
+    ContainerDb(sqlite, "Local Database", "SQLite in WAL Mode (DatabaseSync)", "Embedded high-concurrency database storing 3,600 master question bank, users, and ledgers")
     
     Container_Ext(gemini, "Google Gemini API", "HTTPS / JSON", "Cloud AI model provider for Socratic tutoring")
     Container_Ext(turso, "Turso Cloud DB", "HTTPS / LibSQL", "Encrypted cloud persistence replica")
@@ -103,7 +103,7 @@ graph TD
     
     Auth -->|learnerId, parentPin| Assessment
     Auth -->|learnerId| Gamification
-    Curriculum -->|syllabus hierarchy, 12k bank| Assessment
+    Curriculum -->|syllabus hierarchy, 3,600 bank| Assessment
     Assessment -->|accuracy >= 70%, completion| Gamification
     Assessment -->|diagnostic reports| Auth
     Subscription -->|quota limits, tier| Assessment
@@ -111,7 +111,7 @@ graph TD
 ```
 
 1. **Identity & Parent Oversight Context:** Owns `learners`, credentials, parent PIN hashes, and RLS session keys.
-2. **Curriculum & Question Bank Context:** Owns board structures (`CBSE`, `ICSE`, `IGCSE`), 12 grade levels, subjects, chapters, and the 12,000 verified question records in `question_bank`.
+2. **Curriculum & Question Bank Context:** Owns board structures (`CBSE`, `ICSE`, `IGCSE`), 12 grade levels, subjects, chapters, and the 3,600 verified question records in `question_bank`.
 3. **Assessment & Evaluation Context:** Owns quiz session state, 1-second bot dwell timers, question count verification, answer integrity evaluation, and `quiz_attempts`.
 4. **Gamification & Coin Ledger Context:** Owns `coin_ledger`, daily spin wheel cooldowns, streak freezes, and `gift_requests` physical merchandise redemptions.
 5. **Subscriptions & UPI Payments Context:** Owns `subscriptions`, 12-digit UTR references, A-Codes prepaid vouchers, and super-admin approval queues.

@@ -5084,7 +5084,7 @@ const DEFAULT_CONFIG = {
     heroTitle: 'Master Your School Curriculum with Adaptive AI Quizzes',
     heroSubtitle: 'CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant Socratic guidance, verifiable certificates, and an earnable Study Coin economy.',
     announcementActive: true,
-    announcementText: '🚀 12,000 Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
+    announcementText: '🚀 3,600+ Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
     statsStudents: '10,000+',
     statsQuizzes: '500,000+',
     statsPassRate: '99.4%',

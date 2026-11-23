@@ -32,7 +32,7 @@ The following components, services, and modules are verified as active and in-sc
 3. **Data Persistence Engine:**
    * Primary local embedded database: SQLite in WAL mode ([`server/db.js`](../../server/db.js)) using Node 22 built-in `node:sqlite` (`DatabaseSync`).
    * Cloud replica & disaster recovery sync: Turso Cloud Database ([`server/tursoClient.js`](../../server/tursoClient.js)).
-   * Syllabus Question Bank: 12,000 verified curriculum questions spanning Classes 1–12 across Math, Computer Science, Science, English, and Social Studies.
+   * Syllabus Question Bank: 3,600 verified curriculum questions spanning Classes 1–12 across Math, Computer Science, Science, English, and Social Studies.
 
 4. **Nova AI Socratic Tutoring Service:**
    * Live model integration via Google Gemini API (`server/api.js`).
