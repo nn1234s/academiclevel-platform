@@ -752,6 +752,12 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
           <span>🎀 bestie study vibe (100 inside)</span>
         </button>
         <button
+          onClick={() => executeSend(`tell me about our comprehensive practice worksheets and how i can redeem them with 30 coins!`)}
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border border-amber-300 text-amber-900 font-bold transition-colors cursor-pointer shadow-xs shrink-0 flex items-center space-x-1"
+        >
+          <span>📄 practice worksheets (30 coins)</span>
+        </button>
+        <button
           onClick={() => executeSend(`can you simplify the hardest concept in ${activeSubject || 'this chapter'} with a super cute example?`)}
           className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs shrink-0"
         >

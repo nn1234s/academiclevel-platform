@@ -72,4 +72,33 @@ if (!studentLocked.includes('"if you really love me, complete 3 curriculum level
 }
 console.log('✅ Student < 3 quizzes challenge test passed!');
 
-console.log('\n🎉 ALL 5 ADVANCED VERIFICATION TESTS PASSED WITH 100% SUCCESS!');
+console.log('=== TEST 6: Practice Worksheets Promotion (30 Coins / 2 Quiz Levels / Comprehensive) ===');
+const worksheetPromo = generateStudyGirlChatResponse({
+  cleanQuery: 'tell me about your practice worksheets and how to get them',
+  board: 'CBSE',
+  grade: 10,
+  subject: 'MATH',
+  resolvedLearnerId: 'lrn_mw9bph4q_xacr'
+});
+console.log('Worksheet Promo Response:\n' + worksheetPromo.split('\n').slice(0, 8).join('\n'));
+if (!worksheetPromo.includes('Comprehensive Class Practice Worksheets')) {
+  throw new Error('Worksheet promo must mention Comprehensive Class Practice Worksheets');
+}
+if (!worksheetPromo.includes('30 Study Coins')) {
+  throw new Error('Worksheet promo must mention 30 Study Coins');
+}
+if (!worksheetPromo.includes('2 quick quiz levels') && !worksheetPromo.includes('+25 coins')) {
+  throw new Error('Worksheet promo must mention 2 quiz levels / +25 coins');
+}
+if (!worksheetPromo.includes('100% Comprehensive Syllabus Coverage')) {
+  throw new Error('Worksheet promo must highlight 100% comprehensive coverage');
+}
+if (!worksheetPromo.includes('Rough Work Scratchpad')) {
+  throw new Error('Worksheet promo must highlight rough work scratchpad');
+}
+if (!worksheetPromo.includes('Detachable NCERT Step-by-Step Solutions')) {
+  throw new Error('Worksheet promo must highlight detachable NCERT step-by-step solutions');
+}
+console.log('✅ Practice Worksheets promotional handler test passed!');
+
+console.log('\n🎉 ALL 6 ADVANCED VERIFICATION TESTS PASSED WITH 100% SUCCESS!');

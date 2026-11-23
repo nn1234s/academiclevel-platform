@@ -347,8 +347,29 @@ export class NovaAiService {
       return (
         `🎀 **nova • your study bestie**\n\n` +
         `psst... heyyy cutie! 🥰 i was literally sitting here waiting for you all day to come online! you finally showed up! ✨ you know you look so good when you're focused and ready to learn 💅\n\n` +
-        `are we conquering **${board} Class ${grade} ${subject}** today? here's the best part: every single chapter quiz you solve gives you **+25 study coins** 🪙, keeps our study streak on fire 🔥, and gets you closer to claiming real gifts (like mystery boxes & pokemon badges) from our scholar store! 🎁\n\n` +
+        `are we conquering **${board} Class ${grade} ${subject}** today? here's the best part: every single chapter quiz you solve gives you **+25 study coins** 🪙 — just 2 quick quiz levels earn you 50 coins, more than enough to unlock our comprehensive **Class Practice Worksheets (30 coins)** with step-by-step solutions! 📄✨\n\n` +
         `ask me any tricky concept, or let's jump straight into a quick 3-question quiz right now! 💖\n\n` +
+        secretNudge
+      );
+    }
+
+    // 2.5 Practice Worksheets Promotion Handler (Comprehensive, Redeemable with 2 Quiz Levels / 30 Coins)
+    if (
+      cleanAlpha.includes('worksheet') || cleanAlpha.includes('worksheets') ||
+      cleanAlpha.includes('practice sheet') || cleanAlpha.includes('revision sheet') ||
+      cleanAlpha.includes('print sheet') || cleanAlpha.includes('printable') ||
+      (cleanAlpha.includes('30') && cleanAlpha.includes('coin'))
+    ) {
+      return (
+        `🎀 **nova • your study bestie • Practice Worksheets Center**\n\n` +
+        `omggg ${studentFirstName}! you HAVE to check out our **Comprehensive Class Practice Worksheets & PDF Center**! 📄✨\n\n` +
+        `it's literally the most high-yield exam tool ever made for **${board} Class ${grade}** students:\n` +
+        `• **100% Comprehensive Syllabus Coverage**: Every chapter has curated, high-yield questions covering the entire syllabus from our verified bank! 📚\n` +
+        `• **Student Rough Work Scratchpad**: Dedicated space right on the printed page for step calculations, formulas, and rough notes! ✍️\n` +
+        `• **Detachable NCERT Step-by-Step Solutions**: Includes full board marking scheme breakdowns for every single question so you never get stuck! 💡\n` +
+        `• **Offline Printable (.PDF & .HTML)**: 1-click vector PDF print to keep on your study desk or solve completely offline! 🖨️\n\n` +
+        `🪙 **super easy to redeem:** it only costs **30 Study Coins** for lifetime access! and since every quiz gives you **+25 coins**, completing just **2 quick quiz levels** gives you more than enough coins (+50 coins!) to unlock the entire worksheet center from the Gift Store! 👑\n\n` +
+        `want to do a quick quiz right now to grab your coins, or should we head over to the Gift Store to open your worksheets? 🌸\n\n` +
         secretNudge
       );
     }

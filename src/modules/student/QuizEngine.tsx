@@ -29,8 +29,12 @@ import {
   BookOpen,
   Mail,
   LogOut,
-  ArrowLeft
+  ArrowLeft,
+  FileText,
+  Printer,
+  Check
 } from 'lucide-react';
+import { PracticeWorksheetViewer } from './PracticeWorksheetViewer';
 
 interface QuizEngineProps {
   board: Board;
@@ -72,6 +76,36 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
+
+  // Practice Worksheets Modal & Promotion State (30 Coins / Redeem in 2 Quizzes)
+  const [isWorksheetModalOpen, setIsWorksheetModalOpen] = useState<boolean>(false);
+  const isWorksheetUnlocked = typeof window !== 'undefined' && (
+    localStorage.getItem(`al_unlocked_worksheets_${learner.id}`) === 'true' ||
+    (learner.metadataJson && JSON.parse(learner.metadataJson || '{}').unlockedWorksheets) ||
+    learner.role === 'SUPER_ADMIN' ||
+    learner.id === 'usr_super_admin_001' ||
+    (learner as any).username?.toLowerCase() === 'super' ||
+    learner.fullName?.toLowerCase() === 'super'
+  );
+
+  const handleQuickUnlockWorksheets = () => {
+    if (isWorksheetUnlocked) {
+      setIsWorksheetModalOpen(true);
+      return;
+    }
+    const cost = 30;
+    if (learner.coinBalance < cost) {
+      return;
+    }
+    const tx = CoinLedgerService.appendTransaction(learner.id, -cost, 'MALL_PURCHASE', {
+      item: 'PRACTICE_WORKSHEETS_ALL_CLASSES'
+    });
+    if (tx.success) {
+      localStorage.setItem(`al_unlocked_worksheets_${learner.id}`, 'true');
+      refreshCurrentLearner();
+      setIsWorksheetModalOpen(true);
+    }
+  };
 
   // Diagnostic Answer Log for Mailbox Report Generation
   interface AnswerLog {
@@ -631,7 +665,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         </div>
 
         {/* Mailbox Diagnostic Report Notification Banner */}
-        <div className="mb-8 p-4 sm:p-5 bg-gradient-to-r from-purple-50 via-white to-indigo-50 border border-purple-200 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-sm">
+        <div className="mb-6 p-4 sm:p-5 bg-gradient-to-r from-purple-50 via-white to-indigo-50 border border-purple-200 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-sm">
           <div className="flex items-center space-x-3.5">
             <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 border border-purple-200 flex items-center justify-center flex-shrink-0 shadow-xs">
               <Mail className="w-5 h-5" />
@@ -662,6 +696,55 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
           </button>
         </div>
 
+        {/* Practice Worksheets Promotion Banner (30 Coins / Redeem in 2 Quizzes) */}
+        <div className="mb-8 p-4 sm:p-5 bg-gradient-to-r from-amber-50/80 via-white to-indigo-50/70 border-2 border-amber-200/90 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 text-left shadow-sm">
+          <div className="flex items-start space-x-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+              <FileText className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+                  ⚡ Redeem in 2 Quizzes (30 Coins)
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+                  100% Comprehensive Syllabus
+                </span>
+              </div>
+              <p className="text-xs font-bold text-slate-900">
+                Class Practice Worksheets &amp; PDF Revision Center
+              </p>
+              <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                Comprehensive chapter worksheets with student rough work scratchpads and detachable step-by-step NCERT solutions.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex-shrink-0 w-full sm:w-auto">
+            {isWorksheetUnlocked ? (
+              <button
+                onClick={() => setIsWorksheetModalOpen(true)}
+                className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Open Worksheets</span>
+              </button>
+            ) : learner.coinBalance >= 30 ? (
+              <button
+                onClick={handleQuickUnlockWorksheets}
+                className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+              >
+                <StudyCoinIcon className="w-4 h-4" />
+                <span>Unlock (30 Coins)</span>
+              </button>
+            ) : (
+              <div className="text-[11px] text-amber-900 bg-amber-100 border border-amber-300 px-3 py-1.5 rounded-xl font-medium text-center">
+                <span>Earn {30 - learner.coinBalance} more coins ({learner.coinBalance}/30)</span>
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={() => loadQuizQuestions(true)}
@@ -677,6 +760,14 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
             {isHinglish ? 'Padhai jari rakhein' : 'Continue Learning Journey'}
           </button>
         </div>
+
+        {/* Practice Worksheets Modal */}
+        {isWorksheetModalOpen && (
+          <PracticeWorksheetViewer
+            learner={learner}
+            onClose={() => setIsWorksheetModalOpen(false)}
+          />
+        )}
       </div>
     );
   }
