@@ -616,7 +616,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                         <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/30 text-amber-300 font-bold">60 Days</span>
                       </div>
                       <p className="text-[11px] text-slate-300 mt-1">
-                        2 Months Unlimited Quizzes &amp; Socratic AI tutor for 40 students. (~₹62.47 / student).
+                        2 Months Unlimited Quizzes &amp; Nova StudyGirl AI tutor for 40 students. (~₹62.47 / student).
                       </p>
                     </button>
 

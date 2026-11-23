@@ -733,27 +733,27 @@ ${recipientName.trim()}`;
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-bold text-slate-900 text-sm">Physical Parcel Fulfillment &amp; Fair-Play Economics</span>
               {isEnrolledScholar ? (
-                <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
+                <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
                   ✓ Scholar Enrolled
                 </span>
               ) : (
-                <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
+                <span className="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
                   Free Tier • Upgrade to Claim
                 </span>
               )}
               {hasAcademicMilestone ? (
-                <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold flex items-center space-x-1">
+                <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] px-2.5 py-0.5 rounded-full font-bold flex items-center space-x-1">
                   <CheckCircle2 className="w-3 h-3" />
                   <span>Milestone Verified ({levelsCount}/3 Levels Mastered)</span>
                 </span>
               ) : (
-                <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
+                <span className="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
                   🎯 Proof of Study: {levelsCount}/3 Levels
                 </span>
               )}
             </div>
-            <p className="text-slate-400 text-[11px] mt-1 leading-relaxed">
-              Earn <strong className="text-amber-400">+25 coins</strong> per level mastered (70%+ accuracy) plus daily streak bonuses. Physical scholar merchandise items are reserved for enrolled Lite/Plus Scholars with min. 3 levels mastered. Digital study power-ups (Streak Freezes, Frames, Worksheets) are available to all students instantly!
+            <p className="text-slate-600 text-[11px] mt-1 leading-relaxed">
+              Earn <strong className="text-amber-700">+25 coins</strong> per level mastered (70%+ accuracy) plus daily streak bonuses. Physical scholar merchandise items are reserved for enrolled Lite/Plus Scholars with min. 3 levels mastered. Digital study power-ups (Streak Freezes, Frames, Worksheets) are available to all students instantly!
             </p>
           </div>
         </div>

@@ -175,7 +175,7 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
       </div>
 
       {/* Jackpot Unlock Status Bar */}
-      <div className="mb-6 p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between text-xs">
+      <div className="mb-6 p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs">
         <div className="flex items-center space-x-2 text-left">
           {isJackpotUnlocked ? (
             <Unlock className="w-4 h-4 text-emerald-600 flex-shrink-0" />
@@ -193,7 +193,7 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
             </p>
           </div>
         </div>
-        <span className="text-xs font-bold text-amber-800 bg-amber-100 border border-amber-300 px-3 py-1 rounded-xl">
+        <span className="text-xs font-bold text-amber-800 bg-amber-100 border border-amber-300 px-3 py-1 rounded-xl self-start sm:self-auto flex-shrink-0">
           {qualifiedReferralsCount} Friends Invited
         </span>
       </div>

@@ -286,7 +286,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
 
           {/* Quick Metrics Pod */}
-          <div className="flex flex-row lg:flex-col items-center sm:items-end justify-between gap-3 bg-black/30 backdrop-blur-md p-4 rounded-3xl border border-white/20 min-w-[200px] shadow-xl">
+          <div className="flex flex-col items-stretch gap-2.5 bg-black/30 backdrop-blur-md p-4 rounded-3xl border border-white/20 w-full lg:w-auto lg:min-w-[220px] shadow-xl">
             <div className="flex items-center space-x-3 w-full justify-between">
               <span className="text-xs font-bold text-white/80">Study Streak:</span>
               <div className="flex items-center space-x-1 font-black text-amber-300">

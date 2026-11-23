@@ -41,7 +41,7 @@ export const WhatsDifferentFromChatGPT: React.FC<WhatsDifferentFromChatGPTProps>
     {
       feature: 'True Learning vs "Homework Copying"',
       chatgpt: 'Dumps the final answer immediately. Kids blindly copy without understanding and fail school exams.',
-      academiclevel: 'Socratic AI Tutor never gives away answers. It asks probing hints, analogies, and guides step-by-step thinking.',
+      academiclevel: 'Nova StudyGirl AI never gives away answers. She asks friendly hints, cute analogies, and guides step-by-step thinking.',
       icon: Brain,
       highlight: true
     },
@@ -98,8 +98,8 @@ export const WhatsDifferentFromChatGPT: React.FC<WhatsDifferentFromChatGPTProps>
 
         <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl mx-auto">
           {isTeacher
-            ? 'Kids use generic ChatGPT to blindly copy homework answers without learning. AcademicLevel stops cheating with Socratic reasoning, real CBSE/ICSE curriculum diagnostics, and isolated Teacher Admin accounts.'
-            : 'Generic ChatGPT does homework FOR kids, killing their exam performance. AcademicLevel is the only syllabus-locked platform with Socratic AI guidance, exam timers, and real motivation.'}
+            ? 'Kids use generic ChatGPT to blindly copy homework answers without learning. AcademicLevel stops cheating with guided bestie reasoning, real CBSE/ICSE curriculum diagnostics, and isolated Teacher Admin accounts.'
+            : 'Generic ChatGPT does homework FOR kids, killing their exam performance. AcademicLevel is the only syllabus-locked platform with Nova StudyGirl guidance, exam timers, and real motivation.'}
         </p>
       </div>
 

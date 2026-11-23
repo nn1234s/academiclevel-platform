@@ -83,7 +83,8 @@ import {
   AlertTriangle,
   ArrowRight,
   XOctagon,
-  Globe
+  Globe,
+  Home
 } from 'lucide-react';
 
 // Code-split Super-Admin Vault Shell (unlinked from public navigation)
@@ -593,26 +594,29 @@ export const App: React.FC = () => {
         {/* ======================================================== */}
         {/* HEADER / NAVIGATION BAR (Zero Admin Links)               */}
         {/* ======================================================== */}
-        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-8 py-3.5 shadow-xs">
+        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 sm:px-8 py-2.5 sm:py-3.5 shadow-xs">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             {/* Brand Logo */}
             <div
               onClick={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
-              className="flex items-center space-x-2.5 cursor-pointer group"
+              className="flex items-center space-x-2.5 cursor-pointer group shrink-0"
+              title="AcademicLevel"
             >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-extrabold text-base shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-extrabold text-base shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0">
                 AL
               </div>
-              <div>
-                <span className="font-extrabold text-base tracking-tight text-slate-900 block leading-none">
-                  AcademicLevel
-                </span>
-                <span className="text-[10px] text-slate-500 font-medium">Learn in your era</span>
-              </div>
+              {!isAuthenticated && (
+                <div className="hidden sm:block">
+                  <span className="font-extrabold text-base tracking-tight text-slate-900 block leading-none">
+                    AcademicLevel
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-medium">Learn in your era</span>
+                </div>
+              )}
             </div>
 
             {/* Desktop Navigation Links with Clean Dropdowns */}
-            <nav ref={navContainerRef} className="hidden md:flex items-center space-x-1.5 text-xs font-semibold">
+            <nav ref={navContainerRef} className="hidden lg:flex items-center space-x-1.5 text-xs font-semibold">
               {!isAuthenticated ? (
                 <>
                   {/* Direct Link: Home */}
@@ -858,7 +862,7 @@ export const App: React.FC = () => {
                                 About Us
                               </p>
                               <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
-                                Mission, Socratic AI methodology &amp; pedagogy
+                                Mission, Nova StudyGirl AI methodology &amp; pedagogy
                               </p>
                             </div>
                           </button>
@@ -1029,17 +1033,17 @@ export const App: React.FC = () => {
             </nav>
 
             {/* User Profile / Auth Action Buttons */}
-            <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
               {/* Language Switcher Pill */}
               <button
                 onClick={() => setShowPromptModal(true)}
-                className="flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200 shadow-2xs cursor-pointer"
+                className="flex items-center space-x-1 px-2.5 py-1.5 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200 shadow-2xs cursor-pointer shrink-0"
                 title="Change UI Language (Hindi / English)"
                 aria-label="Change UI Language"
               >
                 <Globe className="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" />
                 <span className="text-[11px] font-bold">
-                  {language === 'hi' ? '🇮🇳 Hindi' : '🇬🇧 English'}
+                  {language === 'hi' ? 'HI' : 'EN'}
                 </span>
               </button>
               {!isAuthenticated ? (
@@ -1051,39 +1055,39 @@ export const App: React.FC = () => {
                     }}
                     className="hidden sm:inline-flex items-center text-xs font-bold text-indigo-600 hover:text-indigo-700 px-3.5 py-2 rounded-xl bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition-all cursor-pointer"
                   >
-                    Sign In (Existing User)
+                    Sign In
                   </button>
                   <button
                     onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
-                    className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs rounded-xl shadow-md transition-all cursor-pointer"
+                    className="px-3.5 sm:px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs rounded-xl shadow-md transition-all cursor-pointer"
                   >
-                    Special ₹49 Offer
+                    Special ₹49
                   </button>
                 </>
               ) : (
-                <div className="flex items-center space-x-2 sm:space-x-3">
-                  {/* 1-Year Gold VIP Pass Badge */}
+                <div className="flex items-center space-x-1.5 sm:space-x-2">
+                  {/* 1-Year Gold VIP Pass Badge - Just a sleek crown icon */}
                   {currentLearner?.activePlan === 'GOLD' && (
                     <button
                       onClick={() => navigateTo('PROFILE')}
-                      className="hidden sm:inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border border-amber-400 text-amber-800 text-xs font-black shadow-xs cursor-pointer hover:border-amber-500 transition-all"
+                      className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 text-amber-950 font-black shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer border border-amber-300 shrink-0"
                       title="1-Year Gold VIP Pass Active (365 Days Access)"
+                      aria-label="Gold Pass Active"
                     >
-                      <Crown className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-                      <span>GOLD PASS</span>
+                      <Crown className="w-4 h-4 text-amber-950 fill-amber-900" />
                     </button>
                   )}
 
-                  {/* Mailbox Badge */}
+                  {/* Mailbox Badge - Just a sleek mail icon */}
                   <button
                     onClick={() => setGlobalMailboxOpen(true)}
-                    title="Open Student Mailbox & Quiz Diagnostic Reports"
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold hover:bg-purple-100 active:scale-95 transition-all shadow-xs cursor-pointer relative z-20 touch-manipulation min-h-[36px]"
+                    title="Student Mailbox & Diagnostic Reports"
+                    aria-label="Student Mailbox"
+                    className="relative inline-flex items-center justify-center w-9 h-9 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0 touch-manipulation"
                   >
                     <Mail className="w-4 h-4 text-purple-600" />
-                    <span className="hidden sm:inline">Mailbox</span>
                     {currentLearner && StorageRLSLayer.getUnreadMailboxCount(currentLearner.id) > 0 && (
-                      <span className="px-1.5 py-0.2 bg-amber-500 text-white text-[10px] font-black rounded-full animate-pulse">
+                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-amber-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white animate-pulse shadow-xs">
                         {StorageRLSLayer.getUnreadMailboxCount(currentLearner.id)}
                       </span>
                     )}
@@ -1093,30 +1097,37 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => navigateTo('GIFT_STORE')}
                     title="Open Scholar's Gift Store"
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold hover:bg-amber-100 transition-all shadow-xs cursor-pointer"
+                    aria-label="Study Coins Balance"
+                    className="flex items-center space-x-1 px-2.5 py-1.5 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold hover:bg-amber-100 transition-all shadow-2xs cursor-pointer shrink-0"
                   >
-                    <StudyCoinIcon className="w-4 h-4" glow />
-                    <span>{currentLearner?.coinBalance || 0}</span>
+                    <StudyCoinIcon className="w-4 h-4 shrink-0" glow />
+                    <span className="font-extrabold text-[11px] sm:text-xs">
+                      {currentLearner?.coinBalance ? (currentLearner.coinBalance >= 100000 ? `${Math.floor(currentLearner.coinBalance / 1000)}k` : currentLearner.coinBalance.toLocaleString()) : 0}
+                    </span>
                   </button>
 
                   {/* Profile Button */}
                   <button
                     onClick={() => navigateTo('PROFILE')}
-                    className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-all"
+                    title={`Student Profile (${currentLearner?.fullName || 'Student'})`}
+                    aria-label="Student Profile"
+                    className="flex items-center space-x-1.5 px-2.5 py-1.5 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-all shrink-0 cursor-pointer"
                   >
-                    <User className="w-3.5 h-3.5 text-slate-600" />
-                    <span className="hidden sm:inline truncate max-w-[120px]">
+                    <User className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                    <span className="hidden xl:inline truncate max-w-[90px]">
                       {currentLearner?.fullName.split(' ')[0]}
                     </span>
                   </button>
 
+                  {/* Logout Button */}
                   <button
                     onClick={() => {
                       logout();
                       navigateTo('HOME');
                     }}
-                    className="p-2 text-slate-500 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors"
+                    className="w-9 h-9 flex items-center justify-center text-slate-500 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors shrink-0 cursor-pointer"
                     title="Log Out"
+                    aria-label="Log Out"
                   >
                     <LogOut className="w-4 h-4" />
                   </button>
@@ -1126,7 +1137,8 @@ export const App: React.FC = () => {
               {/* Mobile Drawer Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 text-slate-600 hover:text-slate-900 rounded-xl bg-slate-100"
+                className="lg:hidden p-2 text-slate-600 hover:text-slate-900 rounded-xl bg-slate-100 min-w-[36px] min-h-[36px] flex items-center justify-center cursor-pointer active:scale-95 transition-all"
+                aria-label="Toggle navigation menu"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
@@ -1136,7 +1148,7 @@ export const App: React.FC = () => {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-slate-200 p-4 space-y-4 text-xs font-semibold shadow-lg text-slate-800">
+          <div className="lg:hidden bg-white border-b border-slate-200 p-4 space-y-4 text-xs font-semibold shadow-xl text-slate-800 animate-fadeIn">
             {!isAuthenticated ? (
               <div className="space-y-3">
                 <button
@@ -1145,7 +1157,7 @@ export const App: React.FC = () => {
                     setAuthModalMode('LOGIN');
                     setAuthModalOpen(true);
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-indigo-700 font-bold bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 flex items-center justify-between"
+                  className="w-full text-left p-3 rounded-xl text-indigo-700 font-bold bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 flex items-center justify-between min-h-[44px]"
                 >
                   <span>Sign In (Existing User)</span>
                   <span className="text-[10px] bg-indigo-100 px-2 py-0.5 rounded-full font-mono text-indigo-700">
@@ -1158,8 +1170,9 @@ export const App: React.FC = () => {
                     setMobileMenuOpen(false);
                     navigateTo('HOME');
                   }}
-                  className="w-full text-left p-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
+                  className="w-full text-left p-3 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5 min-h-[44px]"
                 >
+                  <Home className="w-4 h-4 text-slate-500" />
                   <span>Home</span>
                 </button>
 
@@ -1173,7 +1186,7 @@ export const App: React.FC = () => {
                       setMobileMenuOpen(false);
                       navigateTo('PUBLIC_COURSES');
                     }}
-                    className="w-full text-left p-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
+                    className="w-full text-left p-3 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5 min-h-[44px]"
                   >
                     <BookOpen className="w-4 h-4 text-indigo-600" />
                     <span>Curriculum &amp; Syllabi (Classes 1–12)</span>
@@ -1183,9 +1196,9 @@ export const App: React.FC = () => {
                       setMobileMenuOpen(false);
                       navigateTo('SPECIAL_49_FUNNEL');
                     }}
-                    className="w-full text-left p-2 rounded-xl text-amber-700 font-bold hover:bg-amber-50 flex items-center justify-between"
+                    className="w-full text-left p-3 rounded-xl text-amber-700 font-bold hover:bg-amber-50 flex items-center justify-between min-h-[44px]"
                   >
-                    <span className="flex items-center space-x-2">
+                    <span className="flex items-center space-x-2.5">
                       <Zap className="w-4 h-4 text-amber-600" />
                       <span>Special ₹49 Pass</span>
                     </span>
@@ -1198,9 +1211,9 @@ export const App: React.FC = () => {
                       setMobileMenuOpen(false);
                       navigateTo('SCHOOL_PORTAL');
                     }}
-                    className="w-full text-left p-2 rounded-xl text-emerald-700 font-bold hover:bg-emerald-50 flex items-center justify-between"
+                    className="w-full text-left p-3 rounded-xl text-emerald-700 font-bold hover:bg-emerald-50 flex items-center justify-between min-h-[44px]"
                   >
-                    <span className="flex items-center space-x-2">
+                    <span className="flex items-center space-x-2.5">
                       <School className="w-4 h-4 text-emerald-600" />
                       <span>Schools &amp; Tutors</span>
                     </span>
@@ -1213,7 +1226,7 @@ export const App: React.FC = () => {
                       setMobileMenuOpen(false);
                       navigateTo('PRICING');
                     }}
-                    className="w-full text-left p-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
+                    className="w-full text-left p-3 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5 min-h-[44px]"
                   >
                     <CreditCard className="w-4 h-4 text-sky-600" />
                     <span>All Plans &amp; Pricing</span>
@@ -1230,7 +1243,7 @@ export const App: React.FC = () => {
                       setMobileMenuOpen(false);
                       navigateTo('ABOUT');
                     }}
-                    className="w-full text-left p-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
+                    className="w-full text-left p-3 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5 min-h-[44px]"
                   >
                     <Sparkles className="w-4 h-4 text-purple-600" />
                     <span>About AcademicLevel</span>
@@ -1240,7 +1253,7 @@ export const App: React.FC = () => {
                       setMobileMenuOpen(false);
                       navigateTo('FAQ');
                     }}
-                    className="w-full text-left p-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
+                    className="w-full text-left p-3 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5 min-h-[44px]"
                   >
                     <HelpCircle className="w-4 h-4 text-blue-600" />
                     <span>Frequently Asked Questions</span>
@@ -1250,9 +1263,9 @@ export const App: React.FC = () => {
                       setMobileMenuOpen(false);
                       navigateTo('INNOVATIVE_EDTECH');
                     }}
-                    className="w-full text-left p-2 rounded-xl text-amber-700 font-semibold hover:bg-amber-50 flex items-center justify-between"
+                    className="w-full text-left p-3 rounded-xl text-amber-700 font-semibold hover:bg-amber-50 flex items-center justify-between min-h-[44px]"
                   >
-                    <span className="flex items-center space-x-2">
+                    <span className="flex items-center space-x-2.5">
                       <Trophy className="w-4 h-4 text-amber-600" />
                       <span>#1 EdTech Award</span>
                     </span>
@@ -1265,7 +1278,7 @@ export const App: React.FC = () => {
                       setMobileMenuOpen(false);
                       navigateTo('HALL_OF_FAME');
                     }}
-                    className="w-full text-left p-2 rounded-xl text-cyan-700 font-semibold hover:bg-cyan-50 flex items-center space-x-2"
+                    className="w-full text-left p-3 rounded-xl text-cyan-700 font-semibold hover:bg-cyan-50 flex items-center space-x-2.5 min-h-[44px]"
                   >
                     <ShieldCheck className="w-4 h-4 text-cyan-600" />
                     <span>Security &amp; Bug Bounty</span>
@@ -1275,7 +1288,7 @@ export const App: React.FC = () => {
                       setMobileMenuOpen(false);
                       navigateTo('PRIVACY');
                     }}
-                    className="w-full text-left p-2 rounded-xl text-slate-600 font-medium hover:bg-slate-100 flex items-center space-x-2"
+                    className="w-full text-left p-3 rounded-xl text-slate-600 font-medium hover:bg-slate-100 flex items-center space-x-2.5 min-h-[44px]"
                   >
                     <FileText className="w-4 h-4 text-slate-500" />
                     <span>Terms, Privacy &amp; 20-Min Refund</span>
@@ -1285,7 +1298,7 @@ export const App: React.FC = () => {
                       setMobileMenuOpen(false);
                       navigateTo('SITEMAP');
                     }}
-                    className="w-full text-left p-2 rounded-xl text-indigo-700 font-medium hover:bg-indigo-50 flex items-center space-x-2"
+                    className="w-full text-left p-3 rounded-xl text-indigo-700 font-medium hover:bg-indigo-50 flex items-center space-x-2.5 min-h-[44px]"
                   >
                     <Compass className="w-4 h-4 text-indigo-600" />
                     <span>Sitemap &amp; Directory</span>
@@ -1293,151 +1306,227 @@ export const App: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <>
+              <div className="space-y-2">
+                {/* Mobile Student Profile Capsule */}
+                <div className="p-3.5 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border border-indigo-100 rounded-2xl flex items-center justify-between shadow-2xs mb-2">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-black text-sm flex items-center justify-center shadow-xs">
+                      {currentLearner?.fullName?.charAt(0) || 'S'}
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-xs text-slate-900 leading-tight">
+                        {currentLearner?.fullName || 'Student'}
+                      </p>
+                      <p className="text-[10px] text-slate-500 font-medium">
+                        {currentLearner?.board} • Class {currentLearner?.grade}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    {currentLearner?.activePlan === 'GOLD' ? (
+                      <span className="px-2 py-0.5 bg-gradient-to-r from-amber-400 to-yellow-400 text-amber-950 text-[10px] font-black rounded-lg flex items-center space-x-1 shadow-2xs border border-amber-300">
+                        <Crown className="w-3 h-3 fill-amber-950" />
+                        <span>GOLD</span>
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-bold rounded-lg">
+                        Scholar
+                      </span>
+                    )}
+                  </div>
+                </div>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigateTo('DASHBOARD');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
+                  className={`w-full text-left p-3 rounded-xl flex items-center space-x-2.5 min-h-[44px] transition-colors ${
+                    currentRoute === 'DASHBOARD' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
-                  Dashboard
+                  <Home className="w-4 h-4 text-indigo-600" />
+                  <span>{t('nav_dashboard')}</span>
                 </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     setGlobalMailboxOpen(true);
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-purple-700 hover:bg-purple-50 flex items-center justify-between font-semibold"
+                  className="w-full text-left p-3 rounded-xl text-purple-700 hover:bg-purple-50 flex items-center justify-between font-semibold min-h-[44px] transition-colors"
                 >
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2.5">
                     <Mail className="w-4 h-4 text-purple-600" />
                     <span>Student Mailbox</span>
                   </div>
                   {currentLearner && StorageRLSLayer.getUnreadMailboxCount(currentLearner.id) > 0 && (
-                    <span className="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-black rounded-full animate-pulse">
+                    <span className="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-black rounded-full animate-pulse shadow-xs">
                       {StorageRLSLayer.getUnreadMailboxCount(currentLearner.id)} New
                     </span>
                   )}
                 </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigateTo('COURSES');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
+                  className={`w-full text-left p-3 rounded-xl flex items-center space-x-2.5 min-h-[44px] transition-colors ${
+                    currentRoute === 'COURSES' || currentRoute === 'LEVELS' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
-                  Course Catalogue
+                  <BookOpen className="w-4 h-4 text-indigo-600" />
+                  <span>{t('nav_courses')}</span>
                 </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigateTo('NOVA_AI');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
+                  className={`w-full text-left p-3 rounded-xl flex items-center justify-between min-h-[44px] transition-colors ${
+                    currentRoute === 'NOVA_AI' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
-                  Nova AI Socratic Tutor
+                  <div className="flex items-center space-x-2.5">
+                    <Sparkles className="w-4 h-4 text-purple-500" />
+                    <span>Nova AI StudyGirl Tutor 🎀</span>
+                  </div>
+                  <span className="text-[9px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full font-bold">
+                    Bestie
+                  </span>
                 </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigateTo('COMMUNITY');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
+                  className={`w-full text-left p-3 rounded-xl flex items-center space-x-2.5 min-h-[44px] transition-colors ${
+                    currentRoute === 'COMMUNITY' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
-                  StudentPacks Community
+                  <Users className="w-4 h-4 text-sky-600" />
+                  <span>StudentPacks Community</span>
                 </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigateTo('SPIN_WHEEL');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
+                  className={`w-full text-left p-3 rounded-xl flex items-center justify-between min-h-[44px] transition-colors ${
+                    currentRoute === 'SPIN_WHEEL' ? 'bg-amber-50 text-amber-800 font-bold' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
-                  Daily Spin Wheel
+                  <div className="flex items-center space-x-2.5">
+                    <StudyCoinIcon className="w-4 h-4" />
+                    <span>Daily Spin Wheel</span>
+                  </div>
+                  <span className="text-[10px] text-amber-600 font-mono font-bold">24h Cooldown</span>
                 </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigateTo('REFERRAL');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center justify-between"
+                  className="w-full text-left p-3 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center justify-between min-h-[44px] transition-colors"
                 >
-                  <span>Friend ACodes & Invites</span>
+                  <div className="flex items-center space-x-2.5">
+                    <Zap className="w-4 h-4 text-amber-500" />
+                    <span>Friend ACodes &amp; Invites</span>
+                  </div>
                   <span className="flex items-center space-x-1 text-xs text-amber-700 font-bold bg-amber-100 px-2 py-0.5 rounded-full">
                     <StudyCoinIcon className="w-3.5 h-3.5" />
                     <span>+40 Coins</span>
                   </span>
                 </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigateTo('GIFT_STORE');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
+                  className={`w-full text-left p-3 rounded-xl flex items-center space-x-2.5 min-h-[44px] transition-colors ${
+                    currentRoute === 'GIFT_STORE' ? 'bg-amber-50 text-amber-800 font-bold' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
                   <Gift className="w-4 h-4 text-amber-500" />
-                  <span>Scholar&apos;s Gift Store (Worldwide Rewards)</span>
+                  <span>Scholar&apos;s Gift Store (Rewards)</span>
                 </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigateTo('CERTIFICATES');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
+                  className={`w-full text-left p-3 rounded-xl flex items-center space-x-2.5 min-h-[44px] transition-colors ${
+                    currentRoute === 'CERTIFICATES' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
-                  Certificate Vault
+                  <Award className="w-4 h-4 text-indigo-600" />
+                  <span>Certificate Vault</span>
                 </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigateTo('PREMIUM');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
+                  className="w-full text-left p-3 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2.5 min-h-[44px] transition-colors"
                 >
-                  Membership Center (UPI)
+                  <CreditCard className="w-4 h-4 text-emerald-600" />
+                  <span>Membership Center (₹49)</span>
                 </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigateTo('SCHOLARSHIPS');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-amber-700 hover:bg-amber-50 flex items-center space-x-2"
+                  className="w-full text-left p-3 rounded-xl text-amber-700 hover:bg-amber-50 flex items-center space-x-2.5 min-h-[44px] transition-colors"
                 >
                   <Trophy className="w-4 h-4 text-amber-600" />
                   <span>Worldwide Scholarships</span>
                 </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigateTo('PROFILE');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
+                  className={`w-full text-left p-3 rounded-xl flex items-center space-x-2.5 min-h-[44px] transition-colors ${
+                    currentRoute === 'PROFILE' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
                   <User className="w-4 h-4 text-slate-500" />
                   <span>Student Profile &amp; Parent PIN</span>
                 </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     setShowPromptModal(true);
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-indigo-700 hover:bg-indigo-50 flex items-center space-x-2 font-bold"
+                  className="w-full text-left p-3 rounded-xl text-indigo-700 hover:bg-indigo-50 flex items-center space-x-2.5 font-bold min-h-[44px] transition-colors"
                 >
                   <Globe className="w-4 h-4 text-indigo-600" />
-                  <span>{language === 'hi' ? '🇮🇳 Language: Hindi' : '🇬🇧 Language: English'}</span>
+                  <span>{language === 'hi' ? '🇮🇳 Language: Hindi / Hinglish' : '🇬🇧 Language: English'}</span>
                 </button>
+
                 <button
                   onClick={() => {
                     logout();
                     navigateTo('HOME');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-rose-600 font-bold hover:bg-rose-50 flex items-center space-x-2 border-t border-slate-100 mt-2 pt-3"
+                  className="w-full text-left p-3 rounded-xl text-rose-600 font-bold hover:bg-rose-50 flex items-center space-x-2.5 border-t border-slate-100 mt-2 pt-3 min-h-[44px] transition-colors"
                 >
                   <LogOut className="w-4 h-4 text-rose-600" />
                   <span>Log Out ({currentLearner?.fullName.split(' ')[0] || 'Student'})</span>
                 </button>
-              </>
+              </div>
             )}
           </div>
         )}
@@ -1445,7 +1534,7 @@ export const App: React.FC = () => {
         {/* ======================================================== */}
         {/* MAIN BODY VIEW CONTAINER                                */}
         {/* ======================================================== */}
-        <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-1 max-w-7xl mx-auto w-full px-3.5 sm:px-6 lg:px-8 py-4 sm:py-8">
           {/* Public Views */}
           {currentRoute === 'HOME' && (
             <LandingPage
@@ -1827,7 +1916,7 @@ export const App: React.FC = () => {
                   </div>
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed max-w-sm">
-                  India&apos;s premier AI-powered K-12 learning ecosystem. CBSE, ICSE, and Cambridge IGCSE daily interactive quizzes, Socratic Nova AI tutoring, and physical reward store.
+                  India&apos;s premier AI-powered K-12 learning ecosystem. CBSE, ICSE, and Cambridge IGCSE daily interactive quizzes, Nova StudyGirl AI tutoring, and physical reward store.
                 </p>
                 <div className="text-[11px] text-slate-500 space-y-0.5 font-mono">
                   <p>Operated by ZingQuark (ZQ Technology)</p>
@@ -1846,7 +1935,7 @@ export const App: React.FC = () => {
                       onClick={() => navigateTo('NOVA_AI')}
                       className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
-                      Socratic Nova AI
+                      Nova StudyGirl AI 🎀
                     </button>
                   </li>
                   <li>

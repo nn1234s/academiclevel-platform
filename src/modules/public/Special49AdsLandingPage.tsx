@@ -689,7 +689,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       </div>
                       <div className="flex items-center space-x-2">
                         <span className="text-[#ffe066] text-sm leading-none">▶</span>
-                        <span>24/7 Nova AI 3.5 Flash Lite Socratic Tutor</span>
+                        <span>24/7 Nova AI 3.5 Flash Lite Interactive Study Tutor</span>
                       </div>
                     </div>
 
@@ -1629,7 +1629,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <tr>
                   <td className="p-4 font-bold text-slate-900">Doubt Clearing Availability</td>
                   <td className="p-4 text-slate-600">Fixed 1-hour batch slots only</td>
-                  <td className="p-4 font-black text-emerald-700 bg-orange-50/30">24/7 Nova AI 3.5 Flash Lite Socratic Tutor</td>
+                  <td className="p-4 font-black text-emerald-700 bg-orange-50/30">24/7 Nova AI 3.5 Flash Lite Interactive Study Tutor</td>
                 </tr>
                 <tr>
                   <td className="p-4 font-bold text-slate-900">Gamification &amp; Motivation</td>
@@ -1766,7 +1766,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             <div className="space-y-2">
               <h4 className="text-slate-900 font-bold uppercase text-[11px] tracking-wider">Features</h4>
               <ul className="space-y-1.5 text-slate-600">
-                <li><a href="/nova-ai" className="hover:text-indigo-600 transition-colors">Socratic Nova AI</a></li>
+                <li><a href="/nova-ai" className="hover:text-indigo-600 transition-colors">Nova StudyGirl AI</a></li>
                 <li><a href="/gift-store" className="hover:text-indigo-600 transition-colors">Scholar&apos;s Gift Store</a></li>
                 <li><a href="/verify" className="hover:text-indigo-600 transition-colors">Verify Certificate</a></li>
                 <li><a href="/sitemap" className="hover:text-indigo-600 transition-colors">Sitemap Directory</a></li>

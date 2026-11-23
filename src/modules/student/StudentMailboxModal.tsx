@@ -514,7 +514,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Nova AI Socratic Commentary Card */}
+                    {/* Nova AI StudyGirl Commentary Card */}
                     <div className="bg-purple-50/70 border border-purple-200 rounded-3xl p-5 sm:p-6 shadow-xs relative overflow-hidden">
                       <div className="flex items-start space-x-3.5">
                         <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 border border-purple-300 flex items-center justify-center flex-shrink-0 shadow-xs">

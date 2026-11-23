@@ -106,7 +106,7 @@ export const CourseLevels: React.FC<CourseLevelsProps> = ({
 
       {/* CHAPTER-WISE SYLLABUS PRACTICE */}
       <div className="space-y-4">
-          <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 flex items-center justify-between text-xs text-indigo-950">
+          <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs text-indigo-950">
             <div className="flex items-center space-x-2">
               <GraduationCap className="w-4 h-4 text-indigo-600" />
               <span>Questions are grouped strictly by chapter so you can practice topics one-by-one with zero topic jumbling!</span>

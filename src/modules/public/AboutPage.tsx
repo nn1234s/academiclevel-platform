@@ -22,7 +22,7 @@ export const AboutPage: React.FC = () => {
           Indian school education has historically been divided between two extremes: expensive coaching institutions charging lakhs of rupees, or rote textbook memorization that fails to build first-principles thinking.
         </p>
         <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-          AcademicLevel bridges this divide by embedding true <strong>Socratic Pedagogy</strong> into an age-adaptive interface. Whether a child is in Class 2 learning their first fractions or Class 12 preparing for Physics Board examinations, our AI engine adapts to their developmental stage.
+          AcademicLevel bridges this divide by embedding true <strong>Interactive Pedagogy</strong> into an age-adaptive interface. Whether a child is in Class 2 learning their first fractions or Class 12 preparing for Physics Board examinations, our AI engine adapts to their developmental stage.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-100">

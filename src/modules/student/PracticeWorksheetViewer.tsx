@@ -420,7 +420,7 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
   </table>
 
   <!-- DETAILED STEP-BY-STEP EXPLANATIONS -->
-  <div class="section-title" style="font-size: 10pt;">Detailed Socratic & NCERT Explanations</div>
+  <div class="section-title" style="font-size: 10pt;">Detailed Step-by-Step & NCERT Explanations</div>
   <div class="solutions-container">
     ${questions.map((q, idx) => `
       <div class="solution-item">
@@ -805,7 +805,7 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
                 </div>
               </div>
 
-              {/* Detailed Socratic Explanations */}
+              {/* Detailed Step-by-Step Explanations */}
               <div className="space-y-4 pt-2">
                 <span className="text-[11px] font-bold text-slate-600 uppercase">Detailed Solutions & Explanations:</span>
                 {questions.map((q, idx) => (

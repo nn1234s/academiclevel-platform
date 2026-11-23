@@ -50,11 +50,11 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
       borderAccent: 'border-amber-500/60'
     },
     {
-      id: 'socratic-ai',
-      title: 'Socratic Nova AI Tutoring',
+      id: 'studygirl-ai',
+      title: 'Nova StudyGirl AI Tutoring',
       badge: '🤖 Pedagogical AI',
       subtitle: 'Instant Hints • Step-by-Step Guidance',
-      desc: 'Zero rote answers — Nova asks guiding Socratic questions that help students discover solutions through their own reasoning.',
+      desc: 'Zero rote answers — Nova asks guiding guided questions that help students discover solutions through their own reasoning.',
       accent: 'from-emerald-500/20 via-teal-500/10 to-emerald-500/5',
       borderAccent: 'border-emerald-500/60'
     },

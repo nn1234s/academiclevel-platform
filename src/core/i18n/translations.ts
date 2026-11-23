@@ -239,7 +239,7 @@ export const translations: Record<Language, Translations> = {
     quiz_complete_title: 'Level Mastery Complete! 🎉',
     quiz_coins_earned: 'Study Coins Jeete',
 
-    nova_greeting: 'Hello! Main hoon Nova, aapka 24/7 Socratic AI Tutor. Aaj kaunsa concept master karna hai?',
+    nova_greeting: 'Hello! Main hoon Nova, aapki 24/7 StudyGirl bestie. Aaj kaunsa concept master karna hai? 🎀',
     nova_placeholder: 'Apne syllabus se koi bhi doubt pucho, main step-by-step guide karunga...',
     nova_send: 'Send to Nova',
     nova_thinking: 'Nova AI aapka concept step-by-step decode kar raha hai...',

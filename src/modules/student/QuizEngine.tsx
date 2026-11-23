@@ -878,12 +878,12 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         </div>
 
         {/* Action Button: Visible right at the top of the answer interaction area */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
           {!isAnswerSubmitted ? (
             <button
               onClick={handleSubmitAnswer}
               disabled={selectedOption === null || questionDwellSeconds < 1}
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+              className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95 min-h-[40px]"
             >
               <span>{questionDwellSeconds < 1 ? 'Reading... (1s)' : 'Submit Answer'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -891,7 +891,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
           ) : (
             <button
               onClick={handleNextQuestion}
-              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+              className="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95 min-h-[40px]"
             >
               <span>{currentIndex + 1 < questions.length ? 'Next Question' : 'View Results'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -965,7 +965,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         })}
       </div>
 
-      {/* Explanation & Socratic Helper */}
+      {/* Explanation & StudyGirl Helper */}
       {isAnswerSubmitted && (
         <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-3 animate-in fade-in duration-200 shadow-xs">
           <div>
@@ -991,8 +991,8 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       )}
 
       {/* Action Footer */}
-      <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-        <span className="text-[11px] text-slate-500">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-slate-200">
+        <span className="text-[11px] text-slate-500 text-center sm:text-left">
           {questionDwellSeconds < 1 && !isAnswerSubmitted ? (
             <span className="text-amber-600 font-medium">Reading dwell guard active: 1s</span>
           ) : (
@@ -1004,7 +1004,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
           <button
             onClick={handleSubmitAnswer}
             disabled={selectedOption === null || questionDwellSeconds < 1}
-            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer"
+            className="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center space-x-1.5 cursor-pointer min-h-[42px]"
           >
             <span>{questionDwellSeconds < 1 ? 'Reading... (1s)' : 'Submit Answer'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -1012,7 +1012,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         ) : (
           <button
             onClick={handleNextQuestion}
-            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer"
+            className="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center space-x-1.5 cursor-pointer min-h-[42px]"
           >
             <span>{currentIndex + 1 < questions.length ? 'Next Question' : 'View Results'}</span>
             <ArrowRight className="w-3.5 h-3.5" />

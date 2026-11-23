@@ -199,7 +199,7 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
 
       {/* Controlled Class-Change Manager */}
       <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
               <GraduationCap className="w-4 h-4 text-indigo-600" />
@@ -210,7 +210,7 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
             </p>
           </div>
 
-          <div className="text-right text-[11px] text-slate-500 font-mono">
+          <div className="text-left sm:text-right text-[11px] text-slate-500 font-mono self-start sm:self-auto flex-shrink-0">
             <div>Premium Changes Used: <strong className="text-slate-900">{learner.classChangesUsedPremium}/1</strong></div>
             <div>Post-Expiry Changes Used: <strong className="text-slate-900">{learner.classChangesUsedPostExpiry}/1</strong></div>
           </div>

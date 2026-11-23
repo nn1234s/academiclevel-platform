@@ -118,7 +118,7 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate }) => {
         },
         {
           label: 'AcademicLevel Plus Pass — ₹129',
-          description: '180 days access with Socratic Nova AI tutoring, Olympiad mocks, and parent analytics.',
+          description: '180 days access with Nova StudyGirl AI tutoring, Olympiad mocks, and parent analytics.',
           route: 'PRICING',
           pill: '180 Days'
         },
@@ -138,11 +138,11 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate }) => {
     {
       title: 'AI & Learning Engine',
       icon: Sparkles,
-      description: 'Next-generation educational technology built on Socratic pedagogy and cognitive mastery.',
+      description: 'Next-generation educational technology built on interactive pedagogy and cognitive mastery.',
       badge: 'Nova AI',
       items: [
         {
-          label: 'Socratic Nova AI Coach',
+          label: 'Nova StudyGirl AI Coach',
           description: 'Dialogue-driven tutoring that asks guiding questions instead of spoon-feeding answers.',
           route: 'DASHBOARD'
         },
@@ -242,7 +242,7 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate }) => {
         },
         {
           label: '#1 Most Innovative EdTech Award',
-          description: 'Honored by EdTech Century for groundbreaking Socratic AI learning architecture.',
+          description: 'Honored by EdTech Century for groundbreaking Nova StudyGirl AI learning architecture.',
           route: 'INNOVATIVE_EDTECH',
           pill: 'EdTech Century'
         },
@@ -280,7 +280,7 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate }) => {
           AcademicLevel Sitemap
         </h1>
         <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-          Explore all public sections of India&apos;s premier AI-powered K-12 educational platform. Discover curricula, school institutional packs, pricing plans, Socratic AI tools, and legal compliance documentation.
+          Explore all public sections of India&apos;s premier AI-powered K-12 educational platform. Discover curricula, school institutional packs, pricing plans, Nova StudyGirl AI tools, and legal compliance documentation.
         </p>
       </div>
 
