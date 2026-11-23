@@ -44,7 +44,7 @@ export const LanguagePreferenceModal: React.FC = () => {
           </p>
 
           <div className="space-y-3 pt-1">
-            {/* Option 1: Hindi | Hinglish */}
+            {/* Option 1: Hindi (Hinglish UI) */}
             <button
               onClick={() => chooseLanguage('hi')}
               className={`w-full p-4 rounded-2xl border-2 text-left transition-all flex items-center justify-between group cursor-pointer ${
@@ -60,14 +60,14 @@ export const LanguagePreferenceModal: React.FC = () => {
                 <div>
                   <div className="flex items-center space-x-2">
                     <span className="text-sm font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
-                      Hindi | Hinglish
+                      Hindi
                     </span>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
-                      Popular
+                      Hinglish UI
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5 leading-tight">
-                    हिंदी &amp; Hinglish — Padhai, quizzes aur hints aasan bhasha mein
+                    Hinglish UI — Padhai, quizzes aur hints aasan conversational Hinglish mein
                   </p>
                 </div>
               </div>

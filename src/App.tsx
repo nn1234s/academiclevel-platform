@@ -1034,12 +1034,12 @@ export const App: React.FC = () => {
               <button
                 onClick={() => setShowPromptModal(true)}
                 className="flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200 shadow-2xs cursor-pointer"
-                title={language === 'hi' ? 'UI भाषा बदलें (Hinglish/English)' : 'Change UI Language (English/Hinglish)'}
+                title="Change UI Language (Hindi / English)"
                 aria-label="Change UI Language"
               >
                 <Globe className="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" />
                 <span className="text-[11px] font-bold">
-                  {language === 'hi' ? '🇮🇳 Hinglish' : '🇬🇧 English'}
+                  {language === 'hi' ? '🇮🇳 Hindi' : '🇬🇧 English'}
                 </span>
               </button>
               {!isAuthenticated ? (
@@ -1425,7 +1425,7 @@ export const App: React.FC = () => {
                   className="w-full text-left p-2.5 rounded-xl text-indigo-700 hover:bg-indigo-50 flex items-center space-x-2 font-bold"
                 >
                   <Globe className="w-4 h-4 text-indigo-600" />
-                  <span>{language === 'hi' ? '🇮🇳 भाषा: Hinglish (बदलें)' : '🇬🇧 Language: English (Change)'}</span>
+                  <span>{language === 'hi' ? '🇮🇳 Language: Hindi' : '🇬🇧 Language: English'}</span>
                 </button>
                 <button
                   onClick={() => {
@@ -2235,13 +2235,11 @@ export const App: React.FC = () => {
               {/* Scary Heading */}
               <div className="text-center space-y-1">
                 <h3 className="text-xl sm:text-2xl font-black text-rose-700 tracking-tight leading-snug">
-                  {language === 'hi'
-                    ? 'Was this a internet error? Or have you left on Purpose? (क्या यह इंटरनेट एरर था या आपने जानबूझकर छोड़ा?)'
-                    : 'Was this a internet error? Or have you left on Purpose?'}
+                  Was this a internet error? Or have you left on Purpose?
                 </h3>
                 <p className="text-xs text-slate-600 leading-relaxed font-medium">
                   {language === 'hi'
-                    ? 'बीच में क्विज़ छोड़ने से यह attempt कैंसल हो जाएगा और स्टडी कॉइन्स नहीं मिलेंगे!'
+                    ? 'Quiz beech mein chhodne se attempt cancel ho jayega aur Study Coins nahi milenge!'
                     : 'Exiting will void your quiz attempt, and unearned XP & Study Coins will be lost!'}
                 </p>
               </div>
@@ -2250,11 +2248,11 @@ export const App: React.FC = () => {
               <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 space-y-3">
                 <div className="text-center">
                   <span className="text-xs font-bold text-rose-800 uppercase tracking-wide block">
-                    {language === 'hi' ? 'पेरेंट सिक्योरिटी चेक (Parent PIN)' : 'Parent Security Check'}
+                    Parent Security Check
                   </span>
                   <p className="text-xs text-rose-700 mt-0.5">
                     {language === 'hi'
-                      ? 'Enter parent pin to exit or return to quiz (पेरेंट पिन दर्ज करें या वापस लौटें)'
+                      ? 'Quiz se exit karne ke liye Parent PIN enter karein ya Return to Quiz click karein'
                       : 'Enter parent pin to exit or return to quiz'}
                   </p>
                 </div>
@@ -2267,7 +2265,7 @@ export const App: React.FC = () => {
                       setExitPinInput(e.target.value);
                       setExitPinError('');
                     }}
-                    placeholder="Enter 4-digit Parent PIN"
+                    placeholder={language === 'hi' ? '4-digit Parent PIN enter karo' : 'Enter 4-digit Parent PIN'}
                     className="w-full text-center tracking-widest text-lg font-mono font-bold py-2.5 px-4 bg-white border-2 border-rose-300 rounded-xl focus:outline-none focus:border-rose-600 text-slate-900"
                   />
                   {exitPinError && (
@@ -2290,7 +2288,7 @@ export const App: React.FC = () => {
                   className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm rounded-xl shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-98"
                 >
                   <ArrowRight className="w-4 h-4" />
-                  <span>Return to Quiz</span>
+                  <span>{language === 'hi' ? 'Return to Quiz (Wapas Chalo)' : 'Return to Quiz'}</span>
                 </button>
                 <button
                   onClick={() => {
@@ -2307,13 +2305,13 @@ export const App: React.FC = () => {
                         navigateTo('DASHBOARD', { forceExit: true });
                       }
                     } else {
-                      setExitPinError('Incorrect Parent PIN. Ask your parent or click Return to Quiz.');
+                      setExitPinError(language === 'hi' ? 'Galat Parent PIN. Parent se pucho ya Return to Quiz click karo.' : 'Incorrect Parent PIN. Ask your parent or click Return to Quiz.');
                     }
                   }}
                   className="w-full py-2.5 px-4 bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-slate-300 hover:border-rose-300 font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5" />
-                  <span>Confirm Exit (Requires Parent PIN)</span>
+                  <span>{language === 'hi' ? 'Confirm Exit (Requires Parent PIN)' : 'Confirm Exit (Requires Parent PIN)'}</span>
                 </button>
               </div>
             </div>
