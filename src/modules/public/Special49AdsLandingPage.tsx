@@ -1719,24 +1719,24 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       {/* ======================================================== */}
       {/* 8.5 COMPREHENSIVE FOOTER & LEGAL DIRECTORY              */}
       {/* ======================================================== */}
-      <footer className="bg-slate-950 text-neutral-400 border-t border-slate-800 pt-12 pb-24 px-4 sm:px-6 lg:px-8 text-xs">
+      <footer className="bg-white text-slate-600 border-t border-slate-200 pt-12 pb-24 px-4 sm:px-6 lg:px-8 text-xs">
         <div className="max-w-4xl mx-auto space-y-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
             <div className="flex items-center space-x-2.5">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-500 to-indigo-600 flex items-center justify-center text-white font-black text-xs shadow-md">
                 AL
               </div>
               <div>
-                <span className="font-black text-white text-sm tracking-wider uppercase block leading-none">
+                <span className="font-black text-slate-900 text-sm tracking-wider uppercase block leading-none">
                   AcademicLevel
                 </span>
-                <span className="text-[10px] font-mono tracking-widest text-slate-400 uppercase">
+                <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
                   Learn in your era • Special Offer
                 </span>
               </div>
             </div>
 
-            <div className="text-[11px] text-slate-400 font-mono space-y-0.5 sm:text-right">
+            <div className="text-[11px] text-slate-500 font-mono space-y-0.5 sm:text-right">
               <p>Operated by ZingQuark (ZQ Technology)</p>
               <p>UDYAM Reg: UDYAM-OD-19-0189385 • Contact: academiclevels@gmail.com</p>
             </div>
@@ -1744,48 +1744,48 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-xs">
             <div className="space-y-2">
-              <h4 className="text-white font-bold uppercase text-[11px] tracking-wider">Curriculum</h4>
-              <ul className="space-y-1.5 text-slate-400">
-                <li><a href="/curriculum" className="hover:text-white transition-colors">CBSE Classes 1–12</a></li>
-                <li><a href="/curriculum" className="hover:text-white transition-colors">ICSE Board</a></li>
-                <li><a href="/curriculum" className="hover:text-white transition-colors">Cambridge IGCSE</a></li>
-                <li><a href="/faq" className="hover:text-white transition-colors">Curriculum FAQs</a></li>
+              <h4 className="text-slate-900 font-bold uppercase text-[11px] tracking-wider">Curriculum</h4>
+              <ul className="space-y-1.5 text-slate-600">
+                <li><a href="/curriculum/cbse" className="hover:text-indigo-600 transition-colors">CBSE Classes 1–12</a></li>
+                <li><a href="/curriculum/icse" className="hover:text-indigo-600 transition-colors">ICSE Board</a></li>
+                <li><a href="/curriculum/cambridge" className="hover:text-indigo-600 transition-colors">Cambridge IGCSE</a></li>
+                <li><a href="/curriculum/olympiad" className="hover:text-indigo-600 transition-colors">Olympiad &amp; Foundations</a></li>
               </ul>
             </div>
 
             <div className="space-y-2">
-              <h4 className="text-white font-bold uppercase text-[11px] tracking-wider">Memberships</h4>
-              <ul className="space-y-1.5 text-slate-400">
-                <li><a href="/special49" className="hover:text-white transition-colors">Special ₹49 Pass</a></li>
-                <li><a href="/pricing" className="hover:text-white transition-colors">Plus Pass (₹129)</a></li>
-                <li><a href="/pricing" className="hover:text-white transition-colors">1-Year Gold VIP (₹205)</a></li>
-                <li><a href="/school" className="hover:text-white transition-colors">School Portal</a></li>
+              <h4 className="text-slate-900 font-bold uppercase text-[11px] tracking-wider">Memberships</h4>
+              <ul className="space-y-1.5 text-slate-600">
+                <li><a href="/special49" className="hover:text-indigo-600 transition-colors">Special ₹49 Pass</a></li>
+                <li><a href="/pricing" className="hover:text-indigo-600 transition-colors">Plus Pass (₹129)</a></li>
+                <li><a href="/pricing" className="hover:text-indigo-600 transition-colors">1-Year Gold VIP (₹205)</a></li>
+                <li><a href="/school" className="hover:text-indigo-600 transition-colors">School Portal</a></li>
               </ul>
             </div>
 
             <div className="space-y-2">
-              <h4 className="text-white font-bold uppercase text-[11px] tracking-wider">Features</h4>
-              <ul className="space-y-1.5 text-slate-400">
-                <li><a href="/nova-ai" className="hover:text-white transition-colors">Socratic Nova AI</a></li>
-                <li><a href="/gift-store" className="hover:text-white transition-colors">Scholar's Gift Store</a></li>
-                <li><a href="/verify" className="hover:text-white transition-colors">Verify Certificate</a></li>
-                <li><a href="/sitemap" className="hover:text-white transition-colors">Sitemap Directory</a></li>
+              <h4 className="text-slate-900 font-bold uppercase text-[11px] tracking-wider">Features</h4>
+              <ul className="space-y-1.5 text-slate-600">
+                <li><a href="/nova-ai" className="hover:text-indigo-600 transition-colors">Socratic Nova AI</a></li>
+                <li><a href="/gift-store" className="hover:text-indigo-600 transition-colors">Scholar&apos;s Gift Store</a></li>
+                <li><a href="/verify" className="hover:text-indigo-600 transition-colors">Verify Certificate</a></li>
+                <li><a href="/sitemap" className="hover:text-indigo-600 transition-colors">Sitemap Directory</a></li>
               </ul>
             </div>
 
             <div className="space-y-2">
-              <h4 className="text-white font-bold uppercase text-[11px] tracking-wider">Legal &amp; Safety</h4>
-              <ul className="space-y-1.5 text-slate-400">
-                <li><a href="/privacy" className="hover:text-white transition-colors">Policies &amp; Privacy</a></li>
-                <li><a href="/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="/terms" className="hover:text-white transition-colors">20-Min Refund Policy</a></li>
-                <li><a href="/safety" className="hover:text-white transition-colors">Child Safety Protocol</a></li>
-                <li><a href="/delacc" className="hover:text-red-400 transition-colors">Delete Account (/delacc)</a></li>
+              <h4 className="text-slate-900 font-bold uppercase text-[11px] tracking-wider">Legal &amp; Safety</h4>
+              <ul className="space-y-1.5 text-slate-600">
+                <li><a href="/privacy" className="hover:text-indigo-600 transition-colors">Policies &amp; Privacy</a></li>
+                <li><a href="/terms" className="hover:text-indigo-600 transition-colors">Terms of Service</a></li>
+                <li><a href="/terms" className="hover:text-indigo-600 transition-colors">20-Min Refund Policy</a></li>
+                <li><a href="/safety" className="hover:text-indigo-600 transition-colors">Child Safety Protocol</a></li>
+                <li><a href="/delacc" className="hover:text-red-600 transition-colors">Delete Account (/delacc)</a></li>
               </ul>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-800/80 text-center text-slate-400 text-[11px]">
+          <div className="pt-4 border-t border-slate-200 text-center text-slate-500 text-[11px]">
             &copy; {new Date().getFullYear()} AcademicLevel (ZingQuark). All rights reserved.
           </div>
         </div>

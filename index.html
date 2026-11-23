@@ -21,14 +21,9 @@
     <script>
       (function() {
         try {
-          var saved = localStorage.getItem('al_theme');
-          // AcademicLevel defaults strictly to Light Mode for all new learners
-          if (saved === 'dark') {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-            if (!saved) localStorage.setItem('al_theme', 'light');
-          }
+          localStorage.removeItem('al_theme');
+          localStorage.setItem('al_theme', 'light');
+          document.documentElement.classList.remove('dark');
         } catch (e) {}
       })();
     </script>

@@ -36,6 +36,8 @@ server/data/*.db-shm
 server/data/*.sqlite
 server/data/*.sqlite-wal
 server/data/*.sqlite-shm
+server/data/*.bak*
+*.bak*
 *.db
 *.db-wal
 *.db-shm

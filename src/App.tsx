@@ -14,6 +14,7 @@ import { AdsLandingPage } from './modules/public/AdsLandingPage';
 import { SecretAdPage } from './modules/public/SecretAdPage';
 import { Special49AdsLandingPage } from './modules/public/Special49AdsLandingPage';
 import { PublicCourses } from './modules/public/PublicCourses';
+import { CurriculumPage } from './modules/public/CurriculumPage';
 import { PricingPage } from './modules/public/PricingPage';
 import { AboutPage } from './modules/public/AboutPage';
 import { FAQPage } from './modules/public/FAQPage';
@@ -192,6 +193,12 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
   ) return { route: 'INNOVATIVE_EDTECH' };
 
   if (p === '/sitemap' || p === '/sitemap.html') return { route: 'SITEMAP' };
+  
+  // Dedicated Curriculum Board Routes with Sample Questions & Free Signup
+  if (p === '/curriculum/cbse' || p === '/cbse') return { route: 'CURRICULUM_CBSE' };
+  if (p === '/curriculum/icse' || p === '/icse') return { route: 'CURRICULUM_ICSE' };
+  if (p === '/curriculum/cambridge' || p === '/cambridge' || p === '/igcse' || p === '/curriculum/igcse') return { route: 'CURRICULUM_CAMBRIDGE' };
+  if (p === '/curriculum/olympiad' || p === '/olympiad') return { route: 'CURRICULUM_OLYMPIAD' };
   if (p === '/curriculum') return { route: isAuth ? 'COURSES' : 'PUBLIC_COURSES' };
   if (p.startsWith('/verify')) return { route: 'VERIFY_CERTIFICATE' };
   if (p === '/nova' || p === '/nova-ai' || p === '/ai-tutor') return { route: 'NOVA_AI' };
@@ -231,6 +238,10 @@ function getPathForRoute(route: string): string {
     case 'PRICING': return '/pricing';
     case 'ABOUT': return '/about';
     case 'FAQ': return '/faq';
+    case 'CURRICULUM_CBSE': return '/curriculum/cbse';
+    case 'CURRICULUM_ICSE': return '/curriculum/icse';
+    case 'CURRICULUM_CAMBRIDGE': return '/curriculum/cambridge';
+    case 'CURRICULUM_OLYMPIAD': return '/curriculum/olympiad';
     case 'PUBLIC_COURSES': return '/curriculum';
     case 'PRIVACY': return '/privacy';
     case 'TERMS': return '/terms';
@@ -281,30 +292,23 @@ export const App: React.FC = () => {
     return 'HOME';
   });
 
-  // Theme state: defaults strictly to 'light' for all new sessions/users per academic design standards
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window === 'undefined') return 'light';
+  // Theme state: Enforced Light Mode platform-wide per academic design standards
+  const [theme, setTheme] = useState<'light'>('light');
+
+  useEffect(() => {
     try {
-      const saved = localStorage.getItem('al_theme');
-      return saved === 'dark' ? 'dark' : 'light';
-    } catch {
-      return 'light';
-    }
-  });
+      localStorage.setItem('al_theme', 'light');
+      document.documentElement.classList.remove('dark');
+    } catch {}
+  }, []);
 
   const toggleTheme = () => {
-    const nextTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(nextTheme);
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('al_theme', nextTheme);
-        if (nextTheme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      } catch {}
-    }
+    // Theme locked strictly to light mode
+    setTheme('light');
+    try {
+      localStorage.setItem('al_theme', 'light');
+      document.documentElement.classList.remove('dark');
+    } catch {}
   };
 
   // Modal states
@@ -542,25 +546,25 @@ export const App: React.FC = () => {
 
   return (
     <ErrorBoundary fallbackTitle="AcademicLevel Platform Error">
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500 selection:text-white">
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-indigo-500 selection:text-white">
         {/* ======================================================== */}
         {/* HEADER / NAVIGATION BAR (Zero Admin Links)               */}
         {/* ======================================================== */}
-        <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3.5">
+        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-8 py-3.5 shadow-xs">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             {/* Brand Logo */}
             <div
               onClick={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
               className="flex items-center space-x-2.5 cursor-pointer group"
             >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-extrabold text-base shadow-lg shadow-indigo-950 group-hover:scale-105 transition-transform">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-extrabold text-base shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform">
                 AL
               </div>
               <div>
-                <span className="font-extrabold text-base tracking-tight text-white block leading-none">
+                <span className="font-extrabold text-base tracking-tight text-slate-900 block leading-none">
                   AcademicLevel
                 </span>
-                <span className="text-[10px] text-slate-400 font-medium">Learn in your era</span>
+                <span className="text-[10px] text-slate-500 font-medium">Learn in your era</span>
               </div>
             </div>
 
@@ -573,8 +577,8 @@ export const App: React.FC = () => {
                     onClick={() => navigateTo('HOME')}
                     className={`px-3 py-2 rounded-xl transition-all cursor-pointer ${
                       currentRoute === 'HOME'
-                        ? 'text-indigo-400 font-bold bg-indigo-500/10'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                        ? 'text-indigo-600 font-bold bg-indigo-50'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
                     Home
@@ -593,40 +597,99 @@ export const App: React.FC = () => {
                         currentRoute === 'SPECIAL_49_FUNNEL' ||
                         currentRoute === 'SCHOOL_PORTAL' ||
                         currentRoute === 'PRICING'
-                          ? 'text-amber-400 font-bold bg-amber-500/10'
-                          : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                          ? 'text-amber-700 font-bold bg-amber-50'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                       }`}
                     >
                       <span>Curriculum &amp; Offers</span>
                       <ChevronDown
                         className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                          activeDropdown === 'OFFERS' ? 'rotate-180 text-amber-400' : 'text-slate-400'
+                          activeDropdown === 'OFFERS' ? 'rotate-180 text-amber-600' : 'text-slate-400'
                         }`}
                       />
                     </button>
 
                     {activeDropdown === 'OFFERS' && (
                       <div
-                        className="absolute top-full left-0 mt-2 w-80 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl shadow-black p-2 z-[9999] ring-1 ring-slate-700/60"
-                        style={{ backgroundColor: '#0f172a', zIndex: 9999 }}
+                        className="absolute top-full left-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-[9999] ring-1 ring-slate-200/80"
                       >
                         <div className="p-1.5 space-y-1">
                           <button
                             onClick={() => {
                               setActiveDropdown(null);
-                              navigateTo('PUBLIC_COURSES');
+                              navigateTo('CURRICULUM_CBSE');
                             }}
-                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                            className="w-full flex items-start space-x-3 p-2 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
                           >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
-                              <BookOpen className="w-4 h-4" />
+                            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-indigo-50 border border-indigo-200 text-indigo-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <BookOpen className="w-3.5 h-3.5" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-white group-hover:text-indigo-300 transition-colors">
-                                Curriculum &amp; Syllabi
+                              <p className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                                CBSE Classes 1–12
                               </p>
-                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
-                                CBSE, ICSE &amp; Cambridge IGCSE Classes 1 to 12
+                              <p className="text-[10px] text-slate-500 leading-tight">
+                                NCERT &amp; NEP 2020 aligned board syllabus
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('CURRICULUM_ICSE');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-blue-50 border border-blue-200 text-blue-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <BookOpen className="w-3.5 h-3.5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                                ICSE / CISCE Board
+                              </p>
+                              <p className="text-[10px] text-slate-500 leading-tight">
+                                Analytical problem solving &amp; step marking
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('CURRICULUM_CAMBRIDGE');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-purple-50 border border-purple-200 text-purple-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <BookOpen className="w-3.5 h-3.5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-slate-900 group-hover:text-purple-600 transition-colors">
+                                Cambridge IGCSE
+                              </p>
+                              <p className="text-[10px] text-slate-500 leading-tight">
+                                International inquiry-based critical thinking
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('CURRICULUM_OLYMPIAD');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-amber-50 border border-amber-200 text-amber-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <Trophy className="w-3.5 h-3.5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
+                                Olympiad &amp; Foundations
+                              </p>
+                              <p className="text-[10px] text-slate-500 leading-tight">
+                                HOTS speed simulation &amp; pattern recognition
                               </p>
                             </div>
                           </button>
@@ -636,21 +699,21 @@ export const App: React.FC = () => {
                               setActiveDropdown(null);
                               navigateTo('SPECIAL_49_FUNNEL');
                             }}
-                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
                           >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-500/10 border border-amber-500/20 text-amber-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-50 border border-amber-200 text-amber-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
                               <Zap className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
-                                <p className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">
+                                <p className="text-xs font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
                                   Special ₹49 Pass
                                 </p>
-                                <span className="text-[9px] font-black bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/40">
+                                <span className="text-[9px] font-black bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-300">
                                   HOT
                                 </span>
                               </div>
-                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
                                 60-Day unlimited concept booster &amp; quizzes
                               </p>
                             </div>
@@ -661,21 +724,21 @@ export const App: React.FC = () => {
                               setActiveDropdown(null);
                               navigateTo('SCHOOL_PORTAL');
                             }}
-                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
                           >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-50 border border-emerald-200 text-emerald-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
                               <School className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
-                                <p className="text-xs font-bold text-white group-hover:text-emerald-300 transition-colors">
+                                <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
                                   Schools (₹2,499)
                                 </p>
-                                <span className="text-[9px] font-black bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/40">
+                                <span className="text-[9px] font-black bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded border border-emerald-300">
                                   PACK
                                 </span>
                               </div>
-                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
                                 Institutional pack with 40 Lite or 20 Plus A-Codes
                               </p>
                             </div>
@@ -686,16 +749,16 @@ export const App: React.FC = () => {
                               setActiveDropdown(null);
                               navigateTo('PRICING');
                             }}
-                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer border-t border-slate-800/60 pt-2.5 mt-1"
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer border-t border-slate-100 pt-2.5 mt-1"
                           >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-sky-500/10 border border-sky-500/20 text-sky-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-sky-50 border border-sky-200 text-sky-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
                               <CreditCard className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-white group-hover:text-sky-300 transition-colors">
+                              <p className="text-xs font-bold text-slate-900 group-hover:text-sky-600 transition-colors">
                                 All Plans &amp; Pricing
                               </p>
-                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
                                 Compare Lite (₹49), Plus (₹129) &amp; 1-Year Gold VIP
                               </p>
                             </div>
@@ -720,22 +783,21 @@ export const App: React.FC = () => {
                         currentRoute === 'INNOVATIVE_EDTECH' ||
                         currentRoute === 'PRIVACY' ||
                         currentRoute === 'SITEMAP'
-                          ? 'text-indigo-400 font-bold bg-indigo-500/10'
-                          : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                          ? 'text-indigo-600 font-bold bg-indigo-50'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                       }`}
                     >
                       <span>About &amp; Trust</span>
                       <ChevronDown
                         className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                          activeDropdown === 'ABOUT' ? 'rotate-180 text-indigo-400' : 'text-slate-400'
+                          activeDropdown === 'ABOUT' ? 'rotate-180 text-indigo-600' : 'text-slate-400'
                         }`}
                       />
                     </button>
 
                     {activeDropdown === 'ABOUT' && (
                       <div
-                        className="absolute top-full left-0 mt-2 w-80 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl shadow-black p-2 z-[9999] ring-1 ring-slate-700/60"
-                        style={{ backgroundColor: '#0f172a', zIndex: 9999 }}
+                        className="absolute top-full left-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-[9999] ring-1 ring-slate-200/80"
                       >
                         <div className="p-1.5 space-y-1">
                           <button
@@ -743,16 +805,16 @@ export const App: React.FC = () => {
                               setActiveDropdown(null);
                               navigateTo('ABOUT');
                             }}
-                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
                           >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-purple-500/10 border border-purple-500/20 text-purple-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-purple-50 border border-purple-200 text-purple-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
                               <Sparkles className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-white group-hover:text-purple-300 transition-colors">
+                              <p className="text-xs font-bold text-slate-900 group-hover:text-purple-600 transition-colors">
                                 About Us
                               </p>
-                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
                                 Mission, Socratic AI methodology &amp; pedagogy
                               </p>
                             </div>
@@ -763,16 +825,16 @@ export const App: React.FC = () => {
                               setActiveDropdown(null);
                               navigateTo('FAQ');
                             }}
-                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
                           >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 border border-blue-500/20 text-blue-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 border border-blue-200 text-blue-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
                               <HelpCircle className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-white group-hover:text-blue-300 transition-colors">
+                              <p className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
                                 Frequently Asked Questions
                               </p>
-                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
                                 Parent guides, student safety &amp; answers
                               </p>
                             </div>
@@ -783,21 +845,21 @@ export const App: React.FC = () => {
                               setActiveDropdown(null);
                               navigateTo('INNOVATIVE_EDTECH');
                             }}
-                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
                           >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-500/10 border border-amber-500/20 text-amber-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-50 border border-amber-200 text-amber-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
                               <Trophy className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
-                                <p className="text-xs font-bold text-white group-hover:text-amber-300 transition-colors">
+                                <p className="text-xs font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
                                   #1 EdTech Award
                                 </p>
-                                <span className="text-[9px] font-black bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/40">
+                                <span className="text-[9px] font-black bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-300">
                                   WINNER
                                 </span>
                               </div>
-                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
                                 Century EdTech Leader &amp; Innovation recognition
                               </p>
                             </div>
@@ -808,16 +870,16 @@ export const App: React.FC = () => {
                               setActiveDropdown(null);
                               navigateTo('HALL_OF_FAME');
                             }}
-                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
                           >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-cyan-50 border border-cyan-200 text-cyan-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
                               <ShieldCheck className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors">
+                              <p className="text-xs font-bold text-slate-900 group-hover:text-cyan-600 transition-colors">
                                 Security &amp; Bug Bounty
                               </p>
-                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
                                 Hall of Fame &amp; responsible disclosure policy
                               </p>
                             </div>
@@ -828,16 +890,16 @@ export const App: React.FC = () => {
                               setActiveDropdown(null);
                               navigateTo('PRIVACY');
                             }}
-                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer border-t border-slate-800/60 pt-2.5 mt-1"
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer border-t border-slate-100 pt-2.5 mt-1"
                           >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800 border border-slate-700 text-slate-300 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 border border-slate-200 text-slate-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
                               <FileText className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-white group-hover:text-slate-200 transition-colors">
+                              <p className="text-xs font-bold text-slate-900 group-hover:text-slate-700 transition-colors">
                                 Terms &amp; 20-Min Refund
                               </p>
-                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
                                 Privacy protection, DPDP &amp; cancellation policy
                               </p>
                             </div>
@@ -848,16 +910,16 @@ export const App: React.FC = () => {
                               setActiveDropdown(null);
                               navigateTo('SITEMAP');
                             }}
-                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-800/80 transition-colors group cursor-pointer"
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
                           >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-50 border border-indigo-200 text-indigo-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
                               <Compass className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-white group-hover:text-indigo-300 transition-colors">
+                              <p className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
                                 Sitemap &amp; Directory
                               </p>
-                              <p className="text-[11px] text-slate-400 leading-tight mt-0.5">
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
                                 Public index of curriculum, plans, schools &amp; legal
                               </p>
                             </div>
@@ -873,7 +935,7 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => navigateTo('DASHBOARD')}
                     className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'DASHBOARD' ? 'text-indigo-400 font-bold bg-indigo-500/10' : 'text-slate-300 hover:text-white'
+                      currentRoute === 'DASHBOARD' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
                     Dashboard
@@ -881,7 +943,7 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => navigateTo('COURSES')}
                     className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'COURSES' || currentRoute === 'LEVELS' ? 'text-indigo-400 font-bold bg-indigo-500/10' : 'text-slate-300 hover:text-white'
+                      currentRoute === 'COURSES' || currentRoute === 'LEVELS' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
                     Courses
@@ -889,7 +951,7 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => navigateTo('NOVA_AI')}
                     className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'NOVA_AI' ? 'text-indigo-400 font-bold bg-indigo-500/10' : 'text-slate-300 hover:text-white'
+                      currentRoute === 'NOVA_AI' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
                     Nova AI Tutor
@@ -897,7 +959,7 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => navigateTo('COMMUNITY')}
                     className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'COMMUNITY' ? 'text-indigo-400 font-bold bg-indigo-500/10' : 'text-slate-300 hover:text-white'
+                      currentRoute === 'COMMUNITY' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
                     StudentPacks
@@ -905,16 +967,16 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => navigateTo('GIFT_STORE')}
                     className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1.5 ${
-                      currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' ? 'text-amber-400 font-bold bg-amber-500/10' : 'text-slate-300 hover:text-white'
+                      currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' ? 'text-amber-700 font-bold bg-amber-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <Gift className="w-3.5 h-3.5 text-amber-400" />
+                    <Gift className="w-3.5 h-3.5 text-amber-500" />
                     <span>Gift Store</span>
                   </button>
                   <button
                     onClick={() => navigateTo('CERTIFICATES')}
                     className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'CERTIFICATES' || currentRoute === 'MASTER_CERT' ? 'text-indigo-400 font-bold bg-indigo-500/10' : 'text-slate-300 hover:text-white'
+                      currentRoute === 'CERTIFICATES' || currentRoute === 'MASTER_CERT' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
                     Certificates
@@ -932,13 +994,13 @@ export const App: React.FC = () => {
                       setAuthModalMode('LOGIN');
                       setAuthModalOpen(true);
                     }}
-                    className="hidden sm:inline-flex items-center text-xs font-bold text-indigo-300 hover:text-white px-3.5 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 transition-all cursor-pointer"
+                    className="hidden sm:inline-flex items-center text-xs font-bold text-indigo-600 hover:text-indigo-700 px-3.5 py-2 rounded-xl bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition-all cursor-pointer"
                   >
                     Sign In (Existing User)
                   </button>
                   <button
                     onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
-                    className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-orange-950 transition-all cursor-pointer"
+                    className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs rounded-xl shadow-md transition-all cursor-pointer"
                   >
                     Special ₹49 Offer
                   </button>
@@ -949,10 +1011,10 @@ export const App: React.FC = () => {
                   {currentLearner?.activePlan === 'GOLD' && (
                     <button
                       onClick={() => navigateTo('PROFILE')}
-                      className="hidden sm:inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border border-amber-400/50 text-amber-300 text-xs font-black shadow-sm cursor-pointer hover:border-amber-300 transition-all"
+                      className="hidden sm:inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border border-amber-400 text-amber-800 text-xs font-black shadow-xs cursor-pointer hover:border-amber-500 transition-all"
                       title="1-Year Gold VIP Pass Active (365 Days Access)"
                     >
-                      <Crown className="w-3.5 h-3.5 text-amber-300 flex-shrink-0" />
+                      <Crown className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
                       <span>GOLD PASS</span>
                     </button>
                   )}
@@ -961,12 +1023,12 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => setGlobalMailboxOpen(true)}
                     title="Open Student Mailbox & Quiz Diagnostic Reports"
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-bold hover:bg-purple-500/25 active:scale-95 transition-all shadow-sm cursor-pointer relative z-20 touch-manipulation min-h-[36px]"
+                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-700 text-xs font-bold hover:bg-purple-100 active:scale-95 transition-all shadow-xs cursor-pointer relative z-20 touch-manipulation min-h-[36px]"
                   >
-                    <Mail className="w-4 h-4 text-purple-400" />
+                    <Mail className="w-4 h-4 text-purple-600" />
                     <span className="hidden sm:inline">Mailbox</span>
                     {currentLearner && StorageRLSLayer.getUnreadMailboxCount(currentLearner.id) > 0 && (
-                      <span className="px-1.5 py-0.2 bg-amber-400 text-slate-950 text-[10px] font-black rounded-full animate-pulse">
+                      <span className="px-1.5 py-0.2 bg-amber-500 text-white text-[10px] font-black rounded-full animate-pulse">
                         {StorageRLSLayer.getUnreadMailboxCount(currentLearner.id)}
                       </span>
                     )}
@@ -976,7 +1038,7 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => navigateTo('GIFT_STORE')}
                     title="Open Scholar's Gift Store"
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-bold hover:bg-amber-500/20 transition-all shadow-sm cursor-pointer"
+                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold hover:bg-amber-100 transition-all shadow-xs cursor-pointer"
                   >
                     <StudyCoinIcon className="w-4 h-4" glow />
                     <span>{currentLearner?.coinBalance || 0}</span>
@@ -985,9 +1047,9 @@ export const App: React.FC = () => {
                   {/* Profile Button */}
                   <button
                     onClick={() => navigateTo('PROFILE')}
-                    className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition-all"
+                    className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-all"
                   >
-                    <User className="w-3.5 h-3.5" />
+                    <User className="w-3.5 h-3.5 text-slate-600" />
                     <span className="hidden sm:inline truncate max-w-[120px]">
                       {currentLearner?.fullName.split(' ')[0]}
                     </span>
@@ -998,7 +1060,7 @@ export const App: React.FC = () => {
                       logout();
                       navigateTo('HOME');
                     }}
-                    className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors"
+                    className="p-2 text-slate-500 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors"
                     title="Log Out"
                   >
                     <LogOut className="w-4 h-4" />
@@ -1009,7 +1071,7 @@ export const App: React.FC = () => {
               {/* Mobile Drawer Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/80"
+                className="md:hidden p-2 text-slate-600 hover:text-slate-900 rounded-xl bg-slate-100"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
@@ -1019,7 +1081,7 @@ export const App: React.FC = () => {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-slate-900 border-b border-slate-800 p-4 space-y-4 text-xs font-semibold">
+          <div className="md:hidden bg-white border-b border-slate-200 p-4 space-y-4 text-xs font-semibold shadow-lg text-slate-800">
             {!isAuthenticated ? (
               <div className="space-y-3">
                 <button
@@ -1028,42 +1090,51 @@ export const App: React.FC = () => {
                     setAuthModalMode('LOGIN');
                     setAuthModalOpen(true);
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-indigo-300 font-bold bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 flex items-center justify-between"
+                  className="w-full text-left p-2.5 rounded-xl text-indigo-700 font-bold bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 flex items-center justify-between"
                 >
                   <span>Sign In (Existing User)</span>
-                  <span className="text-[10px] bg-indigo-500/20 px-2 py-0.5 rounded-full font-mono text-indigo-300">
+                  <span className="text-[10px] bg-indigo-100 px-2 py-0.5 rounded-full font-mono text-indigo-700">
                     Student &amp; Educator
                   </span>
                 </button>
 
                 <button
-                  onClick={() => navigateTo('HOME')}
-                  className="w-full text-left p-2 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('HOME');
+                  }}
+                  className="w-full text-left p-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
                 >
                   <span>Home</span>
                 </button>
 
                 {/* Group 1: Curriculum & Offers */}
-                <div className="pt-2 border-t border-slate-800/80 space-y-1">
-                  <p className="px-2 text-[10px] font-black uppercase tracking-wider text-slate-500 font-mono mb-1">
+                <div className="pt-2 border-t border-slate-100 space-y-1">
+                  <p className="px-2 text-[10px] font-black uppercase tracking-wider text-slate-400 font-mono mb-1">
                     Curriculum &amp; Offers
                   </p>
                   <button
-                    onClick={() => navigateTo('PUBLIC_COURSES')}
-                    className="w-full text-left p-2 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigateTo('PUBLIC_COURSES');
+                    }}
+                    className="w-full text-left p-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
                   >
-                    <BookOpen className="w-4 h-4 text-indigo-400" />
+                    <BookOpen className="w-4 h-4 text-indigo-600" />
                     <span>Curriculum &amp; Syllabi (Classes 1–12)</span>
                   </button>
                   <button
-                    onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
-                    className="w-full text-left p-2 rounded-xl text-amber-400 font-bold hover:bg-slate-800 flex items-center justify-between"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigateTo('SPECIAL_49_FUNNEL');
+                    }}
+                    className="w-full text-left p-2 rounded-xl text-amber-700 font-bold hover:bg-amber-50 flex items-center justify-between"
                   >
                     <span className="flex items-center space-x-2">
-                      <Zap className="w-4 h-4 text-amber-400" />
+                      <Zap className="w-4 h-4 text-amber-600" />
                       <span>Special ₹49 Pass</span>
                     </span>
-                    <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30">
+                    <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-300">
                       HOT
                     </span>
                   </button>
@@ -1072,75 +1143,96 @@ export const App: React.FC = () => {
                       setMobileMenuOpen(false);
                       navigateTo('SCHOOL_PORTAL');
                     }}
-                    className="w-full text-left p-2 rounded-xl text-emerald-300 font-bold hover:bg-slate-800 flex items-center justify-between"
+                    className="w-full text-left p-2 rounded-xl text-emerald-700 font-bold hover:bg-emerald-50 flex items-center justify-between"
                   >
                     <span className="flex items-center space-x-2">
-                      <School className="w-4 h-4 text-emerald-400" />
+                      <School className="w-4 h-4 text-emerald-600" />
                       <span>Schools &amp; Tutors</span>
                     </span>
-                    <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                    <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded border border-emerald-300">
                       ₹2,499
                     </span>
                   </button>
                   <button
-                    onClick={() => navigateTo('PRICING')}
-                    className="w-full text-left p-2 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigateTo('PRICING');
+                    }}
+                    className="w-full text-left p-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
                   >
-                    <CreditCard className="w-4 h-4 text-sky-400" />
+                    <CreditCard className="w-4 h-4 text-sky-600" />
                     <span>All Plans &amp; Pricing</span>
                   </button>
                 </div>
 
                 {/* Group 2: About & Trust */}
-                <div className="pt-2 border-t border-slate-800/80 space-y-1">
-                  <p className="px-2 text-[10px] font-black uppercase tracking-wider text-slate-500 font-mono mb-1">
+                <div className="pt-2 border-t border-slate-100 space-y-1">
+                  <p className="px-2 text-[10px] font-black uppercase tracking-wider text-slate-400 font-mono mb-1">
                     About &amp; Trust
                   </p>
                   <button
-                    onClick={() => navigateTo('ABOUT')}
-                    className="w-full text-left p-2 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigateTo('ABOUT');
+                    }}
+                    className="w-full text-left p-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
                   >
-                    <Sparkles className="w-4 h-4 text-purple-400" />
+                    <Sparkles className="w-4 h-4 text-purple-600" />
                     <span>About AcademicLevel</span>
                   </button>
                   <button
-                    onClick={() => navigateTo('FAQ')}
-                    className="w-full text-left p-2 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigateTo('FAQ');
+                    }}
+                    className="w-full text-left p-2 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
                   >
-                    <HelpCircle className="w-4 h-4 text-blue-400" />
+                    <HelpCircle className="w-4 h-4 text-blue-600" />
                     <span>Frequently Asked Questions</span>
                   </button>
                   <button
-                    onClick={() => navigateTo('INNOVATIVE_EDTECH')}
-                    className="w-full text-left p-2 rounded-xl text-amber-300 font-semibold hover:bg-slate-800 flex items-center justify-between"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigateTo('INNOVATIVE_EDTECH');
+                    }}
+                    className="w-full text-left p-2 rounded-xl text-amber-700 font-semibold hover:bg-amber-50 flex items-center justify-between"
                   >
                     <span className="flex items-center space-x-2">
-                      <Trophy className="w-4 h-4 text-amber-400" />
+                      <Trophy className="w-4 h-4 text-amber-600" />
                       <span>#1 EdTech Award</span>
                     </span>
-                    <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30">
+                    <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded border border-amber-300">
                       WINNER
                     </span>
                   </button>
                   <button
-                    onClick={() => navigateTo('HALL_OF_FAME')}
-                    className="w-full text-left p-2 rounded-xl text-cyan-400 font-semibold hover:bg-slate-800 flex items-center space-x-2"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigateTo('HALL_OF_FAME');
+                    }}
+                    className="w-full text-left p-2 rounded-xl text-cyan-700 font-semibold hover:bg-cyan-50 flex items-center space-x-2"
                   >
-                    <ShieldCheck className="w-4 h-4 text-cyan-400" />
+                    <ShieldCheck className="w-4 h-4 text-cyan-600" />
                     <span>Security &amp; Bug Bounty</span>
                   </button>
                   <button
-                    onClick={() => navigateTo('PRIVACY')}
-                    className="w-full text-left p-2 rounded-xl text-slate-400 font-medium hover:bg-slate-800 flex items-center space-x-2"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigateTo('PRIVACY');
+                    }}
+                    className="w-full text-left p-2 rounded-xl text-slate-600 font-medium hover:bg-slate-100 flex items-center space-x-2"
                   >
-                    <FileText className="w-4 h-4 text-slate-400" />
+                    <FileText className="w-4 h-4 text-slate-500" />
                     <span>Terms, Privacy &amp; 20-Min Refund</span>
                   </button>
                   <button
-                    onClick={() => navigateTo('SITEMAP')}
-                    className="w-full text-left p-2 rounded-xl text-indigo-400 font-medium hover:bg-slate-800 flex items-center space-x-2"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigateTo('SITEMAP');
+                    }}
+                    className="w-full text-left p-2 rounded-xl text-indigo-700 font-medium hover:bg-indigo-50 flex items-center space-x-2"
                   >
-                    <Compass className="w-4 h-4 text-indigo-400" />
+                    <Compass className="w-4 h-4 text-indigo-600" />
                     <span>Sitemap &amp; Directory</span>
                   </button>
                 </div>
@@ -1148,8 +1240,11 @@ export const App: React.FC = () => {
             ) : (
               <>
                 <button
-                  onClick={() => navigateTo('DASHBOARD')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('DASHBOARD');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
                 >
                   Dashboard
                 </button>
@@ -1158,83 +1253,113 @@ export const App: React.FC = () => {
                     setMobileMenuOpen(false);
                     setGlobalMailboxOpen(true);
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-purple-300 hover:bg-slate-800 flex items-center justify-between font-semibold"
+                  className="w-full text-left p-2.5 rounded-xl text-purple-700 hover:bg-purple-50 flex items-center justify-between font-semibold"
                 >
                   <div className="flex items-center space-x-2">
-                    <Mail className="w-4 h-4 text-purple-400" />
+                    <Mail className="w-4 h-4 text-purple-600" />
                     <span>Student Mailbox</span>
                   </div>
                   {currentLearner && StorageRLSLayer.getUnreadMailboxCount(currentLearner.id) > 0 && (
-                    <span className="px-2 py-0.5 bg-amber-400 text-slate-950 text-[10px] font-black rounded-full animate-pulse">
+                    <span className="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-black rounded-full animate-pulse">
                       {StorageRLSLayer.getUnreadMailboxCount(currentLearner.id)} New
                     </span>
                   )}
                 </button>
                 <button
-                  onClick={() => navigateTo('COURSES')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('COURSES');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
                 >
                   Course Catalogue
                 </button>
                 <button
-                  onClick={() => navigateTo('NOVA_AI')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('NOVA_AI');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
                 >
                   Nova AI Socratic Tutor
                 </button>
                 <button
-                  onClick={() => navigateTo('COMMUNITY')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('COMMUNITY');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
                 >
                   StudentPacks Community
                 </button>
                 <button
-                  onClick={() => navigateTo('SPIN_WHEEL')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('SPIN_WHEEL');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
                 >
                   Daily Spin Wheel
                 </button>
                 <button
-                  onClick={() => navigateTo('REFERRAL')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center justify-between"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('REFERRAL');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center justify-between"
                 >
                   <span>Friend ACodes & Invites</span>
-                  <span className="flex items-center space-x-1 text-xs text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full">
+                  <span className="flex items-center space-x-1 text-xs text-amber-700 font-bold bg-amber-100 px-2 py-0.5 rounded-full">
                     <StudyCoinIcon className="w-3.5 h-3.5" />
                     <span>+40 Coins</span>
                   </span>
                 </button>
                 <button
-                  onClick={() => navigateTo('GIFT_STORE')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('GIFT_STORE');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
                 >
-                  <Gift className="w-4 h-4 text-amber-400" />
+                  <Gift className="w-4 h-4 text-amber-500" />
                   <span>Scholar&apos;s Gift Store (Worldwide Rewards)</span>
                 </button>
                 <button
-                  onClick={() => navigateTo('CERTIFICATES')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('CERTIFICATES');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
                 >
                   Certificate Vault
                 </button>
                 <button
-                  onClick={() => navigateTo('PREMIUM')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('PREMIUM');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100"
                 >
                   Membership Center (UPI)
                 </button>
                 <button
-                  onClick={() => navigateTo('SCHOLARSHIPS')}
-                  className="w-full text-left p-2.5 rounded-xl text-amber-300 hover:bg-slate-800 flex items-center space-x-2"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('SCHOLARSHIPS');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-amber-700 hover:bg-amber-50 flex items-center space-x-2"
                 >
-                  <Trophy className="w-4 h-4 text-amber-400" />
+                  <Trophy className="w-4 h-4 text-amber-600" />
                   <span>Worldwide Scholarships</span>
                 </button>
                 <button
-                  onClick={() => navigateTo('PROFILE')}
-                  className="w-full text-left p-2.5 rounded-xl text-slate-300 hover:bg-slate-800 flex items-center space-x-2"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('PROFILE');
+                  }}
+                  className="w-full text-left p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center space-x-2"
                 >
-                  <User className="w-4 h-4 text-slate-400" />
+                  <User className="w-4 h-4 text-slate-500" />
                   <span>Student Profile & Parent PIN</span>
                 </button>
                 <button
@@ -1242,9 +1367,9 @@ export const App: React.FC = () => {
                     logout();
                     navigateTo('HOME');
                   }}
-                  className="w-full text-left p-2.5 rounded-xl text-rose-400 font-bold hover:bg-rose-500/10 flex items-center space-x-2 border-t border-slate-800 mt-2 pt-3"
+                  className="w-full text-left p-2.5 rounded-xl text-rose-600 font-bold hover:bg-rose-50 flex items-center space-x-2 border-t border-slate-100 mt-2 pt-3"
                 >
-                  <LogOut className="w-4 h-4 text-rose-400" />
+                  <LogOut className="w-4 h-4 text-rose-600" />
                   <span>Log Out ({currentLearner?.fullName.split(' ')[0] || 'Student'})</span>
                 </button>
               </>
@@ -1267,13 +1392,28 @@ export const App: React.FC = () => {
               onNavigate={navigateTo}
             />
           )}
-          {currentRoute === 'PUBLIC_COURSES' && (
-            <PublicCourses
-              initialBoard={publicBoardFilter}
-              onSelectTrack={(b, g) => {
+          {(currentRoute === 'PUBLIC_COURSES' ||
+            currentRoute === 'CURRICULUM_CBSE' ||
+            currentRoute === 'CURRICULUM_ICSE' ||
+            currentRoute === 'CURRICULUM_CAMBRIDGE' ||
+            currentRoute === 'CURRICULUM_OLYMPIAD') && (
+            <CurriculumPage
+              track={
+                currentRoute === 'CURRICULUM_CBSE'
+                  ? 'CBSE'
+                  : currentRoute === 'CURRICULUM_ICSE'
+                  ? 'ICSE'
+                  : currentRoute === 'CURRICULUM_CAMBRIDGE'
+                  ? 'CAMBRIDGE'
+                  : currentRoute === 'CURRICULUM_OLYMPIAD'
+                  ? 'OLYMPIAD'
+                  : 'ALL'
+              }
+              onOpenRegister={() => {
                 setAuthModalMode('REGISTER');
                 setAuthModalOpen(true);
               }}
+              onNavigate={navigateTo}
             />
           )}
           {currentRoute === 'PRICING' && (
@@ -1583,9 +1723,9 @@ export const App: React.FC = () => {
         </main>
 
         {/* ======================================================== */}
-        {/* PUBLIC FOOTER (Matches Modern Minimalist Multi-Column)    */}
+        {/* PUBLIC FOOTER (Modern Light Mode Multi-Column)            */}
         {/* ======================================================== */}
-        <footer className="bg-black text-neutral-400 border-t border-neutral-800/80 pt-16 pb-12 px-4 sm:px-6 lg:px-8 text-xs">
+        <footer className="bg-white text-slate-600 border-t border-slate-200 pt-16 pb-12 px-4 sm:px-6 lg:px-8 text-xs">
           <div className="max-w-7xl mx-auto">
             {/* Top Multi-Column Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-10">
@@ -1596,18 +1736,18 @@ export const App: React.FC = () => {
                     AL
                   </div>
                   <div>
-                    <span className="font-black text-white text-base tracking-widest uppercase block leading-none">
+                    <span className="font-black text-slate-900 text-base tracking-widest uppercase block leading-none">
                       AcademicLevel
                     </span>
-                    <span className="text-[10px] font-mono tracking-widest text-neutral-400 uppercase">
+                    <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
                       Learn in your era
                     </span>
                   </div>
                 </div>
-                <p className="text-xs text-neutral-400 leading-relaxed max-w-sm">
+                <p className="text-xs text-slate-600 leading-relaxed max-w-sm">
                   India&apos;s premier AI-powered K-12 learning ecosystem. CBSE, ICSE, and Cambridge IGCSE daily interactive quizzes, Socratic Nova AI tutoring, and physical reward store.
                 </p>
-                <div className="text-[11px] text-neutral-500 space-y-0.5 font-mono">
+                <div className="text-[11px] text-slate-500 space-y-0.5 font-mono">
                   <p>Operated by ZingQuark (ZQ Technology)</p>
                   <p>UDYAM Reg: UDYAM-OD-19-0189385</p>
                 </div>
@@ -1615,14 +1755,14 @@ export const App: React.FC = () => {
 
               {/* Column 1: PLATFORM & AI */}
               <div className="space-y-3">
-                <h4 className="text-white font-black tracking-wider text-xs uppercase">
+                <h4 className="text-slate-900 font-black tracking-wider text-xs uppercase">
                   Platform &amp; AI
                 </h4>
                 <ul className="space-y-2 text-xs">
                   <li>
                     <button
                       onClick={() => navigateTo('NOVA_AI')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Socratic Nova AI
                     </button>
@@ -1630,7 +1770,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo(isAuthenticated ? 'COURSES' : 'PUBLIC_COURSES')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Daily Adaptive Quizzes
                     </button>
@@ -1638,7 +1778,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('GIFT_STORE')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Study Coin Rewards
                     </button>
@@ -1646,7 +1786,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('GIFT_STORE')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Physical Gift Store
                     </button>
@@ -1654,7 +1794,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('INNOVATIVE_EDTECH')}
-                      className="text-amber-400 hover:text-amber-300 font-semibold transition-colors cursor-pointer text-left flex items-center gap-1"
+                      className="text-amber-600 hover:text-amber-700 font-semibold transition-colors cursor-pointer text-left flex items-center gap-1"
                     >
                       <span>★ #1 Innovative EdTech</span>
                     </button>
@@ -1662,40 +1802,40 @@ export const App: React.FC = () => {
                 </ul>
               </div>
 
-              {/* Column 2: CURRICULUM */}
+              {/* Column 2: CURRICULUM (Dedicated Separate URLs) */}
               <div className="space-y-3">
-                <h4 className="text-white font-black tracking-wider text-xs uppercase">
+                <h4 className="text-slate-900 font-black tracking-wider text-xs uppercase">
                   Curriculum
                 </h4>
                 <ul className="space-y-2 text-xs">
                   <li>
                     <button
-                      onClick={() => navigateTo('PUBLIC_COURSES', { board: 'CBSE' })}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      onClick={() => navigateTo('CURRICULUM_CBSE')}
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left font-medium"
                     >
                       CBSE Classes 1–12
                     </button>
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('PUBLIC_COURSES', { board: 'ICSE' })}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      onClick={() => navigateTo('CURRICULUM_ICSE')}
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left font-medium"
                     >
                       ICSE / CISCE Board
                     </button>
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('PUBLIC_COURSES', { board: 'IGCSE' })}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      onClick={() => navigateTo('CURRICULUM_CAMBRIDGE')}
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left font-medium"
                     >
                       Cambridge IGCSE
                     </button>
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('PUBLIC_COURSES', { board: 'CBSE' })}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      onClick={() => navigateTo('CURRICULUM_OLYMPIAD')}
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left font-medium"
                     >
                       Olympiad &amp; Foundations
                     </button>
@@ -1703,7 +1843,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('FAQ')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left font-medium"
                     >
                       Curriculum FAQs
                     </button>
@@ -1713,7 +1853,7 @@ export const App: React.FC = () => {
 
               {/* Column 3: MEMBERSHIPS */}
               <div className="space-y-3">
-                <h4 className="text-white font-black tracking-wider text-xs uppercase">
+                <h4 className="text-slate-900 font-black tracking-wider text-xs uppercase">
                   Memberships
                 </h4>
                 <ul className="space-y-2 text-xs">
@@ -1728,7 +1868,7 @@ export const App: React.FC = () => {
                           setPaywallModalOpen(true);
                         }
                       }}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Lite Pass (₹49 / 60D)
                     </button>
@@ -1744,7 +1884,7 @@ export const App: React.FC = () => {
                           setPaywallModalOpen(true);
                         }
                       }}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Plus Pass (₹129 / 180D)
                     </button>
@@ -1760,7 +1900,7 @@ export const App: React.FC = () => {
                           setPaywallModalOpen(true);
                         }
                       }}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       1-Year Gold VIP (₹205)
                     </button>
@@ -1768,7 +1908,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('SCHOOL_PORTAL')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Institutional School Pack
                     </button>
@@ -1776,7 +1916,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('PRICING')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Pricing Overview
                     </button>
@@ -1786,14 +1926,14 @@ export const App: React.FC = () => {
 
               {/* Column 4: COMPANY & LEGAL */}
               <div className="space-y-3">
-                <h4 className="text-white font-black tracking-wider text-xs uppercase">
+                <h4 className="text-slate-900 font-black tracking-wider text-xs uppercase">
                   About &amp; Legal
                 </h4>
                 <ul className="space-y-2 text-xs">
                   <li>
                     <button
                       onClick={() => navigateTo('ABOUT')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       About AcademicLevel
                     </button>
@@ -1801,7 +1941,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('PRIVACY')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Policies &amp; Privacy
                     </button>
@@ -1809,7 +1949,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('TERMS')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Terms of Service
                     </button>
@@ -1817,7 +1957,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('TERMS')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       20-Minute Refund Policy
                     </button>
@@ -1825,7 +1965,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('SAFETY')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Child Safety Protocol
                     </button>
@@ -1833,7 +1973,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('HALL_OF_FAME')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Security &amp; Bug Bounty
                     </button>
@@ -1841,7 +1981,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('VERIFY_CERTIFICATE')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Certificate Verification (/verify)
                     </button>
@@ -1849,7 +1989,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('SITEMAP')}
-                      className="hover:text-white transition-colors cursor-pointer text-left"
+                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Sitemap &amp; Directory
                     </button>
@@ -1857,7 +1997,7 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       onClick={() => navigateTo('ACCOUNT_DELETION')}
-                      className="hover:text-red-400 transition-colors cursor-pointer text-left"
+                      className="text-rose-600 hover:text-rose-700 transition-colors cursor-pointer text-left"
                       title="Google Play Mandated Account & Data Deletion Portal (/delacc)"
                     >
                       Delete Account (/delacc)
@@ -1868,7 +2008,7 @@ export const App: React.FC = () => {
             </div>
 
             {/* Divider Line */}
-            <div className="w-full border-t border-neutral-800 my-8 sm:my-10" />
+            <div className="w-full border-t border-slate-200 my-8 sm:my-10" />
 
             {/* Bottom Row: Centered Circular Outline Social Icons & Copyright */}
             <div className="flex flex-col items-center justify-center text-center space-y-4">
@@ -1879,7 +2019,7 @@ export const App: React.FC = () => {
                   href="https://youtube.com/academiclevels"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full border border-neutral-700 hover:border-white text-neutral-400 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                  className="w-10 h-10 rounded-full border border-slate-300 hover:border-slate-800 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center transition-all hover:scale-110"
                   title="AcademicLevel YouTube: https://youtube.com/academiclevels"
                   aria-label="YouTube"
                 >
@@ -1893,7 +2033,7 @@ export const App: React.FC = () => {
                   href="https://instagram.com/academiclevel1"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full border border-neutral-700 hover:border-white text-neutral-400 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                  className="w-10 h-10 rounded-full border border-slate-300 hover:border-slate-800 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center transition-all hover:scale-110"
                   title="AcademicLevel Instagram: https://instagram.com/academiclevel1"
                   aria-label="Instagram"
                 >
@@ -1907,7 +2047,7 @@ export const App: React.FC = () => {
                 {/* Email Support */}
                 <a
                   href="mailto:academiclevels@gmail.com"
-                  className="w-10 h-10 rounded-full border border-neutral-700 hover:border-white text-neutral-400 hover:text-white flex items-center justify-center transition-all hover:scale-110"
+                  className="w-10 h-10 rounded-full border border-slate-300 hover:border-slate-800 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center transition-all hover:scale-110"
                   title="Support Email: academiclevels@gmail.com"
                   aria-label="Email Support"
                 >
@@ -1921,7 +2061,7 @@ export const App: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigateTo('HALL_OF_FAME')}
-                  className="w-10 h-10 rounded-full border border-neutral-700 hover:border-white text-neutral-400 hover:text-white flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
+                  className="w-10 h-10 rounded-full border border-slate-300 hover:border-slate-800 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
                   title="Security & Bug Bounty Hall of Fame"
                   aria-label="Security"
                 >
@@ -1931,8 +2071,8 @@ export const App: React.FC = () => {
                 {/* Global Website */}
                 <button
                   type="button"
-                  onClick={() => navigateTo('LANDING')}
-                  className="w-10 h-10 rounded-full border border-neutral-700 hover:border-white text-neutral-400 hover:text-white flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
+                  onClick={() => navigateTo('HOME')}
+                  className="w-10 h-10 rounded-full border border-slate-300 hover:border-slate-800 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
                   title="AcademicLevel Platform Home"
                   aria-label="Homepage"
                 >
@@ -1946,10 +2086,10 @@ export const App: React.FC = () => {
 
               {/* Copyright & Legal Subtext */}
               <div className="space-y-1">
-                <p className="text-xs text-neutral-300 font-medium">
+                <p className="text-xs text-slate-700 font-medium">
                   ©Copyright. All rights reserved.
                 </p>
-                <p className="text-[10px] text-neutral-600 font-mono">
+                <p className="text-[10px] text-slate-400 font-mono">
                   © 2020–{new Date().getFullYear()} AcademicLevel • Operated by ZingQuark (ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385)
                 </p>
               </div>

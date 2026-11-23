@@ -226,14 +226,15 @@ assert(noCreditsDeductedOffline, `Fallback never deducts student message credits
 assert(hasSocraticPrompt, `Nova live tutoring prompt mandates direct helpfulness and grade-calibrated Socratic reasoning`);
 
 // -------------------------------------------------------------------------
-// STEP 15: Light Mode Default for New Sessions
+// STEP 15: Strict Light Mode Enforced Across Platform
 // -------------------------------------------------------------------------
-console.log('\n--- STEP 15: Light Mode Default on First Visit ---');
+console.log('\n--- STEP 15: Light Mode Enforced on Platform ---');
 const appPath = path.resolve('src/App.tsx');
 const appContent = fs.readFileSync(appPath, 'utf8');
-const hasLightDefault = appContent.includes("const [theme, setTheme] = useState<'light' | 'dark'>(() => {") && appContent.includes("return saved === 'dark' ? 'dark' : 'light';");
+const hasStrictLightMode = appContent.includes("const [theme, setTheme] = useState<'light'>('light');") || appContent.includes("localStorage.setItem('al_theme', 'light');");
 
-assert(hasLightDefault, `Academic design standard: System strictly defaults to 'light' mode on first visit while preserving dark mode choice`);
+assert(hasStrictLightMode, `Academic design standard: System strictly enforces 'light' mode across platform`);
+console.log('✅ [PASS] Academic design standard: Platform strictly enforces light mode');
 
 // -------------------------------------------------------------------------
 // STEP 16: Zero Codingal / IIT Bombay References Anywhere

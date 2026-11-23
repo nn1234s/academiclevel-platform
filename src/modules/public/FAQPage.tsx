@@ -41,15 +41,15 @@ export const FAQPage: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 text-slate-100 py-6 px-4">
+    <div className="max-w-3xl mx-auto space-y-8 text-slate-900 py-6 px-4">
       <div className="text-center">
-        <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-400 uppercase bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">
+        <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-700 uppercase bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full">
           Frequently Asked Questions
         </span>
-        <h1 className="text-3xl sm:text-4xl font-black text-white mt-2">
+        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 mt-2">
           Everything You Need to Know
         </h1>
-        <p className="text-xs sm:text-sm text-slate-400 mt-2">
+        <p className="text-xs sm:text-sm text-slate-600 mt-2">
           Clear answers regarding curriculum, quotas, UPI payments, and anti-cheat policies.
         </p>
       </div>
@@ -60,22 +60,22 @@ export const FAQPage: React.FC = () => {
           return (
             <div
               key={idx}
-              className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden transition-all shadow-md"
+              className="bg-white border border-slate-200 rounded-2xl overflow-hidden transition-all shadow-xs"
             >
               <button
                 onClick={() => setOpenIndex(isOpen ? null : idx)}
-                className="w-full p-4 sm:p-5 text-left flex items-center justify-between text-xs sm:text-sm font-bold text-white hover:text-indigo-300 transition-colors"
+                className="w-full p-4 sm:p-5 text-left flex items-center justify-between text-xs sm:text-sm font-bold text-slate-900 hover:text-indigo-600 transition-colors cursor-pointer"
               >
                 <span>{faq.q}</span>
                 <ChevronDown
-                  className={`w-4 h-4 text-slate-400 transform transition-transform ${
-                    isOpen ? 'rotate-180 text-indigo-400' : ''
+                  className={`w-4 h-4 text-slate-500 transform transition-transform ${
+                    isOpen ? 'rotate-180 text-indigo-600' : ''
                   }`}
                 />
               </button>
 
               {isOpen && (
-                <div className="px-5 pb-5 pt-1 text-xs text-slate-300 leading-relaxed border-t border-slate-800/60">
+                <div className="px-5 pb-5 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100">
                   {faq.a}
                 </div>
               )}

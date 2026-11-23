@@ -502,15 +502,15 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
 
   if (isLoadingQuiz) {
     return (
-      <div className="max-w-xl mx-auto p-12 text-center text-slate-100 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl">
-        <div className="w-14 h-14 mx-auto rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/30 animate-pulse">
+      <div className="max-w-xl mx-auto p-12 text-center text-slate-800 bg-white border border-slate-200 rounded-3xl shadow-xl">
+        <div className="w-14 h-14 mx-auto rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4 border border-indigo-200 animate-pulse">
           <Cpu className="w-7 h-7" />
         </div>
-        <h3 className="text-lg font-bold text-white mb-1">Synthesizing Assessment Nodes...</h3>
-        <p className="text-xs text-slate-400 max-w-sm mx-auto mb-6">
+        <h3 className="text-lg font-bold text-slate-900 mb-1">Synthesizing Assessment Nodes...</h3>
+        <p className="text-xs text-slate-500 max-w-sm mx-auto mb-6">
           Engaging AcademicLevel Hybrid Engine — combining Live Gemini AI with verified CBSE/ICSE syllabus guardrails.
         </p>
-        <div className="w-48 h-1.5 bg-slate-800 rounded-full mx-auto overflow-hidden">
+        <div className="w-48 h-1.5 bg-slate-200 rounded-full mx-auto overflow-hidden">
           <div className="w-full h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-pulse" />
         </div>
       </div>
@@ -519,9 +519,9 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
 
   if (!currentQuestion) {
     return (
-      <div className="p-12 text-center text-slate-400 bg-slate-900 border border-slate-800 rounded-3xl">
-        <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-3 text-indigo-400" />
-        <p className="text-sm">Loading syllabus assessment nodes...</p>
+      <div className="p-12 text-center text-slate-600 bg-white border border-slate-200 rounded-3xl shadow-sm">
+        <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-3 text-indigo-600" />
+        <p className="text-sm font-medium">Loading syllabus assessment nodes...</p>
       </div>
     );
   }
@@ -532,67 +532,67 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
     const passed = accuracy >= 70;
 
     return (
-      <div className="max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl text-center text-slate-100">
-        <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+      <div className="max-w-2xl mx-auto bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xl text-center text-slate-900">
+        <div className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4 bg-indigo-50 text-indigo-600 border border-indigo-200">
           <Award className="w-8 h-8" />
         </div>
 
         <div className="flex items-center justify-center space-x-2 mb-2">
           {quizSource === 'GEMINI_LIVE' ? (
-            <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-purple-950/60 border border-purple-500/40 text-purple-300">
-              <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
+            <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-purple-50 border border-purple-200 text-purple-700">
+              <Sparkles className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
               <span>Live Gemini AI Quiz Completed</span>
             </span>
           ) : (
-            <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-950/60 border border-emerald-500/40 text-emerald-300">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 border border-emerald-200 text-emerald-800">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>Verified Syllabus Bank Completed</span>
             </span>
           )}
         </div>
 
-        <span className="text-xs font-mono font-bold tracking-widest text-indigo-400 uppercase">
+        <span className="text-xs font-mono font-bold tracking-widest text-indigo-700 uppercase">
           Assessment Complete • {board} Class {grade}
         </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold mt-1 mb-2">
+        <h2 className="text-2xl sm:text-3xl font-extrabold mt-1 mb-2 text-slate-900">
           {passed ? 'Level Mastery Achieved! 🎉' : 'Assessment Finished'}
         </h2>
-        <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto mb-6">
-          You scored <strong className="text-white">{score}</strong> out of <strong className="text-white">{questions.length}</strong> questions ({accuracy}% accuracy).
+        <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mb-6">
+          You scored <strong className="text-slate-900">{score}</strong> out of <strong className="text-slate-900">{questions.length}</strong> questions ({accuracy}% accuracy).
         </p>
 
         {/* Reward Status Banner */}
         {rewardResult?.awarded && (
-          <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center space-x-3 text-amber-300">
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-center space-x-3 text-amber-900 shadow-xs">
             <StudyCoinIcon className="w-8 h-8 flex-shrink-0" glow animate />
             <div className="text-xs text-left">
-              <p className="font-bold flex items-center gap-1.5">
+              <p className="font-bold flex items-center gap-1.5 text-amber-900">
                 <StudyCoinIcon className="w-4 h-4" />
                 <span>+25 Study Coins Credited to Ledger!</span>
               </p>
-              <p className="text-amber-400/80">Level certificate generated and secured in your Certificate Vault.</p>
+              <p className="text-amber-800">Level certificate generated and secured in your Certificate Vault.</p>
             </div>
           </div>
         )}
 
         {/* Anti-cheat audit badge */}
-        <div className="inline-flex items-center space-x-2 text-[11px] text-slate-400 bg-slate-950 px-3.5 py-1.5 rounded-full border border-slate-800 mb-6">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+        <div className="inline-flex items-center space-x-2 text-[11px] text-slate-600 bg-slate-50 px-3.5 py-1.5 rounded-full border border-slate-200 mb-6">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
           <span>Anti-Cheat Verification: {antiCheatViolations === 0 ? 'Passed (Full Integrity)' : 'Anomalous speedrun detected'}</span>
         </div>
 
         {/* Mailbox Diagnostic Report Notification Banner */}
-        <div className="mb-8 p-4 sm:p-5 bg-gradient-to-r from-purple-950/60 via-slate-900 to-indigo-950/60 border border-purple-500/40 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-lg">
+        <div className="mb-8 p-4 sm:p-5 bg-gradient-to-r from-purple-50 via-white to-indigo-50 border border-purple-200 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-sm">
           <div className="flex items-center space-x-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center justify-center flex-shrink-0 shadow-inner">
+            <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 border border-purple-200 flex items-center justify-center flex-shrink-0 shadow-xs">
               <Mail className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs font-bold text-white flex items-center space-x-1.5">
+              <p className="text-xs font-bold text-slate-900 flex items-center space-x-1.5">
                 <span>Quiz Diagnostic Report Delivered!</span>
-                <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
               </p>
-              <p className="text-[11px] text-purple-300/80">
+              <p className="text-[11px] text-slate-600">
                 Nova AI has analyzed your answers, topic strengths, and solutions in your Student Mailbox.
               </p>
             </div>
@@ -606,7 +606,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
                 onFinish();
               }
             }}
-            className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-md shadow-purple-950 transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer"
           >
             <span>Open Report in Mailbox</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -616,14 +616,14 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={() => loadQuizQuestions(true)}
-            className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center justify-center space-x-2"
+            className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl border border-slate-300 transition-all flex items-center justify-center space-x-2"
           >
             <RefreshCw className="w-4 h-4" />
             <span>Generate Another AI Practice Set</span>
           </button>
           <button
             onClick={onFinish}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all"
+            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all"
           >
             Continue Learning Journey
           </button>
@@ -636,9 +636,9 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   const theme = getClassTheme(grade);
 
   return (
-    <div ref={quizContainerRef} className="max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-100">
+    <div ref={quizContainerRef} className="max-w-3xl mx-auto bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl text-slate-900">
       {/* Class Persona Header */}
-      <div className={`p-4 rounded-2xl mb-6 bg-gradient-to-r ${theme.gradientHero} text-white flex items-center justify-between`}>
+      <div className={`p-4 rounded-2xl mb-6 bg-gradient-to-r ${theme.gradientHero} text-white flex items-center justify-between shadow-xs`}>
         <div className="flex items-center space-x-3">
           <span className="text-2xl p-2 rounded-xl bg-white/20 backdrop-blur-md">{theme.mascot.emoji}</span>
           <div>
@@ -679,10 +679,10 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       </div>
 
       {/* Header bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-200">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <span className="text-[10px] font-mono font-bold tracking-wider text-indigo-400 uppercase">
+            <span className="text-[10px] font-mono font-bold tracking-wider text-indigo-700 uppercase">
               {board} • Class {grade} • {subjectId.toUpperCase()} • {levelNode}
             </span>
 
@@ -690,23 +690,23 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
             {quizSource === 'GEMINI_LIVE' ? (
               <span
                 title="Synthesized dynamically by Google Gemini 2.5 Flash"
-                className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/40 text-purple-300"
+                className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 border border-purple-200 text-purple-700"
               >
-                <Sparkles className="w-3 h-3 text-purple-400 animate-pulse" />
+                <Sparkles className="w-3 h-3 text-purple-600 animate-pulse" />
                 <span>Live Gemini AI</span>
               </span>
             ) : (
               <span
                 title="Curated, 100% board syllabus verified offline bank"
-                className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-300"
+                className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 border border-emerald-200 text-emerald-800"
               >
-                <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                <ShieldCheck className="w-3 h-3 text-emerald-600" />
                 <span>Verified Syllabus Bank</span>
               </span>
             )}
           </div>
 
-          <h3 className="text-sm font-semibold text-white">
+          <h3 className="text-sm font-bold text-slate-900">
             Question {currentIndex + 1} of {questions.length}
           </h3>
         </div>
@@ -715,19 +715,19 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
           <button
             onClick={() => loadQuizQuestions(true)}
             title="Synthesize new questions"
-            className="px-2.5 py-1 text-[11px] rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center space-x-1 border border-slate-700 transition-all cursor-pointer"
+            className="px-2.5 py-1 text-[11px] rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 flex items-center space-x-1 border border-slate-300 transition-all cursor-pointer font-medium"
           >
             <RefreshCw className="w-3 h-3" />
             <span className="hidden sm:inline">New AI Set</span>
           </button>
 
           {/* Anti-cheat minimum timer badge */}
-          <div className="flex items-center space-x-1 text-xs font-mono text-slate-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
-            <Clock className="w-3.5 h-3.5 text-indigo-400" />
+          <div className="flex items-center space-x-1 text-xs font-mono text-slate-700 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
+            <Clock className="w-3.5 h-3.5 text-indigo-600" />
             <span>{questionDwellSeconds}s</span>
           </div>
 
-          <div className="text-xs font-bold text-emerald-400 bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-900/50">
+          <div className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
             Score: {score}
           </div>
 
@@ -735,9 +735,9 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
             <button
               onClick={onExitQuiz}
               title="Exit Assessment"
-              className="px-2.5 py-1 text-[11px] rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 flex items-center space-x-1 border border-rose-500/30 transition-all cursor-pointer font-bold active:scale-95"
+              className="px-2.5 py-1 text-[11px] rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 flex items-center space-x-1 border border-rose-200 transition-all cursor-pointer font-bold active:scale-95"
             >
-              <LogOut className="w-3 h-3 text-rose-400" />
+              <LogOut className="w-3 h-3 text-rose-600" />
               <span>Exit</span>
             </button>
           )}
@@ -745,18 +745,18 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       </div>
 
       {/* Interactive Question Palette & Chapter Navigator */}
-      <div className="mb-6 p-3 bg-slate-950/80 rounded-2xl border border-slate-800">
-        <div className="text-xs text-slate-400 mb-2.5 flex flex-wrap items-center justify-between gap-2">
-          <span className="flex items-center space-x-1.5 font-semibold text-slate-300">
-            <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
+      <div className="mb-6 p-3 bg-slate-50 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="text-xs text-slate-600 mb-2.5 flex flex-wrap items-center justify-between gap-2">
+          <span className="flex items-center space-x-1.5 font-semibold text-slate-800">
+            <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
             <span>Question Navigator:</span>
           </span>
           <div className="flex items-center space-x-3 text-xs font-semibold">
-            <span className="text-slate-400">
-              Answered: <strong className="text-white">{answersLog.length}</strong> of {questions.length}
+            <span className="text-slate-600">
+              Answered: <strong className="text-slate-900">{answersLog.length}</strong> of {questions.length}
             </span>
-            <span className="text-emerald-400">
-              Score: <strong className="text-emerald-300">{score}</strong>
+            <span className="text-emerald-700">
+              Score: <strong className="text-emerald-800">{score}</strong>
             </span>
           </div>
         </div>
@@ -767,13 +767,13 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
             const isCorrect = logEntry?.isCorrect;
             const isCurr = qIdx === currentIndex;
 
-            let paletteStyle = 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700/60';
+            let paletteStyle = 'bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-900 border border-slate-300 shadow-2xs';
             if (isCurr) {
               paletteStyle = 'bg-indigo-600 text-white ring-2 ring-indigo-400 shadow-md scale-105 border border-indigo-400';
             } else if (isAnswered) {
               paletteStyle = isCorrect
-                ? 'bg-emerald-600 text-white border border-emerald-500 shadow-sm'
-                : 'bg-rose-600 text-white border border-rose-500 shadow-sm';
+                ? 'bg-emerald-600 text-white border border-emerald-500 shadow-xs'
+                : 'bg-rose-600 text-white border border-rose-500 shadow-xs';
             }
 
             return (
@@ -790,9 +790,9 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
           })}
         </div>
         {/* Visual Progress Bar */}
-        <div className="w-full bg-slate-900 rounded-full h-1.5 mt-2.5 overflow-hidden">
+        <div className="w-full bg-slate-200 rounded-full h-1.5 mt-2.5 overflow-hidden">
           <div
-            className="bg-indigo-500 h-1.5 rounded-full transition-all duration-300"
+            className="bg-indigo-600 h-1.5 rounded-full transition-all duration-300"
             style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
           />
         </div>
@@ -801,12 +801,12 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       {/* Question Text & Chapter Identification */}
       <div className="mb-6">
         <div className="flex flex-wrap items-center gap-2 mb-2.5">
-          <span className="text-[11px] font-bold text-indigo-300 bg-indigo-500/15 border border-indigo-500/30 px-3 py-1 rounded-full inline-flex items-center space-x-1.5">
-            <BookOpen className="w-3 h-3 text-indigo-400" />
+          <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full inline-flex items-center space-x-1.5">
+            <BookOpen className="w-3 h-3 text-indigo-600" />
             <span>Chapter: {currentQuestion.topicTag || chapter || 'Curriculum Focus'}</span>
           </span>
           {chapter && currentQuestion.topicTag && currentQuestion.topicTag !== chapter && (
-            <span className="text-[11px] font-medium text-slate-300 bg-slate-800 px-2.5 py-0.5 rounded-full inline-block">
+            <span className="text-[11px] font-medium text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full inline-block border border-slate-200">
               {currentQuestion.topicTag}
             </span>
           )}
@@ -816,21 +816,21 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
             </span>
           )}
         </div>
-        <h2 className="text-base sm:text-lg font-bold text-white leading-relaxed">
+        <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-relaxed">
           {currentQuestion.text}
         </h2>
       </div>
 
       {/* Primary Top Action Bar: Repositioned prominently above options for immediate access on desktop & mobile */}
-      <div className="mb-4 p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+      <div className="mb-4 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center space-x-2 text-xs">
           {selectedOption === null && !isAnswerSubmitted ? (
-            <span className="text-slate-400 flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
+            <span className="text-slate-500 flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping inline-block" />
               <span>Select an option below to answer</span>
             </span>
           ) : !isAnswerSubmitted ? (
-            <span className="text-indigo-300 font-semibold flex items-center space-x-2">
+            <span className="text-indigo-800 font-semibold flex items-center space-x-2">
               <span className="w-5 h-5 rounded-md bg-indigo-600 text-white font-bold text-[11px] flex items-center justify-center">
                 {String.fromCharCode(65 + selectedOption!)}
               </span>
@@ -839,13 +839,13 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
           ) : (
             <span className="flex items-center space-x-1.5 text-xs font-semibold">
               {Number(selectedOption) === Number(currentQuestion.correctIndex) ? (
-                <span className="text-emerald-400 flex items-center space-x-1.5 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span className="text-emerald-800 flex items-center space-x-1.5 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   <span>Correct Answer! (+1 Score)</span>
                 </span>
               ) : (
-                <span className="text-rose-400 flex items-center space-x-1.5 bg-rose-500/10 border border-rose-500/30 px-2.5 py-1 rounded-lg">
-                  <XCircle className="w-4 h-4 text-rose-400" />
+                <span className="text-rose-800 flex items-center space-x-1.5 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg">
+                  <XCircle className="w-4 h-4 text-rose-600" />
                   <span>Incorrect. See step-by-step solution below.</span>
                 </span>
               )}
@@ -859,7 +859,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
             <button
               onClick={handleSubmitAnswer}
               disabled={selectedOption === null || questionDwellSeconds < 1}
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-950 transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
             >
               <span>{questionDwellSeconds < 1 ? 'Reading... (1s)' : 'Submit Answer'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -867,7 +867,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
           ) : (
             <button
               onClick={handleNextQuestion}
-              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-950 transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
+              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer active:scale-95"
             >
               <span>{currentIndex + 1 < questions.length ? 'Next Question' : 'View Results'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -879,28 +879,28 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       {/* Options */}
       <div className="space-y-3 mb-6">
         {currentQuestion.options.map((option, idx) => {
-          let btnStyle = 'border-slate-800 bg-slate-950/60 hover:border-slate-700 text-slate-200';
-          let letterBadgeStyle = 'bg-slate-800 text-slate-300 border border-slate-700';
+          let btnStyle = 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50 text-slate-800 shadow-2xs';
+          let letterBadgeStyle = 'bg-slate-100 text-slate-700 border border-slate-300 font-bold';
 
           const isThisSelected = selectedOption === idx;
           const isThisCorrect = idx === Number(currentQuestion.correctIndex);
 
           if (!isAnswerSubmitted) {
             if (isThisSelected) {
-              btnStyle = 'border-2 border-indigo-500 bg-indigo-950/50 text-white shadow-md shadow-indigo-950/40 ring-1 ring-indigo-500/50';
-              letterBadgeStyle = 'bg-indigo-600 text-white border-indigo-500 font-bold';
+              btnStyle = 'border-2 border-indigo-600 bg-indigo-50/70 text-indigo-950 shadow-sm ring-1 ring-indigo-400/40';
+              letterBadgeStyle = 'bg-indigo-600 text-white border-indigo-600 font-bold';
             }
           } else {
             // Post-submission rigorous evaluation styles
             if (isThisCorrect) {
-              btnStyle = 'border-2 border-emerald-500 bg-emerald-950/50 text-emerald-100 shadow-md shadow-emerald-950/40';
-              letterBadgeStyle = 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold';
+              btnStyle = 'border-2 border-emerald-500 bg-emerald-50 text-emerald-950 shadow-sm';
+              letterBadgeStyle = 'bg-emerald-600 text-white border-emerald-500 font-bold';
             } else if (isThisSelected) {
-              btnStyle = 'border-2 border-rose-500 bg-rose-950/50 text-rose-100 shadow-md shadow-rose-950/40';
-              letterBadgeStyle = 'bg-rose-500 text-white border-rose-400 font-bold';
+              btnStyle = 'border-2 border-rose-500 bg-rose-50 text-rose-950 shadow-sm';
+              letterBadgeStyle = 'bg-rose-600 text-white border-rose-500 font-bold';
             } else {
-              btnStyle = 'border-slate-800/40 bg-slate-950/20 text-slate-500 opacity-40';
-              letterBadgeStyle = 'bg-slate-800/60 text-slate-500 border-slate-800';
+              btnStyle = 'border-slate-200 bg-slate-50/50 text-slate-400 opacity-60';
+              letterBadgeStyle = 'bg-slate-100 text-slate-400 border-slate-200';
             }
           }
 
@@ -919,19 +919,19 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
               </div>
               <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
                 {isAnswerSubmitted && isThisCorrect && (
-                  <span className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Correct Answer</span>
                   </span>
                 )}
                 {isAnswerSubmitted && isThisSelected && !isThisCorrect && (
-                  <span className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
-                    <XCircle className="w-3.5 h-3.5 text-rose-400" />
+                  <span className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                    <XCircle className="w-3.5 h-3.5 text-rose-600" />
                     <span>Your Answer</span>
                   </span>
                 )}
                 {!isAnswerSubmitted && isThisSelected && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/20 px-2 py-0.5 rounded border border-indigo-500/30">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded border border-indigo-200">
                     Selected
                   </span>
                 )}
@@ -943,19 +943,19 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
 
       {/* Explanation & Socratic Helper */}
       {isAnswerSubmitted && (
-        <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-300 space-y-3 animate-in fade-in duration-200">
+        <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-3 animate-in fade-in duration-200 shadow-xs">
           <div>
-            <span className="font-bold text-indigo-400 block mb-1 text-xs">Step-by-Step Solution:</span>
-            <p className="text-slate-300 whitespace-pre-line leading-relaxed">{currentQuestion.explanation}</p>
+            <span className="font-bold text-indigo-700 block mb-1 text-xs">Step-by-Step Solution:</span>
+            <p className="text-slate-700 whitespace-pre-line leading-relaxed">{currentQuestion.explanation}</p>
           </div>
 
-          <div className="pt-2.5 border-t border-slate-900 flex flex-wrap items-center justify-between gap-2">
-            <span className="text-slate-400">💡 Hint / Exam Tip: {currentQuestion.hint}</span>
+          <div className="pt-2.5 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+            <span className="text-slate-600 font-medium">💡 Hint / Exam Tip: {currentQuestion.hint}</span>
             <button
               onClick={() => onOpenNovaAi(currentQuestion, selectedOption!)}
-              className="text-indigo-400 hover:text-indigo-300 font-semibold flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-950/40 border border-indigo-800/60 transition-all cursor-pointer"
+              className="text-indigo-700 hover:text-indigo-800 font-semibold flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition-all cursor-pointer"
             >
-              <HelpCircle className="w-4 h-4 text-indigo-400" />
+              <HelpCircle className="w-4 h-4 text-indigo-600" />
               <span>Ask Nova AI Tutor to Explain Socratically</span>
             </button>
           </div>
@@ -963,10 +963,10 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       )}
 
       {/* Action Footer */}
-      <div className="flex items-center justify-between pt-4 border-t border-slate-800">
+      <div className="flex items-center justify-between pt-4 border-t border-slate-200">
         <span className="text-[11px] text-slate-500">
           {questionDwellSeconds < 1 && !isAnswerSubmitted ? (
-            <span className="text-amber-400/80">Reading dwell guard active: 1s</span>
+            <span className="text-amber-600 font-medium">Reading dwell guard active: 1s</span>
           ) : (
             <span>Anti-cheat verification active</span>
           )}
@@ -976,7 +976,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
           <button
             onClick={handleSubmitAnswer}
             disabled={selectedOption === null || questionDwellSeconds < 1}
-            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center space-x-1.5 cursor-pointer"
+            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer"
           >
             <span>{questionDwellSeconds < 1 ? 'Reading... (1s)' : 'Submit Answer'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -984,7 +984,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         ) : (
           <button
             onClick={handleNextQuestion}
-            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-950 transition-all flex items-center space-x-1.5 cursor-pointer"
+            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer"
           >
             <span>{currentIndex + 1 < questions.length ? 'Next Question' : 'View Results'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
