@@ -18,35 +18,35 @@ export const ClassSwitcherBar: React.FC<ClassSwitcherBarProps> = ({
   const grades: Grade[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-3 sm:p-4 shadow-xl backdrop-blur-md">
+    <div className="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 shadow-sm">
       {showTitle && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3 pb-2.5 border-b border-slate-800">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3 pb-2.5 border-b border-slate-100">
           <div className="flex items-center space-x-2">
             <span className="text-base">{currentTheme.mascot.emoji}</span>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs font-black text-white uppercase tracking-wider">
+                <span className="text-xs font-black text-slate-900 uppercase tracking-wider">
                   Class UI Selector
                 </span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${currentTheme.pillColor}`}>
                   Active: Class {activeGrade} • {currentTheme.name}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-0.5">
+              <p className="text-[11px] text-slate-500 mt-0.5">
                 Every class has its own distinct theme, mascot, customized dashboard, and 1,000 class-wise quizzes.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-1.5 text-[11px] text-slate-400 bg-slate-950 px-2.5 py-1 rounded-xl border border-slate-800">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin-slow" />
+          <div className="flex items-center space-x-1.5 text-[11px] text-slate-600 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200">
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             <span>1,000 Verified Quizzes / Class</span>
           </div>
         </div>
       )}
 
       {/* Horizontal Class Selector Pills */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-700">
+      <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-300">
         {grades.map(g => {
           const theme = getClassTheme(g);
           const isActive = Number(activeGrade) === g;
@@ -57,8 +57,8 @@ export const ClassSwitcherBar: React.FC<ClassSwitcherBarProps> = ({
               onClick={() => onSelectGrade(g)}
               className={`flex-shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 group relative ${
                 isActive
-                  ? `bg-gradient-to-r ${theme.gradientHero} text-white shadow-lg scale-105 ring-2 ring-white/30`
-                  : 'bg-slate-950/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700'
+                  ? `bg-gradient-to-r ${theme.gradientHero} text-white shadow-md scale-105 ring-2 ring-indigo-500/20`
+                  : 'bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 hover:border-slate-300'
               }`}
               title={`Switch to Class ${g}: ${theme.name} (${theme.stageTitle})`}
             >

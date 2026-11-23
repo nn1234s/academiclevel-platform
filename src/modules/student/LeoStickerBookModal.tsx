@@ -314,8 +314,8 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="bg-slate-900 border-2 border-amber-400/60 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl shadow-amber-500/10 overflow-hidden text-slate-100 my-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-md animate-fade-in overflow-y-auto">
+      <div className="bg-white border-2 border-amber-300 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden text-slate-900 my-auto">
         {/* Playful Header */}
         <div className="bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-500 p-4 sm:p-6 text-slate-950 flex items-center justify-between shadow-md relative overflow-hidden flex-shrink-0">
           <div className="flex items-center space-x-3.5 relative z-10">
@@ -355,7 +355,7 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
 
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-xl bg-black/20 hover:bg-black/40 text-slate-950 flex items-center justify-center transition-colors"
+              className="w-9 h-9 rounded-xl bg-black/20 hover:bg-black/40 text-slate-950 flex items-center justify-center transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -363,31 +363,31 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
         </div>
 
         {/* Progress Bar & Navigation Tabs */}
-        <div className="bg-slate-950 border-b border-slate-800 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 flex-shrink-0">
+        <div className="bg-slate-50 border-b border-slate-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 flex-shrink-0">
           <div className="flex items-center space-x-3 w-full sm:w-auto">
             <div className="flex items-center space-x-2">
-              <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-              <span className="text-sm font-black text-white">
+              <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+              <span className="text-sm font-black text-slate-900">
                 {unlockedCount} / {ALL_STICKERS.length} Stickers
               </span>
             </div>
-            <div className="w-32 sm:w-48 bg-slate-800 rounded-full h-2.5 overflow-hidden">
+            <div className="w-32 sm:w-48 bg-slate-200 rounded-full h-2.5 overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-amber-400 to-yellow-400 transition-all duration-500 rounded-full"
+                className="h-full bg-gradient-to-r from-amber-400 to-yellow-500 transition-all duration-500 rounded-full"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-xs font-mono font-bold text-amber-400">{progressPercent}%</span>
+            <span className="text-xs font-mono font-bold text-amber-600">{progressPercent}%</span>
           </div>
 
           <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
-            <div className="bg-slate-900 p-1 rounded-xl border border-slate-800 flex space-x-1">
+            <div className="bg-slate-200/80 p-1 rounded-xl flex space-x-1">
               <button
                 onClick={() => setActiveTab('ALBUM')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
                   activeTab === 'ALBUM'
                     ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-                    : 'text-slate-400 hover:text-white'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <BookOpen className="w-3.5 h-3.5" />
@@ -396,10 +396,10 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
 
               <button
                 onClick={() => setActiveTab('ALL_STICKERS')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
                   activeTab === 'ALL_STICKERS'
                     ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-                    : 'text-slate-400 hover:text-white'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Sparkles className="w-3.5 h-3.5" />
@@ -410,19 +410,19 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
         </div>
 
         {/* Modal Main Content Area */}
-        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6 bg-slate-50/50">
           {activeTab === 'ALBUM' ? (
             /* TAB 1: INTERACTIVE STICKER ALBUM NOTEBOOK */
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-base font-black text-white flex items-center space-x-2">
+                  <h3 className="text-base font-black text-slate-900 flex items-center space-x-2">
                     <span>📖 Leo&apos;s Collector Notebook</span>
-                    <span className="text-xs text-amber-400 font-normal">
+                    <span className="text-xs text-amber-600 font-semibold">
                       (Tap stickers from your collection below to stick them on this page!)
                     </span>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Your personal learning scrapbook. Arranged stickers are saved automatically!
                   </p>
                 </div>
@@ -430,7 +430,7 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
                 {placedStickers.length > 0 && (
                   <button
                     onClick={handleClearAlbum}
-                    className="text-xs font-semibold text-rose-400 hover:text-rose-300 self-start sm:self-auto flex items-center space-x-1"
+                    className="text-xs font-semibold text-rose-600 hover:text-rose-700 self-start sm:self-auto flex items-center space-x-1 cursor-pointer"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                     <span>Clear Page</span>
@@ -439,12 +439,12 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
               </div>
 
               {/* The Illustrated Notebook Canvas */}
-              <div className="min-h-[220px] bg-gradient-to-b from-amber-50/10 via-slate-950 to-amber-950/20 border-2 border-dashed border-amber-400/40 rounded-3xl p-6 shadow-inner relative flex flex-wrap gap-4 items-center justify-center">
+              <div className="min-h-[220px] bg-amber-50/60 border-2 border-dashed border-amber-300 rounded-3xl p-6 shadow-xs relative flex flex-wrap gap-4 items-center justify-center">
                 {placedStickers.length === 0 ? (
                   <div className="text-center py-8 space-y-2">
                     <span className="text-5xl block animate-pulse">✨</span>
-                    <p className="text-sm font-bold text-slate-300">Your sticker notebook is empty!</p>
-                    <p className="text-xs text-slate-400 max-w-sm">
+                    <p className="text-sm font-bold text-slate-700">Your sticker notebook is empty!</p>
+                    <p className="text-xs text-slate-500 max-w-sm">
                       Tap any unlocked sticker in your collection tray below to paste it proudly onto this page.
                     </p>
                   </div>
@@ -456,16 +456,16 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
                       <div
                         key={id}
                         onClick={() => handleTogglePlaceSticker(id)}
-                        className={`bg-slate-900 border-2 ${sticker.borderColor} p-3.5 rounded-2xl flex flex-col items-center justify-center space-y-1 shadow-lg hover:scale-110 transition-transform cursor-pointer group relative`}
+                        className={`bg-white border-2 ${sticker.borderColor} p-3.5 rounded-2xl flex flex-col items-center justify-center space-y-1 shadow-md hover:scale-110 transition-transform cursor-pointer group relative`}
                         title="Click to remove from notebook"
                       >
                         <span className="text-4xl drop-shadow-md group-hover:rotate-12 transition-transform">
                           {sticker.emoji}
                         </span>
-                        <span className="text-[10px] font-black text-amber-300 max-w-[80px] text-center truncate">
+                        <span className="text-[10px] font-black text-amber-800 max-w-[80px] text-center truncate">
                           {sticker.name}
                         </span>
-                        <span className="text-[8px] bg-slate-950 px-1.5 py-0.2 rounded-full text-slate-400 border border-slate-800">
+                        <span className="text-[8px] bg-slate-100 px-1.5 py-0.2 rounded-full text-slate-600 border border-slate-200">
                           Pasted ✓
                         </span>
                       </div>
@@ -475,13 +475,13 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
               </div>
 
               {/* Collection Tray Below Canvas */}
-              <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-3">
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-xs">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-slate-300 flex items-center space-x-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <h4 className="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                     <span>Your Unlocked Sticker Tray ({unlockedCount})</span>
                   </h4>
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-slate-500">
                     Tap to paste or un-paste on notebook
                   </span>
                 </div>
@@ -493,16 +493,16 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
                       <button
                         key={sticker.id}
                         onClick={() => handleTogglePlaceSticker(sticker.id)}
-                        className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center space-x-2 ${
+                        className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center space-x-2 cursor-pointer ${
                           isPlaced
-                            ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-sm'
-                            : 'bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white'
+                            ? 'bg-amber-100 border-amber-300 text-amber-900 shadow-xs'
+                            : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-700 hover:text-slate-900'
                         }`}
                       >
                         <span className="text-xl">{sticker.emoji}</span>
                         <div className="text-left">
                           <p className="text-[11px] font-bold leading-tight">{sticker.name}</p>
-                          <span className="text-[9px] text-slate-400 block font-normal">
+                          <span className="text-[9px] text-slate-500 block font-normal">
                             {isPlaced ? 'Pasted on Page' : '+ Paste'}
                           </span>
                         </div>
@@ -517,10 +517,10 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-black text-white flex items-center space-x-2">
+                  <h3 className="text-base font-black text-slate-900 flex items-center space-x-2">
                     <span>🌟 All 20 Academic Stickers</span>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Solve quizzes and study daily to unlock every single cartoon buddy.
                   </p>
                 </div>
@@ -537,8 +537,8 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
                       onClick={() => setSelectedSticker(sticker)}
                       className={`border rounded-2xl p-4 text-center flex flex-col items-center justify-between space-y-2 cursor-pointer transition-all relative group ${
                         unlocked
-                          ? `bg-slate-950 ${sticker.borderColor} hover:scale-105 shadow-md shadow-amber-500/5`
-                          : 'bg-slate-950/40 border-slate-800/80 opacity-60 hover:opacity-80'
+                          ? `bg-white ${sticker.borderColor} hover:scale-105 shadow-sm`
+                          : 'bg-slate-50 border-slate-200 opacity-60 hover:opacity-80'
                       }`}
                     >
                       {/* Sticker Visual */}
@@ -548,14 +548,14 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
                         </span>
                         {!unlocked && (
                           <div className="absolute inset-0 flex items-center justify-center text-slate-400">
-                            <Lock className="w-5 h-5 drop-shadow-md text-amber-400" />
+                            <Lock className="w-5 h-5 drop-shadow-md text-amber-500" />
                           </div>
                         )}
                       </div>
 
                       <div>
-                        <p className="text-xs font-black text-white">{sticker.name}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-2 leading-tight">
+                        <p className="text-xs font-black text-slate-900">{sticker.name}</p>
+                        <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-2 leading-tight">
                           {unlocked ? sticker.description : sticker.howToUnlock}
                         </p>
                       </div>
@@ -566,16 +566,16 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
                             e.stopPropagation();
                             handleTogglePlaceSticker(sticker.id);
                           }}
-                          className={`w-full py-1 rounded-lg text-[10px] font-bold border transition-colors ${
+                          className={`w-full py-1 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer ${
                             isPlaced
-                              ? 'bg-amber-500/20 border-amber-400 text-amber-300'
-                              : 'bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-300'
+                              ? 'bg-amber-100 border-amber-300 text-amber-900'
+                              : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-700'
                           }`}
                         >
                           {isPlaced ? 'Pasted ✓' : '+ Paste'}
                         </button>
                       ) : (
-                        <span className="text-[9px] font-mono text-slate-500 px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+                        <span className="text-[9px] font-mono text-slate-500 px-2 py-0.5 rounded bg-slate-100 border border-slate-200">
                           Locked 🔒
                         </span>
                       )}
@@ -588,18 +588,18 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
 
           {/* Selected Sticker Detail Card Popover */}
           {selectedSticker && (
-            <div className="bg-slate-950 border-2 border-amber-400/60 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in shadow-xl">
+            <div className="bg-white border-2 border-amber-300 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in shadow-xl">
               <div className="flex items-center space-x-3.5">
                 <span className="text-4xl">{selectedSticker.emoji}</span>
                 <div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs font-black text-amber-300">{selectedSticker.name}</span>
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-slate-900 text-slate-400 border border-slate-800 font-mono">
+                    <span className="text-xs font-black text-amber-700">{selectedSticker.name}</span>
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-mono">
                       {selectedSticker.category}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-300 mt-0.5">{selectedSticker.description}</p>
-                  <p className="text-[11px] text-amber-400/90 font-medium mt-1">
+                  <p className="text-xs text-slate-600 mt-0.5">{selectedSticker.description}</p>
+                  <p className="text-[11px] text-amber-700 font-medium mt-1">
                     🎯 How to Unlock: {selectedSticker.howToUnlock}
                   </p>
                 </div>
@@ -609,14 +609,14 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
                 {isStickerUnlocked(selectedSticker) && (
                   <button
                     onClick={() => handleTogglePlaceSticker(selectedSticker.id)}
-                    className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all"
+                    className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all cursor-pointer"
                   >
                     {placedStickers.includes(selectedSticker.id) ? 'Remove from Page' : 'Stick in Album ⭐'}
                   </button>
                 )}
                 <button
                   onClick={() => setSelectedSticker(null)}
-                  className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs text-slate-400 hover:text-white"
+                  className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-600 hover:text-slate-900 cursor-pointer"
                 >
                   Close
                 </button>
@@ -626,9 +626,9 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
         </div>
 
         {/* Modal Action Footer */}
-        <div className="bg-slate-950 border-t border-slate-800 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 flex-shrink-0">
-          <div className="flex items-center space-x-2 text-xs text-slate-400">
-            <Sparkles className="w-4 h-4 text-amber-400 flex-shrink-0" />
+        <div className="bg-slate-50 border-t border-slate-200 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 flex-shrink-0">
+          <div className="flex items-center space-x-2 text-xs text-slate-600">
+            <Sparkles className="w-4 h-4 text-amber-500 flex-shrink-0" />
             <span>Complete quizzes with &gt;= 70% accuracy to earn shiny new animal stickers!</span>
           </div>
 
@@ -637,7 +637,7 @@ export const LeoStickerBookModal: React.FC<LeoStickerBookModalProps> = ({
               onClose();
               onStartQuiz();
             }}
-            className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-transform active:scale-95"
+            className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs rounded-xl shadow-lg flex items-center justify-center space-x-2 transition-transform active:scale-95 cursor-pointer"
           >
             <Rocket className="w-4 h-4" />
             <span>Solve a Quiz with Leo (+Unlock Sticker)</span>

@@ -71,9 +71,9 @@ export class QuotaService {
     if (isSuperAdmin) {
       return {
         isLocked: false,
-        quizzesCompleted: learner.quizzesCompletedCount,
+        quizzesCompleted: learner.quizzesCompletedCount || 0,
         maxQuizzes: Infinity,
-        levelsCompleted: learner.levelsCompletedCount,
+        levelsCompleted: learner.levelsCompletedCount || 0,
         maxLevels: Infinity,
         hasActiveSubscription: true,
         activePlan: 'PLUS',
@@ -81,54 +81,49 @@ export class QuotaService {
       };
     }
 
-    // 2. Direct check: Has verified active subscription already attached to learner object
     const anyLearner = learner as any;
-    const hasExplicitActiveSub = Boolean(anyLearner.hasActiveSubscription) && anyLearner.activePlan && anyLearner.activePlan !== 'FREE';
-    if (hasExplicitActiveSub || (anyLearner.activeSub && anyLearner.activeSub.status === 'ACTIVE')) {
-      const sub = anyLearner.activeSub;
-      const plan = anyLearner.activePlan || sub?.planTier || anyLearner.planTier || 'LITE';
-      const expiresAt = anyLearner.subscriptionExpiresAt || sub?.expiresAt || new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString();
-      const msLeft = new Date(expiresAt).getTime() - Date.now();
-      let daysRemaining = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
-      // Guard: Concept Booster is strictly capped to 60 days, and PLUS is capped to 365 days max (eliminates 999 days artifact)
+
+    // 2. Comprehensive active subscription detection across storage and learner fields:
+    const activeSub = this.getActiveSubscription(learner.id, learner.email, learner.phone);
+    const hasSubInStorage = Boolean(
+      activeSub &&
+      activeSub.status === 'ACTIVE' &&
+      activeSub.expiresAt &&
+      new Date(activeSub.expiresAt).getTime() > Date.now()
+    );
+
+    const candidatePlan = anyLearner.activePlan || anyLearner.planTier || anyLearner.activeSub?.planTier || activeSub?.planTier;
+    const isKnownPaidPlan = candidatePlan === 'LITE' || candidatePlan === 'PLUS' || candidatePlan === 'GOLD' || candidatePlan === 'TRIAL';
+
+    const expiresAt = anyLearner.subscriptionExpiresAt || anyLearner.activeSub?.expiresAt || activeSub?.expiresAt;
+    const isDateValid = expiresAt ? new Date(expiresAt).getTime() > Date.now() : true;
+
+    const isExplicitlyActive = Boolean(anyLearner.hasActiveSubscription) && candidatePlan !== 'FREE';
+
+    // If student holds ANY verified active plan or subscription, grant 100% unlocked access
+    if (isExplicitlyActive || hasSubInStorage || (isKnownPaidPlan && isDateValid)) {
+      const plan = (isKnownPaidPlan ? candidatePlan : 'LITE') as 'LITE' | 'PLUS' | 'GOLD' | 'TRIAL';
+      const resolvedExpiry = expiresAt || new Date(Date.now() + (plan === 'GOLD' ? 365 : plan === 'PLUS' ? 180 : 60) * 24 * 60 * 60 * 1000).toISOString();
+      const msLeft = new Date(resolvedExpiry).getTime() - Date.now();
+      let daysRemaining = Math.max(1, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+      // Guard: Concept Booster capped to 60 days, Plus to 365 days
       if (plan === 'LITE' && daysRemaining > 60) daysRemaining = 60;
       if (daysRemaining > 365) daysRemaining = 365;
 
       return {
-        isLocked: daysRemaining <= 0,
+        isLocked: false, // Absolutely never locked for active premium subscribers
         quizzesCompleted: learner.quizzesCompletedCount || 0,
         maxQuizzes: Infinity,
         levelsCompleted: learner.levelsCompletedCount || 0,
         maxLevels: Infinity,
-        hasActiveSubscription: daysRemaining > 0,
-        activePlan: plan as any,
-        expiresAt,
+        hasActiveSubscription: true,
+        activePlan: plan,
+        expiresAt: resolvedExpiry,
         daysRemaining
       };
     }
 
-    // 3. Persistent subscription check
-    const activeSub = this.getActiveSubscription(learner.id, learner.email, learner.phone);
-    if (activeSub && activeSub.expiresAt) {
-      const msLeft = new Date(activeSub.expiresAt).getTime() - Date.now();
-      let daysRemaining = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
-      if (activeSub.planTier === 'LITE' && daysRemaining > 60) daysRemaining = 60;
-      if (daysRemaining > 365) daysRemaining = 365;
-
-      return {
-        isLocked: daysRemaining <= 0,
-        quizzesCompleted: learner.quizzesCompletedCount || 0,
-        maxQuizzes: Infinity,
-        levelsCompleted: learner.levelsCompletedCount || 0,
-        maxLevels: Infinity,
-        hasActiveSubscription: daysRemaining > 0,
-        activePlan: activeSub.planTier,
-        expiresAt: activeSub.expiresAt,
-        daysRemaining
-      };
-    }
-
-    // 4. Free Tier Account: Strictly limited to 3 completed curriculum levels
+    // 3. Free Tier Account: Strictly limited to 3 completed curriculum levels
     const levelsCompleted = learner.levelsCompletedCount || 0;
     const isLocked = levelsCompleted >= FREE_TIER_MAX_LEVELS;
 

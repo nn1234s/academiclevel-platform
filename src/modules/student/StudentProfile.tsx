@@ -118,44 +118,44 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
         </div>
 
         <div className="flex flex-col sm:flex-row items-center gap-3">
-          <div className="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-center min-w-[130px]">
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl text-center min-w-[130px] shadow-xs">
             <span className="text-[10px] text-slate-500 uppercase font-mono block">Enrolled Class</span>
-            <span className="text-2xl font-black text-white">Class {learner.grade}</span>
+            <span className="text-2xl font-black text-slate-900">Class {learner.grade}</span>
           </div>
           <button
             onClick={() => {
               if (onLogout) onLogout();
               else logout();
             }}
-            className="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-semibold rounded-xl transition-all flex items-center space-x-1.5"
+            className="px-3 py-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-semibold rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer shadow-xs"
             title="Sign out of your student account"
           >
-            <LogOut className="w-3.5 h-3.5 text-rose-400" />
+            <LogOut className="w-3.5 h-3.5 text-rose-600" />
             <span>Sign Out</span>
           </button>
         </div>
       </div>
 
       {/* Active Subscription & Entitlement Branding Card */}
-      <div className={`p-6 rounded-3xl border shadow-xl transition-all ${
+      <div className={`p-6 rounded-3xl border shadow-sm transition-all ${
         learner.activePlan === 'GOLD'
-          ? 'bg-gradient-to-br from-amber-950/40 via-slate-900 to-amber-950/20 border-amber-500/50 ring-1 ring-amber-500/30'
-          : (learner.hasActiveSubscription ? 'bg-slate-900 border-indigo-900/50' : 'bg-slate-900 border-slate-800')
+          ? 'bg-gradient-to-br from-amber-50 via-white to-amber-50/50 border-amber-300 ring-1 ring-amber-200'
+          : (learner.hasActiveSubscription ? 'bg-white border-indigo-200 ring-1 ring-indigo-100' : 'bg-white border-slate-200')
       }`}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center space-x-3.5">
             {learner.activePlan === 'GOLD' ? (
-              <div className="p-3 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-lg shadow-amber-950/50 flex-shrink-0">
-                <Crown className="w-6 h-6 text-amber-300" />
+              <div className="p-3 rounded-2xl bg-amber-100 text-amber-800 border border-amber-300 shadow-sm flex-shrink-0">
+                <Crown className="w-6 h-6 text-amber-600" />
               </div>
             ) : (
-              <div className="p-3 rounded-2xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex-shrink-0">
-                <Shield className="w-6 h-6 text-indigo-400" />
+              <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-700 border border-indigo-200 flex-shrink-0">
+                <Shield className="w-6 h-6 text-indigo-600" />
               </div>
             )}
             <div>
               <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                <h3 className="text-base font-black text-white">
+                <h3 className="text-base font-black text-slate-900">
                   {learner.activePlan === 'GOLD' 
                     ? '👑 1-Year AcademicLevel Gold Pass' 
                     : (learner.activePlan === 'PLUS' 
@@ -168,13 +168,13 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
                   learner.hasActiveSubscription
                     ? (learner.activePlan === 'GOLD' 
                         ? 'bg-amber-400 text-slate-950 font-black' 
-                        : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30')
-                    : 'bg-slate-800 text-slate-400'
+                        : 'bg-emerald-50 text-emerald-700 border border-emerald-300')
+                    : 'bg-slate-100 text-slate-600 border border-slate-200'
                 }`}>
                   {learner.hasActiveSubscription ? 'ACTIVE' : 'FREE TIER'}
                 </span>
               </div>
-              <p className="text-xs text-slate-300 mt-1 max-w-lg">
+              <p className="text-xs text-slate-600 mt-1 max-w-lg">
                 {learner.activePlan === 'GOLD'
                   ? '365 Days (1 Full Academic Year) complete coverage: Terms 1 & 2, Midterms, Final Board Exams, VIP Store Rewards, & Nova AI 24/7.'
                   : (learner.activePlan === 'PLUS'
@@ -187,9 +187,9 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
           </div>
 
           {learner.subscriptionExpiresAt && learner.hasActiveSubscription && (
-            <div className="text-left sm:text-right bg-black/40 border border-white/10 px-4 py-2.5 rounded-2xl flex-shrink-0">
-              <span className="text-[10px] text-slate-400 uppercase font-mono block">Validity Status</span>
-              <span className="text-xs font-bold text-amber-300 font-mono">
+            <div className="text-left sm:text-right bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-2xl flex-shrink-0">
+              <span className="text-[10px] text-slate-500 uppercase font-mono block">Validity Status</span>
+              <span className="text-xs font-bold text-amber-700 font-mono">
                 Valid till {new Date(learner.subscriptionExpiresAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
               </span>
             </div>
@@ -198,21 +198,21 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
       </div>
 
       {/* Controlled Class-Change Manager */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-              <GraduationCap className="w-4 h-4 text-indigo-400" />
+            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <GraduationCap className="w-4 h-4 text-indigo-600" />
               <span>Controlled Class-Change Manager</span>
             </h3>
-            <p className="text-xs text-slate-400 mt-1 max-w-md">
+            <p className="text-xs text-slate-500 mt-1 max-w-md">
               Server-enforced policy: Maximum 1 class change during an active Premium period and 1 class change post-expiry.
             </p>
           </div>
 
-          <div className="text-right text-[11px] text-slate-400 font-mono">
-            <div>Premium Changes Used: <strong className="text-white">{learner.classChangesUsedPremium}/1</strong></div>
-            <div>Post-Expiry Changes Used: <strong className="text-white">{learner.classChangesUsedPostExpiry}/1</strong></div>
+          <div className="text-right text-[11px] text-slate-500 font-mono">
+            <div>Premium Changes Used: <strong className="text-slate-900">{learner.classChangesUsedPremium}/1</strong></div>
+            <div>Post-Expiry Changes Used: <strong className="text-slate-900">{learner.classChangesUsedPostExpiry}/1</strong></div>
           </div>
         </div>
 
@@ -220,14 +220,14 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
           <div
             className={`p-3 rounded-xl border text-xs flex items-center space-x-2 ${
               classChangeMessage.type === 'success'
-                ? 'bg-emerald-950/40 border-emerald-800 text-emerald-300'
-                : 'bg-red-950/40 border-red-800 text-red-300'
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                : 'bg-rose-50 border-rose-300 text-rose-800'
             }`}
           >
             {classChangeMessage.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
             ) : (
-              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
             )}
             <span>{classChangeMessage.text}</span>
           </div>
@@ -237,7 +237,7 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
           <select
             value={selectedGrade}
             onChange={e => setSelectedGrade(Number(e.target.value) as Grade)}
-            className="w-full sm:w-64 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none"
+            className="w-full sm:w-64 bg-slate-50 border border-slate-300 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none cursor-pointer"
           >
             {([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as Grade[]).map(g => (
               <option key={g} value={g}>
@@ -248,7 +248,7 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
 
           <button
             type="submit"
-            className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all whitespace-nowrap"
+            className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all whitespace-nowrap cursor-pointer"
           >
             Update Class
           </button>
@@ -256,18 +256,18 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
       </div>
 
       {/* Parent PIN Lock & Oversight View */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Shield className="w-4 h-4 text-emerald-400" />
-            <h3 className="text-sm font-bold text-white">Parental PIN Oversight & Control</h3>
+            <Shield className="w-4 h-4 text-emerald-600" />
+            <h3 className="text-sm font-bold text-slate-900">Parental PIN Oversight & Control</h3>
           </div>
           <span className="text-[10px] text-slate-500 font-mono">DPDP Safe</span>
         </div>
 
         {!isParentUnlocked ? (
           <form onSubmit={handleUnlockParentView} className="max-w-sm space-y-3">
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               Enter your 4-digit Parent PIN to view screentime logs, payment receipts, and moderation reports.
             </p>
 
@@ -278,37 +278,37 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
                 placeholder="4-digit PIN (default: 1234)"
                 value={parentPinInput}
                 onChange={e => setParentPinInput(e.target.value.replace(/[^0-9]/g, ''))}
-                className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-xs text-white font-mono tracking-widest focus:outline-none"
+                className="w-full bg-slate-50 border border-slate-300 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono tracking-widest focus:outline-none"
               />
               <button
                 type="button"
                 onClick={() => setShowPin(!showPin)}
-                className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300"
+                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
 
-            {parentPinError && <p className="text-xs text-red-400">{parentPinError}</p>}
+            {parentPinError && <p className="text-xs text-rose-600">{parentPinError}</p>}
 
             <button
               type="submit"
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl transition-all flex items-center space-x-1.5"
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer shadow-xs"
             >
               <Unlock className="w-3.5 h-3.5" />
               <span>Unlock Parent Dashboard</span>
             </button>
           </form>
         ) : (
-          <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3 text-xs text-slate-300">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-900">
-              <span className="text-emerald-400 font-bold flex items-center space-x-1">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 text-xs text-slate-700">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+              <span className="text-emerald-700 font-bold flex items-center space-x-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Parental Access Verified</span>
               </span>
               <button
                 onClick={() => setIsParentUnlocked(false)}
-                className="text-[11px] text-slate-500 hover:text-slate-300"
+                className="text-[11px] text-slate-500 hover:text-slate-700 cursor-pointer"
               >
                 Lock Panel
               </button>
@@ -317,19 +317,19 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
                 <span className="text-slate-500 block">Parent Name:</span>
-                <span className="font-semibold text-white">{learner.parentName || 'Registered Parent'}</span>
+                <span className="font-semibold text-slate-900">{learner.parentName || 'Registered Parent'}</span>
               </div>
               <div>
                 <span className="text-slate-500 block">Child Safety Filter:</span>
-                <span className="font-semibold text-emerald-400">Strict (PII & Profanity Active)</span>
+                <span className="font-semibold text-emerald-700">Strict (PII & Profanity Active)</span>
               </div>
               <div>
                 <span className="text-slate-500 block">Quizzes Taken This Month:</span>
-                <span className="font-semibold text-white">{learner.quizzesCompletedCount} Quizzes</span>
+                <span className="font-semibold text-slate-900">{learner.quizzesCompletedCount} Quizzes</span>
               </div>
               <div>
                 <span className="text-slate-500 block">Active Streak:</span>
-                <span className="font-semibold text-amber-400">{learner.currentStreakDays} Consecutive Days</span>
+                <span className="font-semibold text-amber-700">{learner.currentStreakDays} Consecutive Days</span>
               </div>
             </div>
           </div>
@@ -337,16 +337,16 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
       </div>
 
       {/* Danger Zone: Google Play Mandated In-App Account Deletion */}
-      <div className="bg-red-950/20 border border-red-900/40 rounded-3xl p-6 shadow-xl space-y-4">
+      <div className="bg-rose-50 border border-rose-200 rounded-3xl p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Trash2 className="w-4 h-4 text-red-400" />
-            <h3 className="text-sm font-bold text-red-300">Danger Zone: Delete Account</h3>
+            <Trash2 className="w-4 h-4 text-rose-600" />
+            <h3 className="text-sm font-bold text-rose-800">Danger Zone: Delete Account</h3>
           </div>
-          <span className="text-[10px] text-red-400/80 font-mono">Google Play &amp; DPDP Policy</span>
+          <span className="text-[10px] text-rose-700 font-mono">Google Play &amp; DPDP Policy</span>
         </div>
 
-        <p className="text-xs text-slate-400 leading-relaxed">
+        <p className="text-xs text-slate-600 leading-relaxed">
           Permanently delete your AcademicLevel account, learning streaks, certificates, quiz records, and earned Study Coins. This action is irreversible and immediately wipes all records.
         </p>
 
@@ -354,16 +354,16 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
           <button
             type="button"
             onClick={() => setShowDeleteConfirm(true)}
-            className="px-4 py-2.5 bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/40 font-bold text-xs rounded-xl transition-all flex items-center space-x-2 cursor-pointer"
+            className="px-4 py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-800 border border-rose-300 font-bold text-xs rounded-xl transition-all flex items-center space-x-2 cursor-pointer shadow-xs"
           >
-            <Trash2 className="w-3.5 h-3.5 text-red-400" />
+            <Trash2 className="w-3.5 h-3.5 text-rose-600" />
             <span>Delete Account</span>
           </button>
         ) : (
-          <div className="p-4 bg-slate-950 border border-red-800/60 rounded-2xl space-y-3">
-            <div className="text-xs text-red-200">
+          <div className="p-4 bg-white border border-rose-300 rounded-2xl space-y-3 shadow-xs">
+            <div className="text-xs text-rose-900">
               <strong className="block font-bold mb-1">Confirm Account &amp; Data Deletion</strong>
-              Please confirm by typing <span className="font-mono bg-red-950 text-red-300 px-1 py-0.5 rounded font-bold">DELETE</span> or entering your 4-digit Parent PIN.
+              Please confirm by typing <span className="font-mono bg-rose-100 text-rose-800 px-1 py-0.5 rounded font-bold">DELETE</span> or entering your 4-digit Parent PIN.
             </div>
 
             <input
@@ -371,11 +371,11 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
               placeholder="Type DELETE or 4-digit Parent PIN"
               value={deleteConfirmInput}
               onChange={e => setDeleteConfirmInput(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 focus:border-red-500 rounded-xl px-4 py-2 text-xs text-white focus:outline-none font-mono"
+              className="w-full bg-slate-50 border border-slate-300 focus:border-rose-500 rounded-xl px-4 py-2 text-xs text-slate-900 focus:outline-none font-mono"
             />
 
             {deleteError && (
-              <p className="text-xs text-red-400">{deleteError}</p>
+              <p className="text-xs text-rose-600">{deleteError}</p>
             )}
 
             <div className="flex items-center space-x-2 pt-1">
@@ -383,7 +383,7 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
                 type="button"
                 onClick={handleConfirmDelete}
                 disabled={isDeleting}
-                className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl transition-all shadow cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl transition-all shadow-xs cursor-pointer disabled:opacity-50"
               >
                 {isDeleting ? 'Deleting Account...' : 'Permanently Delete Account'}
               </button>

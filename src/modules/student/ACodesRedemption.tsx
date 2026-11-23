@@ -39,18 +39,18 @@ export const ACodesRedemption: React.FC<ACodesRedemptionProps> = ({
   };
 
   return (
-    <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-100">
-      <div className="w-14 h-14 bg-indigo-500/10 border border-indigo-500/30 rounded-2xl flex items-center justify-center text-indigo-400 mx-auto mb-4">
+    <div className="max-w-md mx-auto bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl text-slate-900">
+      <div className="w-14 h-14 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-4">
         <KeyRound className="w-7 h-7" />
       </div>
 
       <div className="text-center mb-6">
-        <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-400 uppercase bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">
+        <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-700 uppercase bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full">
           Institutional Scholarships
         </span>
-        <h2 className="text-2xl font-extrabold text-white mt-2">Redeem ACode Voucher</h2>
-        <p className="text-xs text-slate-400 mt-1">
-          Enter your 16-character scholarship key (e.g. <span className="font-mono text-indigo-300">AL-SCHOLAR-2026</span>) to activate instant premium access.
+        <h2 className="text-2xl font-extrabold text-slate-900 mt-2">Redeem ACode Voucher</h2>
+        <p className="text-xs text-slate-600 mt-1">
+          Enter your 16-character scholarship key (e.g. <span className="font-mono text-indigo-600 font-bold">AL-SCHOLAR-2026</span>) to activate instant premium access.
         </p>
       </div>
 
@@ -58,14 +58,14 @@ export const ACodesRedemption: React.FC<ACodesRedemptionProps> = ({
         <div
           className={`mb-4 p-3 rounded-xl border text-xs flex items-center space-x-2 ${
             statusMessage.type === 'success'
-              ? 'bg-emerald-950/40 border-emerald-800 text-emerald-300'
-              : 'bg-red-950/40 border-red-800 text-red-300'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-red-50 border-red-200 text-red-800'
           }`}
         >
           {statusMessage.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
           ) : (
-            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+            <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
           )}
           <span>{statusMessage.text}</span>
         </div>
@@ -73,7 +73,7 @@ export const ACodesRedemption: React.FC<ACodesRedemptionProps> = ({
 
       <form onSubmit={handleRedeem} className="space-y-4">
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+          <label className="block text-xs font-semibold text-slate-700 mb-1.5">
             ACode Voucher Key
           </label>
           <input
@@ -82,14 +82,14 @@ export const ACodesRedemption: React.FC<ACodesRedemptionProps> = ({
             placeholder="AL-XXXX-XXXX"
             value={acodeInput}
             onChange={e => setAcodeInput(e.target.value.toUpperCase())}
-            className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm font-mono tracking-widest text-white uppercase placeholder-slate-600 focus:outline-none text-center"
+            className="w-full bg-slate-50 border border-slate-300 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm font-mono tracking-widest text-slate-900 uppercase placeholder-slate-400 focus:outline-none text-center"
           />
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting || !acodeInput.trim()}
-          className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-2"
+          className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer"
         >
           <span>{isSubmitting ? 'Verifying ACode...' : 'Activate Scholarship Voucher'}</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -99,7 +99,7 @@ export const ACodesRedemption: React.FC<ACodesRedemptionProps> = ({
           <button
             type="button"
             onClick={onCancel}
-            className="w-full py-2 text-slate-400 hover:text-white text-xs font-medium transition-colors"
+            className="w-full py-2 text-slate-500 hover:text-slate-800 text-xs font-medium transition-colors cursor-pointer"
           >
             Cancel
           </button>

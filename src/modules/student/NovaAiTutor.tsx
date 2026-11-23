@@ -503,27 +503,27 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
   );
 
   return (
-    <div className="flex flex-col h-[650px] max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl text-slate-100 relative">
+    <div className="flex flex-col h-[650px] max-w-3xl mx-auto bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl text-slate-900 relative">
       {/* Header */}
-      <div className="bg-slate-950 p-4 border-b border-slate-800 flex items-center justify-between">
+      <div className="bg-slate-50 p-4 border-b border-slate-200 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-900/50">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-900/20">
             <Sparkles className="w-5 h-5 animate-pulse" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h3 className="font-bold text-sm text-white">Nova AI Socratic Tutor</h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              <h3 className="font-bold text-sm text-slate-900">Nova AI Socratic Tutor</h3>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
                 {board} • Class {grade}
               </span>
               {!learner && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   Guest Preview Mode
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-slate-400 flex items-center space-x-1.5 mt-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+            <p className="text-[11px] text-slate-500 flex items-center space-x-1.5 mt-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping inline-block" />
               <span>Multi-Model Chain (Google Gemini 3.5 Flash Lite + Socratic Engine)</span>
             </p>
           </div>
@@ -536,7 +536,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
               initWelcome();
             }}
             title="Restart Conversation"
-            className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer shadow-xs"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -547,14 +547,14 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 setRefillStatus(null);
                 setShowRefillModal(true);
               }}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-all cursor-pointer shadow-sm"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 transition-all cursor-pointer shadow-xs"
               title="AI Credits Limit: 8,500 Credits"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
               <span>
                 {quota ? `${quota.remainingToday.toLocaleString()} / 8,500 Credits` : '8,500 Credits'}
               </span>
-              <span className="text-[9px] bg-amber-400/20 text-amber-200 px-1 py-0.5 rounded uppercase font-black">
+              <span className="text-[9px] bg-amber-200 text-amber-900 px-1 py-0.5 rounded uppercase font-black">
                 +Refill
               </span>
             </button>
@@ -563,7 +563,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
           {onClose && (
             <button
               onClick={onClose}
-              className="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors cursor-pointer"
+              className="text-xs text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 transition-colors cursor-pointer shadow-xs"
             >
               Close
             </button>
@@ -572,14 +572,14 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       </div>
 
       {/* Preset Questions Drawer Toggle Bar */}
-      <div className="px-4 py-2 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between text-xs">
-        <div className="flex items-center space-x-1.5 text-indigo-400 font-bold">
-          <GraduationCap className="w-4 h-4 text-indigo-400" />
+      <div className="px-4 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs">
+        <div className="flex items-center space-x-1.5 text-indigo-700 font-bold">
+          <GraduationCap className="w-4 h-4 text-indigo-600" />
           <span>Preset Question Library ({PRESET_QUESTIONS.length} Questions)</span>
         </div>
         <button
           onClick={() => setShowPresetDrawer(prev => !prev)}
-          className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 font-semibold text-[11px] transition-all cursor-pointer"
+          className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 font-semibold text-[11px] transition-all cursor-pointer"
         >
           <span>{showPresetDrawer ? 'Hide Library' : 'Browse Presets'}</span>
           {showPresetDrawer ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -588,7 +588,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
 
       {/* Expandable Preset Library */}
       {showPresetDrawer && (
-        <div className="p-3 bg-slate-950 border-b border-slate-800 space-y-2.5 max-h-48 overflow-y-auto animate-fadeIn">
+        <div className="p-3 bg-slate-50 border-b border-slate-200 space-y-2.5 max-h-48 overflow-y-auto animate-fadeIn">
           {/* Category Tabs */}
           <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 no-scrollbar text-[10px]">
             {[
@@ -606,7 +606,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 className={`px-2.5 py-1 rounded-full whitespace-nowrap font-bold transition-all cursor-pointer ${
                   activePresetCategory === cat.id
                     ? 'bg-indigo-600 text-white'
-                    : 'bg-slate-900 text-slate-400 hover:text-white'
+                    : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {cat.label}
@@ -623,15 +623,15 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                   setShowPresetDrawer(false);
                   executeSend(preset.prompt);
                 }}
-                className="text-left p-2.5 rounded-xl bg-slate-900/90 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/50 transition-all text-xs group cursor-pointer"
+                className="text-left p-2.5 rounded-xl bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 transition-all text-xs group cursor-pointer shadow-xs"
               >
-                <div className="font-bold text-white group-hover:text-indigo-300 flex items-center justify-between">
+                <div className="font-bold text-slate-900 group-hover:text-indigo-700 flex items-center justify-between">
                   <span>{preset.label}</span>
-                  <span className="text-[10px] text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-[10px] text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
                     Ask Nova &rarr;
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{preset.prompt}</p>
+                <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{preset.prompt}</p>
               </button>
             ))}
           </div>
@@ -639,7 +639,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       )}
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-4">
+      <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/50">
         {messages.map(msg => (
           <div
             key={msg.id}
@@ -651,7 +651,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
               className={`w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 text-xs ${
                 msg.sender === 'STUDENT'
                   ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-gradient-to-tr from-indigo-900 to-purple-900 text-indigo-300 border border-indigo-700/60'
+                  : 'bg-indigo-100 text-indigo-700 border border-indigo-200'
               }`}
             >
               {msg.sender === 'STUDENT' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
@@ -661,7 +661,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
               className={`max-w-[85%] rounded-2xl p-4 text-xs leading-relaxed whitespace-pre-wrap ${
                 msg.sender === 'STUDENT'
                   ? 'bg-indigo-600 text-white rounded-tr-none shadow-md'
-                  : 'bg-slate-950 border border-slate-800 text-slate-200 rounded-tl-none shadow-lg'
+                  : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none shadow-sm'
               }`}
             >
               {msg.text}
@@ -670,7 +670,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 className={`text-[9px] mt-2 pt-1 border-t flex items-center justify-between ${
                   msg.sender === 'STUDENT'
                     ? 'text-indigo-200 border-indigo-500/30'
-                    : 'text-slate-500 border-slate-800/80'
+                    : 'text-slate-400 border-slate-100'
                 }`}
               >
                 <span>{msg.timestamp}</span>
@@ -680,13 +680,13 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                     {/* Read Out Loud Button */}
                     <button
                       onClick={() => handleToggleSpeak(msg.id, msg.text)}
-                      className="hover:text-indigo-400 transition-colors flex items-center space-x-1 cursor-pointer"
+                      className="hover:text-indigo-600 text-slate-500 transition-colors flex items-center space-x-1 cursor-pointer"
                       title="Read explanation out loud"
                     >
                       {speakingId === msg.id ? (
                         <>
-                          <VolumeX className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-                          <span className="text-amber-400">Stop</span>
+                          <VolumeX className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+                          <span className="text-amber-600 font-bold">Stop</span>
                         </>
                       ) : (
                         <>
@@ -699,13 +699,13 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                     {/* Copy Button */}
                     <button
                       onClick={() => handleCopyText(msg.id, msg.text)}
-                      className="hover:text-indigo-400 transition-colors flex items-center space-x-1 cursor-pointer"
+                      className="hover:text-indigo-600 text-slate-500 transition-colors flex items-center space-x-1 cursor-pointer"
                       title="Copy explanation to clipboard"
                     >
                       {copiedId === msg.id ? (
                         <>
-                          <Check className="w-3.5 h-3.5 text-emerald-400" />
-                          <span className="text-emerald-400">Copied!</span>
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="text-emerald-700 font-bold">Copied!</span>
                         </>
                       ) : (
                         <>
@@ -722,8 +722,8 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
         ))}
 
         {isTyping && (
-          <div className="flex items-center space-x-2 text-slate-300 text-xs italic p-3 bg-slate-950/80 rounded-2xl border border-slate-800 w-fit animate-pulse">
-            <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-400" />
+          <div className="flex items-center space-x-2 text-slate-600 text-xs italic p-3 bg-white rounded-2xl border border-slate-200 shadow-xs w-fit animate-pulse">
+            <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-600" />
             <span>Nova is reasoning socratically according to {board} marking standards...</span>
           </div>
         )}
@@ -731,50 +731,50 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       </div>
 
       {/* Suggested Quick Prompts */}
-      <div className="px-4 py-2 bg-slate-950 border-t border-slate-800/80 flex items-center space-x-2 overflow-x-auto text-[11px] no-scrollbar">
+      <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 flex items-center space-x-2 overflow-x-auto text-[11px] no-scrollbar">
         <span className="text-slate-500 flex-shrink-0 flex items-center space-x-1">
-          <Lightbulb className="w-3 h-3 text-amber-400" />
+          <Lightbulb className="w-3 h-3 text-amber-500" />
           <span>Quick:</span>
         </span>
         <button
           onClick={() => executeSend(`Can you simplify the hardest concept in ${activeSubject} with an analogy?`)}
-          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs"
         >
           💡 Simplify concept
         </button>
         <button
           onClick={() => executeSend(`Show step-by-step mathematical derivation for the main formula in ${activeSubject}.`)}
-          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs"
         >
           🔍 Step-by-step derivation
         </button>
         <button
           onClick={() => executeSend(`Give me 1 challenging ${board} exam-style practice problem for Class ${grade}.`)}
-          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs"
         >
           📝 Practice question
         </button>
         <button
           onClick={() => executeSend(`What are common silly mistakes students make in ${activeSubject} exams?`)}
-          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs"
         >
           ⚠️ Common mistake traps
         </button>
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSendMessage} className="p-3 bg-slate-950 border-t border-slate-800 flex items-center space-x-2">
+      <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-slate-200 flex items-center space-x-2">
         <input
           type="text"
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
           placeholder={`Ask Nova anything about ${board} Class ${grade} ${activeSubject}...`}
-          className="flex-1 bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none"
+          className="flex-1 bg-slate-50 border border-slate-300 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none"
         />
         <button
           type="submit"
           disabled={!inputValue.trim() || isTyping}
-          className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white rounded-xl shadow-md shadow-indigo-950 transition-all cursor-pointer"
+          className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white rounded-xl shadow-md transition-all cursor-pointer"
         >
           <Send className="w-4 h-4" />
         </button>
@@ -782,26 +782,26 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
 
       {/* Modal: Refill AI Messages using AL Coins */}
       {showRefillModal && (
-        <div className="absolute inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative text-left">
+        <div className="absolute inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl relative text-left">
             <button
               onClick={() => {
                 setShowRefillModal(false);
                 setRefillStatus(null);
               }}
-              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-full bg-slate-800 cursor-pointer"
+              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 rounded-full bg-slate-100 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 rounded-2xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400">
-                <Zap className="w-5 h-5 text-amber-400" />
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+                <Zap className="w-5 h-5 text-amber-600" />
               </div>
               <div>
-                <h4 className="text-sm font-black text-white">Unlock Extra AI Messages</h4>
-                <p className="text-[11px] text-slate-400">
-                  Your Balance: <strong className="text-amber-400 font-mono inline-flex items-center gap-1"><StudyCoinIcon className="w-3.5 h-3.5" /> {learner?.coinBalance || 0} AL Coins</strong>
+                <h4 className="text-sm font-black text-slate-900">Unlock Extra AI Messages</h4>
+                <p className="text-[11px] text-slate-500">
+                  Your Balance: <strong className="text-amber-600 font-mono inline-flex items-center gap-1"><StudyCoinIcon className="w-3.5 h-3.5" /> {learner?.coinBalance || 0} AL Coins</strong>
                 </p>
               </div>
             </div>
@@ -810,24 +810,24 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
               <div
                 className={`p-3 rounded-xl mb-4 text-xs font-semibold flex items-center space-x-2 ${
                   refillStatus.success
-                    ? 'bg-emerald-950/80 border border-emerald-600 text-emerald-300'
-                    : 'bg-rose-950/80 border border-rose-600 text-rose-300'
+                    ? 'bg-emerald-50 border border-emerald-300 text-emerald-800'
+                    : 'bg-rose-50 border border-rose-300 text-rose-800'
                 }`}
               >
-                {refillStatus.success ? <CheckCircle className="w-4 h-4 shrink-0" /> : <X className="w-4 h-4 shrink-0" />}
+                {refillStatus.success ? <CheckCircle className="w-4 h-4 shrink-0 text-emerald-600" /> : <X className="w-4 h-4 shrink-0 text-rose-600" />}
                 <span>{refillStatus.text}</span>
               </div>
             )}
 
             {isSubscriber ? (
               <div className="py-6 text-center space-y-4">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
-                  <Sparkles className="w-7 h-7 text-emerald-400" />
+                <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
+                  <Sparkles className="w-7 h-7 text-emerald-600" />
                 </div>
                 <div>
-                  <h4 className="text-base font-black text-white">Unlimited Nova AI Active</h4>
-                  <p className="text-xs text-slate-300 max-w-sm mx-auto mt-1 leading-relaxed">
-                    You have active <strong className="text-emerald-300 font-semibold">{quota?.planTier || (learner as any)?.activePlan || 'PLUS'} Scholar</strong> status. All daily Socratic AI query caps are lifted!
+                  <h4 className="text-base font-black text-slate-900">Unlimited Nova AI Active</h4>
+                  <p className="text-xs text-slate-600 max-w-sm mx-auto mt-1 leading-relaxed">
+                    You have active <strong className="text-emerald-700 font-semibold">{quota?.planTier || (learner as any)?.activePlan || 'PLUS'} Scholar</strong> status. All daily Socratic AI query caps are lifted!
                   </p>
                 </div>
                 <div className="pt-2">
@@ -842,44 +842,44 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
             ) : (
               <>
                 <div className="space-y-3 mb-5">
-                  <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-amber-400/50 transition-all flex items-center justify-between">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 hover:border-amber-400 transition-all flex items-center justify-between">
                     <div>
                       <div className="flex items-center space-x-2">
-                        <span className="font-extrabold text-xs text-white">5 Extra AI Messages</span>
-                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-indigo-500/20 text-indigo-300">
+                        <span className="font-extrabold text-xs text-slate-900">5 Extra AI Messages</span>
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
                           Standard
                         </span>
                       </div>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
+                      <p className="text-[10px] text-slate-500 mt-0.5">
                         Valid today and carried over until used.
                       </p>
                     </div>
                     <button
                       onClick={() => handleBuyMessages('PACK_5')}
                       disabled={isRefilling}
-                      className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-40"
+                      className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-black text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-40"
                     >
                       <StudyCoinIcon className="w-4 h-4" />
                       <span>10 Coins</span>
                     </button>
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-slate-950 border border-amber-500/30 hover:border-amber-400 transition-all flex items-center justify-between">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-amber-200 hover:border-amber-400 transition-all flex items-center justify-between">
                     <div>
                       <div className="flex items-center space-x-2">
-                        <span className="font-extrabold text-xs text-white">12 Extra AI Messages</span>
-                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-500/20 text-emerald-300">
+                        <span className="font-extrabold text-xs text-slate-900">12 Extra AI Messages</span>
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
                           Best Value (+2 Free)
                         </span>
                       </div>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
+                      <p className="text-[10px] text-slate-500 mt-0.5">
                         Save 4 AL Coins for exam preparation.
                       </p>
                     </div>
                     <button
                       onClick={() => handleBuyMessages('PACK_12')}
                       disabled={isRefilling}
-                      className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-40"
+                      className="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-black text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-40"
                     >
                       <StudyCoinIcon className="w-4 h-4" />
                       <span>20 Coins</span>
@@ -887,7 +887,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                   </div>
                 </div>
 
-                <p className="text-[10px] text-slate-400 text-center">
+                <p className="text-[10px] text-slate-500 text-center">
                   Need more coins? Ace your quizzes (&ge; 70% score for Level mastery) or spin the daily wheel to earn coins!
                 </p>
               </>

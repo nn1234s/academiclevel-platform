@@ -510,22 +510,22 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-      <div className="bg-slate-900 border border-indigo-900/60 rounded-3xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden text-slate-900">
         {/* TOP MODAL HEADER */}
-        <div className="p-4 sm:p-5 bg-gradient-to-r from-indigo-950 via-slate-900 to-purple-950 border-b border-indigo-900/50 flex items-center justify-between">
+        <div className="p-4 sm:p-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600">
               <FileText className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h3 className="font-extrabold text-white text-base">Class Practice Worksheets & PDF Center</h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 border border-amber-500/30 text-amber-300">
+                <h3 className="font-extrabold text-slate-900 text-base">Class Practice Worksheets & PDF Center</h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 border border-amber-300 text-amber-800">
                   30 Coins Unlocked
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 Calibrated 12,000-question curriculum bank for Classes 1 to 12 with rough work & solutions
               </p>
             </div>
@@ -533,21 +533,21 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* CONTROLS & GENERATOR TOOLBAR */}
-        <div className="p-4 bg-slate-950/90 border-b border-slate-800 grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs">
+        <div className="p-4 bg-slate-50 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs">
           {/* Board Selector */}
           <div>
-            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Board</label>
+            <label className="block text-[10px] text-slate-600 mb-1 font-semibold">Board</label>
             <select
               value={board}
               onChange={e => setBoard(e.target.value as Board)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-white"
+              className="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-slate-900 shadow-xs cursor-pointer"
             >
               <option value="CBSE">CBSE Board</option>
               <option value="ICSE">ICSE Board</option>
@@ -557,11 +557,11 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
 
           {/* Grade Selector (All Classes 1 to 12) */}
           <div>
-            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Class / Grade</label>
+            <label className="block text-[10px] text-slate-600 mb-1 font-semibold">Class / Grade</label>
             <select
               value={grade}
               onChange={e => setGrade(Number(e.target.value) as Grade)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-white"
+              className="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-slate-900 shadow-xs cursor-pointer"
             >
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
                 <option key={g} value={g}>Class {g}</option>
@@ -571,11 +571,11 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
 
           {/* Subject Selector */}
           <div>
-            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Subject</label>
+            <label className="block text-[10px] text-slate-600 mb-1 font-semibold">Subject</label>
             <select
               value={subjectId}
               onChange={e => setSubjectId(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-white"
+              className="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-slate-900 shadow-xs cursor-pointer"
             >
               {subjects.map(s => (
                 <option key={s.id} value={s.id}>{s.name}</option>
@@ -585,11 +585,11 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
 
           {/* Question Count */}
           <div>
-            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Length</label>
+            <label className="block text-[10px] text-slate-600 mb-1 font-semibold">Length</label>
             <select
               value={questionCount}
               onChange={e => setQuestionCount(Number(e.target.value))}
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-white"
+              className="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-slate-900 shadow-xs cursor-pointer"
             >
               <option value={10}>10 Questions (Quick)</option>
               <option value={15}>15 Questions (Standard)</option>
@@ -602,7 +602,7 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
             <button
               onClick={loadQuestions}
               disabled={isLoading}
-              className="w-full py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold rounded-xl transition-all flex items-center justify-center space-x-1.5 shadow-md"
+              className="w-full py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold rounded-xl transition-all flex items-center justify-center space-x-1.5 shadow-sm cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
               <span>{isLoading ? 'Fetching...' : 'Re-roll Bank'}</span>
@@ -611,25 +611,25 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
         </div>
 
         {/* VIEW TABS & EXPORT ACTIONS BAR */}
-        <div className="px-4 py-2.5 bg-slate-900/60 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+        <div className="px-4 py-2.5 bg-slate-50/80 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
           {/* Tab Switcher */}
-          <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+          <div className="flex items-center space-x-1 bg-slate-200/80 p-1 rounded-xl">
             <button
               onClick={() => setActiveTab('worksheet')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'worksheet'
                   ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               📄 Student Worksheet
             </button>
             <button
               onClick={() => setActiveTab('solutions')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'solutions'
                   ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               ✂️ Solutions & Key
@@ -640,7 +640,7 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
           <div className="flex items-center space-x-2">
             <button
               onClick={handlePrintWorksheet}
-              className="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5"
+              className="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center space-x-1.5 cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print / Save as PDF</span>
@@ -648,7 +648,7 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
 
             <button
               onClick={handleDownloadOfflineWorksheet}
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition-all flex items-center space-x-1.5"
+              className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-300 transition-all flex items-center space-x-1.5 cursor-pointer shadow-xs"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download (.html)</span>
@@ -657,11 +657,11 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
         </div>
 
         {/* WORKSHEET PREVIEW CONTENT */}
-        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6 bg-slate-50/50">
           {isLoading ? (
             <div className="py-20 text-center space-y-3">
-              <RefreshCw className="w-8 h-8 text-indigo-400 animate-spin mx-auto" />
-              <p className="text-xs text-slate-400">
+              <RefreshCw className="w-8 h-8 text-indigo-600 animate-spin mx-auto" />
+              <p className="text-xs text-slate-500">
                 Curating high-yield questions for {board} Class {grade} {activeSubjectObj?.name}...
               </p>
             </div>
@@ -669,47 +669,47 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
             /* ========================================================== */
             /* TAB: WORKSHEET PREVIEW */
             /* ========================================================== */
-            <div className="bg-slate-950 border border-slate-800 rounded-3xl p-5 sm:p-7 space-y-6 shadow-inner">
+            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 space-y-6 shadow-sm">
               {/* Document Banner */}
-              <div className="border-b border-slate-800 pb-4 space-y-3">
+              <div className="border-b border-slate-200 pb-4 space-y-3">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                   <div>
-                    <h2 className="text-lg font-black text-white tracking-wide">
+                    <h2 className="text-lg font-black text-slate-900 tracking-wide">
                       ACADEMICLEVEL HIGH-YIELD PRACTICE WORKSHEET
                     </h2>
-                    <p className="text-xs text-indigo-400 font-semibold mt-0.5">
+                    <p className="text-xs text-indigo-600 font-semibold mt-0.5">
                       {board} • Class {grade} • {activeSubjectObj?.name || subjectId.toUpperCase()}
                     </p>
                   </div>
-                  <div className="px-3 py-1 bg-indigo-950/60 border border-indigo-800 text-indigo-300 rounded-full text-xs font-mono font-bold">
+                  <div className="px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-full text-xs font-mono font-bold">
                     Max Marks: {questions.length} | Time: {questions.length * 2} Mins
                   </div>
                 </div>
 
                 {/* Candidate Info Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900/80 p-3 rounded-2xl border border-slate-800/80 text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
                   <div>
                     <span className="text-slate-500 block text-[10px]">Student Name:</span>
-                    <span className="font-bold text-white">{learner.fullName || 'Student'}</span>
+                    <span className="font-bold text-slate-900">{learner.fullName || 'Student'}</span>
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px]">Student ID:</span>
-                    <span className="font-mono text-slate-300">AL-{learner.id.substring(0, 8).toUpperCase()}</span>
+                    <span className="font-mono text-slate-700">AL-{learner.id.substring(0, 8).toUpperCase()}</span>
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px]">Class & Board:</span>
-                    <span className="font-semibold text-slate-300">Class {grade} ({board})</span>
+                    <span className="font-semibold text-slate-700">Class {grade} ({board})</span>
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px]">Date Issued:</span>
-                    <span className="font-semibold text-slate-300">{currentDateStr}</span>
+                    <span className="font-semibold text-slate-700">{currentDateStr}</span>
                   </div>
                 </div>
               </div>
 
               {/* Section A: Question Items */}
               <div className="space-y-5">
-                <div className="flex items-center justify-between text-xs font-bold text-slate-300 border-b border-slate-800 pb-2">
+                <div className="flex items-center justify-between text-xs font-bold text-slate-700 border-b border-slate-200 pb-2">
                   <span>SECTION A: MULTIPLE CHOICE ASSESSMENT</span>
                   <span className="text-slate-500 font-mono text-[10px]">{questions.length} Questions</span>
                 </div>
@@ -717,18 +717,18 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
                 {questions.map((q, idx) => (
                   <div
                     key={q.id || idx}
-                    className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800/80 space-y-3"
+                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start space-x-2">
-                        <span className="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold text-xs flex items-center justify-center flex-shrink-0">
+                        <span className="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center flex-shrink-0">
                           {idx + 1}
                         </span>
-                        <p className="text-xs font-semibold text-white leading-relaxed">
+                        <p className="text-xs font-semibold text-slate-900 leading-relaxed">
                           {q.text}
                         </p>
                       </div>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-slate-800 text-slate-400 flex-shrink-0">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-white border border-slate-200 text-slate-600 flex-shrink-0">
                         {q.difficulty}
                       </span>
                     </div>
@@ -738,9 +738,9 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
                       {q.options.map((opt, oIdx) => (
                         <div
                           key={oIdx}
-                          className="flex items-center space-x-2 p-2 rounded-xl bg-slate-950 border border-slate-800/60 text-xs text-slate-300"
+                          className="flex items-center space-x-2 p-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 shadow-2xs"
                         >
-                          <span className="w-5 h-5 rounded-full border border-slate-600 flex items-center justify-center text-[10px] font-bold text-slate-400">
+                          <span className="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-[10px] font-bold text-slate-500">
                             {String.fromCharCode(65 + oIdx)}
                           </span>
                           <span>{opt}</span>
@@ -757,11 +757,11 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
               </div>
 
               {/* Section B: Rough Work Area */}
-              <div className="border border-dashed border-slate-700 rounded-2xl p-4 bg-slate-900/30 text-center space-y-1">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+              <div className="border border-dashed border-slate-300 rounded-2xl p-4 bg-slate-50 text-center space-y-1">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
                   Student Rough Work & Calculation Area
                 </span>
-                <p className="text-[10px] text-slate-500">
+                <p className="text-[10px] text-slate-400">
                   (Use this space on the printed worksheet for step calculations, scratch notes, and formulas)
                 </p>
                 <div className="h-16"></div>
@@ -771,33 +771,33 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
             /* ========================================================== */
             /* TAB: SOLUTIONS & DETACHABLE ANSWER KEY */
             /* ========================================================== */
-            <div className="bg-slate-950 border border-slate-800 rounded-3xl p-5 sm:p-7 space-y-6 shadow-inner">
-              <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
+            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 space-y-6 shadow-sm">
+              <div className="border-b border-slate-200 pb-3 flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-bold text-white flex items-center space-x-2">
-                    <Scissors className="w-4 h-4 text-emerald-400" />
+                  <h3 className="text-base font-bold text-slate-900 flex items-center space-x-2">
+                    <Scissors className="w-4 h-4 text-emerald-600" />
                     <span>Detachable Answer Key & NCERT Step-by-Step Solutions</span>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Parent & Teacher Grading Rubric • {board} Class {grade} {activeSubjectObj?.name}
                   </p>
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-950/60 border border-emerald-800 text-emerald-300">
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-700">
                   Answer Key
                 </span>
               </div>
 
               {/* Quick Answer Key Matrix */}
               <div className="space-y-2">
-                <span className="text-[11px] font-bold text-slate-400 uppercase">Quick Reference Matrix:</span>
+                <span className="text-[11px] font-bold text-slate-600 uppercase">Quick Reference Matrix:</span>
                 <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
                   {questions.map((q, idx) => (
                     <div
                       key={idx}
-                      className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-center space-y-1"
+                      className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-1"
                     >
-                      <span className="text-[10px] text-slate-500 font-mono block">Q{idx + 1}</span>
-                      <span className="text-xs font-extrabold text-emerald-400">
+                      <span className="text-[10px] text-slate-400 font-mono block">Q{idx + 1}</span>
+                      <span className="text-xs font-extrabold text-emerald-700">
                         ({String.fromCharCode(65 + q.correctIndex)})
                       </span>
                     </div>
@@ -807,23 +807,23 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
 
               {/* Detailed Socratic Explanations */}
               <div className="space-y-4 pt-2">
-                <span className="text-[11px] font-bold text-slate-400 uppercase">Detailed Solutions & Explanations:</span>
+                <span className="text-[11px] font-bold text-slate-600 uppercase">Detailed Solutions & Explanations:</span>
                 {questions.map((q, idx) => (
                   <div
                     key={idx}
-                    className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2 text-xs"
+                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs"
                   >
-                    <div className="flex items-center justify-between font-bold text-white">
+                    <div className="flex items-center justify-between font-bold text-slate-900">
                       <span>Q{idx + 1}. Correct Option: ({String.fromCharCode(65 + q.correctIndex)}) {q.options[q.correctIndex]}</span>
-                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-800">
+                      <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                         1 Mark
                       </span>
                     </div>
-                    <p className="text-slate-300 leading-relaxed">
+                    <p className="text-slate-700 leading-relaxed">
                       <strong>Solution:</strong> {q.explanation || 'Verified curriculum standard solution.'}
                     </p>
                     {q.hint && (
-                      <p className="text-slate-400 italic text-[11px]">
+                      <p className="text-slate-500 italic text-[11px]">
                         💡 <strong>Hint / Pedagogical Note:</strong> {q.hint}
                       </p>
                     )}
@@ -835,9 +835,9 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
         </div>
 
         {/* BOTTOM MODAL FOOTER */}
-        <div className="p-4 bg-slate-950 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div className="flex items-center space-x-2 text-slate-400">
-            <CheckCircle className="w-4 h-4 text-emerald-400" />
+        <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center space-x-2 text-slate-600">
+            <CheckCircle className="w-4 h-4 text-emerald-600" />
             <span>
               Dynamic practice worksheet generated from 12,000-question SQLite bank for <strong>Class {grade} {board}</strong>
             </span>
@@ -846,14 +846,14 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
           <div className="flex items-center space-x-2">
             <button
               onClick={handlePrintWorksheet}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-xs transition-all flex items-center space-x-1.5 cursor-pointer"
             >
               <Printer className="w-4 h-4" />
               <span>Print Worksheet</span>
             </button>
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all"
+              className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold rounded-xl transition-all cursor-pointer shadow-xs"
             >
               Done
             </button>

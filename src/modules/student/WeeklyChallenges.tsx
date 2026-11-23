@@ -85,30 +85,30 @@ export const WeeklyChallenges: React.FC<WeeklyChallengesProps> = ({
   }, [learner.id]);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 text-slate-100">
-      <div className="bg-gradient-to-r from-violet-950 via-slate-900 to-indigo-950 border border-violet-900/50 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="max-w-4xl mx-auto space-y-6 text-slate-900">
+      <div className="bg-gradient-to-r from-violet-50 via-white to-indigo-50 border border-violet-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <span className="text-[10px] font-mono font-bold tracking-widest text-violet-400 uppercase bg-violet-500/10 border border-violet-500/20 px-3 py-1 rounded-full flex items-center space-x-1 w-fit">
-            <Trophy className="w-3 h-3 text-amber-400" />
+          <span className="text-[10px] font-mono font-bold tracking-widest text-violet-700 uppercase bg-violet-100 border border-violet-200 px-3 py-1 rounded-full flex items-center space-x-1 w-fit">
+            <Trophy className="w-3 h-3 text-amber-600" />
             <span>Weekly Competitive Missions</span>
           </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-2">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
             Cohort Leaderboard Missions
           </h2>
-          <p className="text-xs text-slate-300 mt-1 max-w-md">
+          <p className="text-xs text-slate-600 mt-1 max-w-md">
             Timed, synchronized multi-subject challenges calibrated to {learner.board} Class {learner.grade}. Earn bonus coins and climb cohort rankings.
           </p>
         </div>
 
-        <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-center min-w-[140px]">
-          <span className="text-[10px] text-slate-400 block font-medium">Closes In</span>
-          <span className="text-xl font-mono font-black text-amber-400">4d 14h 22m</span>
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center min-w-[140px]">
+          <span className="text-[10px] text-slate-500 block font-medium">Closes In</span>
+          <span className="text-xl font-mono font-black text-amber-700">4d 14h 22m</span>
         </div>
       </div>
 
       {loading && (
-        <div className="flex items-center justify-center p-8 text-slate-400 text-xs space-x-2">
-          <Loader2 className="w-4 h-4 animate-spin text-violet-400" />
+        <div className="flex items-center justify-center p-8 text-slate-500 text-xs space-x-2">
+          <Loader2 className="w-4 h-4 animate-spin text-violet-600" />
           <span>Synchronizing weekly cohorts...</span>
         </div>
       )}
@@ -120,39 +120,39 @@ export const WeeklyChallenges: React.FC<WeeklyChallengesProps> = ({
           return (
             <div
               key={c.id}
-              className={`bg-slate-900 border rounded-3xl p-6 flex flex-col justify-between shadow-xl transition-all ${
-                isDone ? 'border-emerald-600/40 bg-emerald-950/10' : 'border-slate-800 hover:border-violet-500/50'
+              className={`bg-white border rounded-3xl p-6 flex flex-col justify-between shadow-sm transition-all ${
+                isDone ? 'border-emerald-300 bg-emerald-50/20' : 'border-slate-200 hover:border-violet-400'
               }`}
             >
               <div>
                 <div className="flex items-center justify-between mb-3 text-xs">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-violet-500/20 text-violet-300">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-violet-100 text-violet-800">
                     {c.subject}
                   </span>
-                  <span className="text-amber-400 font-bold flex items-center space-x-1.5">
+                  <span className="text-amber-700 font-bold flex items-center space-x-1.5">
                     <StudyCoinIcon className="w-3.5 h-3.5" glow />
                     <span>+{c.rewardCoins} Coins</span>
                   </span>
                 </div>
 
-                <h3 className="font-extrabold text-white text-base leading-snug">{c.title}</h3>
-                <p className="text-xs text-slate-400 mt-2 leading-relaxed">{c.description}</p>
+                <h3 className="font-extrabold text-slate-900 text-base leading-snug">{c.title}</h3>
+                <p className="text-xs text-slate-600 mt-2 leading-relaxed">{c.description}</p>
 
-                <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 space-y-1.5">
+                <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500 space-y-1.5">
                   <div className="flex items-center space-x-1.5">
-                    <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                    <Clock className="w-3.5 h-3.5 text-indigo-600" />
                     <span>Time Limit: {c.duration}</span>
                   </div>
                   <div className="flex items-center space-x-1.5">
-                    <Users className="w-3.5 h-3.5 text-indigo-400" />
+                    <Users className="w-3.5 h-3.5 text-indigo-600" />
                     <span>Cohort: {c.cohortSize}</span>
                   </div>
                 </div>
               </div>
 
               {isDone ? (
-                <div className="mt-6 w-full py-2.5 px-4 bg-emerald-600/20 border border-emerald-500/30 text-emerald-300 font-bold text-xs rounded-xl flex items-center justify-center space-x-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <div className="mt-6 w-full py-2.5 px-4 bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold text-xs rounded-xl flex items-center justify-center space-x-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   <span className="flex items-center gap-1">
                     <StudyCoinIcon className="w-3.5 h-3.5" />
                     Challenge Completed (+{c.rewardCoins} Coins)
@@ -161,7 +161,7 @@ export const WeeklyChallenges: React.FC<WeeklyChallengesProps> = ({
               ) : (
                 <button
                   onClick={() => onLaunchChallenge(c.subject)}
-                  className="mt-6 w-full py-2.5 px-4 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-violet-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                  className="mt-6 w-full py-2.5 px-4 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
                 >
                   <span>Enter Mission</span>
                   <ArrowRight className="w-3.5 h-3.5" />

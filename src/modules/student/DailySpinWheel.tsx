@@ -116,14 +116,14 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
   };
 
   return (
-    <div className="max-w-xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-center text-slate-100">
+    <div className="max-w-xl mx-auto bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm text-center text-slate-900">
       <div className="mb-4">
-        <span className="text-[11px] font-bold tracking-wider text-amber-300 uppercase bg-amber-500/15 border border-amber-500/30 px-3.5 py-1 rounded-full inline-flex items-center space-x-1.5 shadow-sm">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+        <span className="text-[11px] font-bold tracking-wider text-amber-800 uppercase bg-amber-100 border border-amber-300 px-3.5 py-1 rounded-full inline-flex items-center space-x-1.5 shadow-xs">
+          <Sparkles className="w-3.5 h-3.5 text-amber-600" />
           <span>Daily Scholar Reward Wheel</span>
         </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-2.5 tracking-tight">Daily Study Coin Wheel</h2>
-        <p className="text-xs sm:text-sm text-slate-300 mt-1.5 max-w-sm mx-auto leading-relaxed">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2.5 tracking-tight">Daily Study Coin Wheel</h2>
+        <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-sm mx-auto leading-relaxed">
           Spin every 24 hours to earn free Study Coins for awesome avatar frames, streak freezes, and real doorstep rewards!
         </p>
       </div>
@@ -131,25 +131,25 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
       {/* Wheel Graphic Container */}
       <div className="relative w-64 h-64 mx-auto my-6 flex items-center justify-center">
         {/* Pointer Triangle */}
-        <div className="absolute -top-3 z-20 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-amber-400 drop-shadow-md" />
+        <div className="absolute -top-3 z-20 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-amber-500 drop-shadow-md" />
 
         {/* Outer Wheel Rim */}
         <div
-          className="w-full h-full rounded-full border-4 border-amber-400/80 shadow-2xl relative overflow-hidden transition-transform duration-[3500ms] cubic-bezier(0.15, 0.9, 0.2, 1)"
+          className="w-full h-full rounded-full border-4 border-amber-400/80 shadow-lg relative overflow-hidden transition-transform duration-[3500ms] cubic-bezier(0.15, 0.9, 0.2, 1)"
           style={{ transform: `rotate(${wheelRotationDeg}deg)` }}
         >
           {/* Slice 1: 2 Coins (Top-Left) */}
-          <div className="absolute inset-0 bg-indigo-700 [clip-path:polygon(50%_50%,0_0,100%_0)] flex items-start justify-center pt-4">
+          <div className="absolute inset-0 bg-indigo-600 [clip-path:polygon(50%_50%,0_0,100%_0)] flex items-start justify-center pt-4">
             <span className="text-xs font-black text-white tracking-wider">2 COINS</span>
           </div>
 
           {/* Slice 2: 3 Coins (Top-Right) */}
-          <div className="absolute inset-0 bg-violet-700 [clip-path:polygon(50%_50%,100%_0,100%_100%)] flex items-center justify-end pr-4">
+          <div className="absolute inset-0 bg-violet-600 [clip-path:polygon(50%_50%,100%_0,100%_100%)] flex items-center justify-end pr-4">
             <span className="text-xs font-black text-white tracking-wider rotate-90">3 COINS</span>
           </div>
 
           {/* Slice 3: 5 Coins (Bottom-Right) */}
-          <div className="absolute inset-0 bg-blue-700 [clip-path:polygon(50%_50%,100%_100%,0_100%)] flex items-end justify-center pb-4">
+          <div className="absolute inset-0 bg-blue-600 [clip-path:polygon(50%_50%,100%_100%,0_100%)] flex items-end justify-center pb-4">
             <span className="text-xs font-black text-white tracking-wider rotate-180">5 COINS</span>
           </div>
 
@@ -157,8 +157,8 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
           <div
             className={`absolute inset-0 [clip-path:polygon(50%_50%,0_100%,0_0)] flex items-center justify-start pl-3 ${
               isJackpotUnlocked
-                ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black animate-pulse'
-                : 'bg-slate-800 text-slate-500'
+                ? 'bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 font-black animate-pulse'
+                : 'bg-slate-300 text-slate-600'
             }`}
           >
             <div className="-rotate-90 text-[10px] font-black flex items-center space-x-1">
@@ -168,32 +168,32 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
           </div>
 
           {/* Center Hub */}
-          <div className="absolute inset-0 m-auto w-14 h-14 bg-slate-950 border-2 border-amber-400 rounded-full flex items-center justify-center shadow-inner overflow-hidden">
+          <div className="absolute inset-0 m-auto w-14 h-14 bg-white border-2 border-amber-400 rounded-full flex items-center justify-center shadow-xs overflow-hidden">
             <StudyCoinIcon className="w-12 h-12" glow />
           </div>
         </div>
       </div>
 
       {/* Jackpot Unlock Status Bar */}
-      <div className="mb-6 p-3 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-between text-xs">
+      <div className="mb-6 p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between text-xs">
         <div className="flex items-center space-x-2 text-left">
           {isJackpotUnlocked ? (
-            <Unlock className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            <Unlock className="w-4 h-4 text-emerald-600 flex-shrink-0" />
           ) : (
             <Lock className="w-4 h-4 text-slate-500 flex-shrink-0" />
           )}
           <div>
-            <span className="font-semibold text-slate-200">
+            <span className="font-semibold text-slate-900">
               40-Coin Rare Jackpot: {isJackpotUnlocked ? 'Unlocked!' : 'Locked'}
             </span>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-500">
               {isJackpotUnlocked
                 ? 'Unlocked via 1+ qualified referral on your account.'
                 : 'Unlocks when 1 friend joins via your invite and completes their first quiz.'}
             </p>
           </div>
         </div>
-        <span className="text-xs font-bold text-amber-300 bg-amber-500/15 border border-amber-500/30 px-3 py-1 rounded-xl">
+        <span className="text-xs font-bold text-amber-800 bg-amber-100 border border-amber-300 px-3 py-1 rounded-xl">
           {qualifiedReferralsCount} Friends Invited
         </span>
       </div>
@@ -203,8 +203,8 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
         <div
           className={`mb-6 p-4 rounded-2xl border text-xs font-semibold animate-in fade-in duration-300 ${
             spinResult.isJackpot
-              ? 'bg-amber-500/20 border-amber-500 text-amber-300'
-              : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+              ? 'bg-amber-100 border-amber-300 text-amber-800'
+              : 'bg-emerald-50 border border-emerald-300 text-emerald-800'
           }`}
         >
           {spinResult.isJackpot ? (
@@ -226,16 +226,16 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
         <button
           onClick={handleSpinClick}
           disabled={isSpinning}
-          className="w-full py-3.5 px-6 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-sm rounded-2xl shadow-xl shadow-amber-950 transition-all flex items-center justify-center space-x-2"
+          className="w-full py-3.5 px-6 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-sm rounded-2xl shadow-xs transition-all flex items-center justify-center space-x-2 cursor-pointer"
         >
           <StudyCoinIcon className="w-4 h-4" />
           <span>{isSpinning ? 'Spinning Wheel...' : 'Spin the Wheel Now'}</span>
         </button>
       ) : (
-        <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-slate-400 flex items-center justify-center space-x-2">
-          <Clock className="w-4 h-4 text-indigo-400" />
+        <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-600 flex items-center justify-center space-x-2">
+          <Clock className="w-4 h-4 text-indigo-600" />
           <span>Next daily spin unlocks in:</span>
-          <span className="font-bold text-amber-300 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">{formatCooldown(cooldownRemainingMs)}</span>
+          <span className="font-bold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-lg border border-amber-200">{formatCooldown(cooldownRemainingMs)}</span>
         </div>
       )}
     </div>

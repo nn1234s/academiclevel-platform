@@ -79,7 +79,8 @@ import {
   Sun,
   Moon,
   AlertTriangle,
-  ArrowRight
+  ArrowRight,
+  XOctagon
 } from 'lucide-react';
 
 // Code-split Super-Admin Vault Shell (unlinked from public navigation)
@@ -336,6 +337,8 @@ export const App: React.FC = () => {
   // Incomplete Quiz Exit Protection Modal (Item B)
   const [quizExitModalOpen, setQuizExitModalOpen] = useState(false);
   const [pendingQuizExit, setPendingQuizExit] = useState<{ route: string; extra?: any } | null>(null);
+  const [exitPinInput, setExitPinInput] = useState('');
+  const [exitPinError, setExitPinError] = useState('');
 
   // Mobile drawer
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -1413,6 +1416,17 @@ export const App: React.FC = () => {
                 setAuthModalMode('REGISTER');
                 setAuthModalOpen(true);
               }}
+              onSelectPlan={tier => {
+                setCheckoutPlanTier(tier);
+                if (!isAuthenticated) {
+                  setAuthModalMode('REGISTER');
+                  setAuthModalOpen(true);
+                } else if (!quota?.hasActiveSubscription) {
+                  setPaywallModalOpen(true);
+                } else {
+                  navigateTo('DASHBOARD');
+                }
+              }}
               onNavigate={navigateTo}
             />
           )}
@@ -1481,24 +1495,24 @@ export const App: React.FC = () => {
           {/* Public / Guest Accessible Gift Store Showcase */}
           {(currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' || currentRoute === 'STORE') && !isAuthenticated && (
             <div className="py-6 px-4">
-              <div className="max-w-4xl mx-auto mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-950/60 via-slate-900 to-amber-950/60 border border-amber-500/40 text-center text-slate-200">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-                  🎁 Scholar's Physical Prize Catalog
+              <div className="max-w-4xl mx-auto mb-6 p-6 rounded-2xl bg-gradient-to-r from-amber-50 via-white to-amber-50 border border-amber-200 text-center text-slate-800 shadow-sm">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
+                  🎁 Scholar&apos;s Physical Prize Catalog
                 </span>
-                <h2 className="text-xl sm:text-2xl font-black text-white mt-2">
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-2">
                   Earn Study Coins &amp; Claim Real Doorstep Delivery
                 </h2>
-                <p className="text-xs text-slate-300 max-w-xl mx-auto mt-1">
-                  Preview all physical rewards available to AcademicLevel students. Create a free account, complete daily quizzes, and redeem stationery, books, plushies, smartwatches, and tablets!
+                <p className="text-xs text-slate-600 max-w-xl mx-auto mt-1">
+                  Preview all physical rewards available to AcademicLevel students. Complete daily quizzes and redeem stationery, books, plushies, smartwatches, and tablets!
                 </p>
                 <button
                   onClick={() => {
                     setAuthModalMode('REGISTER');
                     setAuthModalOpen(true);
                   }}
-                  className="mt-3 px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all cursor-pointer"
+                  className="mt-4 px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-xs rounded-xl shadow-md transition-all cursor-pointer"
                 >
-                  Create Free Account to Claim Rewards &rarr;
+                  Create Student Account to Claim Rewards &rarr;
                 </button>
               </div>
               <GiftStore
@@ -1540,7 +1554,9 @@ export const App: React.FC = () => {
                   activeGradeOverride={activeGradeOverride}
                   onSelectGradeOverride={setActiveGradeOverride}
                   onNavigate={navigateTo}
-                  onOpenUpgradeModal={() => setPaywallModalOpen(true)}
+                  onOpenUpgradeModal={() => {
+                    if (!quota?.hasActiveSubscription) setPaywallModalOpen(true);
+                  }}
                   onOpenMailbox={(reportId) => {
                     refreshCurrentLearner();
                     if (reportId) setDashboardActiveReportId(reportId);
@@ -1564,7 +1580,9 @@ export const App: React.FC = () => {
                   subjectId={activeSubjectId}
                   onBack={() => navigateTo('COURSES')}
                   onStartQuiz={(node, count, chapter) => navigateTo('QUIZ', { node, questionCount: count, chapter })}
-                  onOpenUpgradeModal={() => setPaywallModalOpen(true)}
+                  onOpenUpgradeModal={() => {
+                    if (!quota?.hasActiveSubscription) setPaywallModalOpen(true);
+                  }}
                 />
               )}
 
@@ -1592,6 +1610,8 @@ export const App: React.FC = () => {
                   }}
                   onExitQuiz={() => {
                     setPendingQuizExit({ route: 'DASHBOARD' });
+                    setExitPinInput('');
+                    setExitPinError('');
                     setQuizExitModalOpen(true);
                   }}
                 />
@@ -1864,8 +1884,10 @@ export const App: React.FC = () => {
                         if (!isAuthenticated) {
                           setAuthModalMode('REGISTER');
                           setAuthModalOpen(true);
-                        } else {
+                        } else if (!quota?.hasActiveSubscription) {
                           setPaywallModalOpen(true);
+                        } else {
+                          navigateTo('DASHBOARD');
                         }
                       }}
                       className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
@@ -1880,8 +1902,10 @@ export const App: React.FC = () => {
                         if (!isAuthenticated) {
                           setAuthModalMode('REGISTER');
                           setAuthModalOpen(true);
-                        } else {
+                        } else if (!quota?.hasActiveSubscription) {
                           setPaywallModalOpen(true);
+                        } else {
+                          navigateTo('DASHBOARD');
                         }
                       }}
                       className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
@@ -1896,8 +1920,10 @@ export const App: React.FC = () => {
                         if (!isAuthenticated) {
                           setAuthModalMode('REGISTER');
                           setAuthModalOpen(true);
-                        } else {
+                        } else if (!quota?.hasActiveSubscription) {
                           setPaywallModalOpen(true);
+                        } else {
+                          navigateTo('DASHBOARD');
                         }
                       }}
                       className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
@@ -2119,7 +2145,8 @@ export const App: React.FC = () => {
         />
 
         <PaywallGateModal
-          isOpen={paywallModalOpen}
+          isOpen={paywallModalOpen && !quota?.hasActiveSubscription}
+          hasActiveSubscription={quota?.hasActiveSubscription}
           onClose={() => setPaywallModalOpen(false)}
           quizzesCompleted={quota?.quizzesCompleted || 0}
           levelsCompleted={quota?.levelsCompleted || 0}
@@ -2134,63 +2161,91 @@ export const App: React.FC = () => {
           }}
         />
 
-        {/* INCOMPLETE QUIZ EXIT PROTECTION MODAL (Item B) */}
+        {/* INCOMPLETE QUIZ EXIT PROTECTION MODAL (Item B: Scary Red X + Parent PIN Prompt) */}
         {quizExitModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl text-slate-100 space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0">
-                  <AlertTriangle className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-black text-white">Exit Active Assessment?</h3>
-                  <p className="text-xs text-slate-400">
-                    {effectiveLearner?.board} Class {effectiveGrade} • {activeSubjectId.toUpperCase()} ({activeLevelNode})
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-150">
+            <div className="bg-white border-2 border-rose-300 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl text-slate-900 space-y-5 relative">
+              {/* Big Red Warning X Icon */}
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-rose-100 border-2 border-rose-300 flex items-center justify-center text-rose-600 shadow-sm animate-pulse">
+                <XOctagon className="w-9 h-9 stroke-[2.5]" />
+              </div>
+
+              {/* Scary Heading */}
+              <div className="text-center space-y-1">
+                <h3 className="text-xl sm:text-2xl font-black text-rose-700 tracking-tight leading-snug">
+                  Was this a internet error? Or have you left on Purpose?
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  Exiting will void your quiz attempt, and unearned XP &amp; Study Coins will be lost!
+                </p>
+              </div>
+
+              {/* Parent Security Check Container */}
+              <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 space-y-3">
+                <div className="text-center">
+                  <span className="text-xs font-bold text-rose-800 uppercase tracking-wide block">
+                    Parent Security Check
+                  </span>
+                  <p className="text-xs text-rose-700 mt-0.5">
+                    Enter parent pin to exit or return to quiz
                   </p>
                 </div>
+                <div className="space-y-1.5">
+                  <input
+                    type="password"
+                    maxLength={6}
+                    value={exitPinInput}
+                    onChange={e => {
+                      setExitPinInput(e.target.value);
+                      setExitPinError('');
+                    }}
+                    placeholder="Enter 4-digit Parent PIN"
+                    className="w-full text-center tracking-widest text-lg font-mono font-bold py-2.5 px-4 bg-white border-2 border-rose-300 rounded-xl focus:outline-none focus:border-rose-600 text-slate-900"
+                  />
+                  {exitPinError && (
+                    <p className="text-xs font-semibold text-rose-600 text-center">
+                      {exitPinError}
+                    </p>
+                  )}
+                </div>
               </div>
 
-              <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-4 text-xs text-slate-300 space-y-2 leading-relaxed">
-                <div className="flex items-start space-x-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <span>
-                    <strong>Your progress is safely saved</strong> in this browser session. You can return anytime to resume where you left off.
-                  </span>
-                </div>
-                <div className="flex items-start space-x-2 pt-2 border-t border-slate-800/80 text-amber-300">
-                  <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                  <span>
-                    <strong>Incomplete attempts do NOT grant rewards:</strong> No level completion status, XP, or Study Coins will be awarded until all questions are answered.
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-2.5 pt-1">
                 <button
                   onClick={() => {
                     setQuizExitModalOpen(false);
                     setPendingQuizExit(null);
+                    setExitPinInput('');
+                    setExitPinError('');
                   }}
-                  className="flex-1 py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
+                  className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm rounded-xl shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center space-x-2 cursor-pointer active:scale-98"
                 >
                   <ArrowRight className="w-4 h-4" />
-                  <span>Continue Assessment</span>
+                  <span>Return to Quiz</span>
                 </button>
                 <button
                   onClick={() => {
-                    setQuizExitModalOpen(false);
-                    const target = pendingQuizExit;
-                    setPendingQuizExit(null);
-                    if (target) {
-                      navigateTo(target.route, { ...target.extra, forceExit: true });
+                    const correctPin = (effectiveLearner?.parentPin || '1234').trim();
+                    if (exitPinInput.trim() === correctPin) {
+                      setQuizExitModalOpen(false);
+                      setExitPinInput('');
+                      setExitPinError('');
+                      const target = pendingQuizExit;
+                      setPendingQuizExit(null);
+                      if (target) {
+                        navigateTo(target.route, { ...target.extra, forceExit: true });
+                      } else {
+                        navigateTo('DASHBOARD', { forceExit: true });
+                      }
                     } else {
-                      navigateTo('DASHBOARD', { forceExit: true });
+                      setExitPinError('Incorrect Parent PIN. Ask your parent or click Return to Quiz.');
                     }
                   }}
-                  className="py-3 px-4 bg-slate-800 hover:bg-rose-950/60 text-slate-300 hover:text-rose-300 border border-slate-700 hover:border-rose-800/50 font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                  className="w-full py-2.5 px-4 bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-slate-300 hover:border-rose-300 font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
                 >
-                  <LogOut className="w-4 h-4 text-rose-400" />
-                  <span>Leave Assessment</span>
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Confirm Exit (Requires Parent PIN)</span>
                 </button>
               </div>
             </div>

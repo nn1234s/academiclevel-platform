@@ -64,31 +64,31 @@ export const AnnualMasterCertificate: React.FC<AnnualMasterCertificateProps> = (
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 text-slate-100">
-      <div className="bg-gradient-to-r from-amber-950 via-slate-900 to-indigo-950 border border-amber-900/60 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
-        <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center mb-4">
+    <div className="max-w-3xl mx-auto space-y-6 text-slate-900">
+      <div className="bg-gradient-to-r from-amber-50 via-white to-indigo-50 border border-amber-200 rounded-3xl p-6 sm:p-10 shadow-sm relative overflow-hidden">
+        <div className="w-16 h-16 rounded-2xl bg-amber-100 border border-amber-300 text-amber-700 flex items-center justify-center mb-4">
           <Award className="w-8 h-8" />
         </div>
 
-        <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
+        <span className="text-[10px] font-mono font-bold tracking-widest text-amber-800 uppercase bg-amber-100 border border-amber-300 px-3 py-1 rounded-full">
           Academic Year {academicYear}
         </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-2">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
           The Annual Master Certificate
         </h2>
-        <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-lg leading-relaxed">
-          Awarded only to students who achieve complete mastery across at least <strong className="text-white">3 distinct course levels</strong> within a single calendar year.
+        <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-lg leading-relaxed">
+          Awarded only to students who achieve complete mastery across at least <strong className="text-slate-900">3 distinct course levels</strong> within a single calendar year.
           Enforces strict deduplication: maximum 1 Master Certificate per student per academic year.
         </p>
 
         {/* Progress Tracker Meter */}
-        <div className="mt-8 bg-slate-950/80 border border-slate-800 rounded-2xl p-6">
+        <div className="mt-8 bg-white border border-slate-200 rounded-2xl p-6 shadow-xs">
           <div className="flex justify-between items-center text-xs font-semibold mb-2">
-            <span className="text-slate-300">Annual Mastery Milestone</span>
-            <span className="font-mono text-amber-400">{distinctCount} of 3 Levels Completed</span>
+            <span className="text-slate-700">Annual Mastery Milestone</span>
+            <span className="font-mono text-amber-700 font-bold">{distinctCount} of 3 Levels Completed</span>
           </div>
 
-          <div className="w-full bg-slate-900 rounded-full h-3 overflow-hidden border border-slate-800">
+          <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
             <div
               className="bg-gradient-to-r from-amber-500 to-yellow-400 h-full rounded-full transition-all duration-500"
               style={{ width: `${Math.min(100, (distinctCount / 3) * 100)}%` }}
@@ -96,13 +96,13 @@ export const AnnualMasterCertificate: React.FC<AnnualMasterCertificateProps> = (
           </div>
 
           <div className="grid grid-cols-3 gap-2 mt-4 text-center text-[11px]">
-            <div className={`p-2.5 rounded-xl border ${distinctCount >= 1 ? 'border-amber-500/40 bg-amber-500/10 text-amber-300' : 'border-slate-800 bg-slate-900 text-slate-500'}`}>
+            <div className={`p-2.5 rounded-xl border ${distinctCount >= 1 ? 'border-amber-300 bg-amber-50 text-amber-900 font-bold' : 'border-slate-200 bg-slate-50 text-slate-400'}`}>
               Level 1 Completed
             </div>
-            <div className={`p-2.5 rounded-xl border ${distinctCount >= 2 ? 'border-amber-500/40 bg-amber-500/10 text-amber-300' : 'border-slate-800 bg-slate-900 text-slate-500'}`}>
+            <div className={`p-2.5 rounded-xl border ${distinctCount >= 2 ? 'border-amber-300 bg-amber-50 text-amber-900 font-bold' : 'border-slate-200 bg-slate-50 text-slate-400'}`}>
               Level 2 Completed
             </div>
-            <div className={`p-2.5 rounded-xl border ${distinctCount >= 3 ? 'border-amber-500/40 bg-amber-500/10 text-amber-300' : 'border-slate-800 bg-slate-900 text-slate-500'}`}>
+            <div className={`p-2.5 rounded-xl border ${distinctCount >= 3 ? 'border-amber-300 bg-amber-50 text-amber-900 font-bold' : 'border-slate-200 bg-slate-50 text-slate-400'}`}>
               Level 3 Completed
             </div>
           </div>
@@ -113,8 +113,8 @@ export const AnnualMasterCertificate: React.FC<AnnualMasterCertificateProps> = (
           <div
             className={`mt-4 p-4 rounded-2xl border text-xs flex items-center space-x-2 ${
               message.type === 'success'
-                ? 'bg-emerald-950/40 border-emerald-800 text-emerald-300'
-                : 'bg-red-950/40 border-red-800 text-red-300'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                : 'bg-red-50 border-red-200 text-red-800'
             }`}
           >
             {message.type === 'success' ? (

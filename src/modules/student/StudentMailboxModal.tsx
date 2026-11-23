@@ -185,25 +185,25 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-5xl h-[92vh] max-h-[850px] shadow-2xl flex flex-col overflow-hidden text-slate-100">
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-5xl h-[92vh] max-h-[850px] shadow-2xl flex flex-col overflow-hidden text-slate-900">
         
         {/* Modal Top Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-800 bg-slate-950/80 flex items-center justify-between gap-3 flex-shrink-0">
+        <div className="p-4 sm:p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between gap-3 flex-shrink-0">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shadow-inner">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center shadow-xs">
               <Mail className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-base sm:text-lg font-black tracking-tight text-white">Student Mailbox</h2>
+                <h2 className="text-base sm:text-lg font-black tracking-tight text-slate-900">Student Mailbox</h2>
                 {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[10px] font-extrabold rounded-full animate-pulse">
+                  <span className="px-2 py-0.5 bg-indigo-100 border border-indigo-200 text-indigo-700 text-[10px] font-extrabold rounded-full">
                     {unreadCount} Unread
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-500">
                 AI Diagnostic Performance Reports, Socratic Insights &amp; Platform Notifications
               </p>
             </div>
@@ -213,16 +213,16 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
-                className="hidden sm:inline-flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-colors"
+                className="hidden sm:inline-flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition-colors cursor-pointer"
                 title="Mark all as read"
               >
-                <CheckCheck className="w-3.5 h-3.5 text-indigo-400" />
+                <CheckCheck className="w-3.5 h-3.5 text-indigo-600" />
                 <span>Mark All Read</span>
               </button>
             )}
             <button
               onClick={onClose}
-              className="p-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/30 transition-all flex items-center justify-center cursor-pointer shadow-sm active:scale-95 min-w-[40px] min-h-[40px]"
+              className="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 bg-rose-500/15 text-rose-600 border border-rose-200 transition-all flex items-center justify-center cursor-pointer shadow-xs active:scale-95 min-w-[40px] min-h-[40px]"
               aria-label="Close Mailbox"
               title="Close Mailbox"
             >
@@ -232,24 +232,24 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
         </div>
 
         {/* Search & Filter Nav */}
-        <div className="p-3 sm:px-5 border-b border-slate-800/80 bg-slate-900/90 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 flex-shrink-0">
+        <div className="p-3 sm:px-5 border-b border-slate-200 bg-slate-50/70 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 flex-shrink-0">
           <div className="flex items-center space-x-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
             <button
               onClick={() => setFilter('ALL')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 filter === 'ALL'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-950'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               }`}
             >
               All Mail ({messages.length})
             </button>
             <button
               onClick={() => setFilter('QUIZ_REPORT')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center space-x-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center space-x-1.5 cursor-pointer ${
                 filter === 'QUIZ_REPORT'
-                  ? 'bg-purple-600 text-white shadow-md shadow-purple-950'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               }`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
@@ -257,15 +257,15 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
             </button>
             <button
               onClick={() => setFilter('UNREAD')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center space-x-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center space-x-1.5 cursor-pointer ${
                 filter === 'UNREAD'
-                  ? 'bg-amber-600 text-white shadow-md shadow-amber-950'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               }`}
             >
               <span>Unread</span>
               {unreadCount > 0 && (
-                <span className="w-4 h-4 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black flex items-center justify-center">
+                <span className="w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] font-black flex items-center justify-center">
                   {unreadCount}
                 </span>
               )}
@@ -273,13 +273,13 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
           </div>
 
           <div className="relative min-w-[200px]">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search reports or topics..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-xl pl-8 pr-3 py-1.5 focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full bg-white border border-slate-200 text-slate-900 text-xs rounded-xl pl-8 pr-3 py-1.5 focus:outline-none focus:border-indigo-500 transition-colors"
             />
           </div>
         </div>
@@ -288,14 +288,14 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
         <div className="flex-1 flex overflow-hidden min-h-0">
           
           {/* Left Column: Messages List */}
-          <div className={`w-full md:w-80 lg:w-96 border-r border-slate-800 flex flex-col bg-slate-950/40 flex-shrink-0 ${
+          <div className={`w-full md:w-80 lg:w-96 border-r border-slate-200 flex flex-col bg-slate-50/50 flex-shrink-0 ${
             selectedMessage && 'hidden md:flex'
           }`}>
-            <div className="flex-1 overflow-y-auto divide-y divide-slate-800/50">
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-200">
               {filteredMessages.length === 0 ? (
                 <div className="p-8 text-center text-slate-500">
-                  <Inbox className="w-10 h-10 mx-auto mb-2 text-slate-600 opacity-60" />
-                  <p className="text-xs font-semibold text-slate-400">No messages found</p>
+                  <Inbox className="w-10 h-10 mx-auto mb-2 text-slate-400 opacity-60" />
+                  <p className="text-xs font-semibold text-slate-600">No messages found</p>
                   <p className="text-[11px] text-slate-500 mt-1 max-w-[200px] mx-auto">
                     {filter === 'QUIZ_REPORT'
                       ? 'Complete any assessment quiz to generate your first diagnostic AI report!'
@@ -315,37 +315,37 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                       onClick={() => setSelectedMessageId(msg.id)}
                       className={`p-3.5 transition-all cursor-pointer relative group ${
                         isSelected
-                          ? 'bg-indigo-950/40 border-l-4 border-indigo-500'
+                          ? 'bg-indigo-50 border-l-4 border-indigo-600'
                           : msg.isRead
-                          ? 'bg-transparent hover:bg-slate-800/40'
-                          : 'bg-indigo-950/15 hover:bg-indigo-950/25 border-l-2 border-indigo-400'
+                          ? 'bg-transparent hover:bg-slate-100/70'
+                          : 'bg-indigo-50/50 hover:bg-indigo-50 border-l-2 border-indigo-400'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <div className="flex items-center space-x-1.5 min-w-0">
                           {!msg.isRead && (
-                            <span className="w-2 h-2 rounded-full bg-indigo-400 flex-shrink-0 animate-pulse" />
+                            <span className="w-2 h-2 rounded-full bg-indigo-600 flex-shrink-0 animate-pulse" />
                           )}
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider truncate ${
                             isQuiz
-                              ? 'bg-purple-950/80 text-purple-300 border border-purple-800/60'
-                              : 'bg-slate-800 text-slate-300'
+                              ? 'bg-purple-100 text-purple-700 border border-purple-200'
+                              : 'bg-slate-200 text-slate-700'
                           }`}>
                             {msg.senderName}
                           </span>
                         </div>
-                        <span className="text-[10px] text-slate-500 font-mono whitespace-nowrap flex-shrink-0">
+                        <span className="text-[10px] text-slate-400 font-mono whitespace-nowrap flex-shrink-0">
                           {formatTimestamp(msg.createdAt)}
                         </span>
                       </div>
 
                       <h4 className={`text-xs line-clamp-1 mb-1 ${
-                        msg.isRead ? 'text-slate-300 font-medium' : 'text-white font-bold'
+                        msg.isRead ? 'text-slate-700 font-medium' : 'text-slate-900 font-bold'
                       }`}>
                         {msg.subject}
                       </h4>
 
-                      <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                      <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
                         {msg.preview}
                       </p>
 
@@ -354,13 +354,13 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                         <div className="mt-2 flex items-center space-x-2 text-[10px]">
                           <span className={`px-2 py-0.5 rounded-md font-bold font-mono ${
                             passed
-                              ? 'bg-emerald-950 text-emerald-300 border border-emerald-800/60'
-                              : 'bg-amber-950 text-amber-300 border border-amber-800/60'
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                              : 'bg-amber-100 text-amber-800 border border-amber-200'
                           }`}>
                             {accuracy}% Score
                           </span>
                           {msg.quizReport.coinsEarned > 0 && (
-                            <span className="flex items-center space-x-1 text-amber-300 font-bold">
+                            <span className="flex items-center space-x-1 text-amber-600 font-bold">
                               <StudyCoinIcon className="w-3 h-3" />
                               <span>+{msg.quizReport.coinsEarned}</span>
                             </span>
@@ -387,7 +387,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
           </div>
 
           {/* Right Column: Message Detail View */}
-          <div className={`flex-1 flex flex-col bg-slate-900 overflow-y-auto ${
+          <div className={`flex-1 flex flex-col bg-white overflow-y-auto ${
             !selectedMessage && 'hidden md:flex'
           }`}>
             {selectedMessage ? (
@@ -396,27 +396,27 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                 {/* Mobile Back Button */}
                 <button
                   onClick={() => setSelectedMessageId(null)}
-                  className="md:hidden flex items-center space-x-1.5 text-xs text-indigo-400 font-bold mb-2 py-1 px-2.5 rounded-lg bg-indigo-950/40 border border-indigo-800/50"
+                  className="md:hidden flex items-center space-x-1.5 text-xs text-indigo-600 font-bold mb-2 py-1 px-2.5 rounded-lg bg-indigo-50 border border-indigo-200 cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Back to Inbox List</span>
                 </button>
 
                 {/* Message Header */}
-                <div className="border-b border-slate-800 pb-5">
+                <div className="border-b border-slate-200 pb-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                     <div className="flex items-center space-x-3">
-                      <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border border-purple-500/30 text-purple-300 flex items-center justify-center font-black text-sm shadow-inner">
+                      <div className="w-11 h-11 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center font-black text-sm shadow-xs">
                         <Zap className="w-5 h-5" />
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <p className="text-xs font-bold text-white">{selectedMessage.senderName}</p>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">
+                          <p className="text-xs font-bold text-slate-900">{selectedMessage.senderName}</p>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                             {selectedMessage.category}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-400">
+                        <p className="text-[11px] text-slate-500">
                           Delivered {new Date(selectedMessage.createdAt).toLocaleString('en-IN', {
                             weekday: 'short',
                             year: 'numeric',
@@ -433,7 +433,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                       <button
                         onClick={() => handleDeleteMessage(selectedMessage.id)}
                         disabled={isDeleting === selectedMessage.id}
-                        className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-red-950/60 text-slate-400 hover:text-red-300 text-xs font-semibold border border-slate-700/60 hover:border-red-800/60 transition-colors flex items-center space-x-1.5"
+                        className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 text-xs font-semibold border border-slate-200 transition-colors flex items-center space-x-1.5 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                         <span>Delete</span>
@@ -441,7 +441,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                     </div>
                   </div>
 
-                  <h3 className="text-lg sm:text-xl font-black text-white tracking-tight leading-snug">
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-snug">
                     {selectedMessage.subject}
                   </h3>
                 </div>
@@ -451,38 +451,38 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                   <div className="space-y-6">
                     
                     {/* Score Summary Card */}
-                    <div className="bg-gradient-to-r from-slate-950 to-indigo-950/40 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl">
+                    <div className="bg-gradient-to-r from-indigo-50/60 via-white to-purple-50/60 border border-indigo-100 rounded-3xl p-5 sm:p-6 shadow-sm">
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                        <div className="p-3 bg-slate-900/80 border border-slate-800/80 rounded-2xl">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Accuracy</span>
+                        <div className="p-3 bg-white border border-slate-200 rounded-2xl shadow-xs">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Accuracy</span>
                           <span className={`text-2xl sm:text-3xl font-black ${
-                            selectedMessage.quizReport.accuracyPercent >= 70 ? 'text-emerald-400' : 'text-amber-400'
+                            selectedMessage.quizReport.accuracyPercent >= 70 ? 'text-emerald-600' : 'text-amber-600'
                           }`}>
                             {selectedMessage.quizReport.accuracyPercent}%
                           </span>
                         </div>
 
-                        <div className="p-3 bg-slate-900/80 border border-slate-800/80 rounded-2xl">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Score</span>
-                          <span className="text-2xl sm:text-3xl font-black text-white">
+                        <div className="p-3 bg-white border border-slate-200 rounded-2xl shadow-xs">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Score</span>
+                          <span className="text-2xl sm:text-3xl font-black text-slate-900">
                             {selectedMessage.quizReport.score} <span className="text-xs text-slate-500 font-normal">/ {selectedMessage.quizReport.totalQuestions}</span>
                           </span>
                         </div>
 
-                        <div className="p-3 bg-slate-900/80 border border-slate-800/80 rounded-2xl">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Mastery Status</span>
+                        <div className="p-3 bg-white border border-slate-200 rounded-2xl shadow-xs">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Mastery Status</span>
                           <span className={`text-xs font-black inline-block mt-1 px-2.5 py-1 rounded-full ${
                             selectedMessage.quizReport.passed
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                              : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-amber-50 text-amber-700 border border-amber-200'
                           }`}>
                             {selectedMessage.quizReport.passed ? 'Level Mastered 🎉' : 'Needs Practice'}
                           </span>
                         </div>
 
-                        <div className="p-3 bg-slate-900/80 border border-slate-800/80 rounded-2xl">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Coins Earned</span>
-                          <div className="flex items-center justify-center space-x-1.5 mt-1 font-black text-lg text-amber-300">
+                        <div className="p-3 bg-white border border-slate-200 rounded-2xl shadow-xs">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Coins Earned</span>
+                          <div className="flex items-center justify-center space-x-1.5 mt-1 font-black text-lg text-amber-700">
                             <StudyCoinIcon className="w-5 h-5" glow />
                             <span>+{selectedMessage.quizReport.coinsEarned}</span>
                           </div>
@@ -490,22 +490,22 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                       </div>
 
                       {/* Meta Pills */}
-                      <div className="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+                      <div className="mt-4 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
                         <div className="flex items-center space-x-2">
-                          <span className="font-bold text-white uppercase">{selectedMessage.quizReport.board} Class {selectedMessage.quizReport.grade}</span>
+                          <span className="font-bold text-slate-900 uppercase">{selectedMessage.quizReport.board} Class {selectedMessage.quizReport.grade}</span>
                           <span>•</span>
-                          <span className="font-bold text-indigo-400 uppercase">{selectedMessage.quizReport.subjectId}</span>
+                          <span className="font-bold text-indigo-600 uppercase">{selectedMessage.quizReport.subjectId}</span>
                           <span>•</span>
-                          <span className="font-mono text-purple-300 text-[11px]">{selectedMessage.quizReport.levelNode}</span>
+                          <span className="font-mono text-purple-700 text-[11px] font-bold">{selectedMessage.quizReport.levelNode}</span>
                         </div>
 
                         <div className="flex items-center space-x-3 text-[11px]">
-                          <span className="flex items-center space-x-1 text-emerald-400">
+                          <span className="flex items-center space-x-1 text-emerald-600 font-medium">
                             <ShieldCheck className="w-3.5 h-3.5" />
                             <span>Anti-Cheat Integrity Verified</span>
                           </span>
                           {selectedMessage.quizReport.timeSpentSeconds > 0 && (
-                            <span className="flex items-center space-x-1 text-slate-400">
+                            <span className="flex items-center space-x-1 text-slate-500">
                               <Clock className="w-3.5 h-3.5" />
                               <span>{selectedMessage.quizReport.timeSpentSeconds}s duration</span>
                             </span>
@@ -515,17 +515,17 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                     </div>
 
                     {/* Nova AI Socratic Commentary Card */}
-                    <div className="bg-purple-950/30 border border-purple-500/30 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+                    <div className="bg-purple-50/70 border border-purple-200 rounded-3xl p-5 sm:p-6 shadow-xs relative overflow-hidden">
                       <div className="flex items-start space-x-3.5">
-                        <div className="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center justify-center flex-shrink-0 shadow-md">
-                          <Zap className="w-5 h-5 text-purple-300" />
+                        <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 border border-purple-300 flex items-center justify-center flex-shrink-0 shadow-xs">
+                          <Zap className="w-5 h-5 text-purple-700" />
                         </div>
                         <div className="space-y-1.5">
                           <div className="flex items-center space-x-2">
-                            <h4 className="text-xs font-bold uppercase tracking-wider text-purple-300">Nova AI Tutor Diagnostic Note</h4>
-                            <Sparkles className="w-3 h-3 text-purple-400" />
+                            <h4 className="text-xs font-bold uppercase tracking-wider text-purple-800">Nova AI Tutor Diagnostic Note</h4>
+                            <Sparkles className="w-3 h-3 text-purple-600" />
                           </div>
-                          <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
+                          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
                             {selectedMessage.quizReport.aiTutorFeedback}
                           </p>
                         </div>
@@ -535,15 +535,15 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                     {/* Conceptual Strengths & Focus Areas */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Mastered Concepts */}
-                      <div className="bg-slate-950/60 border border-emerald-900/40 rounded-2xl p-4">
-                        <div className="flex items-center space-x-2 text-emerald-400 text-xs font-bold mb-2">
-                          <CheckCircle2 className="w-4 h-4" />
+                      <div className="bg-emerald-50/60 border border-emerald-200 rounded-2xl p-4">
+                        <div className="flex items-center space-x-2 text-emerald-700 text-xs font-bold mb-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                           <span>Mastered Concepts ({selectedMessage.quizReport.masteredTopics.length})</span>
                         </div>
                         {selectedMessage.quizReport.masteredTopics.length > 0 ? (
                           <div className="flex flex-wrap gap-1.5">
                             {selectedMessage.quizReport.masteredTopics.map((topic, i) => (
-                              <span key={i} className="px-2.5 py-1 bg-emerald-950/80 border border-emerald-800 text-emerald-300 text-[11px] font-semibold rounded-lg">
+                              <span key={i} className="px-2.5 py-1 bg-white border border-emerald-300 text-emerald-800 text-[11px] font-semibold rounded-lg shadow-xs">
                                 ✓ {topic}
                               </span>
                             ))}
@@ -554,15 +554,15 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                       </div>
 
                       {/* Weak Topics */}
-                      <div className="bg-slate-950/60 border border-amber-900/40 rounded-2xl p-4">
-                        <div className="flex items-center space-x-2 text-amber-400 text-xs font-bold mb-2">
-                          <AlertCircle className="w-4 h-4" />
+                      <div className="bg-amber-50/60 border border-amber-200 rounded-2xl p-4">
+                        <div className="flex items-center space-x-2 text-amber-800 text-xs font-bold mb-2">
+                          <AlertCircle className="w-4 h-4 text-amber-600" />
                           <span>Topics for Revision ({selectedMessage.quizReport.weakTopics.length})</span>
                         </div>
                         {selectedMessage.quizReport.weakTopics.length > 0 ? (
                           <div className="flex flex-wrap gap-1.5">
                             {selectedMessage.quizReport.weakTopics.map((topic, i) => (
-                              <span key={i} className="px-2.5 py-1 bg-amber-950/80 border border-amber-800 text-amber-300 text-[11px] font-semibold rounded-lg">
+                              <span key={i} className="px-2.5 py-1 bg-white border border-amber-300 text-amber-800 text-[11px] font-semibold rounded-lg shadow-xs">
                                 ⚠ {topic}
                               </span>
                             ))}
@@ -577,7 +577,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                     {selectedMessage.quizReport.questions && selectedMessage.quizReport.questions.length > 0 && (
                       <div className="space-y-3 pt-2">
                         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center space-x-2">
-                          <BookOpen className="w-4 h-4 text-indigo-400" />
+                          <BookOpen className="w-4 h-4 text-indigo-600" />
                           <span>Question-by-Question Assessment Review</span>
                         </h4>
 
@@ -589,30 +589,30 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                                 key={q.questionId || idx}
                                 className={`p-4 rounded-2xl border transition-all ${
                                   isCorrect
-                                    ? 'bg-slate-950/70 border-emerald-900/40'
-                                    : 'bg-slate-950/70 border-amber-900/40'
+                                    ? 'bg-emerald-50/50 border-emerald-200'
+                                    : 'bg-amber-50/50 border-amber-200'
                                 }`}
                               >
                                 <div className="flex items-start justify-between gap-3 mb-2">
                                   <div className="flex items-center space-x-2">
                                     <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${
-                                      isCorrect ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'
+                                      isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                                     }`}>
                                       {idx + 1}
                                     </span>
-                                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">
+                                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                                       {q.topicTag || 'Core Concept'}
                                     </span>
                                   </div>
                                   <span className={`text-[11px] font-bold flex items-center space-x-1 ${
-                                    isCorrect ? 'text-emerald-400' : 'text-amber-400'
+                                    isCorrect ? 'text-emerald-700' : 'text-amber-700'
                                   }`}>
-                                    {isCorrect ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                                    {isCorrect ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> : <XCircle className="w-3.5 h-3.5 text-amber-600" />}
                                     <span>{isCorrect ? 'Correct (+1)' : 'Incorrect'}</span>
                                   </span>
                                 </div>
 
-                                <p className="text-xs sm:text-sm font-semibold text-slate-100 mb-3 leading-relaxed">
+                                <p className="text-xs sm:text-sm font-semibold text-slate-900 mb-3 leading-relaxed">
                                   {q.questionText}
                                 </p>
 
@@ -622,11 +622,11 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                                     const isChosen = optIdx === q.chosenIndex;
                                     const isTargetCorrect = optIdx === q.correctIndex;
 
-                                    let badgeStyle = 'bg-slate-900/80 border-slate-800 text-slate-400';
+                                    let badgeStyle = 'bg-slate-50 border-slate-200 text-slate-700';
                                     if (isTargetCorrect) {
-                                      badgeStyle = 'bg-emerald-950/70 border-emerald-500/60 text-emerald-200 font-bold';
+                                      badgeStyle = 'bg-emerald-100/80 border-emerald-400 text-emerald-950 font-bold';
                                     } else if (isChosen && !isTargetCorrect) {
-                                      badgeStyle = 'bg-red-950/70 border-red-500/60 text-red-300 line-through';
+                                      badgeStyle = 'bg-rose-100/80 border-rose-300 text-rose-900 line-through';
                                     }
 
                                     return (
@@ -641,10 +641,10 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                                           <span className="leading-snug">{opt}</span>
                                         </div>
                                         {isTargetCorrect && (
-                                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                                         )}
                                         {isChosen && !isTargetCorrect && (
-                                          <XCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
+                                          <XCircle className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" />
                                         )}
                                       </div>
                                     );
@@ -653,12 +653,12 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
 
                                 {/* Explanation & Step-by-step Solution */}
                                 {q.explanation && (
-                                  <div className="bg-slate-900/90 border border-slate-800/80 rounded-xl p-3 text-xs text-slate-300 space-y-1">
-                                    <p className="font-bold text-slate-200 text-[11px] flex items-center space-x-1.5 text-indigo-400">
-                                      <HelpCircle className="w-3 h-3" />
+                                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-700 space-y-1">
+                                    <p className="font-bold text-slate-900 text-[11px] flex items-center space-x-1.5 text-indigo-700">
+                                      <HelpCircle className="w-3 h-3 text-indigo-600" />
                                       <span>Conceptual Explanation:</span>
                                     </p>
-                                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                                    <p className="text-[11px] text-slate-600 leading-relaxed">
                                       {q.explanation}
                                     </p>
                                   </div>
@@ -672,9 +672,9 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                                         onClose();
                                         onOpenNovaAi(q.questionText, q.explanation);
                                       }}
-                                      className="text-[11px] font-bold text-purple-400 hover:text-purple-300 flex items-center space-x-1 py-1 px-2.5 rounded-lg bg-purple-950/40 hover:bg-purple-900/50 border border-purple-800/40 transition-colors"
+                                      className="text-[11px] font-bold text-purple-700 hover:text-purple-900 flex items-center space-x-1 py-1 px-2.5 rounded-lg bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-colors cursor-pointer"
                                     >
-                                      <Zap className="w-3 h-3" />
+                                      <Zap className="w-3 h-3 text-purple-600" />
                                       <span>Ask Nova AI to explain this question</span>
                                     </button>
                                   </div>
@@ -687,14 +687,14 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                     )}
 
                     {/* Bottom Action Bar */}
-                    <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row gap-3 justify-end">
+                    <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-3 justify-end">
                       {onNavigateToQuiz && (
                         <button
                           onClick={() => {
                             onClose();
                             onNavigateToQuiz(selectedMessage.quizReport?.subjectId);
                           }}
-                          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-950 transition-all flex items-center justify-center space-x-2"
+                          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer"
                         >
                           <RefreshCw className="w-4 h-4" />
                           <span>Practice More in {selectedMessage.quizReport.subjectId.toUpperCase()}</span>
@@ -706,7 +706,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                 ) : (
                   /* Standard text message view */
                   <div className="space-y-4">
-                    <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
                       {selectedMessage.body}
                     </div>
                   </div>
@@ -714,9 +714,9 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
 
               </div>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-500">
-                <Mail className="w-12 h-12 mb-3 text-slate-700 opacity-60" />
-                <h4 className="text-sm font-bold text-slate-400">Select a message</h4>
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400">
+                <Mail className="w-12 h-12 mb-3 text-slate-300 opacity-80" />
+                <h4 className="text-sm font-bold text-slate-700">Select a message</h4>
                 <p className="text-xs text-slate-500 mt-1 max-w-sm">
                   Choose an assessment report from your inbox to inspect question-by-question breakdowns, accuracy, and AI guidance.
                 </p>

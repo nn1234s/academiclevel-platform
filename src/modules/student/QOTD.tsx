@@ -117,37 +117,37 @@ export const QOTD: React.FC<QOTDProps> = ({ learner, onRefreshLearner }) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-100">
-      <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+    <div className="max-w-2xl mx-auto bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl text-slate-900">
+      <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
         <div>
-          <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-400 uppercase bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">
+          <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-700 uppercase bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full">
             Daily Streak Contributor
           </span>
-          <h2 className="text-xl font-bold text-white mt-1.5">{question.title}</h2>
+          <h2 className="text-xl font-bold text-slate-900 mt-1.5">{question.title}</h2>
         </div>
 
-        <div className="flex items-center space-x-1.5 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl font-bold">
-          <Flame className="w-4 h-4 fill-amber-400" />
+        <div className="flex items-center space-x-1.5 text-xs text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl font-bold">
+          <Flame className="w-4 h-4 fill-amber-500 text-amber-500" />
           <span>+1 Streak Day</span>
         </div>
       </div>
 
       <div className="mb-6">
-        <span className="text-xs text-slate-400 font-semibold mb-2 block">{question.subject}</span>
-        <h3 className="text-sm sm:text-base font-bold text-white leading-relaxed">{question.text}</h3>
+        <span className="text-xs text-slate-500 font-semibold mb-2 block">{question.subject}</span>
+        <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-relaxed">{question.text}</h3>
       </div>
 
       <div className="space-y-3 mb-6">
         {question.options.map((opt, idx) => {
-          let btnStyle = 'border-slate-800 bg-slate-950/60 hover:border-slate-700 text-slate-200';
+          let btnStyle = 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800';
           if (selectedOption === idx) {
-            btnStyle = 'border-indigo-500 bg-indigo-950/40 text-white';
+            btnStyle = 'border-indigo-500 bg-indigo-50 text-indigo-950 ring-2 ring-indigo-500/20';
           }
           if (isSubmitted) {
             if (idx === question.correctIndex) {
-              btnStyle = 'border-emerald-500 bg-emerald-950/40 text-emerald-200';
+              btnStyle = 'border-emerald-500 bg-emerald-50 text-emerald-950 font-semibold';
             } else if (selectedOption === idx) {
-              btnStyle = 'border-red-500 bg-red-950/40 text-red-200';
+              btnStyle = 'border-rose-500 bg-rose-50 text-rose-950';
             }
           }
 
@@ -159,13 +159,13 @@ export const QOTD: React.FC<QOTDProps> = ({ learner, onRefreshLearner }) => {
               className={`w-full text-left p-4 rounded-2xl border text-xs sm:text-sm font-medium transition-all flex items-center justify-between ${btnStyle}`}
             >
               <div className="flex items-center space-x-3">
-                <span className="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 text-xs font-mono font-bold flex items-center justify-center flex-shrink-0">
+                <span className="w-6 h-6 rounded-lg bg-slate-200 text-slate-700 text-xs font-mono font-bold flex items-center justify-center flex-shrink-0">
                   {String.fromCharCode(65 + idx)}
                 </span>
                 <span>{opt}</span>
               </div>
               {isSubmitted && idx === question.correctIndex && (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
               )}
             </button>
           );
@@ -173,11 +173,11 @@ export const QOTD: React.FC<QOTDProps> = ({ learner, onRefreshLearner }) => {
       </div>
 
       {isSubmitted && (
-        <div className="mb-6 p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-300 space-y-2">
-          <p className="font-bold text-indigo-400">Official Solution:</p>
+        <div className="mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-2">
+          <p className="font-bold text-indigo-700">Official Solution:</p>
           <p>{question.explanation}</p>
           {rewardClaimed && (
-            <div className="pt-2 text-emerald-400 font-bold flex items-center space-x-1.5">
+            <div className="pt-2 text-emerald-700 font-bold flex items-center space-x-1.5">
               <StudyCoinIcon className="w-4 h-4" glow />
               <span>+1 Study Coin credited for completing today&apos;s question!</span>
             </div>

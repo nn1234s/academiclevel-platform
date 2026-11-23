@@ -228,7 +228,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const daysToBoardExam = Math.max(1, Math.ceil((boardExamDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
 
   return (
-    <div className="space-y-6 text-slate-100">
+    <div className="space-y-6 text-slate-900">
       {/* Super-Admin ONLY: Multi-Class Visual Preview Bar (Hidden for all students) */}
       {isSuperAdmin && (
         <ClassSwitcherBar
@@ -335,30 +335,30 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
       {/* 2.5 Celebratory Dispatched Gift Cards & Rewards Showcase */}
       {dispatchedGifts.length > 0 && (
-        <div className="bg-gradient-to-r from-emerald-950/70 via-slate-900 to-amber-950/60 border-2 border-emerald-500/50 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-r from-emerald-50 via-white to-amber-50 border-2 border-emerald-300 rounded-3xl p-6 sm:p-7 shadow-sm relative overflow-hidden">
           <div className="relative z-10 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 shadow-sm">
-                    <Gift className="w-3.5 h-3.5" />
+                  <span className="px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 shadow-xs">
+                    <Gift className="w-3.5 h-3.5 text-emerald-700" />
                     <span>Official Reward Dispatched</span>
                   </span>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-500/40">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
                     {dispatchedGifts.length} {dispatchedGifts.length === 1 ? 'Reward' : 'Rewards'} Ready
                   </span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black text-white mt-1.5 flex items-center space-x-2">
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5 flex items-center space-x-2">
                   <span>🎁 Your Dispatched Physical Rewards</span>
                 </h2>
-                <p className="text-xs text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
+                <p className="text-xs text-slate-600 mt-0.5 max-w-2xl leading-relaxed">
                   Congratulations! Your academic milestone physical merchandise redemption has been verified and dispatched by the admin team. Track your courier parcel details below.
                 </p>
               </div>
 
               <button
                 onClick={() => onNavigate('GIFT_STORE')}
-                className="px-3.5 py-2 bg-slate-950/80 hover:bg-slate-800 border border-slate-700/80 rounded-xl text-xs font-bold text-emerald-300 flex items-center space-x-1.5 transition-all self-start sm:self-auto flex-shrink-0"
+                className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-emerald-800 flex items-center space-x-1.5 transition-all self-start sm:self-auto flex-shrink-0 shadow-xs cursor-pointer"
               >
                 <span>Physical Rewards Store</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -378,14 +378,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 return (
                   <div
                     key={gift.id}
-                    className="bg-slate-950/90 border border-emerald-500/40 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4 relative group hover:border-emerald-400 transition-colors"
+                    className="bg-white border border-emerald-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-4 relative group hover:border-emerald-400 transition-colors"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 flex items-center space-x-1.5">
+                        <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center space-x-1.5">
                           {isPhysical ? (
                             <>
-                              <Package className="w-3.5 h-3.5 text-amber-400" />
+                              <Package className="w-3.5 h-3.5 text-amber-600" />
                               <span>Amazon Doorstep Delivery</span>
                             </>
                           ) : (
@@ -398,12 +398,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         <span
                           className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border flex items-center space-x-1 ${
                             isDelivered
-                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                               : isShipped
-                              ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+                              ? 'bg-sky-50 text-sky-800 border-sky-300'
                               : isOrdered
-                              ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
-                              : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                              ? 'bg-indigo-50 text-indigo-800 border-indigo-300'
+                              : 'bg-emerald-50 text-emerald-800 border-emerald-300'
                           }`}
                         >
                           <CheckCircle2 className="w-3 h-3" />
@@ -419,20 +419,20 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         </span>
                       </div>
 
-                      <h3 className="text-base font-black text-white group-hover:text-amber-300 transition-colors">
+                      <h3 className="text-base font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
                         {gift.itemTitle}
                       </h3>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
+                      <p className="text-[11px] text-slate-500 mt-0.5">
                         Claimed with {gift.coinsCost.toLocaleString()} Study Coins
                       </p>
                     </div>
 
                     {/* PHYSICAL ITEM COURIER TRACKING BOX */}
                     {isPhysical ? (
-                      <div className="bg-slate-900 border-2 border-sky-500/40 rounded-xl p-3.5 space-y-2">
+                      <div className="bg-sky-50 border border-sky-200 rounded-xl p-3.5 space-y-2">
                         <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-sky-400 flex items-center space-x-1">
-                            <Truck className="w-3.5 h-3.5" />
+                          <span className="font-bold text-sky-800 flex items-center space-x-1">
+                            <Truck className="w-3.5 h-3.5 text-sky-600" />
                             <span>
                               {isDelivered
                                 ? 'Delivered to Doorstep'
@@ -442,92 +442,92 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                             </span>
                           </span>
                           {gift.courierName && (
-                            <span className="text-[10px] font-mono text-sky-300 bg-sky-950 px-2 py-0.5 rounded border border-sky-800">
+                            <span className="text-[10px] font-mono text-sky-800 bg-sky-100 px-2 py-0.5 rounded border border-sky-300">
                               {gift.courierName}
                             </span>
                           )}
                         </div>
 
                         {gift.trackingId ? (
-                          <div className="bg-slate-950 p-2.5 rounded-lg border border-sky-500/30 flex items-center justify-between">
+                          <div className="bg-white p-2.5 rounded-lg border border-sky-200 flex items-center justify-between">
                             <div>
-                              <span className="text-[9px] uppercase font-bold text-slate-400 block">AWB / Tracking Number:</span>
-                              <span className="font-mono text-sm font-black text-amber-300 tracking-wider select-all">
+                              <span className="text-[9px] uppercase font-bold text-slate-500 block">AWB / Tracking Number:</span>
+                              <span className="font-mono text-sm font-black text-amber-700 tracking-wider select-all">
                                 {gift.trackingId}
                               </span>
                             </div>
-                            <span className="text-[10px] text-slate-400 font-mono">Live Tracking</span>
+                            <span className="text-[10px] text-slate-500 font-mono">Live Tracking</span>
                           </div>
                         ) : (
-                          <p className="text-[11px] text-slate-400 italic">
+                          <p className="text-[11px] text-slate-500 italic">
                             Tracking details will appear here once the courier parcel is dispatched.
                           </p>
                         )}
 
-                        <p className="text-[10px] text-slate-400 border-t border-slate-800 pt-1.5 truncate">
+                        <p className="text-[10px] text-slate-500 border-t border-slate-200 pt-1.5 truncate">
                           📍 {gift.shippingAddress.replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim()}
                         </p>
                       </div>
                     ) : (
                       /* Voucher Code Box */
-                      <div className="bg-slate-900 border-2 border-amber-500/50 rounded-xl p-3.5 shadow-inner">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 flex items-center space-x-1">
-                          <Sparkles className="w-3 h-3 text-amber-400" />
-                          <span>Official Voucher Code / PIN</span>
-                        </span>
-                        <span className="text-[9px] font-mono text-slate-400">100% Verified</span>
+                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 shadow-xs">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-800 flex items-center space-x-1">
+                            <Sparkles className="w-3 h-3 text-amber-600" />
+                            <span>Official Voucher Code / PIN</span>
+                          </span>
+                          <span className="text-[9px] font-mono text-slate-500">100% Verified</span>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                          <code className="text-base sm:text-lg font-mono font-black text-amber-900 tracking-wider select-all break-all bg-white px-3 py-1.5 rounded-lg border border-amber-300">
+                            {voucherCode}
+                          </code>
+
+                          <button
+                            onClick={() => handleCopyGiftCode(voucherCode, gift.id)}
+                            className={`px-3.5 py-2 font-black text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer active:scale-95 ${
+                              isCopied
+                                ? 'bg-emerald-600 text-white font-black'
+                                : 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950'
+                            }`}
+                          >
+                            {isCopied ? (
+                              <>
+                                <Check className="w-4 h-4" />
+                                <span>Copied!</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-4 h-4" />
+                                <span>Copy Code</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
+                    )}
 
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                        <code className="text-base sm:text-lg font-mono font-black text-amber-300 tracking-wider select-all break-all bg-black/40 px-3 py-1.5 rounded-lg border border-amber-500/30">
-                          {voucherCode}
-                        </code>
+                    {/* Redemption Instructions & Link */}
+                    {!isPhysical && (
+                      <div className="pt-2 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                        <p className="text-slate-600 text-[11px] leading-relaxed">
+                          {help.instructions}
+                        </p>
 
-                        <button
-                          onClick={() => handleCopyGiftCode(voucherCode, gift.id)}
-                          className={`px-3.5 py-2 font-black text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 active:scale-95 ${
-                            isCopied
-                              ? 'bg-emerald-500 text-slate-950 font-black'
-                              : 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950'
-                          }`}
-                        >
-                          {isCopied ? (
-                            <>
-                              <Check className="w-4 h-4" />
-                              <span>Copied!</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-4 h-4" />
-                              <span>Copy Code</span>
-                            </>
-                          )}
-                        </button>
+                        {help.url && (
+                          <a
+                            href={help.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center space-x-1 text-emerald-700 hover:text-emerald-800 font-bold text-xs flex-shrink-0 self-start sm:self-auto hover:underline"
+                          >
+                            <span>Redeem on {help.brand}</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        )}
                       </div>
-                    </div>
-                  )}
-
-                  {/* Redemption Instructions & Link */}
-                  {!isPhysical && (
-                    <div className="pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                      <p className="text-slate-300 text-[11px] leading-relaxed">
-                        {help.instructions}
-                      </p>
-
-                      {help.url && (
-                        <a
-                          href={help.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center space-x-1 text-emerald-400 hover:text-emerald-300 font-bold text-xs flex-shrink-0 self-start sm:self-auto hover:underline"
-                        >
-                          <span>Redeem on {help.brand}</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                    </div>
-                  )}
+                    )}
                   </div>
                 );
               })}
@@ -541,38 +541,38 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         /* PRIMARY (Classes 1-4): Fun Star Sticker & Adventure Trail */
         <div
           onClick={() => setIsStickerBookOpen(true)}
-          className="bg-slate-900 border border-amber-500/30 hover:border-amber-400 rounded-3xl p-6 shadow-xl relative overflow-hidden cursor-pointer transition-all hover:scale-[1.01] hover:shadow-amber-500/20 group"
+          className="bg-white border border-amber-300 hover:border-amber-400 rounded-3xl p-6 shadow-sm relative overflow-hidden cursor-pointer transition-all hover:scale-[1.01] hover:shadow-amber-500/10 group"
         >
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start space-x-4">
-              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-3xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-3xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                 {theme.specialWidget.emoji}
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 uppercase">
                     {theme.specialWidget.badgeText}
                   </span>
-                  <span className="text-xs font-bold text-white">Class {activeGrade} Explorer Hub</span>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center space-x-1">
+                  <span className="text-xs font-bold text-slate-800">Class {activeGrade} Explorer Hub</span>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center space-x-1">
                     <Sparkles className="w-3 h-3" />
                     <span>Interactive Book Ready</span>
                   </span>
                 </div>
-                <h3 className="text-lg font-black text-white mt-1 group-hover:text-amber-300 transition-colors flex items-center space-x-2">
+                <h3 className="text-lg font-black text-slate-900 mt-1 group-hover:text-amber-700 transition-colors flex items-center space-x-2">
                   <span>{theme.specialWidget.title}</span>
-                  <ArrowRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 text-amber-600 group-hover:translate-x-1 transition-transform" />
                 </h3>
-                <p className="text-xs text-slate-300 mt-0.5 max-w-xl">
+                <p className="text-xs text-slate-600 mt-0.5 max-w-xl">
                   {theme.specialWidget.subtitle} Tap to open your album, paste cartoon buddies, and collect all 20!
                 </p>
               </div>
             </div>
 
             <div className="flex items-center space-x-3 self-stretch sm:self-auto justify-between sm:justify-start">
-              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center min-w-[140px] flex-shrink-0">
-                <span className="text-[10px] text-slate-400 block font-medium uppercase tracking-wider">{theme.specialWidget.statLabel}</span>
-                <span className="text-lg font-black text-amber-400 mt-1 block">
+              <div className="bg-amber-50/60 p-4 rounded-2xl border border-amber-200 text-center min-w-[140px] flex-shrink-0">
+                <span className="text-[10px] text-slate-500 block font-medium uppercase tracking-wider">{theme.specialWidget.statLabel}</span>
+                <span className="text-lg font-black text-amber-800 mt-1 block">
                   {unlockedStickersCount} / {ALL_STICKERS.length} ⭐
                 </span>
               </div>
@@ -582,7 +582,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   e.stopPropagation();
                   setIsStickerBookOpen(true);
                 }}
-                className="px-4 py-2.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs rounded-xl shadow-lg flex items-center space-x-1.5 flex-shrink-0 active:scale-95 transition-transform"
+                className="px-4 py-2.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs rounded-xl shadow-md flex items-center space-x-1.5 flex-shrink-0 active:scale-95 transition-transform cursor-pointer"
               >
                 <BookOpen className="w-4 h-4" />
                 <span>Open Book</span>
@@ -592,64 +592,64 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </div>
       ) : theme.stage === 'MIDDLE' ? (
         /* MIDDLE (Classes 5-8): Tactical Cadet Command & Science Lab */
-        <div className="bg-slate-900 border border-indigo-500/30 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+        <div className="bg-white border border-indigo-200 rounded-3xl p-6 shadow-sm relative overflow-hidden">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start space-x-4">
-              <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-3xl flex items-center justify-center flex-shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-200 text-3xl flex items-center justify-center flex-shrink-0">
                 {theme.specialWidget.emoji}
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase font-mono">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-300 uppercase font-mono">
                     {theme.specialWidget.badgeText}
                   </span>
-                  <span className="text-xs font-bold text-slate-300">Middle School Progression Tree</span>
+                  <span className="text-xs font-bold text-slate-700">Middle School Progression Tree</span>
                 </div>
-                <h3 className="text-lg font-black text-white mt-1">
+                <h3 className="text-lg font-black text-slate-900 mt-1">
                   {theme.specialWidget.title}
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5 max-w-xl">
+                <p className="text-xs text-slate-600 mt-0.5 max-w-xl">
                   {theme.specialWidget.subtitle}
                 </p>
               </div>
             </div>
 
-            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center min-w-[140px] flex-shrink-0">
-              <span className="text-[10px] text-slate-400 block font-medium uppercase font-mono">{theme.specialWidget.statLabel}</span>
-              <span className="text-lg font-black text-indigo-400 mt-1 block font-mono">{theme.specialWidget.statValue}</span>
+            <div className="bg-indigo-50/60 p-4 rounded-2xl border border-indigo-200 text-center min-w-[140px] flex-shrink-0">
+              <span className="text-[10px] text-slate-500 block font-medium uppercase font-mono">{theme.specialWidget.statLabel}</span>
+              <span className="text-lg font-black text-indigo-700 mt-1 block font-mono">{theme.specialWidget.statValue}</span>
             </div>
           </div>
         </div>
       ) : activeGrade === 10 ? (
         /* CLASS 10 TITANS: Official 10th Board Exam Year Hub with Live Countdown Clock */
-        <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-amber-950/30 border-2 border-amber-500/50 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-r from-amber-50 via-white to-amber-50/60 border-2 border-amber-300 rounded-3xl p-6 sm:p-7 shadow-sm relative overflow-hidden">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
-                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 shadow-md">
+                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 shadow-xs">
                   👑 10th Board Exam Headquarters
                 </span>
-                <span className="text-xs font-bold text-amber-300">Target: 100 / 100 in Board Finals</span>
+                <span className="text-xs font-bold text-amber-800">Target: 100 / 100 in Board Finals</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black text-white">
-                CBSE & ICSE Class 10 Specimen Paper Center
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                CBSE &amp; ICSE Class 10 Specimen Paper Center
               </h2>
-              <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+              <p className="text-xs text-slate-600 max-w-xl leading-relaxed">
                 Take timed practice sets calibrated strictly to standard Board Examination formats. Every question features board marking schemes, step-by-step NCERT explanations, and formulas.
               </p>
             </div>
 
             {/* Countdown Pod */}
             <div className="flex items-center space-x-3 w-full lg:w-auto">
-              <div className="bg-slate-950/90 border border-amber-500/40 p-3.5 rounded-2xl text-center min-w-[100px] shadow-lg">
-                <span className="text-[10px] font-mono font-bold text-amber-400 uppercase block">Board Countdown</span>
-                <span className="text-2xl font-black text-white font-mono mt-0.5 block">{daysToBoardExam}</span>
+              <div className="bg-white border border-amber-300 p-3.5 rounded-2xl text-center min-w-[100px] shadow-xs">
+                <span className="text-[10px] font-mono font-bold text-amber-700 uppercase block">Board Countdown</span>
+                <span className="text-2xl font-black text-slate-900 font-mono mt-0.5 block">{daysToBoardExam}</span>
                 <span className="text-[9px] text-slate-500 font-mono">Days Remaining</span>
               </div>
 
-              <div className="bg-slate-950/90 border border-amber-500/40 p-3.5 rounded-2xl text-center min-w-[100px] shadow-lg">
-                <span className="text-[10px] font-mono font-bold text-amber-400 uppercase block">Board Syllabus</span>
-                <span className="text-2xl font-black text-amber-400 font-mono mt-0.5 block">1,000</span>
+              <div className="bg-white border border-amber-300 p-3.5 rounded-2xl text-center min-w-[100px] shadow-xs">
+                <span className="text-[10px] font-mono font-bold text-amber-700 uppercase block">Board Syllabus</span>
+                <span className="text-2xl font-black text-amber-700 font-mono mt-0.5 block">1,000</span>
                 <span className="text-[9px] text-slate-500 font-mono">Curated Questions</span>
               </div>
             </div>
@@ -657,33 +657,33 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </div>
       ) : activeGrade === 12 ? (
         /* CLASS 12 HALL OF FAME: 12th Boards + JEE / NEET / CUET Speed-Run Arena */
-        <div className="bg-gradient-to-r from-red-950/50 via-slate-900 to-amber-950/40 border-2 border-red-500/50 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-r from-red-50 via-white to-amber-50 border-2 border-red-300 rounded-3xl p-6 sm:p-7 shadow-sm relative overflow-hidden">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
-                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white shadow-md">
-                  💎 12th Board & Competitive Arena
+                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 text-white shadow-xs">
+                  💎 12th Board &amp; Competitive Arena
                 </span>
-                <span className="text-xs font-bold text-amber-300">JEE / NEET / CUET Speed-Run Active</span>
+                <span className="text-xs font-bold text-amber-800">JEE / NEET / CUET Speed-Run Active</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black text-white">
-                Class 12 All-India Rank & Distinction Command
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                Class 12 All-India Rank &amp; Distinction Command
               </h2>
-              <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+              <p className="text-xs text-slate-600 max-w-xl leading-relaxed">
                 High-yield multi-concept problems across Calculus, Electromagnetism, Organic Name Reactions, and Genetics with NTA-style timed interface.
               </p>
             </div>
 
             <div className="flex items-center space-x-3 w-full lg:w-auto">
-              <div className="bg-slate-950/90 border border-red-500/40 p-3.5 rounded-2xl text-center min-w-[110px] shadow-lg">
-                <span className="text-[10px] font-mono font-bold text-red-400 uppercase block">Percentile Aim</span>
-                <span className="text-2xl font-black text-white font-mono mt-0.5 block">99.5%</span>
+              <div className="bg-white border border-red-200 p-3.5 rounded-2xl text-center min-w-[110px] shadow-xs">
+                <span className="text-[10px] font-mono font-bold text-red-700 uppercase block">Percentile Aim</span>
+                <span className="text-2xl font-black text-slate-900 font-mono mt-0.5 block">99.5%</span>
                 <span className="text-[9px] text-slate-500 font-mono">Top Percentile</span>
               </div>
 
-              <div className="bg-slate-950/90 border border-amber-500/40 p-3.5 rounded-2xl text-center min-w-[110px] shadow-lg">
-                <span className="text-[10px] font-mono font-bold text-amber-400 uppercase block">Senior Bank</span>
-                <span className="text-2xl font-black text-amber-400 font-mono mt-0.5 block">1,000</span>
+              <div className="bg-white border border-amber-200 p-3.5 rounded-2xl text-center min-w-[110px] shadow-xs">
+                <span className="text-[10px] font-mono font-bold text-amber-700 uppercase block">Senior Bank</span>
+                <span className="text-2xl font-black text-amber-700 font-mono mt-0.5 block">1,000</span>
                 <span className="text-[9px] text-slate-500 font-mono">Advanced Questions</span>
               </div>
             </div>
@@ -691,31 +691,31 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </div>
       ) : (
         /* OTHER SECONDARY & SENIOR (Class 9 & 11) */
-        <div className="bg-slate-900 border border-cyan-500/30 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+        <div className="bg-white border border-cyan-200 rounded-3xl p-6 shadow-sm relative overflow-hidden">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start space-x-4">
-              <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-3xl flex items-center justify-center flex-shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-cyan-50 border border-cyan-200 text-3xl flex items-center justify-center flex-shrink-0">
                 {theme.specialWidget.emoji}
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase font-mono">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-100 text-cyan-800 border border-cyan-300 uppercase font-mono">
                     {theme.specialWidget.badgeText}
                   </span>
-                  <span className="text-xs font-bold text-slate-300">Class {activeGrade} Curriculum Center</span>
+                  <span className="text-xs font-bold text-slate-700">Class {activeGrade} Curriculum Center</span>
                 </div>
-                <h3 className="text-lg font-black text-white mt-1">
+                <h3 className="text-lg font-black text-slate-900 mt-1">
                   {theme.specialWidget.title}
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5 max-w-xl">
+                <p className="text-xs text-slate-600 mt-0.5 max-w-xl">
                   {theme.specialWidget.subtitle}
                 </p>
               </div>
             </div>
 
-            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center min-w-[140px] flex-shrink-0">
-              <span className="text-[10px] text-slate-400 block font-medium uppercase font-mono">{theme.specialWidget.statLabel}</span>
-              <span className="text-lg font-black text-cyan-400 mt-1 block font-mono">{theme.specialWidget.statValue}</span>
+            <div className="bg-cyan-50/60 p-4 rounded-2xl border border-cyan-200 text-center min-w-[140px] flex-shrink-0">
+              <span className="text-[10px] text-slate-500 block font-medium uppercase font-mono">{theme.specialWidget.statLabel}</span>
+              <span className="text-lg font-black text-cyan-800 mt-1 block font-mono">{theme.specialWidget.statValue}</span>
             </div>
           </div>
         </div>
@@ -730,14 +730,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       />
 
       {/* 5. Quota & Subscription Progress Meter */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
           <div>
-            <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-              <Zap className="w-4 h-4 text-amber-400" />
+            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <Zap className="w-4 h-4 text-amber-500" />
               <span>{quota.hasActiveSubscription ? (quota.activePlan === 'GOLD' ? '👑 1-Year Gold VIP Status' : (quota.activePlan === 'LITE' ? 'Concept Booster Status' : `${quota.activePlan} Scholar Status`)) : 'Free Student Plan (3 Levels Included)'}</span>
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-600 mt-0.5">
               {quota.hasActiveSubscription
                 ? (quota.activePlan === 'GOLD'
                     ? `👑 1-Year Gold Pass Active • Full 365 Days All-Access Pass • All Quotas Lifted (${quota.daysRemaining} days remaining)`
@@ -753,13 +753,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           {!quota.hasActiveSubscription ? (
             <button
               onClick={onOpenUpgradeModal}
-              className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs rounded-xl shadow-md transition-all"
+              className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
             >
               Upgrade to Premium (₹49)
             </button>
           ) : (
-            <span className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full flex items-center space-x-1">
-              <CheckCircle2 className="w-3.5 h-3.5" />
+            <span className="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-full flex items-center space-x-1">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               <span>All Quotas Lifted</span>
             </span>
           )}
@@ -767,16 +767,16 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Quizzes Meter */}
-          <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-4">
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
             <div className="flex justify-between items-center text-xs mb-2">
-              <span className="text-slate-400">Quizzes Completed</span>
-              <span className="font-mono font-bold text-white">
+              <span className="text-slate-600">Quizzes Completed</span>
+              <span className="font-mono font-bold text-slate-900">
                 {quota.quizzesCompleted} {quota.hasActiveSubscription ? '• Unlimited Pass' : '• Practice Mode'}
               </span>
             </div>
-            <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
               <div
-                className="h-full rounded-full transition-all bg-indigo-500"
+                className="h-full rounded-full transition-all bg-indigo-600"
                 style={{
                   width: quota.hasActiveSubscription
                     ? '100%'
@@ -787,22 +787,22 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
 
           {/* Course Levels Meter */}
-          <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-4">
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
             <div className="flex justify-between items-center text-xs mb-2">
               <div>
-                <span className="text-slate-400 block">Course Levels Mastered</span>
+                <span className="text-slate-600 block">Course Levels Mastered</span>
                 <span className="text-[10px] text-slate-500 font-mono">≥ 70% score to master</span>
               </div>
-              <span className="font-mono font-bold text-white">
+              <span className="font-mono font-bold text-slate-900">
                 {quota.levelsCompleted} / {quota.hasActiveSubscription ? '∞ (All Levels Unlocked)' : quota.maxLevels}
               </span>
             </div>
-            <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${
                   quota.levelsCompleted >= 3 && !quota.hasActiveSubscription
-                    ? 'bg-red-500'
-                    : 'bg-emerald-500'
+                    ? 'bg-rose-500'
+                    : 'bg-emerald-600'
                 }`}
                 style={{
                   width: quota.hasActiveSubscription
@@ -817,28 +817,28 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
       {/* 4.5 Latest Quiz Diagnostic Report Spotlight */}
       {latestReportMsg && latestReportMsg.quizReport && (
-        <div className="bg-gradient-to-r from-purple-950/60 via-slate-900 to-indigo-950/60 border border-purple-500/40 rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-purple-50 border border-purple-200 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center space-x-4 min-w-0">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg flex-shrink-0 shadow-inner ${
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg flex-shrink-0 shadow-xs ${
               latestReportMsg.quizReport.accuracyPercent >= 70
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                : 'bg-amber-100 text-amber-800 border border-amber-300'
             }`}>
               {latestReportMsg.quizReport.accuracyPercent}%
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-950 text-purple-300 border border-purple-800">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-300">
                   Latest Quiz Report
                 </span>
-                <span className="text-xs font-bold text-white truncate">
+                <span className="text-xs font-bold text-slate-900 truncate">
                   {latestReportMsg.quizReport.subjectId.toUpperCase()} • {latestReportMsg.quizReport.levelNode}
                 </span>
-                <span className="text-[11px] text-slate-400 font-mono">
+                <span className="text-[11px] text-slate-500 font-mono">
                   ({latestReportMsg.quizReport.score}/{latestReportMsg.quizReport.totalQuestions} Correct)
                 </span>
               </div>
-              <p className="text-xs text-slate-300 line-clamp-1 max-w-xl">
+              <p className="text-xs text-slate-600 line-clamp-1 max-w-xl">
                 {latestReportMsg.preview}
               </p>
             </div>
@@ -846,7 +846,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
           <button
             onClick={() => handleOpenMailboxModal(latestReportMsg.id)}
-            className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-950 transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer"
           >
             <Mail className="w-4 h-4" />
             <span>View Full Report</span>
@@ -859,62 +859,62 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
         <button
           onClick={() => onNavigate('SPIN_WHEEL')}
-          className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 text-left transition-all group"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-2xl p-4 text-left transition-all group shadow-xs cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <StudyCoinIcon className="w-6 h-6" glow />
           </div>
-          <p className="text-xs font-bold text-white">Daily Spin Wheel</p>
-          <span className="text-[10px] text-slate-400">24h UTC Cooldown</span>
+          <p className="text-xs font-bold text-slate-900">Daily Spin Wheel</p>
+          <span className="text-[10px] text-slate-500">24h UTC Cooldown</span>
         </button>
 
         <button
           onClick={() => onNavigate('QOTD')}
-          className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 text-left transition-all group"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-400 rounded-2xl p-4 text-left transition-all group shadow-xs cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Compass className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-white">Question of Day</p>
-          <span className="text-[10px] text-slate-400">Streak Booster</span>
+          <p className="text-xs font-bold text-slate-900">Question of Day</p>
+          <span className="text-[10px] text-slate-500">Streak Booster</span>
         </button>
 
         <button
           onClick={() => onNavigate('NOVA_AI')}
-          className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 text-left transition-all group"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-violet-400 rounded-2xl p-4 text-left transition-all group shadow-xs cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-xl bg-violet-500/10 text-violet-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Zap className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-white">Nova AI Socratic</p>
-          <span className="text-[10px] text-slate-400">24/7 AI Tutor</span>
+          <p className="text-xs font-bold text-slate-900">Nova AI Socratic</p>
+          <span className="text-[10px] text-slate-500">24/7 AI Tutor</span>
         </button>
 
         <button
           onClick={() => handleOpenMailboxModal(null)}
-          className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 text-left transition-all group relative overflow-hidden"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-purple-400 rounded-2xl p-4 text-left transition-all group relative overflow-hidden shadow-xs cursor-pointer"
         >
           {unreadMailCount > 0 && (
-            <span className="absolute top-3 right-3 px-2 py-0.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[10px] font-bold rounded-full animate-pulse">
+            <span className="absolute top-3 right-3 px-2 py-0.5 bg-indigo-100 border border-indigo-300 text-indigo-800 text-[10px] font-bold rounded-full animate-pulse">
               {unreadMailCount} New
             </span>
           )}
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Mail className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-white">Student Mailbox</p>
-          <span className="text-[10px] text-slate-400">Quiz Diagnostic Reports</span>
+          <p className="text-xs font-bold text-slate-900">Student Mailbox</p>
+          <span className="text-[10px] text-slate-500">Quiz Diagnostic Reports</span>
         </button>
 
         <button
           onClick={() => onNavigate('GIFT_STORE')}
-          className="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 rounded-2xl p-4 text-left transition-all group"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-emerald-400 rounded-2xl p-4 text-left transition-all group shadow-xs cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Award className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-white">Rewards Store</p>
-          <span className="text-[10px] text-slate-400">Toys, Badges &amp; Bottles</span>
+          <p className="text-xs font-bold text-slate-900">Rewards Store</p>
+          <span className="text-[10px] text-slate-500">Toys, Badges &amp; Bottles</span>
         </button>
       </div>
 
@@ -924,21 +924,21 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div>
             <div className="flex items-center space-x-2">
               <span className="text-lg">{theme.mascot.emoji}</span>
-              <h2 className="text-lg font-bold text-white">
+              <h2 className="text-lg font-bold text-slate-900">
                 Course Catalogue: {learner.board} Class {activeGrade}
               </h2>
               <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase ${theme.pillColor}`}>
                 1,000 Quizzes Loaded
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-600 mt-0.5">
               Select any subject to launch 4-level progression (Foundation, Concept, Exam-Ready, Olympiad).
             </p>
           </div>
 
           <button
             onClick={() => onNavigate('COURSES', { grade: activeGrade })}
-            className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center space-x-1 self-start sm:self-auto"
+            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 self-start sm:self-auto cursor-pointer"
           >
             <span>Browse Full Syllabus</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -950,27 +950,27 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <div
               key={subject.id}
               onClick={() => onNavigate('LEVELS', { subjectId: subject.id, grade: activeGrade })}
-              className={`bg-slate-900 border rounded-3xl p-6 cursor-pointer transition-all shadow-xl flex flex-col justify-between group ${theme.cardBorder} ${theme.cardHover}`}
+              className={`bg-white border rounded-3xl p-6 cursor-pointer transition-all shadow-sm flex flex-col justify-between group ${theme.cardBorder} ${theme.cardHover}`}
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 bg-slate-100 border border-slate-200 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                     {subject.icon}
                   </div>
-                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-slate-950 text-slate-400 border border-slate-800">
+                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
                     Class {activeGrade} Bank
                   </span>
                 </div>
 
-                <h3 className="font-bold text-white text-base group-hover:text-amber-400 transition-colors">
+                <h3 className="font-bold text-slate-900 text-base group-hover:text-indigo-600 transition-colors">
                   {subject.name}
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                <p className="text-xs text-slate-600 mt-1 line-clamp-2 leading-relaxed">
                   {subject.description}
                 </p>
               </div>
 
-              <div className="mt-6 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-indigo-400 font-semibold group-hover:text-amber-400 transition-colors">
+              <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-indigo-600 font-semibold group-hover:text-indigo-800 transition-colors">
                 <span>Start Practice Quiz</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -980,14 +980,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       </div>
 
       {/* 7. Class Badges & Milestones Showcase */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
               <span>{theme.mascot.emoji}</span>
-              <span>Class {activeGrade} Academic Badges & Milestones</span>
+              <span>Class {activeGrade} Academic Badges &amp; Milestones</span>
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-600 mt-0.5">
               Complete quizzes with 70%+ score to unlock signature Class {activeGrade} achievements.
             </p>
           </div>
@@ -997,14 +997,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           {theme.badges.map((b, idx) => (
             <div
               key={idx}
-              className="bg-slate-950 border border-slate-800/80 rounded-2xl p-3.5 text-center flex flex-col items-center justify-between space-y-2 hover:border-slate-700 transition-colors"
+              className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-center flex flex-col items-center justify-between space-y-2 hover:border-slate-300 transition-colors"
             >
               <span className="text-3xl">{b.emoji}</span>
               <div>
-                <p className="text-xs font-bold text-white">{b.title}</p>
-                <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-2">{b.desc}</p>
+                <p className="text-xs font-bold text-slate-900">{b.title}</p>
+                <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-2">{b.desc}</p>
               </div>
-              <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-slate-900 text-slate-400 border border-slate-800">
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-700 border border-slate-300">
                 Class {activeGrade} Badge
               </span>
             </div>

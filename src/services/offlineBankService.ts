@@ -55,6 +55,222 @@ export class OfflineBankService {
   }
 
   private static FALLBACK_QUESTIONS: Question[] = [
+    // --- CLASS 1 CBSE/ICSE MATHEMATICS (Authentic Early Primary Curriculum) ---
+    {
+      id: 'q_cbse_1_m_01',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'math',
+      levelNode: 'FOUNDATION',
+      text: 'Calculate the sum: What is 4 + 3?',
+      options: ['6', '7', '8', '9'],
+      correctIndex: 1,
+      explanation: 'Counting 4 items and adding 3 more items gives 7 items in total: 4 + 3 = 7.',
+      hint: 'Count forward 3 steps from 4: 5, 6, 7.',
+      difficulty: 'EASY',
+      topicTag: 'Addition & Word Problems'
+    },
+    {
+      id: 'q_cbse_1_m_02',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'math',
+      levelNode: 'CONCEPT',
+      text: 'Aarav has 5 red balloons. His sister gives him 4 more green balloons. How many balloons does Aarav have altogether?',
+      options: ['8 balloons', '9 balloons', '10 balloons', '11 balloons'],
+      correctIndex: 1,
+      explanation: '5 + 4 = 9 balloons altogether in Aarav\'s hand.',
+      hint: 'Add 5 and 4 together.',
+      difficulty: 'EASY',
+      topicTag: 'Addition & Word Problems'
+    },
+    {
+      id: 'q_cbse_1_m_03',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'math',
+      levelNode: 'EXAM_READY',
+      text: 'Subtract: What is 9 - 5?',
+      options: ['3', '4', '5', '6'],
+      correctIndex: 1,
+      explanation: 'Taking away 5 from 9 leaves 4: 9 - 5 = 4.',
+      hint: 'Start at 9 and count backwards 5 steps.',
+      difficulty: 'EASY',
+      topicTag: 'Subtraction & Regrouping'
+    },
+    {
+      id: 'q_cbse_1_m_04',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'math',
+      levelNode: 'OLYMPIAD',
+      text: 'Which 2D shape has exactly 3 straight sides and 3 sharp corners (vertices)?',
+      options: ['Circle', 'Triangle', 'Square', 'Rectangle'],
+      correctIndex: 1,
+      explanation: 'A triangle is a geometric shape with 3 sides and 3 corners.',
+      hint: 'Think of a slice of pizza or an ice cream cone tip.',
+      difficulty: 'MEDIUM',
+      topicTag: '2D Shapes & Spatial Sense'
+    },
+    {
+      id: 'q_cbse_1_m_05',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'math',
+      levelNode: 'FOUNDATION',
+      text: 'Which number comes immediately after 19 when counting forward?',
+      options: ['18', '20', '21', '29'],
+      correctIndex: 1,
+      explanation: 'When counting numbers forward: 18, 19, 20. Twenty comes right after 19.',
+      hint: 'What number is 1 more than 19?',
+      difficulty: 'EASY',
+      topicTag: 'Number Sequences & Place Value'
+    },
+
+    // --- CLASS 1 COMPUTER SCIENCE (MS Paint & Hardware Devices) ---
+    {
+      id: 'q_cbse_1_cs_01',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'cs',
+      levelNode: 'FOUNDATION',
+      text: 'Which tool in MS Paint is used to fill a closed drawing shape with color with just one click?',
+      options: ['Pencil Tool', 'Fill with Color (Paint Bucket)', 'Eraser Tool', 'Text Tool'],
+      correctIndex: 1,
+      explanation: 'The Fill with Color bucket tool pours your chosen color inside any completely closed shape.',
+      hint: 'It looks like a tilted bucket spilling paint.',
+      difficulty: 'EASY',
+      topicTag: 'MS Paint & Creative Drawing Tools'
+    },
+    {
+      id: 'q_cbse_1_cs_02',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'cs',
+      levelNode: 'CONCEPT',
+      text: 'Which part of a computer looks like a television screen and displays pictures, games, and text?',
+      options: ['CPU Box', 'Monitor', 'Computer Mouse', 'Keyboard'],
+      correctIndex: 1,
+      explanation: 'The Monitor is the visual display screen showing everything you do on a computer.',
+      hint: 'It is the screen right in front of your eyes!',
+      difficulty: 'EASY',
+      topicTag: 'Computer Parts & Hardware Devices'
+    },
+    {
+      id: 'q_cbse_1_cs_03',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'cs',
+      levelNode: 'EXAM_READY',
+      text: 'Which part of a computer is called the "Brain of the Computer" because it does all calculations?',
+      options: ['Computer Mouse', 'Monitor', 'CPU (Central Processing Unit)', 'Speakers'],
+      correctIndex: 2,
+      explanation: 'The CPU (Central Processing Unit) processes all commands and is called the brain of the computer.',
+      hint: 'It has 3 letters: C-P-U.',
+      difficulty: 'EASY',
+      topicTag: 'Computer Parts & Hardware Devices'
+    },
+    {
+      id: 'q_cbse_1_cs_04',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'cs',
+      levelNode: 'OLYMPIAD',
+      text: 'Which tool in MS Paint helps you rub out or erase any accidental mistake on your canvas?',
+      options: ['Color Palette', 'Brush Tool', 'Eraser Tool', 'Magnifier'],
+      correctIndex: 2,
+      explanation: 'The Eraser tool rubs out lines or color mistakes on the MS Paint drawing canvas.',
+      hint: 'Just like the rubber eraser at the back of your pencil!',
+      difficulty: 'EASY',
+      topicTag: 'MS Paint & Creative Drawing Tools'
+    },
+    {
+      id: 'q_cbse_1_cs_05',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'cs',
+      levelNode: 'FOUNDATION',
+      text: 'Which handheld device has two buttons and a small wheel in the center to point and click?',
+      options: ['Computer Mouse', 'Keyboard', 'Webcam', 'Printer'],
+      correctIndex: 0,
+      explanation: 'A computer mouse is moved by hand to point, click icons, and scroll web pages.',
+      hint: 'It shares its name with a tiny animal that likes cheese!',
+      difficulty: 'EASY',
+      topicTag: 'Computer Parts & Hardware Devices'
+    },
+
+    // --- CLASS 1 EVS / SOCIAL STUDIES (Body Parts, Plants, Animals, Our Planet, Regional Languages) ---
+    {
+      id: 'q_cbse_1_evs_01',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'evs',
+      levelNode: 'FOUNDATION',
+      text: 'Which of our 5 sense organs helps us to see the colors, flowers, and world around us?',
+      options: ['Ears', 'Eyes', 'Nose', 'Tongue'],
+      correctIndex: 1,
+      explanation: 'We see with our Eyes. The 5 sense organs are eyes (sight), ears (hearing), nose (smell), tongue (taste), and skin (touch).',
+      hint: 'You close them when you go to sleep at night.',
+      difficulty: 'EASY',
+      topicTag: 'My Body Parts & 5 Sense Organs'
+    },
+    {
+      id: 'q_cbse_1_evs_02',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'evs',
+      levelNode: 'CONCEPT',
+      text: 'Which part of a plant grows under the soil and absorbs water from the earth?',
+      options: ['Flower', 'Green Leaves', 'Roots', 'Stem'],
+      correctIndex: 2,
+      explanation: 'Roots grow underground, holding the plant firmly and absorbing water and minerals from the soil.',
+      hint: 'They are hidden under the ground.',
+      difficulty: 'EASY',
+      topicTag: 'Plants Around Us & Green World'
+    },
+    {
+      id: 'q_cbse_1_evs_03',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'evs',
+      levelNode: 'EXAM_READY',
+      text: 'Which of the following animals is a loving domestic pet that barks and guards our home?',
+      options: ['Lion', 'Dog', 'Elephant', 'Tiger'],
+      correctIndex: 1,
+      explanation: 'Dogs are loyal pets that live with us and guard our homes with affection.',
+      hint: 'Man\'s best friend that barks: woof woof!',
+      difficulty: 'EASY',
+      topicTag: 'Animals & Their Homes'
+    },
+    {
+      id: 'q_cbse_1_evs_04',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'evs',
+      levelNode: 'OLYMPIAD',
+      text: 'Which regional language is primarily spoken by people in the Indian state of Maharashtra?',
+      options: ['Tamil', 'Marathi', 'Bengali', 'Punjabi'],
+      correctIndex: 1,
+      explanation: 'Marathi is the primary regional language of Maharashtra.',
+      hint: 'The state where Mumbai and Pune are located.',
+      difficulty: 'MEDIUM',
+      topicTag: 'Regional Languages & Festivals of India'
+    },
+    {
+      id: 'q_cbse_1_evs_05',
+      board: 'CBSE',
+      grade: 1,
+      subjectId: 'evs',
+      levelNode: 'FOUNDATION',
+      text: 'The festival of lights celebrated across India by lighting clay lamps (diyas) and sharing sweets is:',
+      options: ['Holi', 'Diwali', 'Eid', 'Christmas'],
+      correctIndex: 1,
+      explanation: 'Diwali (Deepavali) is the festival of lights celebrated with oil lamps, rangoli, and sweets.',
+      hint: 'People light diyas and candles on this night.',
+      difficulty: 'EASY',
+      topicTag: 'Regional Languages & Festivals of India'
+    },
+
     // --- CLASS 10 CBSE MATHEMATICS ---
     {
       id: 'q_cbse_10_m_01',
@@ -418,16 +634,9 @@ export class OfflineBankService {
       );
     }
 
-    // If still empty, match subject and node across platform
-    if (matches.length === 0) {
-      matches = candidatePool.filter(q => normSub(q.subjectId) === targetSub && q.levelNode === levelNode);
-    }
-    if (matches.length === 0) {
-      matches = candidatePool.filter(q => normSub(q.subjectId) === targetSub);
-    }
-    if (matches.length === 0) {
-      matches = candidatePool;
-    }
+    // STRICT GRADE ISOLATION: NEVER cross grade boundaries!
+    // A Grade 1 student must never be served Grade 5 or Grade 10 questions.
+    matches = matches.filter(q => Number(q.grade) === Number(grade));
 
     // Crucial: Sort by chapter/topicTag so questions are organized chapter-by-chapter!
     const organized = [...matches].sort((a, b) => {
@@ -503,29 +712,195 @@ export class OfflineBankService {
     count: number
   ): Question[] {
     const list: Question[] = [];
+    const sId = (subjectId || '').toLowerCase();
+
     for (let i = 1; i <= count; i++) {
-      const correctIdx = Math.floor(Math.random() * 4);
-      const options = [
-        `Principle Alpha: Universal conservation and equilibrium under ${board} guidelines.`,
-        `Principle Beta: Inverse proportional relationship across dimensional metrics.`,
-        `Principle Gamma: Direct empirical correlation with standard SI baseline units.`,
-        `Principle Delta: Constant derivative rate of change in closed systems.`
-      ];
-      const correctChoice = options[correctIdx];
+      let text = '';
+      let options: string[] = [];
+      let correctIndex = 0;
+      let explanation = '';
+      let hint = '';
+      let topicTag = 'Core Practice';
+
+      // 1. MATHEMATICS DYNAMIC GENERATOR
+      if (sId.includes('math')) {
+        if (grade <= 2) {
+          // Grade 1-2 Addition / Subtraction
+          const a = (i * 3) % 9 + 2;
+          const b = (i * 2) % 7 + 1;
+          const sum = a + b;
+          text = `Calculate the sum: What is ${a} + ${b}?`;
+          options = [`${sum - 1}`, `${sum}`, `${sum + 2}`, `${sum + 1}`];
+          correctIndex = 1;
+          explanation = `Adding ${a} and ${b} gives ${sum}: ${a} + ${b} = ${sum}.`;
+          hint = `Count forward ${b} numbers starting from ${a}.`;
+          topicTag = 'Addition & Word Problems';
+        } else if (grade <= 5) {
+          // Grade 3-5 Multiplication / Fractions
+          const a = (i * 3) % 8 + 3;
+          const b = (i * 2) % 6 + 4;
+          const prod = a * b;
+          text = `What is the product of ${a} × ${b}?`;
+          options = [`${prod - 2}`, `${prod + 4}`, `${prod}`, `${prod - 4}`];
+          correctIndex = 2;
+          explanation = `${a} multiplied by ${b} equals ${prod}.`;
+          hint = `Recall multiplication tables for ${a}.`;
+          topicTag = 'Multiplication Tables & Operations';
+        } else if (grade <= 8) {
+          // Grade 6-8 Linear Equations / Algebra
+          const coeff = (i % 4) + 2;
+          const root = (i % 5) + 3;
+          const constant = (i * 2) % 9 + 1;
+          const rhs = coeff * root + constant;
+          text = `Solve for x: ${coeff}x + ${constant} = ${rhs}`;
+          options = [`x = ${root - 1}`, `x = ${root + 2}`, `x = ${root}`, `x = ${root + 1}`];
+          correctIndex = 2;
+          explanation = `${coeff}x = ${rhs} - ${constant} = ${coeff * root} => x = ${root}.`;
+          hint = `Subtract ${constant} from both sides, then divide by ${coeff}.`;
+          topicTag = 'Linear Equations in One Variable';
+        } else if (grade <= 10) {
+          // Grade 9-10 Trigonometry & Quadratics
+          const trigQ = [
+            { t: 'What is the exact value of sin(30°)?', o: ['1/√2', '1/2', '√3/2', '1'], c: 1, e: 'sin(30°) = 1/2.', tag: 'Trigonometry' },
+            { t: 'If discriminant D = b² - 4ac > 0, what is the nature of the quadratic roots?', o: ['Two equal real roots', 'Two distinct real roots', 'No real roots', 'Purely imaginary roots'], c: 1, e: 'When D > 0, the equation has two distinct real roots.', tag: 'Quadratic Equations' },
+            { t: 'Which trigonometric identity is universally true for any angle θ?', o: ['sin²θ - cos²θ = 1', 'sin²θ + cos²θ = 1', 'tan²θ + 1 = cos²θ', 'sec²θ + tan²θ = 1'], c: 1, e: 'Fundamental Pythagorean identity: sin²θ + cos²θ = 1.', tag: 'Trigonometric Identities' },
+            { t: 'In an AP with first term a = 5 and common difference d = 3, find the 10th term a₁₀.', o: ['32', '35', '38', '29'], c: 0, e: 'a₁₀ = a + 9d = 5 + 9(3) = 5 + 27 = 32.', tag: 'Arithmetic Progressions' }
+          ];
+          const pick = trigQ[(i - 1) % trigQ.length];
+          text = pick.t;
+          options = pick.o;
+          correctIndex = pick.c;
+          explanation = pick.e;
+          hint = 'Use standard formulas for Class 10 Board syllabus.';
+          topicTag = pick.tag;
+        } else {
+          // Senior Math (Grades 11-12)
+          text = `Find the derivative d/dx (x³) with respect to x:`;
+          options = ['3x²', '2x³', 'x²', '3x'];
+          correctIndex = 0;
+          explanation = 'Using the power rule d/dx(xⁿ) = n·xⁿ⁻¹: d/dx(x³) = 3x².';
+          hint = 'Bring the exponent down in front and subtract 1 from the power.';
+          topicTag = 'Calculus: Derivatives';
+        }
+      }
+      // 2. COMPUTER SCIENCE DYNAMIC GENERATOR
+      else if (sId.includes('cs') || sId.includes('comp') || sId.includes('code')) {
+        if (grade <= 2) {
+          const cs1Q = [
+            { t: 'Which tool in MS Paint lets you draw freehand smooth lines just like a pencil?', o: ['Eraser', 'Pencil Tool', 'Text Tool', 'Magnifier'], c: 1, e: 'The Pencil tool allows freehand sketching on the canvas.', tag: 'MS Paint & Creative Drawing Tools' },
+            { t: 'Which key on the keyboard is the longest key and puts spaces between words?', o: ['Enter Key', 'Spacebar', 'Backspace', 'Shift Key'], c: 1, e: 'The Spacebar is the widest key on a keyboard used to add blank spaces between words.', tag: 'Computer Parts & Hardware Devices' },
+            { t: 'What is the small blinking vertical line on the monitor screen called?', o: ['Pointer', 'Cursor', 'Icon', 'Button'], c: 1, e: 'The cursor blinks on the screen to show where the next typed letter will appear.', tag: 'Smart Machines & Safe Computer Habits' },
+            { t: 'Which tool in MS Paint has a palette of red, blue, green, and yellow circles to choose colors?', o: ['Color Palette', 'Eraser', 'Shapes Tool', 'Pencil'], c: 0, e: 'The Color Palette lets you pick any drawing or fill color.', tag: 'MS Paint & Creative Drawing Tools' }
+          ];
+          const pick = cs1Q[(i - 1) % cs1Q.length];
+          text = pick.t;
+          options = pick.o;
+          correctIndex = pick.c;
+          explanation = pick.e;
+          hint = 'Think about everyday MS Paint and keyboard tools.';
+          topicTag = pick.tag;
+        } else if (grade <= 6) {
+          const cs5Q = [
+            { t: 'In Scratch programming, which block runs the scripts inside it endlessly without stopping?', o: ['Repeat 10', 'Forever Block', 'If-Then', 'Wait 1 Sec'], c: 1, e: 'The Forever control block loops instructions endlessly until the stop sign is clicked.', tag: 'Scratch Game Programming & Loops' },
+            { t: 'In HTML, which element tag is used to create the highest level, largest heading on a webpage?', o: ['<p>', '<h6>', '<h1>', '<title>'], c: 2, e: '<h1> defines the largest primary heading in HTML.', tag: 'HTML Web Page Basics' },
+            { t: 'Why is it dangerous to share your personal passwords or home address with strangers in online games?', o: ['It slows the computer down', 'It violates cyber safety and compromises your privacy', 'It changes the mouse speed', 'It deletes the game icon'], c: 1, e: 'Cyber safety requires keeping private credentials and location confidential.', tag: 'Cyber Safety & Internet Ethics' }
+          ];
+          const pick = cs5Q[(i - 1) % cs5Q.length];
+          text = pick.t;
+          options = pick.o;
+          correctIndex = pick.c;
+          explanation = pick.e;
+          hint = 'Recall standard Scratch blocks and HTML tags.';
+          topicTag = pick.tag;
+        } else if (grade <= 8) {
+          const cs8Q = [
+            { t: 'In Python programming, which built-in function displays messages or output onto the screen console?', o: ['echo()', 'print()', 'output()', 'display()'], c: 1, e: 'print() is the standard Python function used to print output to the console.', tag: 'Python Programming Basics' },
+            { t: 'In CSS styling, which property is used to change the text color of a paragraph?', o: ['font-style', 'background-color', 'color', 'text-align'], c: 2, e: 'The CSS color property sets the foreground color of text.', tag: 'HTML & CSS Web Development' },
+            { t: 'In MIT App Inventor, which workspace view is used to drag buttons, labels, and arrange mobile screen UI?', o: ['Blocks Editor', 'Designer View', 'Terminal', 'Debugger'], c: 1, e: 'The Designer View in App Inventor arranges visual mobile components.', tag: 'MIT App Inventor & Mobile Apps' }
+          ];
+          const pick = cs8Q[(i - 1) % cs8Q.length];
+          text = pick.t;
+          options = pick.o;
+          correctIndex = pick.c;
+          explanation = pick.e;
+          hint = 'Python print() and CSS styling syntax.';
+          topicTag = pick.tag;
+        } else {
+          // Grades 9-12
+          const cs10Q = [
+            { t: 'In Python, what is the output of len(["apple", "banana", "cherry"])?', o: ['2', '3', '4', '15'], c: 1, e: 'len() returns the number of elements in the list: 3 items.', tag: 'Python Programming & Algorithms' },
+            { t: 'In SQL database queries, which command is used to retrieve data from a table?', o: ['FETCH', 'GET', 'SELECT', 'EXTRACT'], c: 2, e: 'SELECT is the standard SQL command to query and fetch records from tables.', tag: 'SQL & Relational Database Management' },
+            { t: 'Which HTML5 semantic tag represents the introductory navigation bar of a website?', o: ['<header>', '<nav>', '<section>', '<aside>'], c: 1, e: '<nav> specifies a section containing navigation links.', tag: 'HTML5 & Responsive Web Design' }
+          ];
+          const pick = cs10Q[(i - 1) % cs10Q.length];
+          text = pick.t;
+          options = pick.o;
+          correctIndex = pick.c;
+          explanation = pick.e;
+          hint = 'Python len() and SQL query commands.';
+          topicTag = pick.tag;
+        }
+      }
+      // 3. EVS, SCIENCE & SOCIAL STUDIES DYNAMIC GENERATOR
+      else {
+        if (grade <= 2) {
+          const evs1Q = [
+            { t: 'Which of our 5 sense organs helps us to taste yummy ice creams and identify sweet or sour foods?', o: ['Ears', 'Eyes', 'Nose', 'Tongue'], c: 3, e: 'The Tongue has taste buds to detect sweet, salty, sour, and bitter tastes.', tag: 'My Body Parts & 5 Sense Organs' },
+            { t: 'Which beautiful part of a plant attracts butterflies and bees with its sweet fragrance and colors?', o: ['Roots', 'Flower', 'Stem', 'Bark'], c: 1, e: 'Flowers are the colorful parts of plants that attract pollinators.', tag: 'Plants Around Us & Green World' },
+            { t: 'Which of the following animals lives in water and breathes through gills?', o: ['Dog', 'Fish', 'Cat', 'Sparrow'], c: 1, e: 'Fish live in water and use gills to breathe oxygen.', tag: 'Animals & Their Homes' },
+            { t: 'Which bright celestial body in the sky gives our planet Earth light and warmth every morning?', o: ['Moon', 'The Sun', 'Mars', 'Clouds'], c: 1, e: 'The Sun gives natural light and warmth to Earth.', tag: 'Our Planet Earth, Sun & Weather' },
+            { t: 'Which regional language is widely spoken in the Indian state of Tamil Nadu?', o: ['Tamil', 'Hindi', 'Bengali', 'Gujarati'], c: 0, e: 'Tamil is the official regional language of Tamil Nadu.', tag: 'Regional Languages & Festivals of India' }
+          ];
+          const pick = evs1Q[(i - 1) % evs1Q.length];
+          text = pick.t;
+          options = pick.o;
+          correctIndex = pick.c;
+          explanation = pick.e;
+          hint = 'Think of your 5 senses and nature around you.';
+          topicTag = pick.tag;
+        } else if (grade <= 5) {
+          const sci5Q = [
+            { t: 'What is the green pigment in leaves that traps sunlight to help plants perform photosynthesis?', o: ['Hemoglobin', 'Chlorophyll', 'Melanin', 'Stomata'], c: 1, e: 'Chlorophyll absorbs sunlight required for photosynthesis.', tag: 'Plants, Photosynthesis & Forests' },
+            { t: 'How many continents exist on our planet Earth?', o: ['5', '6', '7', '8'], c: 2, e: 'There are 7 continents: Asia, Africa, North America, South America, Antarctica, Europe, and Australia.', tag: 'Our Planet Earth: Continents, Oceans & Maps' },
+            { t: 'In Indian villages, what is the elected local governing council responsible for local amenities called?', o: ['Municipal Corporation', 'Gram Panchayat', 'Lok Sabha', 'Supreme Court'], c: 1, e: 'Gram Panchayat is the local self-government body in Indian villages.', tag: 'Local Government & Community Helpers' }
+          ];
+          const pick = sci5Q[(i - 1) % sci5Q.length];
+          text = pick.t;
+          options = pick.o;
+          correctIndex = pick.c;
+          explanation = pick.e;
+          hint = 'Primary Science & Social Studies syllabus.';
+          topicTag = pick.tag;
+        } else {
+          // Grades 6-10
+          const sci10Q = [
+            { t: 'According to Newton\'s Second Law of Motion, force is equal to mass multiplied by:', o: ['Velocity', 'Acceleration', 'Distance', 'Momentum'], c: 1, e: 'F = m · a (Force = Mass × Acceleration).', tag: 'Physics: Kinematics & Laws of Motion' },
+            { t: 'What is the chemical formula of baking soda used commonly in households?', o: ['NaCl', 'NaHCO₃ (Sodium Hydrogen Carbonate)', 'CaCO₃', 'Na₂CO₃'], c: 1, e: 'Baking soda is sodium hydrogen carbonate (NaHCO₃).', tag: 'Chemistry: Acids, Bases & Salts' },
+            { t: 'In the Indian democratic architecture, which institution acts as the highest court of appeal and guardian of the Constitution?', o: ['Parliament', 'Supreme Court of India', 'Election Commission', 'Prime Minister Office'], c: 1, e: 'The Supreme Court of India is the apex judicial body.', tag: 'Democratic Politics & Government Architecture' }
+          ];
+          const pick = sci10Q[(i - 1) % sci10Q.length];
+          text = pick.t;
+          options = pick.o;
+          correctIndex = pick.c;
+          explanation = pick.e;
+          hint = 'Class 10 CBSE/ICSE Science & Civics curriculum.';
+          topicTag = pick.tag;
+        }
+      }
 
       list.push({
-        id: `synth_${board.toLowerCase()}_${grade}_${subjectId}_${i}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        id: `synth_${board.toLowerCase()}_g${grade}_${subjectId}_${i}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
         board,
         grade,
         subjectId,
         levelNode,
-        text: `[${board} Class ${grade} • ${levelNode}] Practice Challenge #${i}: Which of the following statements represents the core scientific/mathematical principle for ${subjectId.toUpperCase()}?`,
+        text,
         options,
-        correctIndex: correctIdx,
-        explanation: `Under the ${board} Class ${grade} curriculum for ${subjectId}, "${correctChoice.split(':')[0]}" provides the primary foundational baseline.`,
-        hint: `Focus on the conservation and equilibrium principle introduced in the ${board} Class ${grade} syllabus.`,
+        correctIndex,
+        explanation,
+        hint,
         difficulty: levelNode === 'OLYMPIAD' ? 'HARD' : levelNode === 'EXAM_READY' ? 'MEDIUM' : 'EASY',
-        topicTag: `${subjectId.toUpperCase()} Core Unit ${i}`
+        topicTag
       });
     }
     return list;

@@ -246,21 +246,21 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
               key={sch.id}
               className={`rounded-3xl p-5 border relative overflow-hidden transition-all flex flex-col justify-between ${
                 canClaim
-                  ? 'bg-gradient-to-br from-amber-950/60 via-slate-900 to-slate-900 border-amber-500/70 shadow-xl shadow-amber-950/30'
+                  ? 'bg-gradient-to-br from-amber-50 via-white to-amber-50 border-amber-400 shadow-sm'
                   : isClaimed
-                  ? 'bg-slate-900/80 border-emerald-500/40 shadow-md'
-                  : 'bg-slate-900/90 border-slate-800 hover:border-slate-700 shadow-lg'
+                  ? 'bg-emerald-50/40 border-emerald-300 shadow-xs'
+                  : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
               }`}
             >
               <div className="space-y-3">
                 {/* Top Badges */}
                 <div className="flex items-center justify-between gap-2">
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide flex items-center space-x-1.5 bg-indigo-950 border border-indigo-800 text-indigo-300">
-                    <Globe className="w-3 h-3 text-indigo-400" />
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide flex items-center space-x-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700">
+                    <Globe className="w-3 h-3 text-indigo-600" />
                     <span>{sch.durationDays} Days Sprint</span>
                   </span>
 
-                  <span className="px-2.5 py-1 rounded-full text-xs font-black tracking-wide flex items-center space-x-1.5 bg-amber-500/20 border border-amber-500/50 text-amber-300">
+                  <span className="px-2.5 py-1 rounded-full text-xs font-black tracking-wide flex items-center space-x-1.5 bg-amber-100 border border-amber-300 text-amber-800">
                     <StudyCoinIcon className="w-3.5 h-3.5" glow />
                     <span>+{sch.rewardCoins} Coins</span>
                   </span>
@@ -268,47 +268,47 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
 
                 {/* Title & Description */}
                 <div>
-                  <h4 className="text-base font-extrabold text-white leading-snug">{sch.title}</h4>
-                  <p className="text-xs text-slate-300 mt-1 line-clamp-2 leading-relaxed">
+                  <h4 className="text-base font-extrabold text-slate-900 leading-snug">{sch.title}</h4>
+                  <p className="text-xs text-slate-600 mt-1 line-clamp-2 leading-relaxed">
                     {sch.description}
                   </p>
                 </div>
 
                 {/* Linked ACode Voucher if available */}
                 {sch.acode && (
-                  <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-indigo-950/70 border border-indigo-800/70 text-[11px] text-indigo-300">
-                    <KeyRound className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>Voucher Code: <strong className="font-mono text-white">{sch.acode}</strong></span>
+                  <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-[11px] text-indigo-800">
+                    <KeyRound className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Voucher Code: <strong className="font-mono text-slate-900">{sch.acode}</strong></span>
                     <button
                       onClick={() => handleCopyCode(sch.acode!)}
-                      className="ml-1 text-slate-400 hover:text-white"
+                      className="ml-1 text-slate-500 hover:text-slate-900 cursor-pointer"
                       title="Copy ACode"
                     >
-                      {copiedCode === sch.acode ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      {copiedCode === sch.acode ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
                     </button>
                   </div>
                 )}
 
                 {/* If learner won a podium award */}
                 {sch.wonAward && (
-                  <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-amber-500/20 border border-amber-500/50 space-y-1.5">
+                  <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-black text-amber-300 flex items-center space-x-1">
+                      <span className="text-xs font-black text-amber-800 flex items-center space-x-1">
                         <span>🏆</span>
                         <span>You Won Rank #{sch.wonAward.rank} by Quiz Accuracy ({sch.wonAward.accuracy}%)!</span>
                       </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500 text-slate-950">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950">
                         +{sch.wonAward.coins} Coins
                       </span>
                     </div>
                     {sch.wonAward.acode && (
-                      <div className="flex items-center justify-between bg-slate-950/80 px-2.5 py-1.5 rounded-xl border border-amber-500/30 text-[11px]">
-                        <span className="font-mono font-bold text-amber-200">{sch.wonAward.acode}</span>
+                      <div className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-xl border border-amber-300 text-[11px]">
+                        <span className="font-mono font-bold text-amber-900">{sch.wonAward.acode}</span>
                         <button
                           onClick={() => handleCopyCode(sch.wonAward!.acode)}
-                          className="flex items-center space-x-1 text-amber-400 hover:text-white font-semibold"
+                          className="flex items-center space-x-1 text-amber-700 hover:text-amber-900 font-semibold cursor-pointer"
                         >
-                          {copiedCode === sch.wonAward.acode ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                          {copiedCode === sch.wonAward.acode ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
                           <span>{copiedCode === sch.wonAward.acode ? 'Copied' : 'Copy Code'}</span>
                         </button>
                       </div>
@@ -318,19 +318,19 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
 
                 {/* Accuracy Podium Laureates if awarded */}
                 {sch.awards?.podium && sch.awards.podium.length > 0 && (
-                  <div className="bg-slate-950/70 rounded-2xl p-2.5 border border-slate-800 space-y-1.5">
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                  <div className="bg-slate-50 rounded-2xl p-2.5 border border-slate-200 space-y-1.5">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
                       <span>Accuracy Podium Laureates</span>
-                      <span className="text-amber-400">Top Accuracy Winners</span>
+                      <span className="text-amber-700">Top Accuracy Winners</span>
                     </div>
                     <div className="grid grid-cols-3 gap-1.5 text-[10px]">
                       {sch.awards.podium.map((p: any) => (
-                        <div key={p.rank} className="bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 text-center">
-                          <div className="font-bold text-white truncate">
+                        <div key={p.rank} className="bg-white p-1.5 rounded-xl border border-slate-200 text-center">
+                          <div className="font-bold text-slate-900 truncate">
                             {p.rank === 1 ? '🥇 1st' : p.rank === 2 ? '🥈 2nd' : '🥉 3rd'} {p.learnerName?.split(' ')[0] || 'Winner'}
                           </div>
-                          <div className="text-[9px] text-amber-400 font-mono font-semibold">{p.accuracy}% Acc</div>
-                          <div className="text-[9px] text-slate-400 font-bold">+{p.coins}c</div>
+                          <div className="text-[9px] text-amber-700 font-mono font-semibold">{p.accuracy}% Acc</div>
+                          <div className="text-[9px] text-slate-500 font-bold">+{p.coins}c</div>
                         </div>
                       ))}
                     </div>
@@ -338,23 +338,23 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
                 )}
 
                 {/* Progress Bar & Counter */}
-                <div className="bg-slate-950/80 p-3 rounded-2xl border border-slate-800/80 space-y-2">
+                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400 font-medium flex items-center space-x-1">
-                      <Target className="w-3.5 h-3.5 text-indigo-400" />
+                    <span className="text-slate-600 font-medium flex items-center space-x-1">
+                      <Target className="w-3.5 h-3.5 text-indigo-600" />
                       <span>Sprint Goal:</span>
                     </span>
-                    <span className="font-bold text-white">
+                    <span className="font-bold text-slate-900">
                       {sch.completedQuizzesInWindow} / {sch.targetQuizCount} Quizzes Completed
                     </span>
                   </div>
 
                   {/* Visual Bar */}
-                  <div className="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden p-0.5">
+                  <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden p-0.5">
                     <div
                       className={`h-full rounded-full transition-all duration-700 ${
                         canClaim || isClaimed
-                          ? 'bg-gradient-to-r from-emerald-500 to-teal-400 shadow-sm'
+                          ? 'bg-gradient-to-r from-emerald-500 to-teal-400 shadow-xs'
                           : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-amber-500'
                       }`}
                       style={{ width: `${Math.min(100, sch.progressPercent || 0)}%` }}
@@ -422,32 +422,32 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
 
       {/* Celebration Modal */}
       {celebration && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-slate-900 border border-amber-500/60 rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative">
-            <div className="w-16 h-16 rounded-3xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center mx-auto mb-4 text-amber-400">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white border border-amber-300 rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative text-slate-900">
+            <div className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-300 flex items-center justify-center mx-auto mb-4 text-amber-600">
               <Trophy className="w-8 h-8 animate-bounce" />
             </div>
 
-            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 border border-amber-500 text-amber-300 uppercase tracking-wider inline-block mb-3">
+            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-100 border border-amber-300 text-amber-800 uppercase tracking-wider inline-block mb-3">
               Scholarship Awarded!
             </span>
 
-            <h3 className="text-xl font-black text-white mb-2">
+            <h3 className="text-xl font-black text-slate-900 mb-2">
               Outstanding Achievement!
             </h3>
 
-            <p className="text-xs text-slate-300 leading-relaxed max-w-sm mx-auto mb-5">
+            <p className="text-xs text-slate-600 leading-relaxed max-w-sm mx-auto mb-5">
               You completed the worldwide challenge <strong>&quot;{celebration.title}&quot;</strong>! Your hard work and academic dedication have earned you:
             </p>
 
-            <div className="bg-slate-950 p-4 rounded-2xl border border-amber-500/30 mb-6">
-              <div className="flex items-center justify-center space-x-2.5 text-2xl font-black text-amber-300">
+            <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 mb-6">
+              <div className="flex items-center justify-center space-x-2.5 text-2xl font-black text-amber-800">
                 <StudyCoinIcon className="w-8 h-8" glow animate />
                 <span>+{celebration.coins} Study Coins</span>
               </div>
               {celebration.badge && (
-                <div className="text-xs font-bold text-emerald-400 mt-1 flex items-center justify-center space-x-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
+                <div className="text-xs font-bold text-emerald-700 mt-1 flex items-center justify-center space-x-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Earned: {celebration.badge}</span>
                 </div>
               )}
@@ -455,7 +455,7 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
 
             <button
               onClick={() => setCelebration(null)}
-              className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-950 transition-all"
+              className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-xs transition-all cursor-pointer"
             >
               Continue Learning
             </button>
@@ -465,23 +465,23 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
 
       {/* Redeem Scholarship / Winner / Friend ACode Modal */}
       {redeemModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-slate-900 border border-amber-500/50 rounded-3xl p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white border border-amber-300 rounded-3xl p-6 shadow-2xl relative text-slate-900">
             <button
               onClick={() => { setRedeemModalOpen(false); setRedeemNotice(null); }}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/50"
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 rounded-xl bg-slate-100 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
 
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center mx-auto mb-3 text-amber-400">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto mb-3 text-amber-600">
               <KeyRound className="w-6 h-6" />
             </div>
 
-            <h3 className="text-lg font-black text-white text-center">
+            <h3 className="text-lg font-black text-slate-900 text-center">
               Redeem Scholarship / Winner ACode
             </h3>
-            <p className="text-xs text-slate-400 text-center mt-1 mb-4">
+            <p className="text-xs text-slate-600 text-center mt-1 mb-4">
               Enter your official scholarship voucher code, podium award key, or friend pass to claim instant perks and coins!
             </p>
 
@@ -491,15 +491,15 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
                 value={redeemCodeInput}
                 onChange={e => setRedeemCodeInput(e.target.value.toUpperCase())}
                 placeholder="e.g. AL-WIN1-..., AL-SCH-..., AL-FRND-..."
-                className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-center font-mono font-bold text-amber-300 placeholder-slate-600 focus:outline-none focus:border-amber-500 uppercase text-sm"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-center font-mono font-bold text-amber-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 uppercase text-sm"
                 required
               />
 
               {redeemNotice && (
                 <div className={`p-3 rounded-xl text-xs font-semibold ${
                   redeemNotice.type === 'success'
-                    ? 'bg-emerald-950/60 border border-emerald-800 text-emerald-300'
-                    : 'bg-rose-950/60 border border-rose-800 text-rose-300'
+                    ? 'bg-emerald-50 border border-emerald-300 text-emerald-800'
+                    : 'bg-rose-50 border border-rose-300 text-rose-800'
                 }`}>
                   {redeemNotice.text}
                 </div>
@@ -508,7 +508,7 @@ export const WorldwideScholarships: React.FC<WorldwideScholarshipsProps> = ({
               <button
                 type="submit"
                 disabled={isRedeeming}
-                className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-amber-950 transition-all disabled:opacity-50"
+                className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-xs transition-all disabled:opacity-50 cursor-pointer"
               >
                 {isRedeeming ? 'Redeeming Voucher...' : 'Redeem Code & Claim Reward'}
               </button>

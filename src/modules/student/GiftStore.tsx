@@ -670,51 +670,51 @@ ${recipientName.trim()}`;
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 text-slate-100">
+    <div className="max-w-5xl mx-auto space-y-8 text-slate-900">
       {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-amber-950 via-slate-900 to-indigo-950 border border-amber-900/50 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-amber-50 via-white to-indigo-50 border border-amber-200 rounded-3xl p-6 sm:p-10 shadow-sm relative overflow-hidden">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="max-w-xl">
-            <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full inline-flex items-center space-x-1.5 mb-3">
-              <Globe className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-[10px] font-mono font-bold tracking-widest text-amber-700 uppercase bg-amber-100 border border-amber-300 px-3 py-1 rounded-full inline-flex items-center space-x-1.5 mb-3">
+              <Globe className="w-3.5 h-3.5 text-amber-600" />
               <span>🌍 Truly Worldwide Rewards • 100% Physical Rewards &amp; Merchandise</span>
             </span>
-            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+            <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
               Scholar&apos;s Physical Rewards Store &amp; Global Arena
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
               Convert your hard-earned Study Coins into real physical scholar merchandise delivered worldwide, and essential study power-ups!
               <br />
-              <strong className="text-amber-400">100% Physical Doorstep Courier Delivery to any country</strong> via Amazon Worldwide &amp; global logistics partners.
+              <strong className="text-amber-700">100% Physical Doorstep Courier Delivery to any country</strong> via Amazon Worldwide &amp; global logistics partners.
             </p>
           </div>
 
-          <div className="bg-slate-950/80 border border-amber-500/30 rounded-3xl p-5 text-center min-w-[200px] shadow-xl">
-            <span className="text-[11px] text-slate-400 block font-medium">Your Study Coins</span>
+          <div className="bg-white border border-amber-300 rounded-3xl p-5 text-center min-w-[200px] shadow-sm">
+            <span className="text-[11px] text-slate-500 block font-medium">Your Study Coins</span>
             <div className="flex items-center justify-center space-x-2 mt-1">
               <StudyCoinIcon className="w-7 h-7" glow />
-              <span className="text-3xl font-black text-amber-400 font-mono">
+              <span className="text-3xl font-black text-amber-600 font-mono">
                 {learner.coinBalance.toLocaleString()}
               </span>
             </div>
-            <span className="text-[10px] text-slate-500 block mt-1 font-mono">Append-Only Ledger Verified</span>
+            <span className="text-[10px] text-slate-400 block mt-1 font-mono">Append-Only Ledger Verified</span>
           </div>
         </div>
 
         {/* Dynamic Progress toward next milestone */}
-        <div className="mt-8 pt-6 border-t border-slate-800/80">
+        <div className="mt-8 pt-6 border-t border-slate-200">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs gap-1 mb-2">
-            <span className="text-slate-300 font-semibold flex items-center space-x-1.5">
-              <TrendingUp className="w-4 h-4 text-amber-400" />
+            <span className="text-slate-700 font-semibold flex items-center space-x-1.5">
+              <TrendingUp className="w-4 h-4 text-amber-600" />
               <span>
                 Target: {nextTargetReward.name} ({nextTargetReward.coinsCostFormatted})
               </span>
             </span>
-            <span className="font-mono text-amber-400 font-bold">
+            <span className="font-mono text-amber-700 font-bold">
               {learner.coinBalance.toLocaleString()} / {nextTargetReward.coinsCost.toLocaleString()} Coins ({progressPercent.toFixed(1)}%)
             </span>
           </div>
-          <div className="w-full bg-slate-950 rounded-full h-3 overflow-hidden border border-slate-800">
+          <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
             <div
               className="bg-gradient-to-r from-amber-500 via-orange-500 to-indigo-500 h-full rounded-full transition-all duration-700"
               style={{ width: `${progressPercent}%` }}
@@ -724,14 +724,14 @@ ${recipientName.trim()}`;
       </div>
 
       {/* Scholar Economics & Trust Badge */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs shadow-lg">
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs shadow-xs">
         <div className="flex items-start space-x-3.5">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg flex-shrink-0 mt-0.5">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center font-bold text-lg flex-shrink-0 mt-0.5">
             🛡️
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-bold text-white text-sm">Physical Parcel Fulfillment &amp; Fair-Play Economics</span>
+              <span className="font-bold text-slate-900 text-sm">Physical Parcel Fulfillment &amp; Fair-Play Economics</span>
               {isEnrolledScholar ? (
                 <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] px-2.5 py-0.5 rounded-full font-bold">
                   ✓ Scholar Enrolled
@@ -829,68 +829,68 @@ ${recipientName.trim()}`;
             return (
               <div
                 key={item.id}
-                className={`bg-slate-900 border rounded-3xl p-6 flex flex-col justify-between shadow-xl relative overflow-hidden transition-all group ${
+                className={`bg-white border rounded-3xl p-6 flex flex-col justify-between shadow-sm relative overflow-hidden transition-all group ${
                   canAfford && !buttonDisabled
-                    ? 'border-amber-500/60 hover:border-amber-400 shadow-amber-950/20'
-                    : 'border-slate-800 hover:border-slate-700'
+                    ? 'border-amber-400 hover:border-amber-500 shadow-amber-500/10'
+                    : 'border-slate-200 hover:border-slate-300'
                 }`}
               >
                 {item.popular && (
-                  <span className="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-orange-500 text-slate-950 text-[10px] font-black uppercase px-3.5 py-1 rounded-bl-2xl tracking-wider shadow-sm">
+                  <span className="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-orange-500 text-white text-[10px] font-black uppercase px-3.5 py-1 rounded-bl-2xl tracking-wider shadow-xs">
                     Scholar Favorite
                   </span>
                 )}
 
                 <div>
                   <div className="flex items-center space-x-2 mb-3">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-slate-950 text-amber-300 border border-slate-800">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-amber-50 text-amber-800 border border-amber-200">
                       Physical Item
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-400">{item.badge}</span>
+                    <span className="text-[10px] font-semibold text-slate-500">{item.badge}</span>
                   </div>
 
                   {/* Product Visual Image Showcase */}
                   <div
                     onClick={() => handleOpenProductDetails(item)}
-                    className="w-full h-56 bg-slate-950/80 rounded-2xl border border-slate-800 flex items-center justify-center p-4 mb-4 relative overflow-hidden group-hover:border-amber-500/40 transition-all cursor-pointer"
+                    className="w-full h-56 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center p-4 mb-4 relative overflow-hidden group-hover:border-amber-300 transition-all cursor-pointer"
                   >
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="max-h-full max-w-full object-contain filter drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
+                      className="max-h-full max-w-full object-contain filter drop-shadow-md transition-transform duration-300 group-hover:scale-105"
                     />
-                    <div className="absolute bottom-2 left-2 bg-slate-950/90 backdrop-blur-sm border border-slate-800 px-2.5 py-1 rounded-xl text-[10px] text-amber-300 flex items-center space-x-1.5 font-mono shadow">
-                      <Truck className="w-3.5 h-3.5 text-amber-400" />
+                    <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-sm border border-slate-200 px-2.5 py-1 rounded-xl text-[10px] text-amber-800 flex items-center space-x-1.5 font-mono shadow-xs">
+                      <Truck className="w-3.5 h-3.5 text-amber-600" />
                       <span>{item.deliveryTag || 'Delivered using Amazon'}</span>
                     </div>
-                    <div className="absolute top-2 right-2 bg-slate-950/80 backdrop-blur-sm px-2 py-0.5 rounded-lg border border-slate-800 text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1">
-                      <Eye className="w-3 h-3 text-amber-400" />
+                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-lg border border-slate-200 text-[10px] text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity flex items-center space-x-1">
+                      <Eye className="w-3 h-3 text-amber-600" />
                       <span>View Details</span>
                     </div>
                   </div>
 
                   <h3
                     onClick={() => handleOpenProductDetails(item)}
-                    className="text-lg font-black text-white group-hover:text-amber-300 transition-colors cursor-pointer"
+                    className="text-lg font-black text-slate-900 group-hover:text-amber-700 transition-colors cursor-pointer"
                   >
                     {item.name}
                   </h3>
-                  <p className="text-xs text-slate-300 mt-1 leading-relaxed line-clamp-2">
+                  <p className="text-xs text-slate-600 mt-1 leading-relaxed line-clamp-2">
                     {item.description}
                   </p>
 
                   {/* Specs Chips */}
                   <div className="flex flex-wrap gap-1.5 mt-3">
                     {item.specs.map((spec, i) => (
-                      <span key={i} className="px-2 py-0.5 bg-slate-950 rounded-lg text-[10px] text-slate-400 border border-slate-800 font-mono">
+                      <span key={i} className="px-2 py-0.5 bg-slate-50 rounded-lg text-[10px] text-slate-600 border border-slate-200 font-mono">
                         ✓ {spec}
                       </span>
                     ))}
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                    <span className="text-slate-400">Required Coins:</span>
-                    <span className="font-mono font-black text-amber-400 text-base flex items-center space-x-1">
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span className="text-slate-500">Required Coins:</span>
+                    <span className="font-mono font-black text-amber-700 text-base flex items-center space-x-1">
                       <StudyCoinIcon className="w-4 h-4" />
                       <span>{item.coinsCost.toLocaleString()} Coins</span>
                     </span>
@@ -958,24 +958,24 @@ ${recipientName.trim()}`;
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Streak Freeze Shield */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition-all shadow-xl">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-400 transition-all shadow-sm">
             <div>
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mb-4">
                 <Flame className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-white text-base">Streak Freeze Shield</h3>
-              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+              <h3 className="font-bold text-slate-900 text-base">Streak Freeze Shield</h3>
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                 Missing a study day won&apos;t reset your streak. Automatically activates if you miss 24 hours.
               </p>
-              <div className="mt-4 flex items-center justify-between text-xs text-slate-300 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+              <div className="mt-4 flex items-center justify-between text-xs text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
                 <span>Active Freezes:</span>
-                <span className="font-mono font-bold text-amber-400">{learner.streakFreezesAvailable || 0}</span>
+                <span className="font-mono font-bold text-amber-700">{learner.streakFreezesAvailable || 0}</span>
               </div>
             </div>
 
             <button
               onClick={handleBuyStreakFreeze}
-              className="mt-6 w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+              className="mt-6 w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
             >
               <StudyCoinIcon className="w-4 h-4" />
               <span>Buy Freeze (15 Coins)</span>
@@ -983,20 +983,20 @@ ${recipientName.trim()}`;
           </div>
 
           {/* Emerald Frame */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition-all shadow-xl">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-400 transition-all shadow-sm">
             <div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mb-4">
                 <ShieldCheck className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-white text-base">Emerald Scholar Frame</h3>
-              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+              <h3 className="font-bold text-slate-900 text-base">Emerald Scholar Frame</h3>
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                 Equip an exclusive animated emerald border for your avatar across StudentPacks and leaderboards.
               </p>
             </div>
 
             <button
               onClick={() => handleBuyAvatarFrame('Emerald', 20)}
-              className="mt-6 w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+              className="mt-6 w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold text-xs rounded-xl border border-slate-300 transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
             >
               <StudyCoinIcon className="w-4 h-4" />
               <span>{learner.avatarFrame === 'Emerald' ? 'Equipped' : 'Equip (20 Coins)'}</span>
@@ -1004,10 +1004,10 @@ ${recipientName.trim()}`;
           </div>
 
           {/* Practice Worksheets Generator */}
-          <div className={`border rounded-3xl p-6 flex flex-col justify-between transition-all shadow-xl ${
+          <div className={`border rounded-3xl p-6 flex flex-col justify-between transition-all shadow-sm ${
             isWorksheetUnlocked
-              ? 'bg-gradient-to-br from-indigo-950/40 via-slate-900 to-emerald-950/30 border-emerald-500/50 shadow-emerald-950/20'
-              : 'bg-slate-900 border-slate-800 hover:border-indigo-500/50'
+              ? 'bg-gradient-to-br from-indigo-50/60 via-white to-emerald-50/60 border-emerald-300 shadow-xs'
+              : 'bg-white border-slate-200 hover:border-indigo-400'
           }`}>
             <div>
               <div className="flex items-center justify-between mb-4">
@@ -1064,13 +1064,13 @@ ${recipientName.trim()}`;
 
       {/* Redemption History */}
       {existingRequests.length > 0 && (
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-          <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-            <Truck className="w-4 h-4 text-amber-400" />
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
+          <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
+            <Truck className="w-4 h-4 text-amber-600" />
             <span>Your Redemptions &amp; Delivery Tracking ({existingRequests.length})</span>
           </h3>
 
-          <div className="divide-y divide-slate-800">
+          <div className="divide-y divide-slate-100">
             {existingRequests.map(req => {
               const isPhysical = req.isPhysical || (req.shippingAddress && (req.shippingAddress.includes('[PHYSICAL DELIVERY]') || req.shippingAddress.includes('[PHYSICAL DELIVERY VIA AMAZON]'))) || req.itemTitle.toLowerCase().includes('bottle') || req.itemTitle.toLowerCase().includes('squishy') || req.itemTitle.toLowerCase().includes('blaster') || req.itemTitle.toLowerCase().includes('stationery') || req.itemTitle.toLowerCase().includes('badge') || req.itemTitle.toLowerCase().includes('box') || req.itemTitle.toLowerCase().includes('mystery');
               const code = getVoucherDetails(req);
@@ -1085,16 +1085,16 @@ ${recipientName.trim()}`;
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                     <div>
                       <div className="flex items-center space-x-2">
-                        <p className="font-bold text-white text-sm">{req.itemTitle}</p>
-                        <span className="text-amber-400 font-mono text-xs flex items-center gap-1">
+                        <p className="font-bold text-slate-900 text-sm">{req.itemTitle}</p>
+                        <span className="text-amber-700 font-mono text-xs flex items-center gap-1 font-bold">
                           <StudyCoinIcon className="w-3.5 h-3.5" />
                           <span>(-{req.coinsCost.toLocaleString()} Coins)</span>
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                      <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
                         📍 <strong>Destination:</strong> {req.shippingAddress.replace('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]', '').replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim()}
                       </p>
-                      <p className="text-[10px] text-slate-500 mt-0.5">
+                      <p className="text-[10px] text-slate-400 mt-0.5">
                         Phone: {req.contactPhone} • Requested on: {new Date(req.requestedAt).toLocaleString()}
                       </p>
                     </div>
@@ -1103,16 +1103,16 @@ ${recipientName.trim()}`;
                       <span
                         className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-[10px] font-bold ${
                           isDelivered
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                             : isShipped
-                            ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30'
+                            ? 'bg-sky-50 text-sky-700 border border-sky-200'
                             : isOrdered
-                            ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30'
+                            ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
                             : isDispatched
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                             : req.status === 'REJECTED'
-                            ? 'bg-red-500/10 text-red-400 border border-red-500/30'
-                            : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                            ? 'bg-red-50 text-red-700 border border-red-200'
+                            : 'bg-amber-50 text-amber-700 border border-amber-200'
                         }`}
                       >
                         <span>
@@ -1136,10 +1136,10 @@ ${recipientName.trim()}`;
 
                   {/* Physical Parcel Tracking Card */}
                   {isPhysical && (isShipped || isOrdered || isDelivered) && (
-                    <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-950/40 via-slate-950 to-slate-900 border border-sky-500/40 shadow-xl space-y-2">
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-50 via-white to-sky-50 border border-sky-200 shadow-xs space-y-2">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-extrabold text-sky-400 flex items-center space-x-1.5">
-                          <Truck className="w-4 h-4 text-sky-400" />
+                        <span className="font-extrabold text-sky-800 flex items-center space-x-1.5">
+                          <Truck className="w-4 h-4 text-sky-600" />
                           <span>
                             {isDelivered
                               ? 'Delivered to Doorstep'
@@ -1149,20 +1149,20 @@ ${recipientName.trim()}`;
                           </span>
                         </span>
                         {req.courierName && (
-                          <span className="text-[10px] font-mono text-sky-300 bg-sky-950/70 border border-sky-800 px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-mono text-sky-700 bg-sky-100 border border-sky-200 px-2 py-0.5 rounded-full font-bold">
                             Carrier: {req.courierName}
                           </span>
                         )}
                       </div>
                       {req.trackingId && (
-                        <div className="bg-slate-950 p-3 rounded-xl border border-sky-500/30 flex items-center justify-between">
+                        <div className="bg-white p-3 rounded-xl border border-sky-200 flex items-center justify-between shadow-xs">
                           <div>
-                            <span className="text-[10px] uppercase font-bold text-slate-400 block">Tracking ID / AWB:</span>
-                            <span className="font-mono text-sm font-black text-amber-300 tracking-wider select-all">
+                            <span className="text-[10px] uppercase font-bold text-slate-500 block">Tracking ID / AWB:</span>
+                            <span className="font-mono text-sm font-black text-amber-700 tracking-wider select-all">
                               {req.trackingId}
                             </span>
                           </div>
-                          <span className="text-[10px] text-slate-400 font-mono">
+                          <span className="text-[10px] text-slate-500 font-mono">
                             Live on Courier Portal
                           </span>
                         </div>
@@ -1172,31 +1172,31 @@ ${recipientName.trim()}`;
 
                   {/* Dispatched Voucher Code Banner & 1-Click Copy */}
                   {isDispatched && !isPhysical && (
-                    <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/50 via-slate-950 to-slate-900 border-2 border-emerald-500/50 shadow-xl space-y-3">
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-white to-emerald-50 border-2 border-emerald-300 shadow-xs space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-extrabold text-emerald-400 flex items-center space-x-1.5">
-                          <Sparkles className="w-4 h-4 text-emerald-400 animate-pulse" />
+                        <span className="text-xs font-extrabold text-emerald-800 flex items-center space-x-1.5">
+                          <Sparkles className="w-4 h-4 text-emerald-600 animate-pulse" />
                           <span>Voucher Code Generated &amp; Verified</span>
                         </span>
-                        <span className="text-[10px] font-mono text-emerald-300/80 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-mono text-emerald-800 bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full font-bold">
                           Ready to Redeem
                         </span>
                       </div>
 
                       {/* Monospace Code Box */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950 p-3.5 rounded-xl border border-emerald-500/30">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-emerald-200 shadow-xs">
                         <div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">
                             Digital Voucher Code:
                           </span>
-                          <span className="font-mono text-base sm:text-lg font-black text-white tracking-widest selection:bg-emerald-500">
+                          <span className="font-mono text-base sm:text-lg font-black text-slate-900 tracking-widest selection:bg-emerald-500">
                             {code}
                           </span>
                         </div>
 
                         <button
                           onClick={() => handleCopyVoucher(code, req.id)}
-                          className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl flex items-center justify-center space-x-1.5 shadow-md shadow-emerald-950 transition-all flex-shrink-0"
+                          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl flex items-center justify-center space-x-1.5 shadow-sm transition-all flex-shrink-0 cursor-pointer"
                         >
                           {copiedVoucherId === req.id ? (
                             <>
@@ -1240,12 +1240,12 @@ ${recipientName.trim()}`;
       {/* MODAL 2.5: PRODUCT DETAILS & AMAZON DELIVERY POPUP       */}
       {/* ======================================================== */}
       {previewProductItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-          <div className="bg-slate-900 border-2 border-amber-500/50 rounded-3xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl text-slate-100 relative my-6 max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white border-2 border-amber-400 rounded-3xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl text-slate-900 relative my-6 max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             {/* Close Button */}
             <button
               onClick={() => setPreviewProductItem(null)}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/80 transition-colors z-10 cursor-pointer"
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 rounded-xl bg-slate-100 transition-colors z-10 cursor-pointer"
               aria-label="Close product details"
             >
               <X className="w-5 h-5" />
@@ -1256,38 +1256,38 @@ ${recipientName.trim()}`;
               {/* Product Header & Category Pill */}
               <div>
                 <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-slate-950 text-amber-300 border border-slate-800">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-amber-50 text-amber-800 border border-amber-200">
                     Physical Scholar Merchandise
                   </span>
-                  <span className="text-[10px] font-bold text-amber-400/90">
+                  <span className="text-[10px] font-bold text-amber-700">
                     {previewProductItem.badge}
                   </span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
                   {previewProductItem.name}
                 </h2>
               </div>
 
               {/* Product Image & Amazon Badge Showcase */}
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-5 items-center">
-                <div className="sm:col-span-5 bg-slate-950 rounded-2xl border border-slate-800 p-4 flex flex-col items-center justify-center relative overflow-hidden group">
+                <div className="sm:col-span-5 bg-slate-50 rounded-2xl border border-slate-200 p-4 flex flex-col items-center justify-center relative overflow-hidden group">
                   <img
                     src={previewProductItem.image}
                     alt={previewProductItem.name}
-                    className="w-full h-52 sm:h-56 object-contain filter drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
+                    className="w-full h-52 sm:h-56 object-contain filter drop-shadow-md transition-transform duration-300 group-hover:scale-105"
                   />
-                  <div className="absolute top-2 left-2 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <div className="absolute top-2 left-2 bg-emerald-100 border border-emerald-300 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     <span>In Stock</span>
                   </div>
                 </div>
 
                 <div className="sm:col-span-7 space-y-3">
                   {/* Coin Price & Value Tag */}
-                  <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between">
+                  <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-mono uppercase font-bold text-slate-400 block">Redemption Cost</span>
-                      <div className="flex items-center space-x-1.5 text-xl sm:text-2xl font-black font-mono text-amber-400">
+                      <span className="text-[10px] font-mono uppercase font-bold text-slate-500 block">Redemption Cost</span>
+                      <div className="flex items-center space-x-1.5 text-xl sm:text-2xl font-black font-mono text-amber-700">
                         <StudyCoinIcon className="w-6 h-6" glow />
                         <span>{previewProductItem.coinsCost.toLocaleString()} Coins</span>
                       </div>
@@ -1295,56 +1295,56 @@ ${recipientName.trim()}`;
                     {previewProductItem.originalPriceInr && (
                       <div className="text-right">
                         <span className="text-[10px] text-slate-500 block">Retail Value</span>
-                        <span className="text-sm font-bold text-slate-300 line-through">₹{previewProductItem.originalPriceInr}</span>
-                        <span className="text-[10px] font-bold text-emerald-400 block">100% Free with Coins</span>
+                        <span className="text-sm font-bold text-slate-400 line-through">₹{previewProductItem.originalPriceInr}</span>
+                        <span className="text-[10px] font-bold text-emerald-600 block">100% Free with Coins</span>
                       </div>
                     )}
                   </div>
 
                   {/* OFFICIAL AMAZON / FLIPKART / MEESHO DELIVERY BOX */}
-                  <div className="bg-gradient-to-br from-amber-500/10 via-slate-950 to-orange-500/10 border-2 border-amber-500/40 rounded-2xl p-3.5 space-y-2">
+                  <div className="bg-gradient-to-br from-amber-50 via-white to-orange-50 border-2 border-amber-300 rounded-2xl p-3.5 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-black text-amber-300 flex items-center space-x-1.5">
-                        <Truck className="w-4 h-4 text-amber-400" />
+                      <span className="text-xs font-black text-amber-800 flex items-center space-x-1.5">
+                        <Truck className="w-4 h-4 text-amber-600" />
                         <span>{previewProductItem.deliveryTag || 'Delivered using Amazon'}</span>
                       </span>
-                      <span className="text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-md border border-amber-500/30">
+                      <span className="text-[10px] font-mono font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md border border-amber-300">
                         {previewProductItem.deliveryPartner || 'Amazon Logistics'}
                       </span>
                     </div>
 
-                    <div className="space-y-1 text-[11px] text-slate-300">
+                    <div className="space-y-1 text-[11px] text-slate-600">
                       <p className="flex items-center space-x-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                         <span><strong>Free Doorstep Delivery</strong> worldwide • Zero courier fees</span>
                       </p>
                       <p className="flex items-center space-x-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                         <span><strong>Live Tracking:</strong> Real-time courier AWB tracking ID provided</span>
                       </p>
                       <p className="flex items-center space-x-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                         <span><strong>Dispatched in 24–48 Hours:</strong> Carefully packaged and shipped</span>
                       </p>
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-300 leading-relaxed">
+                  <p className="text-xs text-slate-600 leading-relaxed">
                     {previewProductItem.description}
                   </p>
                 </div>
               </div>
 
               {/* DETAILED FEATURES & BULLETS */}
-              <div className="bg-slate-950/80 rounded-2xl border border-slate-800 p-4 space-y-2.5">
-                <div className="flex items-center space-x-2 text-xs font-bold text-white uppercase tracking-wider">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 space-y-2.5">
+                <div className="flex items-center space-x-2 text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                   <span>Key Features &amp; Quality Highlights</span>
                 </div>
-                <div className="grid grid-cols-1 gap-2 text-xs text-slate-200">
+                <div className="grid grid-cols-1 gap-2 text-xs text-slate-700">
                   {previewProductItem.features.map((feat, idx) => (
                     <div key={idx} className="flex items-start space-x-2">
-                      <span className="text-amber-400 font-bold mt-0.5">•</span>
+                      <span className="text-amber-600 font-bold mt-0.5">•</span>
                       <span className="leading-snug">{feat}</span>
                     </div>
                   ))}
@@ -1353,16 +1353,16 @@ ${recipientName.trim()}`;
 
               {/* TECHNICAL SPECIFICATIONS */}
               <div>
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                   Technical Specifications
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {previewProductItem.specs.map((sp, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 bg-slate-950 text-slate-300 border border-slate-800 rounded-xl text-xs font-mono font-medium flex items-center space-x-1.5"
+                      className="px-3 py-1 bg-white text-slate-700 border border-slate-200 rounded-xl text-xs font-mono font-medium flex items-center space-x-1.5 shadow-xs"
                     >
-                      <Check className="w-3 h-3 text-emerald-400" />
+                      <Check className="w-3 h-3 text-emerald-600" />
                       <span>{sp}</span>
                     </span>
                   ))}
@@ -1371,7 +1371,7 @@ ${recipientName.trim()}`;
             </div>
 
             {/* Modal Actions Footer */}
-            <div className="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+            <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
               <div className="text-xs text-slate-400">
                 <span>Your Balance: </span>
                 <strong className={`font-mono ${learner.coinBalance >= previewProductItem.coinsCost ? 'text-emerald-400' : 'text-rose-400'}`}>
@@ -1420,11 +1420,11 @@ ${recipientName.trim()}`;
 
       {/* Modal: Physical Merchandise Courier Address Input */}
       {selectedPhysicalItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-          <div className="bg-slate-900 border border-amber-500/50 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl text-slate-100 relative my-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white border border-amber-300 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl text-slate-900 relative my-8">
             <button
               onClick={() => setSelectedPhysicalItem(null)}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/60"
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 rounded-xl bg-slate-100 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -1436,33 +1436,33 @@ ${recipientName.trim()}`;
                 setSelectedPhysicalItem(null);
                 setPreviewProductItem(item);
               }}
-              className="text-[11px] text-slate-400 hover:text-amber-300 font-semibold mb-3 flex items-center space-x-1 cursor-pointer"
+              className="text-[11px] text-slate-500 hover:text-amber-700 font-semibold mb-3 flex items-center space-x-1 cursor-pointer"
             >
               <span>← Back to Product Details</span>
             </button>
 
             <div className="text-center mb-5">
               <div className="flex items-center justify-center space-x-2 mb-2">
-                <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
+                <span className="text-[10px] font-mono font-bold tracking-widest text-amber-800 uppercase bg-amber-100 border border-amber-300 px-3 py-1 rounded-full">
                   Physical Scholar Merchandise
                 </span>
-                <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-950 px-2.5 py-1 rounded-full border border-amber-800 flex items-center space-x-1 shadow">
-                  <Truck className="w-3 h-3 text-amber-400" />
+                <span className="text-[10px] font-mono font-bold text-amber-900 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200 flex items-center space-x-1 shadow-xs">
+                  <Truck className="w-3 h-3 text-amber-600" />
                   <span>{selectedPhysicalItem.deliveryTag || 'Delivered using Amazon'}</span>
                 </span>
               </div>
-              <h3 className="text-xl font-extrabold text-white mt-1 flex items-center justify-center gap-2">
-                <Package className="w-5 h-5 text-amber-400" />
+              <h3 className="text-xl font-extrabold text-slate-900 mt-1 flex items-center justify-center gap-2">
+                <Package className="w-5 h-5 text-amber-600" />
                 <span>Claim {selectedPhysicalItem.name}</span>
               </h3>
-              <p className="text-xs text-slate-400 mt-1">
-                Cost: <strong className="text-amber-400">{selectedPhysicalItem.coinsCost.toLocaleString()} Study Coins</strong> ({selectedPhysicalItem.coinsCostFormatted}) • Free Doorstep Delivery
+              <p className="text-xs text-slate-600 mt-1">
+                Cost: <strong className="text-amber-700">{selectedPhysicalItem.coinsCost.toLocaleString()} Study Coins</strong> ({selectedPhysicalItem.coinsCostFormatted}) • Free Doorstep Delivery
               </p>
             </div>
 
             {/* Amazon Worldwide Delivery Notice */}
-            <div className="p-3 bg-gradient-to-r from-amber-500/15 via-indigo-500/10 to-emerald-500/15 border border-amber-500/30 rounded-2xl flex items-center space-x-2.5 text-xs text-amber-300 mb-4">
-              <Globe className="w-5 h-5 text-amber-400 flex-shrink-0" />
+            <div className="p-3 bg-gradient-to-r from-amber-50 via-indigo-50/50 to-emerald-50 border border-amber-200 rounded-2xl flex items-center space-x-2.5 text-xs text-amber-900 mb-4">
+              <Globe className="w-5 h-5 text-amber-600 flex-shrink-0" />
               <span>
                 <strong>Truly Worldwide Doorstep Delivery:</strong> We ship directly to students in <strong>any country worldwide</strong> via Amazon Global and international courier networks with live tracking updates!
               </span>
@@ -1471,14 +1471,14 @@ ${recipientName.trim()}`;
             <form onSubmit={handleConfirmPhysicalRedeem} className="space-y-3.5 text-xs">
               {/* Destination Country / Region */}
               <div>
-                <label className="block text-slate-300 font-semibold mb-1 flex items-center space-x-1">
-                  <Globe className="w-3.5 h-3.5 text-sky-400" />
-                  <span>Destination Country / Region <span className="text-rose-400">*</span></span>
+                <label className="block text-slate-700 font-semibold mb-1 flex items-center space-x-1">
+                  <Globe className="w-3.5 h-3.5 text-sky-600" />
+                  <span>Destination Country / Region <span className="text-rose-600">*</span></span>
                 </label>
                 <select
                   value={recipientCountry}
                   onChange={e => setRecipientCountry(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-xl px-3 py-2.5 text-slate-900 focus:outline-none"
                 >
                   <option value="India">🇮🇳 India</option>
                   <option value="United States">🇺🇸 United States</option>
@@ -1507,7 +1507,7 @@ ${recipientName.trim()}`;
                       placeholder="Please enter your country name"
                       value={customCountry}
                       onChange={e => setCustomCountry(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded-xl px-3 py-2 text-white text-xs focus:outline-none"
+                      className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-xl px-3 py-2 text-slate-900 text-xs focus:outline-none"
                     />
                   </div>
                 )}
@@ -1516,8 +1516,8 @@ ${recipientName.trim()}`;
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Recipient Full Name */}
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">
-                    Recipient Full Name <span className="text-rose-400">*</span>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    Recipient Full Name <span className="text-rose-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -1525,15 +1525,15 @@ ${recipientName.trim()}`;
                     placeholder="e.g. Student or Parent Name"
                     value={recipientName}
                     onChange={e => setRecipientName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-xl px-3 py-2.5 text-slate-900 focus:outline-none"
                   />
                 </div>
 
                 {/* Phone with Country Code */}
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1 flex items-center space-x-1">
-                    <Phone className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Phone / WhatsApp (with Country Code) <span className="text-rose-400">*</span></span>
+                  <label className="block text-slate-700 font-semibold mb-1 flex items-center space-x-1">
+                    <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Phone / WhatsApp (with Country Code) <span className="text-rose-600">*</span></span>
                   </label>
                   <input
                     type="tel"
@@ -1541,16 +1541,16 @@ ${recipientName.trim()}`;
                     placeholder="e.g. +91 9876543210 or +1 4155552671"
                     value={physicalPhone}
                     onChange={e => setPhysicalPhone(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none font-mono"
+                    className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-xl px-3 py-2.5 text-slate-900 focus:outline-none font-mono"
                   />
                 </div>
               </div>
 
               {/* Flat / House / Floor */}
               <div>
-                <label className="block text-slate-300 font-semibold mb-1 flex items-center space-x-1">
-                  <Home className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Flat / House No. / Building / Floor <span className="text-rose-400">*</span></span>
+                <label className="block text-slate-700 font-semibold mb-1 flex items-center space-x-1">
+                  <Home className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Flat / House No. / Building / Floor <span className="text-rose-600">*</span></span>
                 </label>
                 <input
                   type="text"
@@ -1558,15 +1558,15 @@ ${recipientName.trim()}`;
                   placeholder="e.g. Flat 302, Sai Residency, Plot No. 42 / 123 Main St"
                   value={flatHouse}
                   onChange={e => setFlatHouse(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-xl px-3 py-2.5 text-slate-900 focus:outline-none"
                 />
               </div>
 
               {/* Street / Locality */}
               <div>
-                <label className="block text-slate-300 font-semibold mb-1 flex items-center space-x-1">
-                  <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Street / Area / Colony / Locality <span className="text-rose-400">*</span></span>
+                <label className="block text-slate-700 font-semibold mb-1 flex items-center space-x-1">
+                  <MapPin className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Street / Area / Colony / Locality <span className="text-rose-600">*</span></span>
                 </label>
                 <input
                   type="text"
@@ -1574,13 +1574,13 @@ ${recipientName.trim()}`;
                   placeholder="e.g. Downtown, Baker Street, Kharavela Nagar"
                   value={streetArea}
                   onChange={e => setStreetArea(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-xl px-3 py-2.5 text-slate-900 focus:outline-none"
                 />
               </div>
 
               {/* Landmark */}
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">
+                <label className="block text-slate-700 font-semibold mb-1">
                   Prominent Landmark (Optional)
                 </label>
                 <input
@@ -1588,15 +1588,15 @@ ${recipientName.trim()}`;
                   placeholder="e.g. Near Royal High School, Opposite Central Park"
                   value={landmark}
                   onChange={e => setLandmark(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2.5 text-white focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-xl px-3 py-2.5 text-slate-900 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 {/* City */}
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">
-                    City / Town <span className="text-rose-400">*</span>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    City / Town <span className="text-rose-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -1604,14 +1604,14 @@ ${recipientName.trim()}`;
                     placeholder="e.g. New York / London / Delhi"
                     value={city}
                     onChange={e => setCity(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2 text-white focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
                   />
                 </div>
 
                 {/* State / Province */}
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">
-                    State / Province / Region <span className="text-rose-400">*</span>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    State / Province / Region <span className="text-rose-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -1619,14 +1619,14 @@ ${recipientName.trim()}`;
                     placeholder="e.g. CA / Ontario / Odisha"
                     value={stateName}
                     onChange={e => setStateName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2 text-white focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-xl px-3 py-2 text-slate-900 focus:outline-none"
                   />
                 </div>
 
                 {/* Postal / ZIP Code */}
                 <div>
-                  <label className="block text-slate-300 font-semibold mb-1">
-                    Postal / ZIP Code <span className="text-rose-400">*</span>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    Postal / ZIP Code <span className="text-rose-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -1635,15 +1635,15 @@ ${recipientName.trim()}`;
                     placeholder="e.g. 751001 / 90210 / SW1A 1AA"
                     value={pincode}
                     onChange={e => setPincode(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded-xl px-3 py-2 text-white font-mono focus:outline-none uppercase"
+                    className="w-full bg-slate-50 border border-slate-300 focus:border-amber-500 rounded-xl px-3 py-2 text-slate-900 font-mono focus:outline-none uppercase"
                   />
                 </div>
               </div>
 
               {/* Coin Debit Summary */}
-              <div className="p-3 bg-amber-950/20 border border-amber-900/40 rounded-xl text-[11px] text-amber-300 flex items-center justify-between">
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 flex items-center justify-between">
                 <span>Coins to be debited:</span>
-                <span className="font-mono font-bold text-amber-400 flex items-center gap-1">
+                <span className="font-mono font-bold text-amber-800 flex items-center gap-1">
                   <StudyCoinIcon className="w-3.5 h-3.5" />
                   <span>-{selectedPhysicalItem.coinsCost.toLocaleString()} Coins</span>
                 </span>
@@ -1653,13 +1653,13 @@ ${recipientName.trim()}`;
                 <button
                   type="button"
                   onClick={() => setSelectedPhysicalItem(null)}
-                  className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl"
+                  className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-amber-950 transition-all"
+                  className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer"
                 >
                   Confirm &amp; Ship to Address
                 </button>
@@ -1671,20 +1671,20 @@ ${recipientName.trim()}`;
 
       {/* Modal: Physical Claim Email Request Confirmation */}
       {submittedPhysicalClaim && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-          <div className="bg-slate-900 border border-amber-500/60 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl text-slate-100 relative space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white border border-amber-300 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl text-slate-900 relative space-y-5">
             <div className="text-center space-y-2">
-              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto shadow-lg">
-                <Package className="w-7 h-7 text-amber-400" />
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-xs">
+                <Package className="w-7 h-7 text-amber-600" />
               </div>
-              <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full inline-block">
+              <span className="text-[10px] font-mono font-bold tracking-widest text-amber-800 uppercase bg-amber-100 border border-amber-300 px-3 py-1 rounded-full inline-block">
                 Courier Claim Dispatched
               </span>
-              <h3 className="text-xl sm:text-2xl font-extrabold text-white">
+              <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">
                 {submittedPhysicalClaim.item.name} Claimed!
               </h3>
-              <p className="text-xs text-slate-300">
-                Your <strong className="text-amber-400 inline-flex items-center gap-1"><StudyCoinIcon className="w-3.5 h-3.5" /> {submittedPhysicalClaim.coinsCost.toLocaleString()} Study Coins</strong> have been debited from the ledger. An official parcel dispatch request has been logged to the admin queue.
+              <p className="text-xs text-slate-600">
+                Your <strong className="text-amber-700 inline-flex items-center gap-1"><StudyCoinIcon className="w-3.5 h-3.5" /> {submittedPhysicalClaim.coinsCost.toLocaleString()} Study Coins</strong> have been debited from the ledger. An official parcel dispatch request has been logged to the admin queue.
               </p>
             </div>
 
@@ -1694,7 +1694,7 @@ ${recipientName.trim()}`;
                 href={submittedPhysicalClaim.mailtoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2"
+                className="w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer"
               >
                 <Send className="w-4 h-4" />
                 <span>Open Mail &amp; Notify academiclevels@gmail.com</span>
@@ -1708,16 +1708,16 @@ ${recipientName.trim()}`;
                   setCopiedPhysicalEmailText(true);
                   setTimeout(() => setCopiedPhysicalEmailText(false), 2500);
                 }}
-                className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition-all flex items-center justify-center space-x-2"
+                className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-300 transition-all flex items-center justify-center space-x-2 cursor-pointer"
               >
                 {copiedPhysicalEmailText ? (
                   <>
-                    <Check className="w-4 h-4 text-emerald-400" />
-                    <span className="text-emerald-300">Copied Courier Claim Text to Clipboard!</span>
+                    <Check className="w-4 h-4 text-emerald-600" />
+                    <span className="text-emerald-700 font-bold">Copied Courier Claim Text to Clipboard!</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="w-4 h-4 text-slate-400" />
+                    <Copy className="w-4 h-4 text-slate-500" />
                     <span>Copy Pre-filled Courier Claim Text</span>
                   </>
                 )}
@@ -1725,29 +1725,29 @@ ${recipientName.trim()}`;
             </div>
 
             {/* Request Summary details */}
-            <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-left text-xs font-mono space-y-2">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-left text-xs font-mono space-y-2">
               <div className="flex justify-between">
-                <span className="text-slate-400">Recipient:</span>
-                <span className="text-white font-bold">{submittedPhysicalClaim.recipientName}</span>
+                <span className="text-slate-500">Recipient:</span>
+                <span className="text-slate-900 font-bold">{submittedPhysicalClaim.recipientName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">WhatsApp / Phone:</span>
-                <span className="text-emerald-400">{submittedPhysicalClaim.phone}</span>
+                <span className="text-slate-500">WhatsApp / Phone:</span>
+                <span className="text-emerald-700 font-bold">{submittedPhysicalClaim.phone}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Delivery Partner:</span>
-                <span className="text-amber-300 font-bold flex items-center gap-1">
-                  <Truck className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-slate-500">Delivery Partner:</span>
+                <span className="text-amber-800 font-bold flex items-center gap-1">
+                  <Truck className="w-3.5 h-3.5 text-amber-600" />
                   <span>Delivered using Amazon</span>
                 </span>
               </div>
               <div className="flex flex-col gap-0.5">
-                <span className="text-slate-400">Shipping Address:</span>
-                <span className="text-amber-300 break-words text-[11px]">{submittedPhysicalClaim.fullAddress.replace('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]', '').replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim()}</span>
+                <span className="text-slate-500">Shipping Address:</span>
+                <span className="text-amber-900 break-words text-[11px] font-semibold">{submittedPhysicalClaim.fullAddress.replace('[PHYSICAL DELIVERY VIA AMAZON WORLDWIDE]', '').replace('[PHYSICAL DELIVERY VIA AMAZON]', '').replace('[PHYSICAL DELIVERY]', '').trim()}</span>
               </div>
-              <div className="flex justify-between pt-1 border-t border-slate-800">
-                <span className="text-slate-400">Request ID:</span>
-                <span className="text-indigo-300">{submittedPhysicalClaim.reqId}</span>
+              <div className="flex justify-between pt-1 border-t border-slate-200">
+                <span className="text-slate-500">Request ID:</span>
+                <span className="text-indigo-700 font-bold">{submittedPhysicalClaim.reqId}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Courier Status:</span>

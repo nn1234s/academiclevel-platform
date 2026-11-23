@@ -70,48 +70,48 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 text-slate-100">
+    <div className="max-w-4xl mx-auto space-y-6 text-slate-900">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-amber-950 via-slate-900 to-indigo-950 border border-amber-900/50 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-amber-50 via-white to-indigo-50 border border-amber-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-mono font-bold tracking-widest text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
+          <span className="text-[10px] font-mono font-bold tracking-widest text-amber-800 uppercase bg-amber-100 border border-amber-300 px-3 py-1 rounded-full">
             Study Coin Economy Mall
           </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-2">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
             Redeem Your Hard-Earned Coins
           </h2>
-          <p className="text-xs text-slate-300 mt-1 max-w-md">
+          <p className="text-xs text-slate-600 mt-1 max-w-md">
             Every coin is verified against the append-only ledger. Power up your profile, safeguard streaks, and download premium revisions.
           </p>
         </div>
 
-        <div className="bg-slate-950/80 border border-amber-500/30 rounded-2xl p-4 text-center min-w-[160px] shadow-lg shadow-amber-950/20">
-          <span className="text-[11px] text-slate-400 block font-medium">Your Available Coins</span>
+        <div className="bg-white border border-amber-300 rounded-2xl p-4 text-center min-w-[160px] shadow-sm">
+          <span className="text-[11px] text-slate-500 block font-medium">Your Available Coins</span>
           <div className="flex items-center justify-center space-x-2 mt-1">
             <StudyCoinIcon className="w-6 h-6" glow />
-            <span className="text-2xl font-black text-amber-400">{learner.coinBalance}</span>
+            <span className="text-2xl font-black text-amber-700">{learner.coinBalance}</span>
           </div>
         </div>
       </div>
 
       {/* Real Cash & Gift Card Rewards Spotlight */}
-      <div className="bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-purple-500/15 border-2 border-amber-500/40 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-amber-50 via-rose-50/50 to-purple-50/50 border-2 border-amber-300 rounded-3xl p-6 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-start space-x-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-500 text-slate-950 flex items-center justify-center font-bold text-2xl shadow-lg flex-shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-500 text-white flex items-center justify-center font-bold text-2xl shadow-sm flex-shrink-0">
             🎁
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-400 bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">
-                Real Cash & Voucher Rewards
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">
+                Real Cash &amp; Voucher Rewards
               </span>
-              <span className="text-[10px] font-bold text-rose-300">Level 1 to 8</span>
+              <span className="text-[10px] font-bold text-rose-700">Level 1 to 8</span>
             </div>
-            <h3 className="text-xl font-black text-white mt-1">
-              ₹10 to ₹500 Real Gift Cards & UPI Cash
+            <h3 className="text-xl font-black text-slate-900 mt-1">
+              ₹10 to ₹500 Real Gift Cards &amp; UPI Cash
             </h3>
-            <p className="text-xs text-slate-300 mt-1 max-w-lg">
-              Unlock Amazon Pay, Google Play, Flipkart, Swiggy, or Direct UPI Cash. Starting at <strong className="text-amber-400">2,500 Coins (₹10 GC)</strong>, scaling up across milestones to <strong className="text-amber-400">120,000 Coins (₹500 GC)</strong>!
+            <p className="text-xs text-slate-600 mt-1 max-w-lg">
+              Unlock Amazon Pay, Google Play, Flipkart, Swiggy, or Direct UPI Cash. Starting at <strong className="text-amber-800">2,500 Coins (₹10 GC)</strong>, scaling up across milestones to <strong className="text-amber-800">120,000 Coins (₹500 GC)</strong>!
             </p>
           </div>
         </div>
@@ -119,7 +119,7 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
         {onNavigateToGiftStore && (
           <button
             onClick={onNavigateToGiftStore}
-            className="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-amber-500 via-rose-500 to-pink-500 hover:from-amber-400 hover:to-pink-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-xl transition-all flex items-center justify-center space-x-2 flex-shrink-0"
+            className="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-amber-500 via-rose-500 to-pink-500 hover:from-amber-400 hover:to-pink-400 text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 flex-shrink-0 cursor-pointer"
           >
             <span>Explore Gift Cards Arena</span>
             <ArrowRight className="w-4 h-4" />
@@ -129,15 +129,15 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
 
       {/* Notifications */}
       {purchaseSuccess && (
-        <div className="p-4 bg-emerald-950/40 border border-emerald-800 rounded-2xl text-xs text-emerald-300 flex items-center space-x-2">
-          <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-800 flex items-center space-x-2">
+          <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
           <span>{purchaseSuccess}</span>
         </div>
       )}
 
       {purchaseError && (
-        <div className="p-4 bg-red-950/40 border border-red-800 rounded-2xl text-xs text-red-300 flex items-center space-x-2">
-          <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-800 flex items-center space-x-2">
+          <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
           <span>{purchaseError}</span>
         </div>
       )}
@@ -145,24 +145,24 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
       {/* Item Categories */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Streak Protection */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition-all">
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-400 transition-all shadow-sm">
           <div>
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mb-4">
               <Flame className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-white text-base">Streak Freeze Shield</h3>
-            <p className="text-xs text-slate-400 mt-2">
+            <h3 className="font-bold text-slate-900 text-base">Streak Freeze Shield</h3>
+            <p className="text-xs text-slate-600 mt-2">
               Missing a study day won&apos;t reset your streak. Automatically activates if you miss 24 hours.
             </p>
-            <div className="mt-4 flex items-center justify-between text-xs text-slate-300 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+            <div className="mt-4 flex items-center justify-between text-xs text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
               <span>Active Freezes:</span>
-              <span className="font-mono font-bold text-amber-400">{learner.streakFreezesAvailable || 0}</span>
+              <span className="font-mono font-bold text-amber-700">{learner.streakFreezesAvailable || 0}</span>
             </div>
           </div>
 
           <button
             onClick={handleBuyStreakFreeze}
-            className="mt-6 w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5"
+            className="mt-6 w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
           >
             <StudyCoinIcon className="w-4 h-4" />
             <span>Buy Freeze (15 Coins)</span>
@@ -170,20 +170,20 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
         </div>
 
         {/* Emerald Frame */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition-all">
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col justify-between hover:border-indigo-400 transition-all shadow-sm">
           <div>
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mb-4">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-white text-base">Emerald Scholar Frame</h3>
-            <p className="text-xs text-slate-400 mt-2">
+            <h3 className="font-bold text-slate-900 text-base">Emerald Scholar Frame</h3>
+            <p className="text-xs text-slate-600 mt-2">
               Equip an exclusive animated emerald border for your avatar across StudentPacks and leaderboards.
             </p>
           </div>
 
           <button
             onClick={() => handleBuyAvatarFrame('Emerald', 20)}
-            className="mt-6 w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5"
+            className="mt-6 w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold text-xs rounded-xl border border-slate-300 transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
           >
             <StudyCoinIcon className="w-4 h-4" />
             <span>{learner.avatarFrame === 'Emerald' ? 'Equipped' : 'Equip (20 Coins)'}</span>
@@ -191,30 +191,30 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
         </div>
 
         {/* Class Practice Worksheets & Revision PDF Center (30 Coins) */}
-        <div className={`border rounded-3xl p-6 flex flex-col justify-between transition-all ${
+        <div className={`border rounded-3xl p-6 flex flex-col justify-between transition-all shadow-sm ${
           isWorksheetUnlocked
-            ? 'bg-gradient-to-br from-indigo-950/40 via-slate-900 to-emerald-950/30 border-emerald-500/50 shadow-lg shadow-emerald-950/20'
-            : 'bg-slate-900 border-slate-800 hover:border-indigo-500/50'
+            ? 'bg-gradient-to-br from-indigo-50/60 via-white to-emerald-50/60 border-emerald-300 shadow-xs'
+            : 'bg-white border-slate-200 hover:border-indigo-400'
         }`}>
           <div>
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center">
                 <FileText className="w-6 h-6" />
               </div>
               {isWorksheetUnlocked ? (
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 flex items-center space-x-1">
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 border border-emerald-300 text-emerald-800 flex items-center space-x-1">
                   <Check className="w-3 h-3" />
-                  <span>Unlocked & Ready</span>
+                  <span>Unlocked &amp; Ready</span>
                 </span>
               ) : (
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 border border-amber-500/30 text-amber-300">
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 border border-amber-300 text-amber-800">
                   30 Coins
                 </span>
               )}
             </div>
 
-            <h3 className="font-bold text-white text-base">Class Practice Worksheets & PDF Center</h3>
-            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+            <h3 className="font-bold text-slate-900 text-base">Class Practice Worksheets &amp; PDF Center</h3>
+            <p className="text-xs text-slate-600 mt-2 leading-relaxed">
               Generate curriculum-calibrated practice worksheets directly from the 12,000-question bank for all classes (Classes 1–12), with rough work workspace and detachable NCERT step-by-step solutions.
             </p>
 

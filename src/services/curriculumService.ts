@@ -21,6 +21,15 @@ export class CurriculumService {
       boards: ['CBSE', 'ICSE', 'IGCSE']
     },
     {
+      id: 'evs',
+      name: 'EVS & Social Studies',
+      icon: '🌱',
+      color: 'from-emerald-600 to-amber-600',
+      description: 'Body Parts, Plants, Animals, Our Planet Earth, Regional Languages & Indian Culture.',
+      grades: [1, 2, 3, 4, 5],
+      boards: ['CBSE', 'ICSE', 'IGCSE']
+    },
+    {
       id: 'physics',
       name: 'Physics',
       icon: '⚡',
@@ -515,10 +524,50 @@ export class CurriculumService {
       ];
     }
 
-    // 2. COMPUTER SCIENCE & CODING CHAPTERS (Scratch, App Inventor, Thunkable, Web, Python, SQL)
+    // 2. COMPUTER SCIENCE & CODING CHAPTERS (MS Paint, Scratch, App Inventor, Thunkable, Web, Python, JS, SQL)
     if (sId.includes('cs') || sId.includes('comp') || sId.includes('code')) {
-      if (grade <= 3) {
+      if (grade <= 2) {
         return [
+          {
+            id: 'ch_cs_paint_p',
+            title: 'MS Paint & Creative Drawing Tools',
+            description: 'Drawing and coloring in MS Paint: Pencil, Eraser, Fill with Color paint bucket, Brushes, and 2D Shapes tool.',
+            questionCount: 10,
+            estimatedMinutes: 10,
+            topics: ['MS Paint Pencil & Eraser', 'Fill with Color (Paint Bucket)', 'Drawing Shapes & Brushes'],
+            badge: 'MS Paint'
+          },
+          {
+            id: 'ch_cs_parts_p',
+            title: 'Computer Parts & Hardware Devices',
+            description: 'Identifying essential computer hardware: Monitor, CPU (brain of computer), Keyboard, Mouse, and Printer.',
+            questionCount: 10,
+            estimatedMinutes: 10,
+            topics: ['Monitor Screen & Display', 'CPU System Unit', 'Mouse Clicking & Keyboard Keys'],
+            badge: 'Computer Parts'
+          },
+          {
+            id: 'ch_cs_smart_p',
+            title: 'Smart Machines & Safe Computer Habits',
+            description: 'Understanding computers as smart machines, starting up and shutting down, mouse pointer, and gentle computer handling.',
+            questionCount: 10,
+            estimatedMinutes: 10,
+            topics: ['Smart Machines in Daily Life', 'Mouse Pointer & Cursor', 'Do\'s and Don\'ts with Computers'],
+            badge: 'Digital Basics'
+          }
+        ];
+      }
+      if (grade <= 4) {
+        return [
+          {
+            id: 'ch_cs_paint_art',
+            title: 'MS Paint & Digital Art Tools',
+            description: 'Advanced MS Paint techniques: Color palette selection, zooming, resizing, crop, and creating pixel artwork.',
+            questionCount: 10,
+            estimatedMinutes: 12,
+            topics: ['MS Paint Color Palette & Picker', 'Selection & Crop Tools', 'Creating Digital Drawings'],
+            badge: 'MS Paint'
+          },
           {
             id: 'ch_cs_scratch_jr',
             title: 'Scratch Junior & Block Coding Basics',
@@ -526,7 +575,16 @@ export class CurriculumService {
             questionCount: 10,
             estimatedMinutes: 12,
             topics: ['Green Flag Start Block', 'Move Steps & Turn Blocks', 'Costume & Sound Blocks'],
-            badge: 'Block Coding'
+            badge: 'Scratch'
+          },
+          {
+            id: 'ch_cs_io_devices',
+            title: 'Input, Output & Storage Devices',
+            description: 'Distinguishing input devices (keyboard, mouse, mic) from output devices (monitor, printer, speaker) and storage (USB, hard drive).',
+            questionCount: 10,
+            estimatedMinutes: 12,
+            topics: ['Input Devices vs Output Devices', 'Storage Media & Pendrives', 'Computer Memory Basics'],
+            badge: 'Hardware'
           },
           {
             id: 'ch_cs_seq_p',
@@ -536,28 +594,19 @@ export class CurriculumService {
             estimatedMinutes: 12,
             topics: ['Algorithm Sequences', 'Debugging Missing Steps', 'Repeating Simple Actions'],
             badge: 'Logic & Thinking'
-          },
-          {
-            id: 'ch_cs_sprites_p',
-            title: 'Sprites, Sounds & Animation',
-            description: 'Controlling multiple sprites, changing backdrop stages, playing audio effects, and speech bubble dialogs.',
-            questionCount: 10,
-            estimatedMinutes: 12,
-            topics: ['Sprite Costumes', 'Stage Backdrops', 'Speech Bubbles & Sound FX'],
-            badge: 'Creative Coding'
           }
         ];
       }
-      if (grade <= 5) {
+      if (grade <= 6) {
         return [
           {
             id: 'ch_cs_scratch_loops',
-            title: 'Scratch Block Coding (Loops & Events)',
+            title: 'Scratch Game Programming & Loops',
             description: 'Repeat 10 loops, forever loops, repeat-until conditions, key pressed events, and broadcast message handling.',
             questionCount: 10,
             estimatedMinutes: 15,
             topics: ['Repeat & Forever Loops', 'When Key Pressed Events', 'Broadcast & Receive Messages'],
-            badge: 'Scratch Loops'
+            badge: 'Scratch'
           },
           {
             id: 'ch_cs_scratch_vars',
@@ -569,30 +618,48 @@ export class CurriculumService {
             badge: 'Game Variables'
           },
           {
-            id: 'ch_cs_scratch_cond',
-            title: 'Conditionals (If-Then) & Sensing in Games',
-            description: 'If-then blocks, if-then-else logic, touching edge sensing, touching mouse pointer, and collision detection.',
+            id: 'ch_cs_html_intro',
+            title: 'HTML Web Page Basics',
+            description: 'HTML skeleton structure, tags: <h1>-<h6> headings, <p> paragraphs, <a> hyperlinks with href, and <img> with src/alt.',
             questionCount: 10,
             estimatedMinutes: 15,
-            topics: ['If-Then Statements', 'Touching Edge Sensing', 'Sprite Collision Detection'],
-            badge: 'Game Sensing'
+            topics: ['HTML Page Skeleton', 'Headings & Paragraphs', 'Links & Image Tags'],
+            badge: 'HTML'
+          },
+          {
+            id: 'ch_cs_cyber_safe',
+            title: 'Cyber Safety & Internet Ethics',
+            description: 'Safe browsing habits, creating strong passwords, identifying phishing scams, and digital etiquette.',
+            questionCount: 10,
+            estimatedMinutes: 15,
+            topics: ['Password Security', 'Safe Web Browsing', 'Cyber Etiquette'],
+            badge: 'Cyber Safety'
           }
         ];
       }
       if (grade <= 8) {
         return [
           {
-            id: 'ch_cs_scratch_adv',
-            title: 'Scratch Advanced Game Design',
-            description: 'Sprite cloning, physics gravity simulation, multi-level maze design, and high score cloud variables.',
+            id: 'ch_cs_html_web',
+            title: 'HTML & CSS Web Development',
+            description: 'HTML structure, tags, forms, tables, and CSS styling (colors, fonts, box model, margins and padding).',
             questionCount: 10,
             estimatedMinutes: 15,
-            topics: ['Create Clone of Myself', 'Platformer Gravity Logic', 'Custom Blocks (Functions)'],
-            badge: 'Advanced Scratch'
+            topics: ['HTML Form Controls & Tables', 'CSS Selectors & Colors', 'Box Model & Page Layouts'],
+            badge: 'HTML & CSS'
+          },
+          {
+            id: 'ch_cs_py_basics_m',
+            title: 'Python Programming Basics',
+            description: 'Python syntax, print(), input(), integer/float/string variables, if-elif-else decisions, and while/for loops.',
+            questionCount: 10,
+            estimatedMinutes: 15,
+            topics: ['Print, Input & Variables', 'If-Elif-Else Conditions', 'For Loops & Lists'],
+            badge: 'Python'
           },
           {
             id: 'ch_cs_app_inv',
-            title: 'MIT App Inventor (Mobile UI & Buttons)',
+            title: 'MIT App Inventor & Mobile Apps',
             description: 'Designer View vs Blocks Editor, Button click event handlers, Text-to-Speech component, and mobile screen layouts.',
             questionCount: 10,
             estimatedMinutes: 15,
@@ -606,38 +673,20 @@ export class CurriculumService {
             questionCount: 10,
             estimatedMinutes: 15,
             topics: ['Screen Navigation', 'Mobile Sensors & Logic', 'App Block Event Handlers'],
-            badge: 'Thunkable Apps'
-          },
-          {
-            id: 'ch_cs_html_web',
-            title: 'HTML & Web Foundations',
-            description: 'HTML skeleton structure, tags: <h1>-<h6>, <p>, <a> hyperlinks with href, <img> with src/alt, and ordered/unordered lists.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['HTML Page Structure', 'Headings, Paragraphs & Lists', 'Hyperlinks & Image Tags'],
-            badge: 'Web Foundations'
+            badge: 'Thunkable'
           }
         ];
       }
       if (grade <= 10) {
         return [
           {
-            id: 'ch_cs_html5_css',
-            title: 'HTML5 & Semantic Web Development',
-            description: 'Semantic tags (<header>, <nav>, <section>, <footer>), forms (<input type="text/email/submit">), and tables (<tr>, <td>).',
+            id: 'ch_cs_py_algo',
+            title: 'Python Programming & Algorithms',
+            description: 'Python syntax, data types, if-elif-else, while loops, for loops with range, lists, tuples, and string functions.',
             questionCount: 10,
             estimatedMinutes: 15,
-            topics: ['Semantic Elements', 'HTML Form Controls', 'Table Structures'],
-            badge: 'HTML5 & Forms'
-          },
-          {
-            id: 'ch_cs_css_style',
-            title: 'CSS Styling & Responsive Layouts',
-            description: 'CSS syntax, selectors, colors, fonts, CSS Box Model (content, padding, border, margin), and display: flex layouts.',
-            questionCount: 10,
-            estimatedMinutes: 15,
-            topics: ['CSS Selectors & Cascade', 'Box Model (Margin & Padding)', 'Flexbox Display Basics'],
-            badge: 'CSS Styling'
+            topics: ['Control Flow & Loops', 'List Methods & Slicing', 'String Manipulation & Functions'],
+            badge: 'Python'
           },
           {
             id: 'ch_cs_js_fund',
@@ -649,13 +698,13 @@ export class CurriculumService {
             badge: 'JavaScript'
           },
           {
-            id: 'ch_cs_py_basics',
-            title: 'Python Programming Basics',
-            description: 'Python syntax, print(), input(), integer/float/string types, if-elif-else, for i in range(), while loops, and lists.',
+            id: 'ch_cs_html5_css',
+            title: 'HTML5 & Responsive Web Design',
+            description: 'Semantic tags (<header>, <nav>, <section>, <footer>), forms (<input type="text/email/submit">), and CSS Flexbox.',
             questionCount: 10,
             estimatedMinutes: 15,
-            topics: ['Print, Input & Variables', 'If-Elif-Else Conditionals', 'For Loops & Lists'],
-            badge: 'Python Basics'
+            topics: ['Semantic Elements', 'HTML Form Controls', 'CSS Flexbox Layouts'],
+            badge: 'HTML5 & CSS'
           },
           {
             id: 'ch_cs_net_cyber',
@@ -1045,35 +1094,192 @@ export class CurriculumService {
       ];
     }
 
-    // 5. SOCIAL SCIENCES
-    if (sId.includes('soc') || sId.includes('hist') || sId.includes('geog') || sId.includes('civic')) {
+    // 5. SOCIAL SCIENCES & ENVIRONMENTAL STUDIES (EVS)
+    if (sId.includes('evs') || sId.includes('soc') || sId.includes('hist') || sId.includes('geog') || sId.includes('civic')) {
+      if (grade <= 2) {
+        return [
+          {
+            id: 'ch_evs_body_p',
+            title: 'My Body Parts & 5 Sense Organs',
+            description: 'Identifying body parts: eyes, ears, nose, tongue, skin, hands, feet, personal hygiene, and healthy habits.',
+            questionCount: 10,
+            estimatedMinutes: 10,
+            topics: ['The 5 Sense Organs', 'Hands, Legs & Body Movement', 'Cleanliness & Health Habits'],
+            badge: 'Body Parts'
+          },
+          {
+            id: 'ch_evs_plants_p',
+            title: 'Plants Around Us & Green World',
+            description: 'Roots, stems, leaves, flowers, trees vs small plants, watering plants, and caring for green nature.',
+            questionCount: 10,
+            estimatedMinutes: 10,
+            topics: ['Parts of a Plant (Roots, Leaves)', 'Big Trees vs Little Shrubs', 'How Plants Need Water & Sun'],
+            badge: 'Plants'
+          },
+          {
+            id: 'ch_evs_animals_p',
+            title: 'Animals & Their Homes',
+            description: 'Loving pets (dogs, cats), farm helpers (cows, horses), wild animals in jungles, birds in nests, and animal babies.',
+            questionCount: 10,
+            estimatedMinutes: 10,
+            topics: ['Pet & Domestic Animals', 'Wild Animals & Dens', 'Birds & Nests'],
+            badge: 'Animals'
+          },
+          {
+            id: 'ch_evs_earth_p',
+            title: 'Our Planet Earth, Sun & Weather',
+            description: 'The Earth we live on, the Sun giving light and heat, day and night cycle, rainy season, summer, and cold winter.',
+            questionCount: 10,
+            estimatedMinutes: 10,
+            topics: ['Our Planet Earth', 'Sun, Moon & Stars', 'Day, Night & Seasons'],
+            badge: 'Our Planet'
+          },
+          {
+            id: 'ch_evs_lang_p',
+            title: 'Regional Languages & Festivals of India',
+            description: 'Languages of India (Hindi, Tamil, Marathi, Bengali, Telugu, Punjabi) and joyful festivals (Diwali, Eid, Christmas, Holi).',
+            questionCount: 10,
+            estimatedMinutes: 10,
+            topics: ['Regional Languages of India', 'Festivals of Lights & Colors', 'National Symbols of India'],
+            badge: 'Regional Languages'
+          }
+        ];
+      }
+      if (grade <= 5) {
+        return [
+          {
+            id: 'ch_evs_plants_e',
+            title: 'Plants, Photosynthesis & Forests',
+            description: 'Photosynthesis equation, chlorophyll, roots absorbing nutrients, types of forests, and protecting trees.',
+            questionCount: 10,
+            estimatedMinutes: 12,
+            topics: ['Photosynthesis Basics', 'Roots & Stems Functions', 'Forests & Saving Nature'],
+            badge: 'Plants'
+          },
+          {
+            id: 'ch_evs_body_e',
+            title: 'Human Body & Digestive Journey',
+            description: 'Teeth types, mouth to stomach digestion, bones, movable joints, and balanced diet nutrition.',
+            questionCount: 10,
+            estimatedMinutes: 12,
+            topics: ['Digestive System', 'Bones & Muscles', 'Healthy Food & Vitamins'],
+            badge: 'Body Systems'
+          },
+          {
+            id: 'ch_soc_earth_e',
+            title: 'Our Planet Earth: Continents, Oceans & Maps',
+            description: 'The 7 continents, 5 oceans, North/South/East/West directions, globe models, and reading physical maps.',
+            questionCount: 10,
+            estimatedMinutes: 12,
+            topics: ['The 7 Continents & 5 Oceans', 'Compass Directions', 'Reading Globes & Maps'],
+            badge: 'Our Planet'
+          },
+          {
+            id: 'ch_soc_lang_e',
+            title: 'Regional Languages, Culture & Heritage of India',
+            description: 'Classical and regional languages of Indian states, traditional clothing, folk dances, and cultural unity in diversity.',
+            questionCount: 10,
+            estimatedMinutes: 12,
+            topics: ['Official Indian Languages', 'States & Their Cultural Heritage', 'Folk Art & National Unity'],
+            badge: 'Regional Languages'
+          },
+          {
+            id: 'ch_soc_gov_e',
+            title: 'Local Government & Community Helpers',
+            description: 'Gram Panchayat in villages, Municipal Corporation in cities, public services, police, firefighters, and doctors.',
+            questionCount: 10,
+            estimatedMinutes: 12,
+            topics: ['Gram Panchayat & Village Governance', 'City Municipal Corporation', 'Community Helpers & Services'],
+            badge: 'Government'
+          }
+        ];
+      }
+      if (grade <= 8) {
+        return [
+          {
+            id: 'ch_soc_planet_m',
+            title: 'Our Planet: Latitudes, Longitudes & Earth Motions',
+            description: 'Equator, Prime Meridian, rotation causing day/night, revolution causing seasons, and climate zones.',
+            questionCount: 10,
+            estimatedMinutes: 15,
+            topics: ['Latitudes & Longitudes', 'Rotation & Revolution', 'Torrid, Temperate & Frigid Zones'],
+            badge: 'Our Planet'
+          },
+          {
+            id: 'ch_soc_gov_m',
+            title: 'Government & Democracy in India',
+            description: 'Levels of government (Centre, State, Local), Panchayati Raj, Indian Constitution, and Fundamental Rights & Duties.',
+            questionCount: 10,
+            estimatedMinutes: 15,
+            topics: ['Three Tiers of Government', 'Panchayati Raj System', 'Fundamental Rights & Duties'],
+            badge: 'Government'
+          },
+          {
+            id: 'ch_soc_lang_m',
+            title: 'Regional Languages & Cultural Diversity of India',
+            description: 'Eighth Schedule languages of India, linguistic reorganisation of states, literature, and architectural monuments.',
+            questionCount: 10,
+            estimatedMinutes: 15,
+            topics: ['Scheduled Languages of India', 'State Reorganisation by Language', 'Monuments & Cultural Heritage'],
+            badge: 'Regional Languages'
+          },
+          {
+            id: 'ch_soc_hist_m',
+            title: 'Medieval India & Delhi Sultanate to Mughals',
+            description: 'Major empires, administration, trade routes, craft traditions, and architectural marvels.',
+            questionCount: 10,
+            estimatedMinutes: 15,
+            topics: ['Delhi Sultanate & Mughals', 'Trade & Craft Centers', 'Temple & Fort Architecture'],
+            badge: 'History'
+          },
+          {
+            id: 'ch_soc_res_m',
+            title: 'Natural Resources, Water & Agriculture',
+            description: 'Land resources, soil degradation, freshwater distribution, multi-purpose dams, and major crop patterns.',
+            questionCount: 10,
+            estimatedMinutes: 15,
+            topics: ['Soil & Water Conservation', 'Kharif, Rabi & Zaid Crops', 'Renewable vs Non-Renewable Resources'],
+            badge: 'Geography'
+          }
+        ];
+      }
+      // Grades 9-10
       return [
         {
-          id: 'ch_soc_hist',
-          title: 'Modern History & National Movements',
-          description: 'Key timelines, anti-colonial movements, Satyagraha, and economic impacts of British rule.',
+          id: 'ch_soc_gov_s',
+          title: 'Democratic Politics & Government Architecture',
+          description: 'Power sharing, federalism, Parliament (Lok Sabha & Rajya Sabha), Prime Minister & Cabinet, and Independent Judiciary.',
           questionCount: 10,
           estimatedMinutes: 15,
-          topics: ['Non-Cooperation & Civil Disobedience', 'Key Historical Treaties', 'Chronology & Source Work'],
+          topics: ['Federalism & Power Sharing', 'Parliament & Electoral Politics', 'Role of the Independent Judiciary'],
+          badge: 'Government'
+        },
+        {
+          id: 'ch_soc_planet_s',
+          title: 'Our Planet: Resources, Climate & Agriculture',
+          description: 'Resource planning, deforestation, Indian monsoon mechanism, cropping seasons, and sustainable development.',
+          questionCount: 10,
+          estimatedMinutes: 15,
+          topics: ['Sustainable Resource Planning', 'Monsoon Climate Dynamics', 'Major Food & Commercial Crops'],
+          badge: 'Our Planet'
+        },
+        {
+          id: 'ch_soc_hist_s',
+          title: 'Nationalism in India & Freedom Struggle',
+          description: 'First World War impact, Satyagraha, Non-Cooperation Movement, Civil Disobedience, Quit India, and partition history.',
+          questionCount: 10,
+          estimatedMinutes: 15,
+          topics: ['Gandhian Satyagraha Movements', 'Civil Disobedience & Dandi March', 'Constitutional Making & Freedom'],
           badge: 'History'
         },
         {
-          id: 'ch_soc_civics',
-          title: 'Indian Constitution & Democratic Institutions',
-          description: 'Preamble, Fundamental Rights, separation of powers, Parliament, and Supreme Court Judiciary.',
+          id: 'ch_soc_econ_s',
+          title: 'Economic Development, Sectors & Money',
+          description: 'Primary, secondary, and tertiary sectors, organized vs unorganized labor, money, credit, and formal banking.',
           questionCount: 10,
           estimatedMinutes: 15,
-          topics: ['Fundamental Rights & Duties', 'Electoral Politics', 'Role of the Independent Judiciary'],
-          badge: 'Civics'
-        },
-        {
-          id: 'ch_soc_geog',
-          title: 'Geography, Resources & Climate Patterns',
-          description: 'Resource classification, soil types, Indian monsoon mechanics, agriculture, and map interpretation.',
-          questionCount: 10,
-          estimatedMinutes: 15,
-          topics: ['Soil Conservation', 'Monsoon Mechanism', 'Major Mineral Belts'],
-          badge: 'Geography'
+          topics: ['Three Sectors of Indian Economy', 'Formal Credit & Banking System', 'Globalization & Consumer Rights'],
+          badge: 'Economics'
         }
       ];
     }

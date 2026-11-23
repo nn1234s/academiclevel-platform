@@ -97,44 +97,44 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
 
   if (isActivatedSuccess) {
     return (
-      <div className="max-w-xl mx-auto bg-slate-900 border-2 border-emerald-500/80 rounded-3xl p-6 sm:p-10 shadow-2xl text-slate-100 text-center space-y-6 animate-in fade-in zoom-in-95 duration-200">
-        <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 border-2 border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto shadow-lg shadow-emerald-950/40">
-          <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+      <div className="max-w-xl mx-auto bg-white border-2 border-emerald-500 rounded-3xl p-6 sm:p-10 shadow-sm text-slate-900 text-center space-y-6 animate-in fade-in zoom-in-95 duration-200">
+        <div className="w-16 h-16 rounded-3xl bg-emerald-50 border-2 border-emerald-300 text-emerald-600 flex items-center justify-center mx-auto shadow-xs">
+          <CheckCircle2 className="w-10 h-10 text-emerald-600" />
         </div>
 
         <div className="space-y-2">
-          <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-400 uppercase bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full inline-block">
+          <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-800 uppercase bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full inline-block">
             ⚡ Automated Gateway Confirmed
           </span>
-          <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
             Membership Activated Instantly!
           </h2>
-          <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-            Welcome to <strong className="text-white">{plan.name}</strong>! Your account has been upgraded with full unlimited syllabus access, 24/7 Nova AI Socratic tutor, and physical rewards eligibility.
+          <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
+            Welcome to <strong className="text-slate-900">{plan.name}</strong>! Your account has been upgraded with full unlimited syllabus access, 24/7 Nova AI Socratic tutor, and physical rewards eligibility.
           </p>
         </div>
 
-        <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-left text-xs font-mono space-y-2">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-left text-xs font-mono space-y-2">
           <div className="flex justify-between">
-            <span className="text-slate-400">Membership Tier:</span>
-            <span className="text-white font-bold">{plan.name} ({plan.durationDays} Days)</span>
+            <span className="text-slate-500">Membership Tier:</span>
+            <span className="text-slate-900 font-bold">{plan.name} ({plan.durationDays} Days)</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-400">Amount Paid:</span>
-            <span className="text-emerald-400 font-bold">₹{plan.priceInr}.00</span>
+            <span className="text-slate-500">Amount Paid:</span>
+            <span className="text-emerald-700 font-bold">₹{plan.priceInr}.00</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-400">Payment Gateway:</span>
-            <span className="text-indigo-300 font-bold">Official UPI PG (cit.org.in)</span>
+            <span className="text-slate-500">Payment Gateway:</span>
+            <span className="text-indigo-700 font-bold">Official UPI PG (cit.org.in)</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-400">Invoice No:</span>
-            <span className="text-amber-400">{activatedInvoice}</span>
+            <span className="text-slate-500">Invoice No:</span>
+            <span className="text-amber-800">{activatedInvoice}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-400">Activation Status:</span>
-            <span className="text-emerald-400 font-bold flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-slate-500">Activation Status:</span>
+            <span className="text-emerald-700 font-bold flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
               <span>ACTIVE (Full Access Live)</span>
             </span>
           </div>
@@ -142,7 +142,7 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
 
         <button
           onClick={() => onSuccess(customRef.trim() || 'UPI-PG-ACTIVE')}
-          className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-950 transition-all flex items-center justify-center space-x-2 cursor-pointer"
+          className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center justify-center space-x-2 cursor-pointer"
         >
           <span>Start Learning &amp; Earn Coins Now</span>
         </button>
@@ -151,10 +151,10 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
   }
 
   return (
-    <div className="max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-8 shadow-2xl text-slate-100">
+    <div className="max-w-2xl mx-auto bg-white border border-slate-200 rounded-3xl p-5 sm:p-8 shadow-sm text-slate-900">
       <button
         onClick={onBack}
-        className="flex items-center space-x-1.5 text-xs text-slate-400 hover:text-white mb-5 transition-colors cursor-pointer"
+        className="flex items-center space-x-1.5 text-xs text-slate-500 hover:text-slate-900 mb-5 transition-colors cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back to Plans</span>
@@ -162,31 +162,31 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
 
       <div className="space-y-6">
         {/* Header & Trust Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
           <div>
-            <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-400 uppercase bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 mb-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-800 uppercase bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 mb-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>Official Automated UPI Gateway</span>
             </span>
-            <h2 className="text-xl sm:text-2xl font-black text-white">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900">
               {plan.name}
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-600 mt-0.5">
               {plan.durationDays} Days Unrestricted Syllabus Coverage • Classes 1 to 12
             </p>
           </div>
 
-          <div className="text-left sm:text-right bg-slate-950 px-4 py-2.5 rounded-2xl border border-slate-800/80">
+          <div className="text-left sm:text-right bg-slate-50 px-4 py-2.5 rounded-2xl border border-slate-200">
             <span className="text-[10px] text-slate-500 uppercase font-mono block">One-Time Fee</span>
-            <div className="text-2xl font-black text-emerald-400 font-mono">
-              ₹{plan.priceInr}<span className="text-xs text-slate-400 font-normal">.00</span>
+            <div className="text-2xl font-black text-emerald-700 font-mono">
+              ₹{plan.priceInr}<span className="text-xs text-slate-500 font-normal">.00</span>
             </div>
           </div>
         </div>
 
         {errorMessage && (
-          <div className="p-3.5 bg-red-950/40 border border-red-800 rounded-2xl text-xs text-red-300 flex items-start space-x-2">
-            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-800 flex items-start space-x-2">
+            <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
             <span>{errorMessage}</span>
           </div>
         )}
@@ -195,20 +195,20 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
         <div className="space-y-4">
           {/* Screaming Gold Upgrade Banners */}
           {planTier === 'LITE' && (
-            <div className="p-3.5 bg-gradient-to-r from-amber-950/90 via-slate-900 to-yellow-950/80 border-2 border-amber-500/60 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-xl ring-2 ring-amber-500/20">
+            <div className="p-3.5 bg-gradient-to-r from-amber-50 via-white to-yellow-50 border-2 border-amber-300 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-xs">
               <div className="space-y-0.5">
-                <span className="text-[10px] font-mono font-black uppercase text-amber-400 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 fill-amber-400" />
+                <span className="text-[10px] font-mono font-black uppercase text-amber-800 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                   <span>👑 1-Year Gold Deal Available: ₹205 (365 Days)</span>
                 </span>
-                <p className="text-slate-200 text-[11px] leading-relaxed">
+                <p className="text-slate-700 text-[11px] leading-relaxed">
                   Pay just <strong>₹156 more</strong> to get <strong>305 EXTRA DAYS (10 full months free!)</strong>. That is only <strong>~₹17.08/month (~56 paise/day!)</strong> covering both terms &amp; final board exams!
                 </p>
               </div>
               <button
                 type="button"
                 onClick={onBack}
-                className="px-3.5 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all shrink-0 cursor-pointer"
+                className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-xs transition-all shrink-0 cursor-pointer"
               >
                 Upgrade to Gold (₹205) ↗
               </button>
@@ -216,20 +216,20 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
           )}
 
           {planTier === 'PLUS' && (
-            <div className="p-3.5 bg-gradient-to-r from-amber-950/90 via-slate-900 to-yellow-950/80 border-2 border-amber-500/60 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-xl ring-2 ring-amber-500/20">
+            <div className="p-3.5 bg-gradient-to-r from-amber-50 via-white to-yellow-50 border-2 border-amber-300 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-xs">
               <div className="space-y-0.5">
-                <span className="text-[10px] font-mono font-black uppercase text-amber-400 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 fill-amber-400" />
+                <span className="text-[10px] font-mono font-black uppercase text-amber-800 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                   <span>👑 Upgrade to 1-Year Gold Pass: ₹205 (365 Days)</span>
                 </span>
-                <p className="text-slate-200 text-[11px] leading-relaxed">
+                <p className="text-slate-700 text-[11px] leading-relaxed">
                   Pay just <strong>₹76 MORE</strong> than Plus to get <strong>185 EXTRA DAYS (Double your duration to 365 Days!)</strong>. Only <strong>~56 paise/day</strong>!
                 </p>
               </div>
               <button
                 type="button"
                 onClick={onBack}
-                className="px-3.5 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all shrink-0 cursor-pointer"
+                className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs rounded-xl shadow-xs transition-all shrink-0 cursor-pointer"
               >
                 Upgrade to Gold (₹205) ↗
               </button>
@@ -237,12 +237,12 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
           )}
 
           {planTier === 'GOLD' && (
-            <div className="p-3.5 bg-gradient-to-r from-amber-950/90 via-slate-900 to-yellow-950/80 border-2 border-amber-500/80 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-xl ring-4 ring-amber-500/30">
+            <div className="p-3.5 bg-gradient-to-r from-amber-50 via-white to-yellow-50 border-2 border-amber-400 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-xs">
               <div className="space-y-0.5">
-                <span className="text-[10px] font-mono font-black uppercase text-amber-400 flex items-center gap-1.5">
+                <span className="text-[10px] font-mono font-black uppercase text-amber-800 flex items-center gap-1.5">
                   <span>👑 1-YEAR GOLD PASS SELECTED • 365 DAYS COMPLETE ACCESS</span>
                 </span>
-                <p className="text-slate-200 text-[11px] leading-relaxed font-semibold">
+                <p className="text-slate-700 text-[11px] leading-relaxed font-semibold">
                   Full academic year coverage • Only <strong>~₹17.08/month (~56 paise/day)</strong> • VIP Store Rewards &amp; Master Certificate
                 </p>
               </div>
@@ -253,17 +253,17 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
           )}
 
           {/* A-CODE VOUCHER REDEMPTION SECTION */}
-          <div className="p-4 bg-gradient-to-r from-indigo-950/80 via-slate-900 to-indigo-950/80 rounded-2xl border border-indigo-500/40 text-left space-y-2.5 shadow-lg shadow-indigo-950/30">
+          <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-2xl text-left space-y-2.5 shadow-xs">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2 text-indigo-300 font-bold text-xs">
-                <KeyRound className="w-4 h-4 text-indigo-400 shrink-0" />
+              <div className="flex items-center space-x-2 text-indigo-900 font-bold text-xs">
+                <KeyRound className="w-4 h-4 text-indigo-600 shrink-0" />
                 <span>Bought from an online store or School?</span>
               </div>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 border border-indigo-300">
                 A-CODE Voucher
               </span>
             </div>
-            <p className="text-[11px] text-slate-300 leading-relaxed">
+            <p className="text-[11px] text-slate-600 leading-relaxed">
               You will have gotten an <strong>A-CODE</strong>. Enter your A-CODE below to activate your plan instantly without paying again!
             </p>
             <div className="flex gap-2">
@@ -272,13 +272,13 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
                 placeholder="Enter A-CODE (e.g. AL-PLUS-XXXX)"
                 value={acodeInput}
                 onChange={e => setAcodeInput(e.target.value.toUpperCase())}
-                className="flex-1 bg-slate-950 border border-slate-800 focus:border-indigo-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 font-mono tracking-wider focus:outline-none uppercase"
+                className="flex-1 bg-white border border-slate-300 focus:border-indigo-500 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 font-mono tracking-wider focus:outline-none uppercase"
               />
               <button
                 type="button"
                 onClick={handleRedeemAcode}
                 disabled={isRedeemingAcode || !acodeInput.trim()}
-                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs rounded-xl shadow-md transition-all shrink-0 cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all shrink-0 cursor-pointer disabled:opacity-50"
               >
                 {isRedeemingAcode ? 'Activating...' : 'Apply A-CODE'}
               </button>
@@ -286,57 +286,57 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             {acodeMessage && (
               <div className={`p-2.5 rounded-xl text-xs flex items-center space-x-1.5 ${
                 acodeMessage.type === 'success' 
-                  ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-300' 
-                  : 'bg-rose-950/60 border border-rose-500/40 text-rose-300'
+                  ? 'bg-emerald-50 border border-emerald-300 text-emerald-800' 
+                  : 'bg-rose-50 border border-rose-300 text-rose-800'
               }`}>
-                {acodeMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> : <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />}
+                {acodeMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> : <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />}
                 <span>{acodeMessage.text}</span>
               </div>
             )}
           </div>
 
           {/* Step 1: BUY NOW VIA UPI PG */}
-          <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+          <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-amber-300 flex items-center space-x-1.5">
-                <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[11px] font-black">1</span>
+              <span className="text-xs font-bold text-amber-800 flex items-center space-x-1.5">
+                <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center text-[11px] font-black">1</span>
                 <span>Step 1: Open Secure Gateway</span>
               </span>
-              <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+              <span className="text-[10px] font-mono text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-300">
                 Official upipg.cit.org.in/pay Gateway
               </span>
             </div>
 
             {/* Payment Return Notice with English & Hinglish Toggle */}
-            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-2 text-left">
+            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-2 text-left">
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center space-x-1.5 font-bold text-amber-300">
-                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                <div className="flex items-center space-x-1.5 font-bold text-amber-800">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                   <span>Payment Return Notice</span>
                 </div>
-                <div className="flex bg-slate-900 rounded-lg p-0.5 text-[10px] font-bold border border-slate-700 shrink-0">
+                <div className="flex bg-slate-200 rounded-lg p-0.5 text-[10px] font-bold border border-slate-300 shrink-0">
                   <button
                     type="button"
                     onClick={() => setNoticeLang('EN')}
-                    className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'EN' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+                    className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'EN' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-600 hover:text-slate-900'}`}
                   >
                     English
                   </button>
                   <button
                     type="button"
                     onClick={() => setNoticeLang('HINGLISH')}
-                    className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'HINGLISH' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+                    className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'HINGLISH' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-600 hover:text-slate-900'}`}
                   >
                     Hinglish
                   </button>
                 </div>
               </div>
               {noticeLang === 'EN' ? (
-                <p className="text-[11px] leading-relaxed text-amber-200/90 font-medium">
+                <p className="text-[11px] leading-relaxed text-amber-900 font-medium">
                   ⚠️ <strong>AFTER you have paid in UPI PG</strong>, instead of being stuck on that page, <strong>CLICK back and return here</strong>, otherwise we will forget your payment as we track payments and accounts by the pay now button click.
                 </p>
               ) : (
-                <p className="text-[11px] leading-relaxed text-amber-200/90 font-medium">
+                <p className="text-[11px] leading-relaxed text-amber-900 font-medium">
                   ⚠️ <strong>UPI PG mein payment complete karne ke baad</strong>, wahan page par ruke rehne ke bajaye <strong>CLICK back karke yahan wapas aaiye</strong>, warna hum aapki payment bhool sakte hain kyunki hum payments aur accounts ko Pay Now button click ke through track karte hain.
                 </p>
               )}
@@ -345,28 +345,28 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             <button
               type="button"
               onClick={handleOpenGateway}
-              className="w-full py-4 px-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl transition-all flex items-center justify-center space-x-2 cursor-pointer transform hover:scale-[1.01]"
+              className="w-full py-4 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer transform hover:scale-[1.01]"
             >
               <ExternalLink className="w-5 h-5" />
               <span>BUY NOW VIA UPI PG (₹{plan.priceInr}) ↗</span>
             </button>
 
             {/* Gateway Link Preview & Copy */}
-            <div className="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-800 text-[11px] font-mono text-slate-400">
+            <div className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-200 text-[11px] font-mono text-slate-600">
               <span className="truncate pr-2">{gatewayUrl}</span>
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold rounded-lg text-[10px] transition-colors flex items-center space-x-1 flex-shrink-0 cursor-pointer"
+                className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-lg text-[10px] transition-colors flex items-center space-x-1 flex-shrink-0 cursor-pointer"
               >
                 {copiedLink ? (
                   <>
-                    <Check className="w-3 h-3 text-emerald-400" />
-                    <span className="text-emerald-300">Copied!</span>
+                    <Check className="w-3 h-3 text-emerald-600" />
+                    <span className="text-emerald-700">Copied!</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="w-3 h-3 text-slate-400" />
+                    <Copy className="w-3 h-3 text-slate-500" />
                     <span>Copy Link</span>
                   </>
                 )}
@@ -375,17 +375,17 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
           </div>
 
           {/* Step 2: Instant 1-Click Activation */}
-          <div className="p-5 bg-slate-950 rounded-2xl border border-emerald-500/30 space-y-3">
+          <div className="p-5 bg-emerald-50/40 rounded-2xl border border-emerald-200 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-emerald-300 flex items-center space-x-1.5">
-                <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[11px] font-black">2</span>
+              <span className="text-xs font-bold text-emerald-800 flex items-center space-x-1.5">
+                <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[11px] font-black">2</span>
                 <span>{hasOpenedGateway ? 'Payment OK. Complete Activation:-' : 'Step 2: Instant Automated Activation'}</span>
               </span>
-              <span className="text-[10px] font-mono text-slate-400">Zero Wait Time</span>
+              <span className="text-[10px] font-mono text-slate-500">Zero Wait Time</span>
             </div>
 
             <div>
-              <label className="block text-[11px] text-slate-400 mb-1">
+              <label className="block text-[11px] text-slate-600 mb-1">
                 UPI PG Reference / UTR (Optional)
               </label>
               <input
@@ -393,7 +393,7 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
                 placeholder="e.g. Transaction ID from receipt (optional)"
                 value={customRef}
                 onChange={e => setCustomRef(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 font-mono focus:outline-none"
+                className="w-full bg-white border border-slate-300 focus:border-emerald-500 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 font-mono focus:outline-none"
               />
             </div>
 
@@ -401,7 +401,7 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
               type="button"
               onClick={() => handleActivateInstantAccess()}
               disabled={isActivating}
-              className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-amber-950/40 transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+              className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
             >
               {isActivating ? (
                 <span>Activating Instant Access...</span>
@@ -416,21 +416,21 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
         </div>
 
         {/* Real Gateway Perks Guarantee */}
-        <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-[11px] text-slate-400 flex flex-wrap items-center justify-between gap-2">
+        <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex flex-wrap items-center justify-between gap-2">
           <span className="flex items-center gap-1.5">
-            <Check className="w-3.5 h-3.5 text-emerald-400" />
+            <Check className="w-3.5 h-3.5 text-emerald-600" />
             <span>100% Automated Gateway</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <Check className="w-3.5 h-3.5 text-emerald-400" />
+            <Check className="w-3.5 h-3.5 text-emerald-600" />
             <span>Instant Plan Unlock</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <Check className="w-3.5 h-3.5 text-emerald-400" />
+            <Check className="w-3.5 h-3.5 text-emerald-600" />
             <span>Physical Rewards Store Eligible</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <Check className="w-3.5 h-3.5 text-emerald-400" />
+            <Check className="w-3.5 h-3.5 text-emerald-600" />
             <span>All UPI Apps Supported</span>
           </span>
         </div>
