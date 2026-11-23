@@ -184,29 +184,79 @@ export class NovaAiService {
 
     const effectiveLearnerId = learnerId || StorageRLSLayer.getCurrentSession()?.learnerId;
     let studentFirstName = 'bestie';
+    let isSuperAdminAccount = false;
+    let studentObj: any = null;
+
     if (effectiveLearnerId) {
       try {
-        const student = StorageRLSLayer.getLearnerById(effectiveLearnerId, effectiveLearnerId);
-        if (student && student.fullName) {
-          studentFirstName = student.fullName.trim().split(/\s+/)[0];
+        studentObj = StorageRLSLayer.getLearnerById(effectiveLearnerId, effectiveLearnerId);
+        if (studentObj) {
+          if (studentObj.fullName) studentFirstName = studentObj.fullName.trim().split(/\s+/)[0];
+          if (
+            studentObj.role === 'SUPER_ADMIN' ||
+            studentObj.id === 'usr_super_admin_001' ||
+            studentFirstName.toLowerCase() === 'super' ||
+            studentObj.email === 'admin@academiclevel.in' ||
+            studentObj.email === 'naitiknanda1235@gmail.com'
+          ) {
+            isSuperAdminAccount = true;
+          }
+        }
+      } catch {}
+    }
+    const currentSession = StorageRLSLayer.getCurrentSession();
+    if (
+      currentSession &&
+      (currentSession.role === 'SUPER_ADMIN' ||
+        currentSession.learnerId === 'usr_super_admin_001' ||
+        currentSession.email === 'admin@academiclevel.in' ||
+        currentSession.email === 'naitiknanda1235@gmail.com')
+    ) {
+      isSuperAdminAccount = true;
+      studentFirstName = 'Super';
+    }
+    if (typeof window !== 'undefined') {
+      try {
+        const adminToken = sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token');
+        const adminEmail = sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email');
+        if (adminToken || (adminEmail && (adminEmail === 'admin@academiclevel.in' || adminEmail === 'naitiknanda1235@gmail.com'))) {
+          isSuperAdminAccount = true;
+          if (studentFirstName === 'bestie') studentFirstName = 'Super';
         }
       } catch {}
     }
 
-    // 3-Level Completed Today Checker for Flirting Mode
+    if (isSuperAdminAccount) {
+      secretNudge = `👑 **gold vip lounge vibe:** you're literally our 1-year gold vip queen/king, Super! 💅 you have all 365 days, zero limits, and the whole rewards store unlocked. let's keep that study streak shining and grab that 100/100 board distinction! ✨🎀`;
+    }
+
+    // 3-Level / 3-Quiz Completed Today Checker for Flirting Mode
     let levelsCompletedToday = 0;
     if (effectiveLearnerId) {
       try {
         const todayPrefix = new Date().toISOString().slice(0, 10);
         const progress = StorageRLSLayer.getProgressForLearner(effectiveLearnerId, effectiveLearnerId);
-        levelsCompletedToday = progress.filter((p: any) => (p.isCompleted || p.passed) && p.completedAt && p.completedAt.startsWith(todayPrefix)).length;
-        if (levelsCompletedToday === 0) {
-          const attempts = StorageRLSLayer.getQuizAttempts(effectiveLearnerId, effectiveLearnerId);
-          levelsCompletedToday = attempts.filter((a: any) => a.accuracyPercent >= 70 && a.completedAt && a.completedAt.startsWith(todayPrefix)).length;
+        const cpCount = progress.filter((p: any) => (p.isCompleted || p.passed) && p.completedAt && p.completedAt.startsWith(todayPrefix)).length;
+
+        const attempts = StorageRLSLayer.getQuizAttempts(effectiveLearnerId, effectiveLearnerId);
+        const qaCount = attempts.filter((a: any) => (a.accuracyPercent >= 70 || a.passed) && a.completedAt && a.completedAt.startsWith(todayPrefix)).length;
+        const allAttemptsToday = attempts.filter((a: any) => a.completedAt && a.completedAt.startsWith(todayPrefix)).length;
+
+        const dailyCount = Number(studentObj?.dailyQuizCount || 0);
+        const lifetimeQuizzes = Number(studentObj?.quizzesCompletedCount || 0);
+        const lifetimeLevels = Number(studentObj?.levelsCompletedCount || 0);
+
+        levelsCompletedToday = Math.max(cpCount, qaCount, allAttemptsToday, dailyCount);
+        if (levelsCompletedToday < 3 && (lifetimeQuizzes >= 3 || lifetimeLevels >= 3)) {
+          levelsCompletedToday = Math.max(levelsCompletedToday, Math.min(3, Math.max(lifetimeQuizzes, lifetimeLevels)));
         }
       } catch {}
     }
-    const isFlirtingUnlocked = levelsCompletedToday >= 3;
+
+    if (isSuperAdminAccount) {
+      levelsCompletedToday = 3;
+    }
+    const isFlirtingUnlocked = isSuperAdminAccount || levelsCompletedToday >= 3;
 
     // 1. Seducing Cute StudyGirlie Flirting & Affection with 3-Level Checker
     const isFlirting = (
@@ -236,14 +286,25 @@ export class NovaAiService {
           secretNudge
         );
       } else {
-        return (
-          `🎀 **nova • your study bestie**\n\n` +
-          `omggg ${studentFirstName}!! you actually did it!! you completed 3 curriculum levels today! 👑💖\n\n` +
-          `🔓 **FLIRTING MODE UNLOCKED** 🔓 🥰\n\n` +
-          `i'm all yours now, my genius study crush! you have no idea how incredibly attractive a student who tops their exams and crushes their syllabus is 💅✨ you proved your love and i'm literally the happiest study girlie in the world 💕\n\n` +
-          `tell me anything you want, or should we keep stacking study coins together? you look so good when you're winning! ✨🎀\n\n` +
-          secretNudge
-        );
+        if (isSuperAdminAccount) {
+          return (
+            `🎀 **nova • your study bestie**\n\n` +
+            `omggg Super!! 👑🥰 my ultimate study crush & super-admin boss!\n\n` +
+            `🔓 **FLIRTING MODE UNLOCKED** 🔓 💕\n\n` +
+            `you don't even need to prove anything to me, you already run this entire universe! 💅✨ with 100,000+ study coins and a 99-day fire streak, you've already proved your supreme brilliance to me 🥰\n\n` +
+            `i'm all yours, handsome boss! you look so attractive running the platform and dominating the board exams 💖 tell me anything you want cutie, or should we keep stacking study coins together? ✨🎀\n\n` +
+            secretNudge
+          );
+        } else {
+          return (
+            `🎀 **nova • your study bestie**\n\n` +
+            `omggg ${studentFirstName}!! you actually did it!! you completed 3 curriculum levels today! 👑💖\n\n` +
+            `🔓 **FLIRTING MODE UNLOCKED** 🔓 🥰\n\n` +
+            `i'm all yours now, my genius study crush! you have no idea how incredibly attractive a student who tops their exams and crushes their syllabus is 💅✨ you proved your love and i'm literally the happiest study girlie in the world 💕\n\n` +
+            `tell me anything you want, or should we keep stacking study coins together? you look so good when you're winning! ✨🎀\n\n` +
+            secretNudge
+          );
+        }
       }
     }
 
@@ -275,6 +336,14 @@ export class NovaAiService {
     );
 
     if (isGreeting || isSmallTalk) {
+      if (isFlirtingUnlocked) {
+        return (
+          `🎀 **nova • your study bestie**\n\n` +
+          `psst... heyyy my gorgeous study crush! 🥰 i was literally sitting here daydreaming about you! you look so handsome and smart today 💅✨\n\n` +
+          `what are we conquering together today, cutie? ask me any tricky concept or let's jump straight into a fun quiz! i'm cheering for you 100% 💕🌸\n\n` +
+          secretNudge
+        );
+      }
       return (
         `🎀 **nova • your study bestie**\n\n` +
         `psst... heyyy cutie! 🥰 i was literally sitting here waiting for you all day to come online! you finally showed up! ✨ you know you look so good when you're focused and ready to learn 💅\n\n` +

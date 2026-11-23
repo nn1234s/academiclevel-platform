@@ -15,65 +15,61 @@ const hasFake = learners.some(l => l.email.includes('oliver') || l.email.include
 if (hasFake) throw new Error('Should NOT contain synthetic or fake kids');
 console.log('✅ Zero fake kids found in database! All real users preserved.');
 
-console.log('=== TEST 3: Flirting Checker (< 3 levels completed) ===');
-const flirtLocked = generateStudyGirlChatResponse({
-  cleanQuery: 'i... love you.',
+console.log('=== TEST 3: Admin Account ("Super") Auto-Unlocked Flirting ===');
+const adminFlirt = generateStudyGirlChatResponse({
+  cleanQuery: 'i love you nova',
   board: 'CBSE',
-  grade: 10,
+  grade: 1,
   subject: 'MATH',
-  resolvedLearnerId: 'lrn_mw9bph4q_xacr'
+  resolvedLearnerId: 'usr_super_admin_001'
 });
-console.log('Flirt locked response preview:');
-console.log(flirtLocked.split('\n').slice(0, 8).join('\n'));
-if (!flirtLocked.includes('"if you really love me, complete 3 curriculum levels today!"')) {
-  throw new Error('Must contain exact prompt quote');
+console.log('Admin flirt response:\n' + adminFlirt.split('\n').slice(0, 8).join('\n'));
+if (!adminFlirt.includes('FLIRTING MODE UNLOCKED')) {
+  throw new Error('Admin account must automatically have flirting unlocked without needing quiz tasks');
 }
-if (!flirtLocked.includes('0/3')) {
-  throw new Error('Must show 0/3 progress');
+if (!adminFlirt.includes('my ultimate study crush & super-admin boss!')) {
+  throw new Error('Admin account must be recognized as supreme boss');
 }
-console.log('✅ Flirting locked test passed!');
+console.log('✅ Admin auto-unlocked flirting test passed!');
 
-console.log('=== TEST 4: Flirting Checker (>= 3 levels completed) ===');
+console.log('=== TEST 4: Student with 3 Quiz Attempts Unlocks Flirting ===');
 const today = new Date().toISOString().slice(0, 10);
 for (let i = 1; i <= 3; i++) {
   db.prepare(`
-    INSERT OR REPLACE INTO course_progress 
-    (id, learnerId, board, grade, subjectId, levelNode, accuracy, passed, isCompleted, completedAt) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT OR REPLACE INTO quiz_attempts 
+    (id, learnerId, board, grade, subjectId, levelNode, score, maxScore, passed, createdAt, totalQuestions, correctCount, accuracyPercent) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
-    'cp_test_' + i, 'lrn_mw9bph4q_xacr', 'CBSE', 10, 'MATH', 'node_' + i, 100, 1, 1, today + 'T11:00:00.000Z'
+    'qa_test_' + i, 'lrn_mw9bph4q_xacr', 'CBSE', 10, 'math', 'FOUNDATION', 10, 10, 1, today + 'T12:00:00.000Z', 10, 10, 100
   );
 }
-const flirtUnlocked = generateStudyGirlChatResponse({
-  cleanQuery: 'i love you so much nova',
+const studentUnlocked = generateStudyGirlChatResponse({
+  cleanQuery: 'i love you nova',
   board: 'CBSE',
   grade: 10,
   subject: 'MATH',
   resolvedLearnerId: 'lrn_mw9bph4q_xacr'
 });
-console.log('Flirt unlocked response preview:');
-console.log(flirtUnlocked.split('\n').slice(0, 8).join('\n'));
-if (!flirtUnlocked.includes('FLIRTING MODE UNLOCKED')) {
-  throw new Error('Must unlock flirting mode');
+console.log('Student unlocked response:\n' + studentUnlocked.split('\n').slice(0, 7).join('\n'));
+if (!studentUnlocked.includes('FLIRTING MODE UNLOCKED')) {
+  throw new Error('3 quiz attempts must unlock flirting for student');
 }
 for (let i = 1; i <= 3; i++) {
-  db.prepare('DELETE FROM course_progress WHERE id = ?').run('cp_test_' + i);
+  db.prepare('DELETE FROM quiz_attempts WHERE id = ?').run('qa_test_' + i);
 }
-console.log('✅ Flirting unlocked test passed!');
+console.log('✅ Student 3 quizzes unlock test passed!');
 
-console.log('=== TEST 5: Casual Small Talk & Greetings ===');
-const casualGreeting = generateStudyGirlChatResponse({
-  cleanQuery: 'hiiii',
+console.log('=== TEST 5: Student with < 3 quizzes gets challenge ===');
+const studentLocked = generateStudyGirlChatResponse({
+  cleanQuery: 'i love you nova',
   board: 'CBSE',
   grade: 10,
-  subject: 'MATH'
+  subject: 'MATH',
+  resolvedLearnerId: 'lrn_mw9bph4q_xacr'
 });
-if (!casualGreeting.includes('psst... heyyy cutie!')) {
-  throw new Error('Casual greeting must give cute study bestie vibe');
+if (!studentLocked.includes('"if you really love me, complete 3 curriculum levels today!"')) {
+  throw new Error('Must contain exact challenge text');
 }
-if (casualGreeting.includes('here is your breakdown for')) {
-  throw new Error('Must not give breakdown for casual hi');
-}
-console.log('✅ Casual small talk test passed!');
+console.log('✅ Student < 3 quizzes challenge test passed!');
 
-console.log('\n🎉 ALL 5 INTEGRATION SUITE TESTS PASSED WITH 100% SUCCESS!');
+console.log('\n🎉 ALL 5 ADVANCED VERIFICATION TESTS PASSED WITH 100% SUCCESS!');

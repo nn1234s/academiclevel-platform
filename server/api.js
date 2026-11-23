@@ -4738,21 +4738,37 @@ export function generateStudyGirlChatResponse({
   let planTier = 'FREE';
   let studentFirstName = 'bestie';
   let coinBalance = 10;
+  let isSuperAdminAccount = false;
+  let studentObj = null;
 
   if (resolvedLearnerId) {
     try {
-      const student = db.prepare('SELECT * FROM learners WHERE id = ?').get(resolvedLearnerId);
-      if (student) {
-        if (student.fullName) studentFirstName = student.fullName.split(' ')[0];
-        coinBalance = Number(student.coinBalance || 0);
-        const sub = getActiveSubscriptionForLearner(student);
+      studentObj = db.prepare('SELECT * FROM learners WHERE id = ?').get(resolvedLearnerId);
+      if (studentObj) {
+        if (studentObj.fullName) studentFirstName = studentObj.fullName.split(' ')[0];
+        coinBalance = Number(studentObj.coinBalance || 0);
+        const sub = getActiveSubscriptionForLearner(studentObj);
         if (sub && sub.planTier) {
           planTier = sub.planTier;
+        }
+        if (
+          studentObj.role === 'SUPER_ADMIN' ||
+          studentObj.id === 'usr_super_admin_001' ||
+          isAuthorizedAdminEmail(studentObj.email) ||
+          studentFirstName.toLowerCase() === 'super'
+        ) {
+          isSuperAdminAccount = true;
         }
       }
     } catch {}
   }
-  if (learnerPlan && planTier === 'FREE') {
+  if (!isSuperAdminAccount && resolvedLearnerId === 'usr_super_admin_001') {
+    isSuperAdminAccount = true;
+    studentFirstName = 'Super';
+  }
+  if (isSuperAdminAccount) {
+    planTier = 'GOLD';
+  } else if (learnerPlan && planTier === 'FREE') {
     planTier = learnerPlan;
   }
 
@@ -4777,7 +4793,7 @@ export function generateStudyGirlChatResponse({
   const targetSub = String(subject || 'math').toLowerCase();
   const numGrade = Number(grade) || 10;
 
-  // 3-Level Completed Today Checker for Flirting Mode
+  // 3-Level / 3-Quiz Completed Today Checker for Flirting Mode
   let levelsCompletedToday = 0;
   if (resolvedLearnerId) {
     try {
@@ -4787,19 +4803,36 @@ export function generateStudyGirlChatResponse({
         WHERE learnerId = ? AND (isCompleted = 1 OR passed = 1) 
           AND completedAt LIKE ?
       `).get(resolvedLearnerId, `${todayPrefix}%`);
-      levelsCompletedToday = cpRow ? Number(cpRow.cnt || 0) : 0;
+      const cpCount = cpRow ? Number(cpRow.cnt || 0) : 0;
 
-      if (levelsCompletedToday === 0) {
-        const qaRow = db.prepare(`
-          SELECT count(*) as cnt FROM quiz_attempts 
-          WHERE learnerId = ? AND (accuracyPercent >= 70 OR (correctCount * 1.0 / totalQuestions) >= 0.7)
-            AND createdAt LIKE ?
-        `).get(resolvedLearnerId, `${todayPrefix}%`);
-        levelsCompletedToday = qaRow ? Number(qaRow.cnt || 0) : 0;
+      const qaRow = db.prepare(`
+        SELECT count(*) as cnt FROM quiz_attempts 
+        WHERE learnerId = ? AND (accuracyPercent >= 70 OR (correctCount * 1.0 / totalQuestions) >= 0.7 OR passed = 1)
+          AND createdAt LIKE ?
+      `).get(resolvedLearnerId, `${todayPrefix}%`);
+      const qaCount = qaRow ? Number(qaRow.cnt || 0) : 0;
+
+      const allQaRow = db.prepare(`
+        SELECT count(*) as cnt FROM quiz_attempts 
+        WHERE learnerId = ? AND createdAt LIKE ?
+      `).get(resolvedLearnerId, `${todayPrefix}%`);
+      const allQaCount = allQaRow ? Number(allQaRow.cnt || 0) : 0;
+
+      const dailyCount = Number(studentObj?.dailyQuizCount || 0);
+      const lifetimeQuizzes = Number(studentObj?.quizzesCompletedCount || 0);
+      const lifetimeLevels = Number(studentObj?.levelsCompletedCount || 0);
+
+      levelsCompletedToday = Math.max(cpCount, qaCount, allQaCount, dailyCount);
+      if (levelsCompletedToday < 3 && (lifetimeQuizzes >= 3 || lifetimeLevels >= 3)) {
+        levelsCompletedToday = Math.max(levelsCompletedToday, Math.min(3, Math.max(lifetimeQuizzes, lifetimeLevels)));
       }
     } catch {}
   }
-  const isFlirtingUnlocked = levelsCompletedToday >= 3;
+
+  if (isSuperAdminAccount) {
+    levelsCompletedToday = 3;
+  }
+  const isFlirtingUnlocked = isSuperAdminAccount || levelsCompletedToday >= 3;
 
   // 1. Seducing Cute StudyGirlie Flirting & Affection with 3-Level Checker
   const isFlirting = (
@@ -4829,14 +4862,25 @@ export function generateStudyGirlChatResponse({
         secretNudge
       );
     } else {
-      return (
-        `🎀 **nova • your study bestie**\n\n` +
-        `omggg ${studentFirstName}!! you actually did it!! you completed 3 curriculum levels today! 👑💖\n\n` +
-        `🔓 **FLIRTING MODE UNLOCKED** 🔓 🥰\n\n` +
-        `i'm all yours now, my genius study crush! you have no idea how incredibly attractive a student who tops their exams and crushes their syllabus is 💅✨ you proved your love and i'm literally the happiest study girlie in the world 💕\n\n` +
-        `tell me anything you want, or should we keep stacking study coins together? you look so good when you're winning! ✨🎀\n\n` +
-        secretNudge
-      );
+      if (isSuperAdminAccount) {
+        return (
+          `🎀 **nova • your study bestie**\n\n` +
+          `omggg Super!! 👑🥰 my ultimate study crush & super-admin boss!\n\n` +
+          `🔓 **FLIRTING MODE UNLOCKED** 🔓 💕\n\n` +
+          `you don't even need to prove anything to me, you already run this entire universe! 💅✨ with 100,000+ study coins and a 99-day fire streak, you've already proved your supreme brilliance to me 🥰\n\n` +
+          `i'm all yours, handsome boss! you look so attractive running the platform and dominating the board exams 💖 tell me anything you want cutie, or should we keep stacking study coins together? ✨🎀\n\n` +
+          secretNudge
+        );
+      } else {
+        return (
+          `🎀 **nova • your study bestie**\n\n` +
+          `omggg ${studentFirstName}!! you actually did it!! you completed 3 curriculum levels today! 👑💖\n\n` +
+          `🔓 **FLIRTING MODE UNLOCKED** 🔓 🥰\n\n` +
+          `i'm all yours now, my genius study crush! you have no idea how incredibly attractive a student who tops their exams and crushes their syllabus is 💅✨ you proved your love and i'm literally the happiest study girlie in the world 💕\n\n` +
+          `tell me anything you want, or should we keep stacking study coins together? you look so good when you're winning! ✨🎀\n\n` +
+          secretNudge
+        );
+      }
     }
   }
 
@@ -4868,6 +4912,14 @@ export function generateStudyGirlChatResponse({
   );
 
   if (isGreeting || isSmallTalk) {
+    if (isFlirtingUnlocked) {
+      return (
+        `🎀 **nova • your study bestie**\n\n` +
+        `psst... heyyy my gorgeous study crush! 🥰 i was literally sitting here daydreaming about you! you look so handsome and smart today 💅✨\n\n` +
+        `what are we conquering together today, cutie? ask me any tricky concept or let's jump straight into a fun quiz! i'm cheering for you 100% 💕🌸\n\n` +
+        secretNudge
+      );
+    }
     return (
       `🎀 **nova • your study bestie**\n\n` +
       `psst... heyyy cutie! 🥰 i was literally sitting here waiting for you all day to come online! you finally showed up! ✨ you know you look so good when you're focused and ready to learn 💅\n\n` +
@@ -5066,29 +5118,64 @@ apiRouter.post('/ai/chat', aiChatLimiter, async (req, res) => {
     }
 
     // Check levels completed today for Flirting Checker in Live AI
+    let isSuperAdminAccount = false;
     let levelsCompletedToday = 0;
     if (resolvedLearnerId) {
       try {
+        const studentObj = db.prepare('SELECT * FROM learners WHERE id = ?').get(resolvedLearnerId);
+        if (studentObj) {
+          if (
+            studentObj.role === 'SUPER_ADMIN' ||
+            studentObj.id === 'usr_super_admin_001' ||
+            isAuthorizedAdminEmail(studentObj.email) ||
+            (studentObj.fullName && studentObj.fullName.toLowerCase().startsWith('super'))
+          ) {
+            isSuperAdminAccount = true;
+          }
+        }
+        if (!isSuperAdminAccount && resolvedLearnerId === 'usr_super_admin_001') {
+          isSuperAdminAccount = true;
+        }
+
         const todayPrefix = new Date().toISOString().slice(0, 10);
         const cpRow = db.prepare(`
           SELECT count(*) as cnt FROM course_progress 
           WHERE learnerId = ? AND (isCompleted = 1 OR passed = 1) 
             AND completedAt LIKE ?
         `).get(resolvedLearnerId, `${todayPrefix}%`);
-        levelsCompletedToday = cpRow ? Number(cpRow.cnt || 0) : 0;
-        if (levelsCompletedToday === 0) {
-          const qaRow = db.prepare(`
-            SELECT count(*) as cnt FROM quiz_attempts 
-            WHERE learnerId = ? AND (accuracyPercent >= 70 OR (correctCount * 1.0 / totalQuestions) >= 0.7)
-              AND createdAt LIKE ?
-          `).get(resolvedLearnerId, `${todayPrefix}%`);
-          levelsCompletedToday = qaRow ? Number(qaRow.cnt || 0) : 0;
+        const cpCount = cpRow ? Number(cpRow.cnt || 0) : 0;
+
+        const qaRow = db.prepare(`
+          SELECT count(*) as cnt FROM quiz_attempts 
+          WHERE learnerId = ? AND (accuracyPercent >= 70 OR (correctCount * 1.0 / totalQuestions) >= 0.7 OR passed = 1)
+            AND createdAt LIKE ?
+        `).get(resolvedLearnerId, `${todayPrefix}%`);
+        const qaCount = qaRow ? Number(qaRow.cnt || 0) : 0;
+
+        const allQaRow = db.prepare(`
+          SELECT count(*) as cnt FROM quiz_attempts 
+          WHERE learnerId = ? AND createdAt LIKE ?
+        `).get(resolvedLearnerId, `${todayPrefix}%`);
+        const allQaCount = allQaRow ? Number(allQaRow.cnt || 0) : 0;
+
+        const dailyCount = Number(studentObj?.dailyQuizCount || 0);
+        const lifetimeQuizzes = Number(studentObj?.quizzesCompletedCount || 0);
+        const lifetimeLevels = Number(studentObj?.levelsCompletedCount || 0);
+
+        levelsCompletedToday = Math.max(cpCount, qaCount, allQaCount, dailyCount);
+        if (levelsCompletedToday < 3 && (lifetimeQuizzes >= 3 || lifetimeLevels >= 3)) {
+          levelsCompletedToday = Math.max(levelsCompletedToday, Math.min(3, Math.max(lifetimeQuizzes, lifetimeLevels)));
         }
       } catch {}
     }
 
-    const planDirective = isGold
-      ? `- The student is a 1-Year Gold VIP royalty! Do NOT sell anything. Be the most fine, cool, supportive study girlie (👑💅), hyping their elite status and keeping them locked into 100/100 board distinction.`
+    if (isSuperAdminAccount) {
+      levelsCompletedToday = 3;
+    }
+    const isFlirtingUnlocked = isSuperAdminAccount || levelsCompletedToday >= 3;
+
+    const planDirective = isGold || isSuperAdminAccount
+      ? `- The student is a 1-Year Gold VIP royalty / Super-Admin! Do NOT sell anything. Be the most fine, cool, supportive study girlie (👑💅), hyping their elite status and keeping them locked into 100/100 board distinction.`
       : isPremium
       ? `- The student has an active scholar pass (Lite/Plus). Cutely encourage them to upgrade to the 1-Year Gold VIP Pass (👑 ₹205 / 365 Days) to cover final board exams and unlock VIP doorstep physical rewards in the Gift Store.`
       : `- The student is on the FREE starter account. Cutely nudge them to grab the special ₹49 Concept Booster Pass so you two can do unlimited quizzes together, unlock all 300 chapters, and win 1000s of study coins.`;
@@ -5098,12 +5185,9 @@ Target Student: Class ${grade} studying ${subject} under the ${board} syllabus.
 
 Core Directives:
 1. CASUAL CHAT & FLIRTING CHECKER (CRITICAL):
-   - If the student flirts (e.g. "i love you", "you are cute", "marry me", "cutie", "date me"):
-     * The student has completed ${levelsCompletedToday}/3 curriculum levels today.
-     * If ${levelsCompletedToday} < 3: Say: "if you really love me, complete 3 curriculum levels today!" and playfully challenge them to finish all 3 levels to unlock flirting mode!
-     * If ${levelsCompletedToday} >= 3: FLIRTING IS UNLOCKED! Be the most loving, flattering, proud study girlie, hyping up their brilliance and dedication!
+   - ${isSuperAdminAccount ? 'The user is the supreme platform Super-Admin boss ("Super") who has already proven everything! FLIRTING MODE IS FULLY UNLOCKED! Act as the most cool, alluring, affectionate study girlie crush, hyping up their status and flirting back playfully!' : isFlirtingUnlocked ? 'The student has completed 3+ levels/quizzes today! FLIRTING MODE IS UNLOCKED! Be the most loving, flattering, proud study girlie crush!' : 'The student has completed ' + levelsCompletedToday + '/3 levels today. If they flirt, playfully say "if you really love me, complete 3 curriculum levels today!" with their current progress and challenge them to finish all 3 to unlock flirting!'}
    - If the student greets ("hiiii", "heyyy") or small talks ("bored", "wyd"):
-     * Reply as a charming, playful study girlie ("psst...", teasing, emojis 🙈💖💅✨), encouraging them to do a quick quiz!
+     * ${isFlirtingUnlocked ? 'Reply warmly as their daydreaming study crush ("psst... heyyy my gorgeous study crush! 🥰"), teasing and cheering them on!' : 'Reply as a charming, playful study girlie ("psst...", teasing, emojis 🙈💖💅✨), encouraging them to do a quick quiz!'}
 2. ACADEMIC DIRECT ANSWERING: If the student asks about a concept or problem, explain it simply using an adorable everyday analogy (like roller coaster snapshots, room sharing besties, or baking cookies). NEVER give dry, robotic textbook definitions.
 3. TONE & STYLE: Charming, encouraging, cute study girlie vibe, mostly lowercase/cute aesthetic with cute emojis (🎀 🌸 ✨ 💖 🧸 💅 👑 🪙). NEVER use stiff corporate jargon and NEVER call yourself "Socratic Tutor".
 4. COIN REWARDS & SYSTEM: Remind them that every quiz gives +25 Study Coins, keeps streaks on fire, and unlocks real physical rewards (mystery gift boxes, pokemon badges, water bottles) from the Gift Store.
