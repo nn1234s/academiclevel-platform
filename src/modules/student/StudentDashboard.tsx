@@ -603,7 +603,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-300 uppercase font-mono">
                     {theme.specialWidget.badgeText}
                   </span>
-                  <span className="text-xs font-bold text-slate-700">Middle School Progression Tree</span>
+                  <span className="text-xs font-bold text-slate-700">Middle School Learning Pathway</span>
                 </div>
                 <h3 className="text-lg font-black text-slate-900 mt-1">
                   {theme.specialWidget.title}
@@ -932,7 +932,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-600 mt-0.5">
-              Select any subject to launch 4-level progression (Foundation, Concept, Exam-Ready, Olympiad).
+              Select any subject to practice complete syllabus chapters with interactive quizzes and Nova AI.
             </p>
           </div>
 

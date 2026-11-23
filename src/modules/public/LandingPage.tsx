@@ -210,7 +210,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       category: 'Curriculum-Mapped Bank',
       badge: 'Classes 1–12',
       highlight: 'CBSE • ICSE • Cambridge',
-      desc: 'Rigorous 4-stage progression across Foundation, Conceptual Applications, Board Exam PYQs, and Olympiad HOTS challenges.',
+      desc: 'Comprehensive chapter-wise practice across Foundation concepts, Applications, Board Exam PYQs, and Olympiad HOTS challenges.',
       gradient: 'from-purple-600 to-pink-700',
       icon: '📚',
     },
@@ -687,7 +687,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 {selectedBoard} Class {selectedGrade} Syllabus Configured
               </span>
               <p className="text-[11px] text-slate-500">
-                4-tier progression: Foundation, Conceptual Applications, {selectedBoard} Exam PYQs &amp; Olympiad HOTS.
+                Structured chapter-wise practice: Foundation concepts, Applications, {selectedBoard} Exam PYQs &amp; Olympiad HOTS.
               </p>
             </div>
             <button
@@ -948,7 +948,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <span>All 4 Progression Nodes</span>
+                  <span>All Syllabus Chapters &amp; Topics</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />

@@ -17,7 +17,7 @@ export const CurriculumManager: React.FC = () => {
           <span>Curriculum & Board Alignment Manager</span>
         </h2>
         <p className="text-xs text-slate-400 mt-0.5">
-          Inspect syllabus mappings, 4 progression nodes, and board-specific topic boundaries across Classes 1–12.
+          Inspect syllabus mappings, curriculum chapters, and board-specific topic boundaries across Classes 1–12.
         </p>
       </div>
 
@@ -54,7 +54,7 @@ export const CurriculumManager: React.FC = () => {
         </div>
       </div>
 
-      {/* Subjects & Progression Nodes */}
+      {/* Subjects & Curriculum Chapters */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {subjects.map(s => {
           const levels = CurriculumService.getLevels(selectedBoard, selectedGrade, s.id);
@@ -70,7 +70,7 @@ export const CurriculumManager: React.FC = () => {
 
               <div className="pt-2 border-t border-slate-800 space-y-2">
                 <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block">
-                  Configured Progression Nodes:
+                  Configured Curriculum Chapters:
                 </span>
                 {levels.map(l => (
                   <div

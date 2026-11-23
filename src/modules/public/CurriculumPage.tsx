@@ -101,7 +101,7 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
       features: [
         'All 12 Classes covered from Primary to Senior Secondary',
         'Mathematics, Science (Physics/Chemistry/Biology), Computer Science, English & Social',
-        '4 Progression Nodes: Foundation, Conceptual, Board Specimen, and Olympiad HOTS',
+        'Complete Chapter-Wise Syllabi: Calibrated topics, practice tests, and Olympiad HOTS',
         '100% verified question bank with step-by-step Socratic explanations'
       ],
       tagColor: 'bg-indigo-50 border-indigo-200 text-indigo-700'
@@ -461,14 +461,14 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
               Classes 1–12 Subjects for {activeBoard}
             </h2>
             <p className="text-xs text-slate-600">
-              Each subject contains 4 difficulty stages: Foundation, Conceptual, Exam PYQs &amp; Olympiad HOTS.
+              Explore chapter-wise syllabus modules, interactive practice questions, and Nova AI support.
             </p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {subjects.map(s => {
-            const levels = CurriculumService.getLevels(activeBoard, selectedGrade, s.id);
+            const chapters = CurriculumService.getChaptersForSubject(activeBoard, selectedGrade, s.id);
             return (
               <div
                 key={s.id}
@@ -482,16 +482,16 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
                   <p className="text-xs text-slate-600 mt-1 leading-relaxed">{s.description}</p>
 
                   <div className="mt-4 pt-3 border-t border-slate-100 space-y-1.5">
-                    <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">
-                      4 Progression Nodes:
+                    <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">
+                      Curriculum Chapters:
                     </span>
                     <div className="flex flex-wrap gap-1.5">
-                      {levels.map(l => (
+                      {chapters.slice(0, 4).map(ch => (
                         <span
-                          key={l.node}
-                          className="px-2 py-0.5 rounded-md bg-slate-50 border border-slate-200 text-[10px] text-indigo-700 font-mono font-bold"
+                          key={ch.id}
+                          className="px-2 py-0.5 rounded-md bg-indigo-50 border border-indigo-200 text-[10px] text-indigo-700 font-medium"
                         >
-                          {l.node}
+                          {ch.title}
                         </span>
                       ))}
                     </div>

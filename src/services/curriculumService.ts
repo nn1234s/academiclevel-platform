@@ -104,7 +104,7 @@ export class CurriculumService {
   }
 
   /**
-   * Generates the 4-tier Progression Nodes for a given Subject x Grade x Board.
+   * Generates curriculum practice levels for a given Subject x Grade x Board.
    */
   public static getLevels(board: Board, grade: Grade, subjectId: string): CourseLevel[] {
     const subject = this.SUBJECT_CATALOG.find(s => s.id === subjectId);

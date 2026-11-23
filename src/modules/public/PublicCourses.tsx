@@ -30,7 +30,7 @@ export const PublicCourses: React.FC<PublicCoursesProps> = ({
           Comprehensive Board Coverage
         </span>
         <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 mt-3">
-          Curriculum &amp; Progression Nodes
+          Curriculum &amp; Syllabus Chapters
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 mt-2">
           Strictly aligned with official syllabus frameworks for CBSE, ICSE/CISCE, and Cambridge IGCSE across Classes 1 to 12.

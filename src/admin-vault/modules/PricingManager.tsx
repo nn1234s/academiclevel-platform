@@ -47,7 +47,7 @@ export const PricingManager: React.FC = () => {
       discountBadge: 'Special Launch Offer (95% Off)',
       liteFeatures: [
         'Unlimited Quizzes & Adaptive Assessments',
-        'Full Access to All 4 Progression Levels',
+        'Full Access to All Syllabus Chapters',
         'Nova AI Socratic Tutor 24/7',
         'Level Mastery Certificates',
         'Max 1 Class Change during active cycle'

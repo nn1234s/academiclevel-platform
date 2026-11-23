@@ -48,7 +48,7 @@ export const CourseCatalogue: React.FC<CourseCatalogueProps> = ({ learner, onSel
             </div>
 
             <div className="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-indigo-600 font-bold group-hover:text-indigo-800">
-              <span>View 4 Progression Nodes</span>
+              <span>Practice Syllabus Chapters</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
