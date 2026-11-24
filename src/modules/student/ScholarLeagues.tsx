@@ -101,8 +101,16 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
   const [hasClaimedBonus, setHasClaimedBonus] = useState<boolean>(false);
 
   useEffect(() => {
-    const data = StorageRLSLayer.getScholarLeagueStandings(learner.id);
-    setLeagueData(data);
+    const refreshStandings = () => {
+      const data = StorageRLSLayer.getScholarLeagueStandings(learner.id);
+      setLeagueData(data);
+    };
+
+    refreshStandings();
+
+    // Check & update every 20 seconds so +5 coins/5-min progression updates live seamlessly
+    const interval = setInterval(refreshStandings, 20000);
+    return () => clearInterval(interval);
   }, [learner.id]);
 
   if (!leagueData) return null;
@@ -246,9 +254,16 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center space-x-2 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
-            <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Promotion Zone: Top 5</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="hidden sm:flex items-center space-x-1.5 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>{isHinglish ? 'Live: Scholars padh rahe hain (+5 Coins / 5m)' : 'Live: Active Scholars (+5 Coins / 5m)'}</span>
+            </span>
+
+            <div className="flex items-center space-x-2 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Promotion Zone: Top 5</span>
+            </div>
           </div>
         </div>
 

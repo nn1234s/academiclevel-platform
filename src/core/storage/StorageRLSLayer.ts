@@ -1092,12 +1092,76 @@ class StorageRLSLayerClass {
       'Arjun Nair', 'Meera Pillai', 'Reyansh Das', 'Prisha Sen', 'Devansh Roy'
     ];
 
+    // Engagement engine: increase bots in the leaderboard by +5 coins every 5 minutes inside the device
+    const now = Date.now();
+    const currentYear = new Date().getUTCFullYear();
+    const weekNumber = Math.floor(now / (7 * 24 * 60 * 60 * 1000));
+    const weekKey = `${currentYear}_W${weekNumber}`;
+    const storageKey = `al_league_bots_prog_${learnerId}`;
+
+    let botBonusMap: Record<string, number> = {};
+    let lastTick = now;
+
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed.weekKey === weekKey && typeof parsed.lastTick === 'number') {
+            botBonusMap = parsed.botBonusMap || {};
+            lastTick = parsed.lastTick;
+          }
+        }
+      } catch {}
+
+      const elapsedMs = now - lastTick;
+      const fiveMinIntervals = Math.floor(elapsedMs / (5 * 60 * 1000));
+
+      if (fiveMinIntervals > 0) {
+        // Capped at 288 intervals (24h) to avoid extreme spikes on long gaps
+        const cappedIntervals = Math.min(fiveMinIntervals, 288);
+        const coinsToAdd = cappedIntervals * 5;
+
+        cohortNames.slice(0, 14).forEach(name => {
+          botBonusMap[name] = (botBonusMap[name] || 0) + coinsToAdd;
+        });
+
+        lastTick = lastTick + cappedIntervals * (5 * 60 * 1000);
+
+        try {
+          localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+              weekKey,
+              lastTick,
+              botBonusMap
+            })
+          );
+        } catch {}
+      } else {
+        try {
+          if (!localStorage.getItem(storageKey)) {
+            localStorage.setItem(
+              storageKey,
+              JSON.stringify({
+                weekKey,
+                lastTick: now,
+                botBonusMap: {}
+              })
+            );
+          }
+        } catch {}
+      }
+    }
+
     const currentDay = new Date().getDay();
     const daysRemaining = currentDay === 0 ? 0 : 7 - currentDay;
 
     const baseVariance = tier === 'DIAMOND' ? 520 : tier === 'GOLD' ? 260 : tier === 'SILVER' ? 120 : 35;
     const standings: ScholarLeagueStanding[] = cohortNames.slice(0, 14).map((name, i) => {
-      const score = Math.max(0, baseVariance + Math.floor(Math.sin((i + 1) * 1.7) * (baseVariance * 0.4)));
+      const baseScore = Math.max(0, baseVariance + Math.floor(Math.sin((i + 1) * 1.7) * (baseVariance * 0.4)));
+      const bonus = botBonusMap[name] || 0;
+      const score = baseScore + bonus;
       return {
         learnerId: 'peer_' + i,
         learnerName: name,
