@@ -96,6 +96,8 @@ export type CoinReasonCode =
   | 'QUIZ_DUEL_WIN' // +X
   | 'QUIZ_DUEL_ENTRY' // -X
   | 'LEAGUE_PROMOTION_REWARD' // +25, +50, +100
+  | 'DAILY_QUESTS_COMPLETE' // +20
+  | 'STREAK_FREEZE_PURCHASE' // -50
   | 'ADMIN_ADJUSTMENT'; // +/-X
 
 export interface MistakeVaultEntry {
@@ -131,6 +133,45 @@ export interface QuizDuel {
   opponentScore: number;
   status: 'COMPLETED' | 'IN_PROGRESS';
   createdAt: string;
+  roomCode?: string;
+  isFriendChallenge?: boolean;
+}
+
+export interface DailyQuest {
+  id: 'QUIZ_PLAY' | 'DUEL_PLAY' | 'VAULT_PRACTICE';
+  title: string;
+  description: string;
+  targetCount: number;
+  currentCount: number;
+  rewardCoins: number;
+  completed: boolean;
+  claimed: boolean;
+  iconName: string;
+}
+
+export interface DailyQuestState {
+  dateKey: string;
+  quests: DailyQuest[];
+  allCompletedBonusClaimed: boolean;
+  streakFreezeEquipped: boolean;
+  streakFreezeCount: number;
+}
+
+export interface ParentWeeklyReport {
+  learnerName: string;
+  grade: number;
+  board: string;
+  weeklyQuizzesCount: number;
+  weeklyQuestionsSolved: number;
+  weeklyAccuracyPercent: number;
+  weeklyCoinsEarned: number;
+  currentStreakDays: number;
+  leagueTier: ScholarLeagueTier;
+  leagueRank: number;
+  topSubject: string;
+  weakAreaToFocus: string;
+  novaFeedback: string;
+  generatedDate: string;
 }
 
 export type ScholarLeagueTier = 'BRONZE' | 'SILVER' | 'GOLD' | 'DIAMOND';

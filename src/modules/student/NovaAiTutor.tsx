@@ -19,7 +19,8 @@ import {
   ChevronDown,
   ChevronUp,
   RotateCcw,
-  GraduationCap
+  GraduationCap,
+  Camera
 } from 'lucide-react';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { STUDYGIRL_100_MESSAGES, getRandomStudyGirlMessage } from '../../data/studygirlMessages';
@@ -294,6 +295,10 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
 
+  // Snap & Solve photo doubt state
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll within the inner chat messages container only (scoped strictly to the chat box, NEVER the window or page!)
@@ -442,8 +447,21 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
     initWelcome();
   }, [board, grade, activeSubject, initialQuestion, initialChosenIndex]);
 
-  const executeSend = async (queryText: string) => {
-    if (!queryText.trim() || isTyping) return;
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      if (typeof ev.target?.result === 'string') {
+        setSelectedPhoto(ev.target.result);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const executeSend = async (queryText: string, attachedPhoto?: string | null) => {
+    if ((!queryText.trim() && !attachedPhoto) || isTyping) return;
 
     // Check if daily quota is exhausted (bypassed for active subscribers or guests)
     if (learner && !isSubscriber && quota && quota.remainingToday <= 0) {
@@ -461,7 +479,9 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
     const userMsg: NovaMessage = {
       id: 'msg_u_' + Date.now(),
       sender: 'STUDENT',
-      text: queryText,
+      text: queryText || (attachedPhoto ? '📸 [Snap & Solve: Textbook Photo Doubt]' : ''),
+      imageUrl: attachedPhoto || undefined,
+      isPhotoDoubt: Boolean(attachedPhoto),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -473,8 +493,13 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
         role: (m.sender === 'STUDENT' ? 'user' : 'model') as 'user' | 'model',
         text: m.text.slice(0, 250)
       }));
+
+      const finalQuery = attachedPhoto
+        ? `[PHOTO DOUBT ANALYSIS] Student uploaded an image of a question/diagram. ${queryText ? `Note from student: "${queryText}".` : ''} Please provide a friendly step-by-step solution in Hinglish with formulas, core concepts, and tips to avoid silly errors!`
+        : queryText;
+
       const response = await NovaAiService.answerStudentQuery(
-        queryText,
+        finalQuery,
         board,
         grade,
         activeSubject,
@@ -506,10 +531,12 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputValue.trim() || isTyping) return;
+    if ((!inputValue.trim() && !selectedPhoto) || isTyping) return;
     const text = inputValue.trim();
+    const photo = selectedPhoto;
     setInputValue('');
-    executeSend(text);
+    setSelectedPhoto(null);
+    executeSend(text, photo);
   };
 
   const filteredPresets = PRESET_QUESTIONS.filter(p =>
@@ -687,6 +714,11 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                   : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none shadow-sm'
               }`}
             >
+              {msg.imageUrl && (
+                <div className="mb-2 rounded-xl overflow-hidden border border-white/20 max-w-xs shadow-xs">
+                  <img src={msg.imageUrl} alt="Uploaded doubt problem" className="w-full max-h-48 object-contain bg-black/20" />
+                </div>
+              )}
               {msg.text}
 
               <div
@@ -813,21 +845,70 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
         >
           ⚠️ silly mistakes to avoid
         </button>
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-pink-100 hover:bg-pink-200 border border-pink-300 text-pink-800 font-bold transition-colors cursor-pointer shadow-xs shrink-0 flex items-center space-x-1"
+        >
+          <Camera className="w-3.5 h-3.5 text-pink-600" />
+          <span>📸 Snap & Solve Photo</span>
+        </button>
       </div>
+
+      {/* Photo Preview if attached */}
+      {selectedPhoto && (
+        <div className="px-4 py-2 bg-pink-50/90 border-t border-pink-200 flex items-center justify-between text-xs animate-in fade-in">
+          <div className="flex items-center space-x-2.5">
+            <img src={selectedPhoto} alt="Selected problem" className="w-10 h-10 object-cover rounded-lg border border-pink-300 shadow-xs" />
+            <div>
+              <span className="font-extrabold text-pink-900 block flex items-center gap-1">
+                <Camera className="w-3.5 h-3.5 text-pink-600" />
+                <span>Textbook Photo Attached</span>
+              </span>
+              <span className="text-[10px] text-pink-700">Nova will analyze and break this down step-by-step!</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSelectedPhoto(null)}
+            className="p-1 rounded-full hover:bg-pink-200 text-pink-700 transition-colors cursor-pointer"
+            title="Remove photo"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Input Form */}
       <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-slate-200 flex items-center space-x-2">
         <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handlePhotoSelect}
+        />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="p-2.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 transition-all flex items-center space-x-1 cursor-pointer shrink-0 shadow-2xs"
+          title="Snap & Solve: Take photo of textbook problem"
+        >
+          <Camera className="w-4 h-4" />
+          <span className="hidden sm:inline text-[11px] font-bold">Snap & Solve</span>
+        </button>
+        <input
           type="text"
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
-          placeholder={`ask your study bestie anything or get motivation... 🎀`}
+          placeholder={selectedPhoto ? "Add optional note (e.g. explain step 2)..." : "Ask your study bestie or snap a photo problem... 🎀"}
           className="flex-1 bg-slate-50 border border-slate-300 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none"
         />
         <button
           type="submit"
-          disabled={!inputValue.trim() || isTyping}
-          className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white rounded-xl shadow-md transition-all cursor-pointer"
+          disabled={(!inputValue.trim() && !selectedPhoto) || isTyping}
+          className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white rounded-xl shadow-md transition-all cursor-pointer shrink-0"
         >
           <Send className="w-4 h-4" />
         </button>

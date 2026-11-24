@@ -1442,7 +1442,8 @@ apiRouter.post('/coins/transact', (req, res) => {
       'REFERRAL_SIGNUP_QUALIFIED',
       'MISTAKE_VAULT_MASTERY',
       'QUIZ_DUEL_WIN',
-      'LEAGUE_PROMOTION_REWARD'
+      'LEAGUE_PROMOTION_REWARD',
+      'DAILY_QUESTS_COMPLETE'
     ];
 
     const isAllowedStudentCredit = (isAuthorizedStudent || Boolean(learner)) && ALLOWED_STUDENT_CREDIT_REASONS.includes(reasonCode);
@@ -1476,6 +1477,9 @@ apiRouter.post('/coins/transact', (req, res) => {
       }
       if (reasonCode === 'LEAGUE_PROMOTION_REWARD' && numAmount > 100) {
         return res.status(400).json({ success: false, error: 'Exceeded maximum league promotion reward of 100 coins.' });
+      }
+      if (reasonCode === 'DAILY_QUESTS_COMPLETE' && numAmount > 25) {
+        return res.status(400).json({ success: false, error: 'Exceeded maximum daily quest reward of 25 coins.' });
       }
     }
 

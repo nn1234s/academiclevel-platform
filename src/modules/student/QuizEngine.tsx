@@ -420,6 +420,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
 
       // 1. Record Quota & Attempt Counter
       QuotaService.recordQuizCompletion(learner.id);
+      StorageRLSLayer.recordQuestProgress(learner.id, 'QUIZ_PLAY');
 
       // Qualify referral if referee's first quiz
       CoinLedgerService.qualifyReferralOnFirstQuiz(learner.id);

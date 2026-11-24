@@ -8,6 +8,8 @@ export interface NovaMessage {
   sender: 'STUDENT' | 'NOVA';
   text: string;
   timestamp: string;
+  imageUrl?: string;
+  isPhotoDoubt?: boolean;
   source?: 'GEMINI_LIVE' | 'CURATED_OFFLINE';
   metadata?: {
     board?: Board;

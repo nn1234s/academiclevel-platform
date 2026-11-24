@@ -106,6 +106,7 @@ export const MistakeVault: React.FC<MistakeVaultProps> = ({
     const isCorrect = selectedRedemptionOption === currentItem.correctOptionIndex;
 
     const res = StorageRLSLayer.recordMistakeAttempt(learner.id, currentItem.id, isCorrect);
+    StorageRLSLayer.recordQuestProgress(learner.id, 'VAULT_PRACTICE');
 
     if (res.coinsAwarded > 0) {
       CoinLedgerService.appendTransaction(learner.id, res.coinsAwarded, 'MISTAKE_VAULT_MASTERY', {

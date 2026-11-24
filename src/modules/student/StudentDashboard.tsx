@@ -42,9 +42,12 @@ import {
   Crown,
   Mail,
   Printer,
-  Swords
+  Swords,
+  Share2
 } from 'lucide-react';
 import { StudentMailboxModal } from './StudentMailboxModal';
+import { DailyQuestsWidget } from './DailyQuestsWidget';
+import { ParentReportCardModal } from './ParentReportCardModal';
 import { MailboxMessage } from '../../core/types';
 import { useLanguage } from '../../core/i18n/LanguageContext';
 import { CoinLedgerService } from '../../services/coinLedgerService';
@@ -74,9 +77,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const { refreshCurrentLearner } = useAuth();
   const { t, isHinglish } = useLanguage();
 
-  // Student Mailbox State
+  // Student Mailbox & Parent Report State
   const [isMailboxOpen, setIsMailboxOpen] = useState<boolean>(false);
   const [selectedMailboxMessageId, setSelectedMailboxMessageId] = useState<string | null>(initialMailboxReportId);
+  const [isParentReportOpen, setIsParentReportOpen] = useState<boolean>(false);
 
   const handleOpenMailboxModal = (msgId?: string | null) => {
     if (onOpenMailbox) {
@@ -891,16 +895,32 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
           </div>
 
-          <button
-            onClick={() => handleOpenMailboxModal(latestReportMsg.id)}
-            className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer"
-          >
-            <Mail className="w-4 h-4" />
-            <span>View Full Report</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <button
+              onClick={() => setIsParentReportOpen(true)}
+              className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              <span>Parents WhatsApp Report 📱</span>
+            </button>
+            <button
+              onClick={() => handleOpenMailboxModal(latestReportMsg.id)}
+              className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer"
+            >
+              <Mail className="w-4 h-4" />
+              <span>View Full Report</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       )}
+
+      {/* Daily Quests & Streak Freeze Widget */}
+      <DailyQuestsWidget
+        learner={learner}
+        onCoinsUpdated={refreshCurrentLearner}
+        onNavigate={onNavigate}
+      />
 
       {/* 5. Quick Launch Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4">
@@ -1228,6 +1248,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           onClose={() => setIsWorksheetModalOpen(false)}
         />
       )}
+
+      {/* Parents WhatsApp Report Card Modal */}
+      <ParentReportCardModal
+        learner={learner}
+        isOpen={isParentReportOpen}
+        onClose={() => setIsParentReportOpen(false)}
+      />
     </div>
   );
 };
