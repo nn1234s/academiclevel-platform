@@ -90,6 +90,22 @@ export const DailyQuestsWidget: React.FC<DailyQuestsWidgetProps> = ({
     return <RotateCcw className="w-4 h-4 text-rose-500" />;
   };
 
+  const getQuestTitle = (q: DailyQuest) => {
+    if (!isHinglish) return q.title;
+    if (q.id === 'QUIZ_PLAY') return 'Quiz Champion 📚';
+    if (q.id === 'DUEL_PLAY') return '1v1 Arena Gladiator ⚔️';
+    if (q.id === 'VAULT_PRACTICE') return 'Mistake Vault Master 📓';
+    return q.title;
+  };
+
+  const getQuestDesc = (q: DailyQuest) => {
+    if (!isHinglish) return q.description;
+    if (q.id === 'QUIZ_PLAY') return '1 Syllabus Quiz solve karo (+10 Coins)';
+    if (q.id === 'DUEL_PLAY') return '1v1 Arena mein 1 battle khelo (+15 Coins)';
+    if (q.id === 'VAULT_PRACTICE') return 'Mistake Vault ya QOTD mein 1 question practice karo (+10 Coins)';
+    return q.description;
+  };
+
   const handleQuestAction = (id: string) => {
     if (id === 'QUIZ_PLAY') onNavigate('COURSES');
     else if (id === 'DUEL_PLAY') onNavigate('DUEL_ARENA');
@@ -120,7 +136,7 @@ export const DailyQuestsWidget: React.FC<DailyQuestsWidgetProps> = ({
           {questState.streakFreezeCount > 0 ? (
             <div className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-xs font-bold shadow-xs">
               <ShieldCheck className="w-4 h-4 text-cyan-400" />
-              <span>Streak Shield: {questState.streakFreezeCount} Equipped</span>
+              <span>{isHinglish ? `Streak Shield: ${questState.streakFreezeCount} Active 🛡️` : `Streak Shield: ${questState.streakFreezeCount} Equipped`}</span>
             </div>
           ) : (
             <button
@@ -171,8 +187,8 @@ export const DailyQuestsWidget: React.FC<DailyQuestsWidgetProps> = ({
                     <StudyCoinIcon className="w-3.5 h-3.5" glow />
                   </span>
                 </div>
-                <h4 className="font-extrabold text-xs sm:text-sm text-white">{quest.title}</h4>
-                <p className="text-[11px] text-slate-300 leading-tight">{quest.description}</p>
+                <h4 className="font-extrabold text-xs sm:text-sm text-white">{getQuestTitle(quest)}</h4>
+                <p className="text-[11px] text-slate-300 leading-tight">{getQuestDesc(quest)}</p>
               </div>
 
               {/* Action / Claim Button */}
@@ -180,14 +196,14 @@ export const DailyQuestsWidget: React.FC<DailyQuestsWidgetProps> = ({
                 {quest.claimed ? (
                   <span className="w-full py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 text-xs font-bold flex items-center justify-center space-x-1 border border-emerald-500/30">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Claimed</span>
+                    <span>{isHinglish ? 'Claim Kar Liya ✓' : 'Claimed'}</span>
                   </span>
                 ) : quest.completed ? (
                   <button
                     onClick={() => handleClaim(quest.id)}
                     className="w-full py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-amber-950 font-black text-xs transition-all shadow-md cursor-pointer animate-bounce"
                   >
-                    Claim +{quest.rewardCoins} Coins! 🪙
+                    {isHinglish ? `+${quest.rewardCoins} Coins Claim Karo! 🪙` : `Claim +${quest.rewardCoins} Coins! 🪙`}
                   </button>
                 ) : (
                   <button
@@ -224,14 +240,14 @@ export const DailyQuestsWidget: React.FC<DailyQuestsWidgetProps> = ({
           {questState.allCompletedBonusClaimed ? (
             <span className="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 font-bold text-xs border border-emerald-500/40 flex items-center space-x-1">
               <CheckCircle2 className="w-4 h-4" />
-              <span>Bonus Claimed (+20 Coins)</span>
+              <span>{isHinglish ? 'Bonus Claim Kar Liya (+20 Coins) ✓' : 'Bonus Claimed (+20 Coins)'}</span>
             </span>
           ) : (
             <button
               onClick={handleClaimAllBonus}
               className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 hover:from-amber-300 hover:to-orange-300 text-amber-950 font-black text-xs shadow-lg transition-all transform hover:scale-105 cursor-pointer shrink-0"
             >
-              Claim +20 Master Coins! 🪙
+              {isHinglish ? '+20 Master Coins Claim Karo! 🪙' : 'Claim +20 Master Coins! 🪙'}
             </button>
           )}
         </div>

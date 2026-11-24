@@ -648,7 +648,7 @@ Room Code: *${createdRoomCode}*`;
         <div className="relative z-10 max-w-2xl space-y-3">
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold">
             <Swords className="w-3.5 h-3.5 text-amber-400" />
-            <span>{isHinglish ? 'Live 1v1 Quiz Arena' : 'Live 1v1 Quiz Arena'}</span>
+            <span>{isHinglish ? 'Live 1v1 Quiz Arena ⚔️' : 'Live 1v1 Quiz Arena'}</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black tracking-tight leading-tight">
             {isHinglish ? '1v1 Quiz Clash: Coin Arena ⚔️' : '1v1 Quiz Clash: Coin Arena ⚔️'}
@@ -831,7 +831,7 @@ Room Code: *${createdRoomCode}*`;
                   </p>
                 </div>
                 <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-black text-amber-700">
-                  <span>Win Pot:</span>
+                  <span>{isHinglish ? 'Jeetne Ka Pot:' : 'Win Pot:'}</span>
                   <span className="flex items-center space-x-1">
                     <span>+{tier.winnerReward}</span>
                     <StudyCoinIcon className="w-3.5 h-3.5 inline-block" />
@@ -876,7 +876,7 @@ Room Code: *${createdRoomCode}*`;
       {duelHistory.length > 0 && (
         <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
           <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">
-            {isHinglish ? 'Recent Duel History' : 'Recent Duel History'}
+            {isHinglish ? 'Pichle Duels Ka Record' : 'Recent Duel History'}
           </h3>
           <div className="divide-y divide-slate-100">
             {duelHistory.slice(0, 5).map(d => {

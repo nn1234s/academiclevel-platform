@@ -159,7 +159,7 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
           <div className="flex items-center justify-between">
             <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-xs font-bold">
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
-              <span>{isHinglish ? 'Weekly Scholar League' : 'Weekly Scholar League'}</span>
+              <span>{isHinglish ? 'Weekly Scholar Leagues 🏆' : 'Weekly Scholar League'}</span>
             </span>
 
             <span className="flex items-center space-x-1 text-xs font-bold text-slate-300 bg-black/30 px-3 py-1 rounded-full border border-white/10">
@@ -190,7 +190,7 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
             {/* Promotion Reward Card */}
             <div className="p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm text-center shrink-0">
               <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block">
-                Promotion Bonus
+                {isHinglish ? 'Promotion Bonus 🎁' : 'Promotion Bonus'}
               </span>
               <span className="text-xl font-black text-amber-300 mt-1 flex items-center justify-center space-x-1">
                 <span>+{currentCfg.promotionReward}</span>
@@ -230,13 +230,13 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
               className="px-4 py-2 rounded-xl bg-white/15 hover:bg-white/20 border border-white/20 text-white font-bold text-xs flex items-center space-x-1.5 cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5 text-rose-300" />
-              <span>{isHinglish ? 'Mistake Vault (+10 Coins)' : 'Mistake Vault (+10 Coins)'}</span>
+              <span>{isHinglish ? 'Mistake Vault (+10 Coins) 📓' : 'Mistake Vault (+10 Coins)'}</span>
             </button>
             <button
               onClick={onBackToDashboard}
               className="px-3.5 py-2 rounded-xl bg-black/30 hover:bg-black/40 text-slate-300 font-bold text-xs cursor-pointer"
             >
-              {isHinglish ? '← Dashboard' : '← Back'}
+              {isHinglish ? '← Dashboard Wapas' : '← Back'}
             </button>
           </div>
         </div>
@@ -247,7 +247,7 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
             <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">
-              {isHinglish ? 'Weekly League Standings' : 'Weekly League Standings'}
+              {isHinglish ? 'Weekly League Rankings' : 'Weekly League Standings'}
             </h3>
             <p className="text-xs text-slate-400">
               {isHinglish ? 'Ranks 1 to 5 agle tier me qualify honge' : 'Ranks 1 to 5 qualify for next week promotion'}
@@ -262,7 +262,7 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
 
             <div className="flex items-center space-x-2 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
               <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Promotion Zone: Top 5</span>
+              <span>{isHinglish ? 'Promotion Zone: Top 5 Scholars' : 'Promotion Zone: Top 5'}</span>
             </div>
           </div>
         </div>
@@ -306,14 +306,14 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
                   <div>
                     <div className="flex items-center space-x-2">
                       <span className={`text-xs sm:text-sm ${isMe ? 'text-indigo-950 font-black' : 'text-slate-800 font-bold'}`}>
-                        {item.learnerName} {isMe && '(You)'}
+                        {item.learnerName} {isMe && (isHinglish ? '(Aap)' : '(You)')}
                       </span>
                       {item.rank === 1 && <Crown className="w-4 h-4 text-amber-500" />}
                     </div>
                     {isPromotionZone && (
                       <span className="text-[10px] text-emerald-600 font-bold flex items-center space-x-0.5">
                         <ArrowUpRight className="w-3 h-3 text-emerald-600" />
-                        <span>Promotion Zone</span>
+                        <span>{isHinglish ? 'Promotion Zone' : 'Promotion Zone'}</span>
                       </span>
                     )}
                   </div>

@@ -328,7 +328,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
 
             <h1 className="text-2xl sm:text-4xl font-black mt-2 leading-tight drop-shadow-sm">
-              {isHinglish ? 'Welcome back' : 'Welcome back'}, {learner.fullName.split(' ')[0]}! {theme.mascot.emoji}
+              {isHinglish ? 'Wapas Swagat Hai' : 'Welcome back'}, {learner.fullName.split(' ')[0]}! {theme.mascot.emoji}
             </h1>
 
             <p className="text-xs sm:text-sm text-white/95 mt-2 leading-relaxed max-w-xl font-medium">
@@ -347,7 +347,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           {/* Quick Metrics Pod */}
           <div className="flex flex-col items-stretch gap-2.5 bg-black/30 backdrop-blur-md p-4 rounded-3xl border border-white/20 w-full lg:w-auto lg:min-w-[220px] shadow-xl">
             <div className="flex items-center space-x-3 w-full justify-between">
-              <span className="text-xs font-bold text-white/80">Study Streak:</span>
+              <span className="text-xs font-bold text-white/80">{isHinglish ? 'Study Streak:' : 'Study Streak:'}</span>
               <div className="flex items-center space-x-1 font-black text-amber-300">
                 <Flame className="w-4 h-4 fill-amber-300" />
                 <span>{learner.currentStreakDays} {isHinglish ? 'Din' : 'Days'}</span>
@@ -355,7 +355,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
 
             <div className="flex items-center space-x-3 w-full justify-between pt-2 border-t border-white/10">
-              <span className="text-xs font-bold text-white/80">Study Coins:</span>
+              <span className="text-xs font-bold text-white/80">{isHinglish ? 'Study Coins:' : 'Study Coins:'}</span>
               <div className="flex items-center space-x-1.5 font-black text-amber-300">
                 <StudyCoinIcon className="w-4 h-4" glow />
                 <span>{learner.coinBalance.toLocaleString()}</span>
@@ -363,7 +363,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
 
             <div className="flex items-center space-x-3 w-full justify-between pt-2 border-t border-white/10">
-              <span className="text-xs font-bold text-white/80">Questions Bank:</span>
+              <span className="text-xs font-bold text-white/80">{isHinglish ? 'Question Bank:' : 'Questions Bank:'}</span>
               <span className="font-mono text-xs font-bold bg-white/20 px-2 py-0.5 rounded-full text-white">
                 300 Quizzes
               </span>
@@ -376,12 +376,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             >
               <span className="text-xs font-bold text-white/90 flex items-center space-x-1.5">
                 <Mail className="w-3.5 h-3.5 text-indigo-300 group-hover:scale-110 transition-transform" />
-                <span>Mailbox:</span>
+                <span>{isHinglish ? 'Mailbox:' : 'Mailbox:'}</span>
               </span>
               <div className="flex items-center space-x-1">
                 {unreadMailCount > 0 ? (
                   <span className="font-mono text-xs font-black bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full animate-pulse shadow-sm">
-                    {unreadMailCount} New
+                    {unreadMailCount} {isHinglish ? 'Naye' : 'New'}
                   </span>
                 ) : (
                   <span className="font-mono text-xs font-bold bg-white/20 px-2 py-0.5 rounded-full text-white group-hover:bg-white/30 transition-colors">
@@ -403,17 +403,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <div className="flex items-center space-x-2">
                   <span className="px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 shadow-xs">
                     <Gift className="w-3.5 h-3.5 text-emerald-700" />
-                    <span>Official Reward Dispatched</span>
+                    <span>{isHinglish ? 'Official Reward Dispatch Ho Gaya' : 'Official Reward Dispatched'}</span>
                   </span>
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                    {dispatchedGifts.length} {dispatchedGifts.length === 1 ? 'Reward' : 'Rewards'} Ready
+                    {dispatchedGifts.length} {isHinglish ? 'Reward Ready' : (dispatchedGifts.length === 1 ? 'Reward' : 'Rewards Ready')}
                   </span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5 flex items-center space-x-2">
-                  <span>🎁 Your Dispatched Physical Rewards</span>
+                  <span>{isHinglish ? '🎁 Aapke Dispatched Gifts & Rewards' : '🎁 Your Dispatched Physical Rewards'}</span>
                 </h2>
                 <p className="text-xs text-slate-600 mt-0.5 max-w-2xl leading-relaxed">
-                  Congratulations! Your academic milestone physical merchandise redemption has been verified and dispatched by the admin team. Track your courier parcel details below.
+                  {isHinglish
+                    ? 'Badhai ho! Aapka milestone physical merchandise redemption verify aur dispatch ho chuka hai. Niche courier tracking details dekhein.'
+                    : 'Congratulations! Your academic milestone physical merchandise redemption has been verified and dispatched by the admin team. Track your courier parcel details below.'}
                 </p>
               </div>
 
@@ -421,7 +423,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 onClick={() => onNavigate('GIFT_STORE')}
                 className="px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-emerald-800 flex items-center space-x-1.5 transition-all self-start sm:self-auto flex-shrink-0 shadow-xs cursor-pointer"
               >
-                <span>Physical Rewards Store</span>
+                <span>{isHinglish ? 'Rewards Store Kholein' : 'Physical Rewards Store'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -470,12 +472,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                           <CheckCircle2 className="w-3 h-3" />
                           <span>
                             {isDelivered
-                              ? 'Delivered to Doorstep'
+                              ? (isHinglish ? 'Doorstep Par Deliver Ho Gaya' : 'Delivered to Doorstep')
                               : isShipped
-                              ? 'Dispatched & In Transit'
+                              ? (isHinglish ? 'Dispatch Ho Gaya • Raste Me Hai' : 'Dispatched & In Transit')
                               : isOrdered
-                              ? 'Order Placed with Courier'
-                              : 'Active & Verified'}
+                              ? (isHinglish ? 'Courier Order Lag Chuka Hai' : 'Order Placed with Courier')
+                              : (isHinglish ? 'Active & Verified' : 'Active & Verified')}
                           </span>
                         </span>
                       </div>
@@ -484,7 +486,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         {gift.itemTitle}
                       </h3>
                       <p className="text-[11px] text-slate-500 mt-0.5">
-                        Claimed with {gift.coinsCost.toLocaleString()} Study Coins
+                        {isHinglish ? `${gift.coinsCost.toLocaleString()} Study Coins se redeem kiya` : `Claimed with ${gift.coinsCost.toLocaleString()} Study Coins`}
                       </p>
                     </div>
 
@@ -496,10 +498,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                             <Truck className="w-3.5 h-3.5 text-sky-600" />
                             <span>
                               {isDelivered
-                                ? 'Delivered to Doorstep'
+                                ? (isHinglish ? 'Doorstep Par Deliver Ho Gaya' : 'Delivered to Doorstep')
                                 : isShipped
-                                ? 'In Transit with Courier Partner'
-                                : 'Courier Order Placed'}
+                                ? (isHinglish ? 'Courier Partner ke Saath Raste Mein' : 'In Transit with Courier Partner')
+                                : (isHinglish ? 'Courier Order Placed' : 'Courier Order Placed')}
                             </span>
                           </span>
                           {gift.courierName && (
@@ -521,7 +523,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                           </div>
                         ) : (
                           <p className="text-[11px] text-slate-500 italic">
-                            Tracking details will appear here once the courier parcel is dispatched.
+                            {isHinglish ? 'Parcel dispatch hote hi tracking details yahan update hongi.' : 'Tracking details will appear here once the courier parcel is dispatched.'}
                           </p>
                         )}
 
@@ -556,12 +558,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                             {isCopied ? (
                               <>
                                 <Check className="w-4 h-4" />
-                                <span>Copied!</span>
+                                <span>{isHinglish ? 'Copy Ho Gaya!' : 'Copied!'}</span>
                               </>
                             ) : (
                               <>
                                 <Copy className="w-4 h-4" />
-                                <span>Copy Code</span>
+                                <span>{isHinglish ? 'Code Copy Karein' : 'Copy Code'}</span>
                               </>
                             )}
                           </button>
@@ -583,7 +585,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                             rel="noopener noreferrer"
                             className="inline-flex items-center space-x-1 text-emerald-700 hover:text-emerald-800 font-bold text-xs flex-shrink-0 self-start sm:self-auto hover:underline"
                           >
-                            <span>Redeem on {help.brand}</span>
+                            <span>{isHinglish ? `${help.brand} Par Redeem Karein` : `Redeem on ${help.brand}`}</span>
                             <ExternalLink className="w-3.5 h-3.5" />
                           </a>
                         )}
@@ -617,7 +619,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   <span className="text-xs font-bold text-slate-800">Class {activeGrade} Explorer Hub</span>
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center space-x-1">
                     <Sparkles className="w-3 h-3" />
-                    <span>Interactive Book Ready</span>
+                    <span>{isHinglish ? 'Interactive Album Ready ✨' : 'Interactive Book Ready'}</span>
                   </span>
                 </div>
                 <h3 className="text-lg font-black text-slate-900 mt-1 group-hover:text-amber-700 transition-colors flex items-center space-x-2">
@@ -625,7 +627,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   <ArrowRight className="w-4 h-4 text-amber-600 group-hover:translate-x-1 transition-transform" />
                 </h3>
                 <p className="text-xs text-slate-600 mt-0.5 max-w-xl">
-                  {theme.specialWidget.subtitle} Tap to open your album, paste cartoon buddies, and collect all 20!
+                  {isHinglish
+                    ? 'Apna album kholein, cartoon stickers paste karein aur sabhi 20 collect karein!'
+                    : `${theme.specialWidget.subtitle} Tap to open your album, paste cartoon buddies, and collect all 20!`}
                 </p>
               </div>
             </div>
@@ -646,7 +650,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 className="px-4 py-2.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs rounded-xl shadow-md flex items-center space-x-1.5 flex-shrink-0 active:scale-95 transition-transform cursor-pointer"
               >
                 <BookOpen className="w-4 h-4" />
-                <span>Open Book</span>
+                <span>{isHinglish ? 'Album Kholein 📖' : 'Open Book'}</span>
               </button>
             </div>
           </div>
@@ -690,13 +694,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 shadow-xs">
                   👑 10th Board Exam Headquarters
                 </span>
-                <span className="text-xs font-bold text-amber-800">Target: 100 / 100 in Board Finals</span>
+                <span className="text-xs font-bold text-amber-800">{isHinglish ? 'Target: Board Finals me 100 / 100' : 'Target: 100 / 100 in Board Finals'}</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900">
                 CBSE &amp; ICSE Class 10 Specimen Paper Center
               </h2>
               <p className="text-xs text-slate-600 max-w-xl leading-relaxed">
-                Take timed practice sets calibrated strictly to standard Board Examination formats. Every question features board marking schemes, step-by-step NCERT explanations, and formulas.
+                {isHinglish
+                  ? 'Asli Board Exam format par timed practice sets solve karo. Har question me step-by-step NCERT explanations aur formulas milenge.'
+                  : 'Take timed practice sets calibrated strictly to standard Board Examination formats. Every question features board marking schemes, step-by-step NCERT explanations, and formulas.'}
               </p>
             </div>
 
@@ -705,13 +711,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               <div className="bg-white border border-amber-300 p-3.5 rounded-2xl text-center min-w-[100px] shadow-xs">
                 <span className="text-[10px] font-mono font-bold text-amber-700 uppercase block">Board Countdown</span>
                 <span className="text-2xl font-black text-slate-900 font-mono mt-0.5 block">{daysToBoardExam}</span>
-                <span className="text-[9px] text-slate-500 font-mono">Days Remaining</span>
+                <span className="text-[9px] text-slate-500 font-mono">{isHinglish ? 'Din Bache Hain' : 'Days Remaining'}</span>
               </div>
 
               <div className="bg-white border border-amber-300 p-3.5 rounded-2xl text-center min-w-[100px] shadow-xs">
-                <span className="text-[10px] font-mono font-bold text-amber-700 uppercase block">Board Syllabus</span>
+                <span className="text-[10px] font-mono font-bold text-amber-700 uppercase block">{isHinglish ? 'Questions Bank' : 'Board Syllabus'}</span>
                 <span className="text-2xl font-black text-amber-700 font-mono mt-0.5 block">300</span>
-                <span className="text-[9px] text-slate-500 font-mono">Curated Questions</span>
+                <span className="text-[9px] text-slate-500 font-mono">{isHinglish ? 'NCERT Questions' : 'Curated Questions'}</span>
               </div>
             </div>
           </div>
@@ -796,18 +802,26 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div>
             <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
               <Zap className="w-4 h-4 text-amber-500" />
-              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'GOLD' ? '👑 1-Year Gold VIP Status' : (quota.activePlan === 'LITE' ? 'Concept Booster Status' : `${quota.activePlan} Scholar Status`)) : 'Free Student Plan (3 Levels Included)'}</span>
+              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'GOLD' ? (isHinglish ? '👑 1-Year Gold VIP Pass Active' : '👑 1-Year Gold VIP Status') : (quota.activePlan === 'LITE' ? (isHinglish ? 'Concept Booster Plan Active' : 'Concept Booster Status') : `${quota.activePlan} Scholar Status`)) : (isHinglish ? 'Free Student Plan (3 Levels Included)' : 'Free Student Plan (3 Levels Included)')}</span>
             </h3>
             <p className="text-xs text-slate-600 mt-0.5">
               {quota.hasActiveSubscription
                 ? (quota.activePlan === 'GOLD'
-                    ? `👑 1-Year Gold Pass Active • Full 365 Days All-Access Pass • All Quotas Lifted (${quota.daysRemaining} days remaining)`
+                    ? (isHinglish
+                        ? `👑 1-Year Gold Pass Active • Full 365 Din Unlimited Access • Sabhi Quotas Unlocked (${quota.daysRemaining} din bache)`
+                        : `👑 1-Year Gold Pass Active • Full 365 Days All-Access Pass • All Quotas Lifted (${quota.daysRemaining} days remaining)`)
                     : (quota.activePlan === 'LITE'
-                        ? `Concept Booster Active • 60 Days Unlimited Quizzes (${quota.daysRemaining} days remaining)`
+                        ? (isHinglish
+                            ? `Concept Booster Active • 60 Din Unlimited Quizzes (${quota.daysRemaining} din bache)`
+                            : `Concept Booster Active • 60 Days Unlimited Quizzes (${quota.daysRemaining} days remaining)`)
                         : `${quota.activePlan} Plan Active • Unlimited Access (${quota.daysRemaining} days remaining)`))
                 : (quota.isLocked
-                    ? 'Free limit of 3 curriculum levels completed. Upgrade to unlock all levels & unlimited quizzes.'
-                    : `Free student tier active. You can master up to ${quota.maxLevels} curriculum levels free.`)}
+                    ? (isHinglish
+                        ? 'Free limit (3 levels) poori ho gayi hai. Sabhi levels aur unlimited quizzes ke liye upgrade karein.'
+                        : 'Free limit of 3 curriculum levels completed. Upgrade to unlock all levels & unlimited quizzes.')
+                    : (isHinglish
+                        ? `Free student tier active. Aap ${quota.maxLevels} curriculum levels bilkul free master kar sakte hain.`
+                        : `Free student tier active. You can master up to ${quota.maxLevels} curriculum levels free.`))}
             </p>
           </div>
 
@@ -816,12 +830,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               onClick={onOpenUpgradeModal}
               className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
             >
-              Upgrade to Premium (₹49)
+              {isHinglish ? 'Premium Mein Upgrade Karein (₹49)' : 'Upgrade to Premium (₹49)'}
             </button>
           ) : (
             <span className="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-full flex items-center space-x-1">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-              <span>All Quotas Lifted</span>
+              <span>{isHinglish ? 'Sabhi Quotas Unlocked ✓' : 'All Quotas Lifted'}</span>
             </span>
           )}
         </div>
@@ -830,9 +844,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           {/* Quizzes Meter */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
             <div className="flex justify-between items-center text-xs mb-2">
-              <span className="text-slate-600">Quizzes Completed</span>
+              <span className="text-slate-600">{isHinglish ? 'Quizzes Solved' : 'Quizzes Completed'}</span>
               <span className="font-mono font-bold text-slate-900">
-                {quota.quizzesCompleted} {quota.hasActiveSubscription ? '• Unlimited Pass' : '• Practice Mode'}
+                {quota.quizzesCompleted} {quota.hasActiveSubscription ? (isHinglish ? '• Unlimited Pass' : '• Unlimited Pass') : (isHinglish ? '• Free Practice Mode' : '• Practice Mode')}
               </span>
             </div>
             <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
@@ -851,11 +865,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
             <div className="flex justify-between items-center text-xs mb-2">
               <div>
-                <span className="text-slate-600 block">Course Levels Mastered</span>
-                <span className="text-[10px] text-slate-500 font-mono">≥ 70% score to master</span>
+                <span className="text-slate-600 block">{isHinglish ? 'Course Levels Mastered' : 'Course Levels Mastered'}</span>
+                <span className="text-[10px] text-slate-500 font-mono">{isHinglish ? 'Master karne ke liye ≥ 70% score' : '≥ 70% score to master'}</span>
               </div>
               <span className="font-mono font-bold text-slate-900">
-                {quota.levelsCompleted} / {quota.hasActiveSubscription ? '∞ (All Levels Unlocked)' : quota.maxLevels}
+                {quota.levelsCompleted} / {quota.hasActiveSubscription ? (isHinglish ? '∞ (Sabhi Levels Unlocked)' : '∞ (All Levels Unlocked)') : quota.maxLevels}
               </span>
             </div>
             <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
@@ -890,13 +904,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-300">
-                  Latest Quiz Report
+                  {isHinglish ? 'Aakhiri Quiz Report 📊' : 'Latest Quiz Report'}
                 </span>
                 <span className="text-xs font-bold text-slate-900 truncate">
                   {latestReportMsg.quizReport.subjectId.toUpperCase()} • {latestReportMsg.quizReport.levelNode}
                 </span>
                 <span className="text-[11px] text-slate-500 font-mono">
-                  ({latestReportMsg.quizReport.score}/{latestReportMsg.quizReport.totalQuestions} Correct)
+                  ({latestReportMsg.quizReport.score}/{latestReportMsg.quizReport.totalQuestions} {isHinglish ? 'Sahi Jawab' : 'Correct'})
                 </span>
               </div>
               <p className="text-xs text-slate-600 line-clamp-1 max-w-xl">
@@ -911,14 +925,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer"
             >
               <Share2 className="w-3.5 h-3.5" />
-              <span>Parents WhatsApp Report 📱</span>
+              <span>{isHinglish ? 'Parents WhatsApp Report 📱' : 'Parents WhatsApp Report 📱'}</span>
             </button>
             <button
               onClick={() => handleOpenMailboxModal(latestReportMsg.id)}
               className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-1.5 flex-shrink-0 cursor-pointer"
             >
               <Mail className="w-4 h-4" />
-              <span>View Full Report</span>
+              <span>{isHinglish ? 'Poori Report Dekhein →' : 'View Full Report'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -942,8 +956,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <StudyCoinIcon className="w-6 h-6" glow />
           </div>
-          <p className="text-xs font-bold text-slate-900">Daily Spin Wheel</p>
-          <span className="text-[10px] text-slate-500">24h UTC Cooldown</span>
+          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Daily Spin Wheel 🎡' : 'Daily Spin Wheel'}</p>
+          <span className="text-[10px] text-slate-500">{isHinglish ? 'Har 24 ghante me free spin' : '24h UTC Cooldown'}</span>
         </button>
 
         {/* 2. 1v1 Coin Duel Arena */}
@@ -952,13 +966,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-400 rounded-2xl p-4 text-left transition-all group relative overflow-hidden shadow-xs cursor-pointer"
         >
           <span className="absolute top-3 right-3 px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-black rounded-full uppercase tracking-wider">
-            Live 1v1
+            {isHinglish ? 'Live 1v1' : 'Live 1v1'}
           </span>
           <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Swords className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-slate-900">1v1 Quiz Duel ⚔️</p>
-          <span className="text-[10px] text-slate-500">Wager Coins &amp; Win Pot</span>
+          <p className="text-xs font-bold text-slate-900">{isHinglish ? '1v1 Quiz Duel ⚔️' : '1v1 Quiz Duel ⚔️'}</p>
+          <span className="text-[10px] text-slate-500">{isHinglish ? 'Coins wager karke pot jeeto' : 'Wager Coins & Win Pot'}</span>
         </button>
 
         {/* 3. Mistake Vault */}
@@ -968,18 +982,18 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         >
           {activeMistakesCount > 0 ? (
             <span className="absolute top-3 right-3 px-1.5 py-0.5 bg-rose-100 text-rose-700 text-[9px] font-black rounded-full">
-              {activeMistakesCount} Tricky
+              {activeMistakesCount} {isHinglish ? 'Tricky' : 'Tricky'}
             </span>
           ) : (
             <span className="absolute top-3 right-3 px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[9px] font-black rounded-full">
-              Clean 🎯
+              {isHinglish ? 'Clean 🎯' : 'Clean 🎯'}
             </span>
           )}
           <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <BookOpen className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-slate-900">Mistake Vault 📓</p>
-          <span className="text-[10px] text-slate-500">Redeem +10 Coins Each</span>
+          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Mistake Vault (Galati Sudharo) 📓' : 'Mistake Vault 📓'}</p>
+          <span className="text-[10px] text-slate-500">{isHinglish ? 'Har galat question par +10 Coins' : 'Redeem +10 Coins Each'}</span>
         </button>
 
         {/* 4. Scholar Leagues */}
@@ -993,8 +1007,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Trophy className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-slate-900">Scholar Leagues 🏆</p>
-          <span className="text-[10px] text-slate-500">Weekly Tier Promotion</span>
+          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Scholar Leagues 🏆' : 'Scholar Leagues 🏆'}</p>
+          <span className="text-[10px] text-slate-500">{isHinglish ? 'Weekly ranking aur tier promotion' : 'Weekly Tier Promotion'}</span>
         </button>
 
         {/* 5. Question of Day */}
@@ -1005,8 +1019,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Compass className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-slate-900">Question of Day</p>
-          <span className="text-[10px] text-slate-500">Streak Booster</span>
+          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Aaj Ka Sawal (QOTD) ⚡' : 'Question of Day'}</p>
+          <span className="text-[10px] text-slate-500">{isHinglish ? 'Daily streak booster question' : 'Streak Booster'}</span>
         </button>
 
         {/* 6. Nova AI Tutor */}
@@ -1017,8 +1031,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Zap className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-slate-900">Nova AI Tutor 🎀</p>
-          <span className="text-[10px] text-slate-500">24/7 AI Concept Tutor</span>
+          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Nova AI Tutor 🎀' : 'Nova AI Tutor 🎀'}</p>
+          <span className="text-[10px] text-slate-500">{isHinglish ? '24/7 AI Bestie Concept Tutor' : '24/7 AI Concept Tutor'}</span>
         </button>
 
         {/* 7. Student Mailbox */}
@@ -1028,14 +1042,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         >
           {unreadMailCount > 0 && (
             <span className="absolute top-3 right-3 px-2 py-0.5 bg-indigo-100 border border-indigo-300 text-indigo-800 text-[10px] font-bold rounded-full animate-pulse">
-              {unreadMailCount} New
+              {unreadMailCount} {isHinglish ? 'Naye' : 'New'}
             </span>
           )}
           <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Mail className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-slate-900">Student Mailbox</p>
-          <span className="text-[10px] text-slate-500">Quiz Diagnostic Reports</span>
+          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Student Mailbox 📬' : 'Student Mailbox'}</p>
+          <span className="text-[10px] text-slate-500">{isHinglish ? 'Quiz diagnostic reports aur notes' : 'Quiz Diagnostic Reports'}</span>
         </button>
 
         {/* 8. Rewards Store */}
@@ -1046,8 +1060,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Award className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-slate-900">Rewards Store</p>
-          <span className="text-[10px] text-slate-500">Toys, Badges &amp; Bottles</span>
+          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Rewards Store 🎁' : 'Rewards Store'}</p>
+          <span className="text-[10px] text-slate-500">{isHinglish ? 'Toys, badges aur bottles' : 'Toys, Badges & Bottles'}</span>
         </button>
       </div>
 
@@ -1061,25 +1075,27 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 flex items-center space-x-1">
                 <Sparkles className="w-3 h-3 text-amber-600" />
-                <span>⚡ Redeem in 2 Quizzes (30 Coins)</span>
+                <span>{isHinglish ? '⚡ 2 Quizzes me redeem karo (30 Coins)' : '⚡ Redeem in 2 Quizzes (30 Coins)'}</span>
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
-                100% Comprehensive Coverage
+                {isHinglish ? '100% Syllabus Coverage' : '100% Comprehensive Coverage'}
               </span>
               {isWorksheetUnlocked && (
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center space-x-1">
                   <Check className="w-3 h-3" />
-                  <span>Unlocked &amp; Ready</span>
+                  <span>{isHinglish ? 'Unlocked aur Ready ✓' : 'Unlocked & Ready'}</span>
                 </span>
               )}
             </div>
 
             <h3 className="text-base sm:text-lg font-black text-slate-900">
-              Comprehensive Class Practice Worksheets &amp; PDF Center
+              {isHinglish ? 'Class Practice Worksheets aur Printable PDF Center 📝' : 'Comprehensive Class Practice Worksheets & PDF Center'}
             </h3>
 
             <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
-              Curriculum-calibrated chapter worksheets covering all subjects for Classes 1 to 12. Includes dedicated student rough work scratchpads, detachable step-by-step NCERT solutions, and 1-click vector printable PDFs!
+              {isHinglish
+                ? 'Classes 1 se 12 tak sabhi subjects ke chapter-wise worksheets. Rough work scratchpad, step-by-step solutions aur 1-click printable PDFs ke saath!'
+                : 'Curriculum-calibrated chapter worksheets covering all subjects for Classes 1 to 12. Includes dedicated student rough work scratchpads, detachable step-by-step NCERT solutions, and 1-click vector printable PDFs!'}
             </p>
 
             <div className="flex flex-wrap gap-2 text-[10px] font-mono text-slate-500 pt-0.5">
@@ -1098,7 +1114,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer"
             >
               <Printer className="w-4 h-4" />
-              <span>Open &amp; Print Worksheets</span>
+              <span>{isHinglish ? 'Worksheets Kholein aur Print Karein 🖨️' : 'Open & Print Worksheets'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           ) : (
@@ -1109,8 +1125,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               <StudyCoinIcon className="w-4 h-4" />
               <span>
                 {learner.coinBalance >= 30
-                  ? 'Unlock Worksheets (30 Coins)'
-                  : `Redeem with 30 Coins (${learner.coinBalance}/30)`}
+                  ? (isHinglish ? 'Worksheets Unlock Karein (30 Coins)' : 'Unlock Worksheets (30 Coins)')
+                  : (isHinglish ? `30 Coins Se Redeem Karein (${learner.coinBalance}/30)` : `Redeem with 30 Coins (${learner.coinBalance}/30)`)}
               </span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -1121,7 +1137,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               onClick={() => onNavigate('GIFT_STORE')}
               className="px-3 py-1.5 text-indigo-700 hover:text-indigo-900 text-[11px] font-bold text-center hover:underline cursor-pointer"
             >
-              View in Gift Store →
+              {isHinglish ? 'Gift Store Mein Dekhein →' : 'View in Gift Store →'}
             </button>
           )}
         </div>
@@ -1151,7 +1167,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             onClick={() => onNavigate('COURSES', { grade: activeGrade })}
             className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 self-start sm:self-auto cursor-pointer"
           >
-            <span>Browse Full Syllabus</span>
+            <span>{isHinglish ? 'Poora Syllabus Dekhein' : 'Browse Full Syllabus'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -1182,7 +1198,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </div>
 
               <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-indigo-600 font-semibold group-hover:text-indigo-800 transition-colors">
-                <span>Start Practice Quiz</span>
+                <span>{isHinglish ? 'Practice Quiz Shuru Karo' : 'Start Practice Quiz'}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
@@ -1196,10 +1212,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div>
             <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
               <span>{theme.mascot.emoji}</span>
-              <span>Class {activeGrade} Academic Badges &amp; Milestones</span>
+              <span>{isHinglish ? `Class ${activeGrade} Academic Badges aur Achievements 🏅` : `Class ${activeGrade} Academic Badges & Milestones`}</span>
             </h3>
             <p className="text-xs text-slate-600 mt-0.5">
-              Complete quizzes with 70%+ score to unlock signature Class {activeGrade} achievements.
+              {isHinglish
+                ? `Quizzes me 70%+ score karke Class ${activeGrade} ke exclusive badges unlock karein!`
+                : `Complete quizzes with 70%+ score to unlock signature Class ${activeGrade} achievements.`}
             </p>
           </div>
         </div>

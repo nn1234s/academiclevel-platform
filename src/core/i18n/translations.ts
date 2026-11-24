@@ -29,6 +29,8 @@ export interface Translations {
   nav_mistake_vault: string;
   nav_duel_arena: string;
   nav_leagues: string;
+  nav_student_packs: string;
+  nav_spin_wheel: string;
   lang_label: string;
 
   // Student Dashboard
@@ -52,6 +54,7 @@ export interface Translations {
   dash_ask_nova_sub: string;
   dash_switch_class: string;
   dash_daily_spin: string;
+  dash_daily_spin_sub: string;
   dash_scholarships: string;
   dash_mistake_vault: string;
   dash_mistake_vault_sub: string;
@@ -59,6 +62,12 @@ export interface Translations {
   dash_duel_arena_sub: string;
   dash_leagues: string;
   dash_leagues_sub: string;
+  dash_mailbox: string;
+  dash_mailbox_sub: string;
+  dash_gift_store: string;
+  dash_gift_store_sub: string;
+  dash_qotd: string;
+  dash_qotd_sub: string;
 
   // Quiz Engine
   quiz_question: string;
@@ -126,6 +135,8 @@ export const translations: Record<Language, Translations> = {
     nav_mistake_vault: 'Mistake Vault 📓',
     nav_duel_arena: '1v1 Coin Duel ⚔️',
     nav_leagues: 'Scholar Leagues 🏆',
+    nav_student_packs: 'StudentPacks Community 👥',
+    nav_spin_wheel: 'Daily Spin Wheel 🎡',
     lang_label: 'Language',
 
     dash_welcome: 'Welcome back,',
@@ -148,6 +159,7 @@ export const translations: Record<Language, Translations> = {
     dash_ask_nova_sub: 'Instant 1-on-1 friendly concept breakdowns without giving away direct answers',
     dash_switch_class: 'Switch Class',
     dash_daily_spin: 'Daily Study Spin Wheel',
+    dash_daily_spin_sub: '24h UTC Cooldown',
     dash_scholarships: 'Worldwide Scholarships',
     dash_mistake_vault: 'Mistake Vault (Error Notebook)',
     dash_mistake_vault_sub: 'Master your past missed questions to earn +10 Coins each!',
@@ -155,6 +167,12 @@ export const translations: Record<Language, Translations> = {
     dash_duel_arena_sub: 'Play rapid 5-question battles against online scholars or friends',
     dash_leagues: 'Weekly Scholar Leagues',
     dash_leagues_sub: 'Climb from Bronze to Diamond Champion with weekly coin rewards',
+    dash_mailbox: 'Student Mailbox',
+    dash_mailbox_sub: 'Quiz reports, diagnostic cards & Nova notes',
+    dash_gift_store: 'Rewards Store',
+    dash_gift_store_sub: 'Toys, stationery, badges & water bottles',
+    dash_qotd: 'Question of Day',
+    dash_qotd_sub: 'Daily streak booster question',
 
     quiz_question: 'Question',
     quiz_of: 'of',
@@ -198,33 +216,35 @@ export const translations: Record<Language, Translations> = {
     btn_english: 'English Interface',
     btn_english_sub: 'Standard academic English interface and navigation',
 
-    nav_home: 'Home',
-    nav_dashboard: 'Dashboard',
-    nav_curriculum: 'Curriculum & Passes',
-    nav_practice: 'Daily Practice',
-    nav_courses: 'Courses & Chapters',
+    nav_home: 'Home 🏠',
+    nav_dashboard: 'Dashboard 📊',
+    nav_curriculum: 'Syllabus & Passes 📜',
+    nav_practice: 'Daily Practice 🎯',
+    nav_courses: 'Syllabus & Chapters 📚',
     nav_nova_ai: 'Nova AI Tutor 🎀',
-    nav_qotd: 'Daily Challenge',
-    nav_gift_store: 'Gift Store',
-    nav_coin_mall: 'Coin Mall',
-    nav_mailbox: 'Mailbox & Reports',
-    nav_certificates: 'Certificates',
-    nav_profile: 'My Profile',
-    nav_logout: 'Log Out',
+    nav_qotd: 'Aaj Ka Sawal (QOTD) ⚡',
+    nav_gift_store: 'Rewards Store 🎁',
+    nav_coin_mall: 'Coin Mall 🪙',
+    nav_mailbox: 'Mailbox & Reports 📬',
+    nav_certificates: 'Certificates 🏅',
+    nav_profile: 'Meri Profile 👤',
+    nav_logout: 'Log Out 🚪',
     nav_signin: 'Sign In (Login)',
-    nav_special_offer: 'Special ₹49 Offer',
-    nav_gold_pass: 'GOLD PASS',
-    nav_mistake_vault: 'Mistake Vault 📓',
+    nav_special_offer: 'Special ₹49 Offer 🔥',
+    nav_gold_pass: 'GOLD PASS 👑',
+    nav_mistake_vault: 'Mistake Vault (Galati Sudharo) 📓',
     nav_duel_arena: '1v1 Coin Duel ⚔️',
     nav_leagues: 'Weekly Leagues 🏆',
+    nav_student_packs: 'StudentPacks Community 👥',
+    nav_spin_wheel: 'Daily Spin Wheel 🎡',
     lang_label: 'Language',
 
-    dash_welcome: 'Welcome back,',
+    dash_welcome: 'Wapas Swagat Hai,',
     dash_sub: 'Aaj kaunsa chapter master karna hai?',
     dash_streak: 'Study Streak 🔥',
-    dash_streak_sub: 'Rozana thoda padho aur apni learning flame maintain rakho!',
+    dash_streak_sub: 'Rozana padho aur apni learning flame banaye rakho!',
     dash_coins: 'Study Coins',
-    dash_coins_sub: 'Gift Store mein real gifts, stationery aur books redeem karo!',
+    dash_coins_sub: 'Real gifts, toys, bottles aur vouchers redeem karo!',
     dash_quizzes: 'Quizzes Solved',
     dash_quizzes_sub: 'Sabhi subjects aur syllabus chapters mein',
     dash_accuracy: 'Mastery Accuracy',
@@ -239,13 +259,20 @@ export const translations: Record<Language, Translations> = {
     dash_ask_nova_sub: 'Bina direct answer leak kiye easy step-by-step hints paayein',
     dash_switch_class: 'Class Change Karo',
     dash_daily_spin: 'Daily Study Spin Wheel',
+    dash_daily_spin_sub: 'Har 24 ghante mein free spin',
     dash_scholarships: 'Worldwide Scholarships',
-    dash_mistake_vault: 'Mistake Vault (Error Notebook)',
-    dash_mistake_vault_sub: 'Galat hue questions ko master karke +10 Coins jeeto!',
+    dash_mistake_vault: 'Mistake Vault (Galati Sudharo)',
+    dash_mistake_vault_sub: 'Purani galatiyon ko master karke +10 Coins jeeto!',
     dash_duel_arena: '1v1 Coin Clash Arena',
     dash_duel_arena_sub: 'Classmates ya online scholars ke saath live 5-question duel khele',
     dash_leagues: 'Weekly Scholar Leagues',
-    dash_leagues_sub: 'Weekly coin rankings me top 5 me aakar agle tier me promote ho!',
+    dash_leagues_sub: 'Weekly rankings me top 5 me aakar agle tier me promote ho!',
+    dash_mailbox: 'Student Mailbox',
+    dash_mailbox_sub: 'Quiz reports, diagnostic cards aur Nova notes',
+    dash_gift_store: 'Rewards Store',
+    dash_gift_store_sub: 'Real toys, badges, stationery aur bottles',
+    dash_qotd: 'Aaj Ka Sawal (QOTD)',
+    dash_qotd_sub: 'Rozana streak booster challenge',
 
     quiz_question: 'Question',
     quiz_of: 'ka',

@@ -3,6 +3,7 @@ import { Learner } from '../../core/types';
 import { CoinLedgerService } from '../../services/coinLedgerService';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { ApiClient } from '../../core/api/apiClient';
+import { useLanguage } from '../../core/i18n/LanguageContext';
 import confetti from 'canvas-confetti';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { Sparkles, Clock, Lock, Unlock, Trophy, AlertCircle } from 'lucide-react';
@@ -13,6 +14,7 @@ interface DailySpinWheelProps {
 }
 
 export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinCompleted }) => {
+  const { isHinglish } = useLanguage();
   const [canSpin, setCanSpin] = useState<boolean>(false);
   const [cooldownRemainingMs, setCooldownRemainingMs] = useState<number>(0);
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
@@ -128,11 +130,11 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
       <div className="mb-4">
         <span className="text-[11px] font-bold tracking-wider text-amber-800 uppercase bg-amber-100 border border-amber-300 px-3.5 py-1 rounded-full inline-flex items-center space-x-1.5 shadow-xs">
           <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-          <span>Daily Scholar Reward Wheel</span>
+          <span>{isHinglish ? 'Daily Scholar Reward Wheel 🎡' : 'Daily Scholar Reward Wheel'}</span>
         </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2.5 tracking-tight">Daily Study Coin Wheel</h2>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2.5 tracking-tight">{isHinglish ? 'Rozana Study Coin Wheel 🪙' : 'Daily Study Coin Wheel'}</h2>
         <p className="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-sm mx-auto leading-relaxed">
-          Spin every 24 hours to earn free Study Coins for awesome avatar frames, streak freezes, and real doorstep rewards!
+          {isHinglish ? 'Har 24 ghante me free spin karke Study Coins jeeto — streak freeze, real gifts aur toys paayein!' : 'Spin every 24 hours to earn free Study Coins for awesome avatar frames, streak freezes, and real doorstep rewards!'}
         </p>
       </div>
 
@@ -192,17 +194,17 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
           )}
           <div>
             <span className="font-semibold text-slate-900">
-              40-Coin Rare Jackpot: {isJackpotUnlocked ? 'Unlocked!' : 'Locked'}
+              {isHinglish ? `40-Coin Rare Jackpot: ${isJackpotUnlocked ? 'Unlocked Hai! 🌟' : 'Locked Hai 🔒'}` : `40-Coin Rare Jackpot: ${isJackpotUnlocked ? 'Unlocked!' : 'Locked'}`}
             </span>
             <p className="text-[11px] text-slate-500">
               {isJackpotUnlocked
-                ? 'Unlocked via 1+ qualified referral on your account.'
-                : 'Unlocks when 1 friend joins via your invite and completes their first quiz.'}
+                ? (isHinglish ? 'Aapke account par 1+ verified friend invite se unlock ho gaya.' : 'Unlocked via 1+ qualified referral on your account.')
+                : (isHinglish ? '1 friend ko invite karein aur unka pehla quiz complete hote hi unlock hoga.' : 'Unlocks when 1 friend joins via your invite and completes their first quiz.')}
             </p>
           </div>
         </div>
         <span className="text-xs font-bold text-amber-800 bg-amber-100 border border-amber-300 px-3 py-1 rounded-xl self-start sm:self-auto flex-shrink-0">
-          {qualifiedReferralsCount} Friends Invited
+          {qualifiedReferralsCount} {isHinglish ? 'Dost Invited' : 'Friends Invited'}
         </span>
       </div>
 
@@ -218,12 +220,12 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
           {spinResult.isJackpot ? (
             <div className="flex items-center justify-center space-x-2">
               <StudyCoinIcon className="w-5 h-5" glow />
-              <span>JACKPOT! You won +40 Study Coins! Ledger updated.</span>
+              <span>{isHinglish ? 'JACKPOT! Aapne jeete +40 Study Coins! 🌟 Ledger update ho gaya.' : 'JACKPOT! You won +40 Study Coins! Ledger updated.'}</span>
             </div>
           ) : (
             <div className="flex items-center justify-center space-x-2">
               <StudyCoinIcon className="w-4 h-4" />
-              <span>Congratulations! You won +{spinResult.coinsAwarded} Study Coins!</span>
+              <span>{isHinglish ? `Badhai ho! Aapne jeete +${spinResult.coinsAwarded} Study Coins! 🎉` : `Congratulations! You won +${spinResult.coinsAwarded} Study Coins!`}</span>
             </div>
           )}
         </div>
@@ -237,12 +239,12 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
           className="w-full py-3.5 px-6 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-slate-950 font-black text-sm rounded-2xl shadow-xs transition-all flex items-center justify-center space-x-2 cursor-pointer"
         >
           <StudyCoinIcon className="w-4 h-4" />
-          <span>{isSpinning ? 'Spinning Wheel...' : 'Spin the Wheel Now'}</span>
+          <span>{isSpinning ? (isHinglish ? 'Wheel ghoom rahi hai... 🌀' : 'Spinning Wheel...') : (isHinglish ? 'Abhi Wheel Spin Karo 🎡' : 'Spin the Wheel Now')}</span>
         </button>
       ) : (
         <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-600 flex items-center justify-center space-x-2">
           <Clock className="w-4 h-4 text-indigo-600" />
-          <span>Next daily spin unlocks in:</span>
+          <span>{isHinglish ? 'Agla daily spin unlock hoga:' : 'Next daily spin unlocks in:'}</span>
           <span className="font-bold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-lg border border-amber-200">{formatCooldown(cooldownRemainingMs)}</span>
         </div>
       )}

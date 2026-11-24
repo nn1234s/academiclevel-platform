@@ -4,6 +4,7 @@ import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { CoinLedgerService } from '../../services/coinLedgerService';
 import { ApiClient } from '../../core/api/apiClient';
 import { QuotaService } from '../../services/quotaService';
+import { useLanguage } from '../../core/i18n/LanguageContext';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import {
   Gift,
@@ -294,6 +295,7 @@ export const PHYSICAL_REWARDS: PhysicalRewardItem[] = [
 ];
 
 export const GiftStore: React.FC<GiftStoreProps> = ({ learner, onRefreshLearner, onNavigateToPremium }) => {
+  const { isHinglish } = useLanguage();
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [copiedVoucherId, setCopiedVoucherId] = useState<string | null>(null);
 
@@ -798,15 +800,15 @@ ${recipientName.trim()}`;
           <div>
             <h2 className="text-lg font-bold text-white flex items-center space-x-2">
               <Package className="w-5 h-5 text-amber-400" />
-              <span>Physical Scholar Merchandise (Worldwide Doorstep Delivery)</span>
+              <span>{isHinglish ? 'Physical Scholar Merchandise (Worldwide Doorstep Delivery) 📦' : 'Physical Scholar Merchandise (Worldwide Doorstep Delivery)'}</span>
             </h2>
             <p className="text-xs text-slate-400">
-              Authentic study merchandise, toys, and hydration gear shipped directly to your verified address in any country worldwide! Both Lite &amp; Plus scholars are eligible!
+              {isHinglish ? 'Real toys, water bottles aur study gear jo sidhe aapke ghar deliver hote hain! Lite aur Plus dono scholars eligible hain.' : 'Authentic study merchandise, toys, and hydration gear shipped directly to your verified address in any country worldwide! Both Lite & Plus scholars are eligible!'}
             </p>
           </div>
           <span className="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold rounded-full uppercase tracking-wider self-start sm:self-auto flex items-center gap-1.5 shadow-sm">
             <Globe className="w-3.5 h-3.5 text-amber-400" />
-            <span>🌍 Free Doorstep Delivery Worldwide (Amazon &amp; Global Couriers)</span>
+            <span>{isHinglish ? '🌍 Free Doorstep Delivery (Amazon aur Courier Partners)' : '🌍 Free Doorstep Delivery Worldwide (Amazon & Global Couriers)'}</span>
           </span>
         </div>
 
@@ -819,15 +821,15 @@ ${recipientName.trim()}`;
 
             let buttonDisabled = !canAfford || !isEnrolledScholar || hasUsedLimit;
             let buttonLabel = canAfford
-              ? `Claim to Home Address`
-              : `Need ${(item.coinsCost - learner.coinBalance).toLocaleString()} more Coins`;
+              ? (isHinglish ? 'Ghar Par Deliver Karwayein' : `Claim to Home Address`)
+              : (isHinglish ? `${(item.coinsCost - learner.coinBalance).toLocaleString()} aur Coins Chahiye` : `Need ${(item.coinsCost - learner.coinBalance).toLocaleString()} more Coins`);
 
             if (!isEnrolledScholar) {
               buttonDisabled = true;
-              buttonLabel = 'Requires Lite (₹49) or Plus (₹129)';
+              buttonLabel = isHinglish ? 'Lite (₹49) ya Plus (₹129) Chahiye' : 'Requires Lite (₹49) or Plus (₹129)';
             } else if (hasUsedLimit) {
               buttonDisabled = true;
-              buttonLabel = 'Term Limit Reached (1 Claim/60d)';
+              buttonLabel = isHinglish ? 'Term Limit Poori Ho Gayi' : 'Term Limit Reached (1 Claim/60d)';
             }
 
             return (
@@ -908,7 +910,7 @@ ${recipientName.trim()}`;
                     className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
                   >
                     <Eye className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Details &amp; Amazon</span>
+                    <span>{isHinglish ? 'Details Dekhein' : 'Details & Amazon'}</span>
                   </button>
 
                   <button
@@ -938,10 +940,10 @@ ${recipientName.trim()}`;
         <div>
           <h2 className="text-lg font-bold text-white flex items-center space-x-2">
             <Zap className="w-5 h-5 text-amber-400" />
-            <span>Digital Study Power-Ups &amp; Academic Perks</span>
+            <span>{isHinglish ? 'Digital Study Power-Ups aur Academic Perks ⚡' : 'Digital Study Power-Ups & Academic Perks'}</span>
           </h2>
           <p className="text-xs text-slate-400">
-            Instant digital utilities: protect your study streaks, equip profile frames, and generate practice worksheets.
+            {isHinglish ? 'Instant digital utilities: streak freeze kharidein, profile avatar frames sajayein aur worksheets generate karein.' : 'Instant digital utilities: protect your study streaks, equip profile frames, and generate practice worksheets.'}
           </p>
         </div>
 

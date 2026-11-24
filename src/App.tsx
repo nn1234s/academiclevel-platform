@@ -1025,7 +1025,7 @@ export const App: React.FC = () => {
                       currentRoute === 'COMMUNITY' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    StudentPacks
+                    {t('nav_student_packs')}
                   </button>
                   <button
                     onClick={() => navigateTo('GIFT_STORE')}
@@ -1384,11 +1384,11 @@ export const App: React.FC = () => {
                 >
                   <div className="flex items-center space-x-2.5">
                     <Mail className="w-4 h-4 text-purple-600" />
-                    <span>Student Mailbox</span>
+                    <span>{t('nav_mailbox')}</span>
                   </div>
                   {currentLearner && StorageRLSLayer.getUnreadMailboxCount(currentLearner.id) > 0 && (
                     <span className="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-black rounded-full animate-pulse shadow-xs">
-                      {StorageRLSLayer.getUnreadMailboxCount(currentLearner.id)} New
+                      {StorageRLSLayer.getUnreadMailboxCount(currentLearner.id)} {language === 'hi' ? 'Naye' : 'New'}
                     </span>
                   )}
                 </button>
@@ -1417,7 +1417,7 @@ export const App: React.FC = () => {
                 >
                   <div className="flex items-center space-x-2.5">
                     <Sparkles className="w-4 h-4 text-purple-500" />
-                    <span>Nova AI Tutor 🎀</span>
+                    <span>{t('nav_nova_ai')}</span>
                   </div>
                   <span className="text-[9px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full font-bold">
                     Bestie
@@ -1434,7 +1434,7 @@ export const App: React.FC = () => {
                   }`}
                 >
                   <Users className="w-4 h-4 text-sky-600" />
-                  <span>StudentPacks Community</span>
+                  <span>{t('nav_student_packs')}</span>
                 </button>
 
                 <button
@@ -1448,9 +1448,9 @@ export const App: React.FC = () => {
                 >
                   <div className="flex items-center space-x-2.5">
                     <StudyCoinIcon className="w-4 h-4" />
-                    <span>Daily Spin Wheel</span>
+                    <span>{t('nav_spin_wheel')}</span>
                   </div>
-                  <span className="text-[10px] text-amber-600 font-mono font-bold">24h Cooldown</span>
+                  <span className="text-[10px] text-amber-600 font-mono font-bold">{language === 'hi' ? '24h Cooldown' : '24h Cooldown'}</span>
                 </button>
 
                 <button
@@ -1516,7 +1516,7 @@ export const App: React.FC = () => {
                 >
                   <div className="flex items-center space-x-2.5">
                     <Zap className="w-4 h-4 text-amber-500" />
-                    <span>Friend ACodes &amp; Invites</span>
+                    <span>{language === 'hi' ? 'Friend ACodes aur Invites ⚡' : 'Friend ACodes & Invites'}</span>
                   </div>
                   <span className="flex items-center space-x-1 text-xs text-amber-700 font-bold bg-amber-100 px-2 py-0.5 rounded-full">
                     <StudyCoinIcon className="w-3.5 h-3.5" />
@@ -1534,7 +1534,7 @@ export const App: React.FC = () => {
                   }`}
                 >
                   <Gift className="w-4 h-4 text-amber-500" />
-                  <span>Scholar&apos;s Gift Store (Rewards)</span>
+                  <span>{t('nav_gift_store')}</span>
                 </button>
 
                 <button

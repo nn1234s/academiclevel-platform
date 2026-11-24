@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MailboxMessage, QuizReportDetail, Question } from '../../core/types';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { ApiClient } from '../../core/api/apiClient';
+import { useLanguage } from '../../core/i18n/LanguageContext';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import {
   Mail,
@@ -47,6 +48,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
   onNavigateToQuiz,
   onOpenNovaAi,
 }) => {
+  const { isHinglish } = useLanguage();
   const [messages, setMessages] = useState<MailboxMessage[]>([]);
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterCategory>('ALL');
@@ -211,15 +213,15 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-base sm:text-lg font-black tracking-tight text-slate-900">Student Mailbox</h2>
+                <h2 className="text-base sm:text-lg font-black tracking-tight text-slate-900">{isHinglish ? 'Student Mailbox 📬' : 'Student Mailbox'}</h2>
                 {unreadCount > 0 && (
                   <span className="px-2 py-0.5 bg-indigo-100 border border-indigo-200 text-indigo-700 text-[10px] font-extrabold rounded-full">
-                    {unreadCount} Unread
+                    {unreadCount} {isHinglish ? 'Naye' : 'Unread'}
                   </span>
                 )}
               </div>
               <p className="text-[11px] text-slate-500">
-                AI Diagnostic Performance Reports, Study Buddy Insights &amp; Platform Notifications
+                {isHinglish ? 'AI Diagnostic Performance Reports, Study Buddy Insights aur Platform Updates' : 'AI Diagnostic Performance Reports, Study Buddy Insights & Platform Notifications'}
               </p>
             </div>
           </div>
@@ -233,9 +235,9 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                   ? 'bg-amber-100 border-amber-300 text-amber-900 hover:bg-amber-200'
                   : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
               }`}
-              title={isOutsideMode ? "Click to resume Nova study notifications" : "Stop notifications while outside or away"}
+              title={isOutsideMode ? (isHinglish ? "Nova study notifications resume karein" : "Click to resume Nova study notifications") : (isHinglish ? "Bahar hone par notifications pause karein" : "Stop notifications while outside or away")}
             >
-              <span>{isOutsideMode ? "🏠 I'm Back Home" : "🚶 I'm Outside"}</span>
+              <span>{isOutsideMode ? (isHinglish ? "🏠 Ghar Wapas (I'm Back)" : "🏠 I'm Back Home") : (isHinglish ? "🚶 Bahar Hoon (I'm Outside)" : "🚶 I'm Outside")}</span>
             </button>
 
             {unreadCount > 0 && (
@@ -245,7 +247,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                 title="Mark all as read"
               >
                 <CheckCheck className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Mark All Read</span>
+                <span>{isHinglish ? 'Sabhi Read Mark Karein' : 'Mark All Read'}</span>
               </button>
             )}
             <button
@@ -265,14 +267,14 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
             <div className="flex items-center space-x-2">
               <span className="text-base">🚶</span>
               <span>
-                <strong>Outside Mode Active:</strong> Nova's 20-min mailbox study notifications are paused. Enjoy being outside! 🌳☀️
+                <strong>{isHinglish ? 'Outside Mode Active:' : 'Outside Mode Active:'}</strong> {isHinglish ? 'Nova ki 20-min mailbox study notifications pause hain. Bahar khoob enjoy karo! 🌳☀️' : "Nova's 20-min mailbox study notifications are paused. Enjoy being outside! 🌳☀️"}
               </span>
             </div>
             <button
               onClick={handleToggleOutsideMode}
               className="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg text-[11px] transition-colors cursor-pointer shrink-0"
             >
-              Resume Alerts 🏠
+              {isHinglish ? 'Alerts Chalu Karein 🏠' : 'Resume Alerts 🏠'}
             </button>
           </div>
         )}
@@ -288,7 +290,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               }`}
             >
-              All Mail ({messages.length})
+              {isHinglish ? `Sabhi Mail (${messages.length})` : `All Mail (${messages.length})`}
             </button>
             <button
               onClick={() => setFilter('NOVA_NOTE')}
@@ -299,7 +301,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
               }`}
             >
               <Sparkles className="w-3.5 h-3.5 text-pink-300" />
-              <span>Nova Notes 🎀 ({novaNotesCount})</span>
+              <span>{isHinglish ? `Nova Notes 🎀 (${novaNotesCount})` : `Nova Notes 🎀 (${novaNotesCount})`}</span>
             </button>
             <button
               onClick={() => setFilter('QUIZ_REPORT')}
@@ -310,7 +312,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
               }`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
-              <span>Quiz Reports ({reportCount})</span>
+              <span>{isHinglish ? `Quiz Reports (${reportCount})` : `Quiz Reports (${reportCount})`}</span>
             </button>
             <button
               onClick={() => setFilter('UNREAD')}
@@ -320,7 +322,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
               }`}
             >
-              <span>Unread</span>
+              <span>{isHinglish ? 'Naye' : 'Unread'}</span>
               {unreadCount > 0 && (
                 <span className="w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] font-black flex items-center justify-center">
                   {unreadCount}
@@ -333,7 +335,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search reports or topics..."
+              placeholder={isHinglish ? "Reports ya topics search karein..." : "Search reports or topics..."}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="w-full bg-white border border-slate-200 text-slate-900 text-xs rounded-xl pl-8 pr-3 py-1.5 focus:outline-none focus:border-indigo-500 transition-colors"
@@ -352,11 +354,11 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
               {filteredMessages.length === 0 ? (
                 <div className="p-8 text-center text-slate-500">
                   <Inbox className="w-10 h-10 mx-auto mb-2 text-slate-400 opacity-60" />
-                  <p className="text-xs font-semibold text-slate-600">No messages found</p>
+                  <p className="text-xs font-semibold text-slate-600">{isHinglish ? 'Koi message nahi mila' : 'No messages found'}</p>
                   <p className="text-[11px] text-slate-500 mt-1 max-w-[200px] mx-auto">
                     {filter === 'QUIZ_REPORT'
-                      ? 'Complete any assessment quiz to generate your first diagnostic AI report!'
-                      : 'Your mailbox is empty.'}
+                      ? (isHinglish ? 'Apna pehla AI diagnostic report paane ke liye koi quiz complete karein!' : 'Complete any assessment quiz to generate your first diagnostic AI report!')
+                      : (isHinglish ? 'Aapka mailbox khali hai.' : 'Your mailbox is empty.')}
                   </p>
                 </div>
               ) : (
@@ -456,7 +458,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                   className="md:hidden flex items-center space-x-1.5 text-xs text-indigo-600 font-bold mb-2 py-1 px-2.5 rounded-lg bg-indigo-50 border border-indigo-200 cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Back to Inbox List</span>
+                  <span>{isHinglish ? '← Wapas Mail List Par' : 'Back to Inbox List'}</span>
                 </button>
 
                 {/* Message Header */}
@@ -493,7 +495,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                         className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 text-xs font-semibold border border-slate-200 transition-colors flex items-center space-x-1.5 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                        <span>Delete</span>
+                        <span>{isHinglish ? 'Delete Karein' : 'Delete'}</span>
                       </button>
                     </div>
                   </div>
@@ -511,7 +513,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                     <div className="bg-gradient-to-r from-indigo-50/60 via-white to-purple-50/60 border border-indigo-100 rounded-3xl p-5 sm:p-6 shadow-sm">
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                         <div className="p-3 bg-white border border-slate-200 rounded-2xl shadow-xs">
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Accuracy</span>
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">{isHinglish ? 'Accuracy' : 'Accuracy'}</span>
                           <span className={`text-2xl sm:text-3xl font-black ${
                             selectedMessage.quizReport.accuracyPercent >= 70 ? 'text-emerald-600' : 'text-amber-600'
                           }`}>
@@ -520,25 +522,25 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                         </div>
 
                         <div className="p-3 bg-white border border-slate-200 rounded-2xl shadow-xs">
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Score</span>
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">{isHinglish ? 'Score' : 'Score'}</span>
                           <span className="text-2xl sm:text-3xl font-black text-slate-900">
                             {selectedMessage.quizReport.score} <span className="text-xs text-slate-500 font-normal">/ {selectedMessage.quizReport.totalQuestions}</span>
                           </span>
                         </div>
 
                         <div className="p-3 bg-white border border-slate-200 rounded-2xl shadow-xs">
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Mastery Status</span>
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">{isHinglish ? 'Mastery Status' : 'Mastery Status'}</span>
                           <span className={`text-xs font-black inline-block mt-1 px-2.5 py-1 rounded-full ${
                             selectedMessage.quizReport.passed
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                               : 'bg-amber-50 text-amber-700 border border-amber-200'
                           }`}>
-                            {selectedMessage.quizReport.passed ? 'Level Mastered 🎉' : 'Needs Practice'}
+                            {selectedMessage.quizReport.passed ? (isHinglish ? 'Level Mastered 🎉' : 'Level Mastered 🎉') : (isHinglish ? 'Practice Ki Zaroorat' : 'Needs Practice')}
                           </span>
                         </div>
 
                         <div className="p-3 bg-white border border-slate-200 rounded-2xl shadow-xs">
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Coins Earned</span>
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">{isHinglish ? 'Coins Jeete' : 'Coins Earned'}</span>
                           <div className="flex items-center justify-center space-x-1.5 mt-1 font-black text-lg text-amber-700">
                             <StudyCoinIcon className="w-5 h-5" glow />
                             <span>+{selectedMessage.quizReport.coinsEarned}</span>
@@ -559,7 +561,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                         <div className="flex items-center space-x-3 text-[11px]">
                           <span className="flex items-center space-x-1 text-emerald-600 font-medium">
                             <ShieldCheck className="w-3.5 h-3.5" />
-                            <span>Anti-Cheat Integrity Verified</span>
+                            <span>{isHinglish ? 'Anti-Cheat Integrity Verified ✓' : 'Anti-Cheat Integrity Verified'}</span>
                           </span>
                           {selectedMessage.quizReport.timeSpentSeconds > 0 && (
                             <span className="flex items-center space-x-1 text-slate-500">
@@ -665,7 +667,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                                     isCorrect ? 'text-emerald-700' : 'text-amber-700'
                                   }`}>
                                     {isCorrect ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> : <XCircle className="w-3.5 h-3.5 text-amber-600" />}
-                                    <span>{isCorrect ? 'Correct (+1)' : 'Incorrect'}</span>
+                                    <span>{isCorrect ? (isHinglish ? 'Sahi Jawab (+1)' : 'Correct (+1)') : (isHinglish ? 'Galat Answer' : 'Incorrect')}</span>
                                   </span>
                                 </div>
 
@@ -713,7 +715,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-700 space-y-1">
                                     <p className="font-bold text-slate-900 text-[11px] flex items-center space-x-1.5 text-indigo-700">
                                       <HelpCircle className="w-3 h-3 text-indigo-600" />
-                                      <span>Conceptual Explanation:</span>
+                                      <span>{isHinglish ? 'Concept Breakdown / Explanation:' : 'Conceptual Explanation:'}</span>
                                     </p>
                                     <p className="text-[11px] text-slate-600 leading-relaxed">
                                       {q.explanation}
@@ -732,7 +734,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                                       className="text-[11px] font-bold text-purple-700 hover:text-purple-900 flex items-center space-x-1 py-1 px-2.5 rounded-lg bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-colors cursor-pointer"
                                     >
                                       <Zap className="w-3 h-3 text-purple-600" />
-                                      <span>Ask Nova AI to explain this question</span>
+                                      <span>{isHinglish ? 'Nova AI Tutor se samjho' : 'Ask Nova AI to explain this question'}</span>
                                     </button>
                                   </div>
                                 )}
@@ -754,7 +756,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                           className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer"
                         >
                           <RefreshCw className="w-4 h-4" />
-                          <span>Practice More in {selectedMessage.quizReport.subjectId.toUpperCase()}</span>
+                          <span>{isHinglish ? `${selectedMessage.quizReport.subjectId.toUpperCase()} me aur practice karo →` : `Practice More in ${selectedMessage.quizReport.subjectId.toUpperCase()}`}</span>
                         </button>
                       )}
                     </div>
@@ -790,7 +792,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                       <div className="pt-4 border-t border-pink-200/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                         <div className="text-xs text-pink-800 font-bold flex items-center space-x-1.5">
                           <Sparkles className="w-4 h-4 text-pink-500 shrink-0" />
-                          <span>Solve 1 quick quiz now to stack up Study Coins! 🪙</span>
+                          <span>{isHinglish ? '1 quick quiz abhi solve karke Study Coins kamao! 🪙' : 'Solve 1 quick quiz now to stack up Study Coins! 🪙'}</span>
                         </div>
 
                         <div className="flex flex-wrap gap-2">
@@ -802,7 +804,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                               }}
                               className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-500 via-rose-500 to-indigo-600 hover:from-pink-600 hover:to-indigo-700 text-white font-black text-xs transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-1.5 cursor-pointer transform hover:scale-102"
                             >
-                              <span>Do Cute 2-Min Quiz 🎀</span>
+                              <span>{isHinglish ? 'Cute 2-Min Quiz Khele 🎀' : 'Do Cute 2-Min Quiz 🎀'}</span>
                               <ArrowRight className="w-3.5 h-3.5" />
                             </button>
                           )}
@@ -815,7 +817,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                               className="px-4 py-2.5 rounded-xl bg-white hover:bg-pink-100/80 text-pink-900 border border-pink-300 font-bold text-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs"
                             >
                               <Zap className="w-3.5 h-3.5 text-pink-500" />
-                              <span>Chat with Nova 💬</span>
+                              <span>{isHinglish ? 'Nova Se Chat Karein 💬' : 'Chat with Nova 💬'}</span>
                             </button>
                           )}
                         </div>
