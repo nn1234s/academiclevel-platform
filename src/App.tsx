@@ -863,7 +863,7 @@ export const App: React.FC = () => {
                                 About Us
                               </p>
                               <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
-                                Mission, Nova StudyGirl AI methodology &amp; pedagogy
+                                Mission, Nova AI Tutor methodology &amp; pedagogy
                               </p>
                             </div>
                           </button>
@@ -1402,7 +1402,7 @@ export const App: React.FC = () => {
                 >
                   <div className="flex items-center space-x-2.5">
                     <Sparkles className="w-4 h-4 text-purple-500" />
-                    <span>Nova AI StudyGirl Tutor 🎀</span>
+                    <span>Nova AI Tutor 🎀</span>
                   </div>
                   <span className="text-[9px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full font-bold">
                     Bestie
@@ -2049,7 +2049,7 @@ export const App: React.FC = () => {
                       onClick={() => navigateTo('NOVA_AI')}
                       className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
-                      Nova StudyGirl AI
+                      Nova AI Tutor
                     </button>
                   </li>
                   <li>
@@ -2152,7 +2152,7 @@ export const App: React.FC = () => {
                 {/* Social media links */}
                 <div className="flex items-center space-x-2">
                   <a
-                    href="https://youtube.com/academiclevels"
+                    href="https://www.youtube.com/@academiclevels"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-8 h-8 rounded-full border border-slate-200 hover:border-slate-800 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all"

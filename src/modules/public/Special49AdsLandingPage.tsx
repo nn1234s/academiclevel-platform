@@ -2075,7 +2075,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             <div className="space-y-2">
               <h4 className="text-slate-900 font-bold uppercase text-[11px] tracking-wider">Features</h4>
               <ul className="space-y-1.5 text-slate-600">
-                <li><a href="/nova-ai" className="hover:text-indigo-600 transition-colors">Nova StudyGirl AI</a></li>
+                <li><a href="/nova-ai" className="hover:text-indigo-600 transition-colors">Nova AI Tutor</a></li>
                 <li><a href="/gift-store" className="hover:text-indigo-600 transition-colors">Scholar&apos;s Gift Store</a></li>
                 <li><a href="/verify" className="hover:text-indigo-600 transition-colors">Verify Certificate</a></li>
                 <li><a href="/sitemap" className="hover:text-indigo-600 transition-colors">Sitemap Directory</a></li>

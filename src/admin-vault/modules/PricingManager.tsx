@@ -48,7 +48,7 @@ export const PricingManager: React.FC = () => {
       liteFeatures: [
         'Unlimited Quizzes & Adaptive Assessments',
         'Full Access to All Syllabus Chapters',
-        'Nova AI StudyGirl Tutor 24/7',
+        'Nova AI Tutor 24/7',
         'Level Mastery Certificates',
         'Max 1 Class Change during active cycle'
       ],
@@ -69,7 +69,7 @@ export const PricingManager: React.FC = () => {
         'Exclusive Gold Scholar Profile Badge & Frame',
         'Olympiad, NTSE & National Foundation Track',
         'Annual Master Certificate of Academic Excellence',
-        '24/7 Nova AI StudyGirl Tutor with Priority Pool',
+        '24/7 Nova AI Tutor with Priority Pool',
         'Max 2 Class Changes during active cycle'
       ]
     };

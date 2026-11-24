@@ -66,10 +66,16 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
         localLearner.lastSpinTimestampUtc = new Date().toISOString();
         StorageRLSLayer.saveLearner(localLearner, learner.id);
       }
-    } catch {
+    } catch (err: any) {
       // Offline fallback
       const fallback = CoinLedgerService.executeSpin(learner.id);
-      result = { coinsAwarded: fallback.coinsAwarded, isJackpot: fallback.isJackpot, error: fallback.error };
+      result = { coinsAwarded: fallback.coinsAwarded, isJackpot: fallback.isJackpot, error: fallback.error || err?.message };
+    }
+
+    if (result.error && result.coinsAwarded === 0) {
+      setIsSpinning(false);
+      setSpinResult(result);
+      return;
     }
 
     // Determine target rotation
@@ -99,6 +105,8 @@ export const DailySpinWheel: React.FC<DailySpinWheelProps> = ({ learner, onSpinC
     setTimeout(() => {
       setIsSpinning(false);
       setSpinResult(result);
+      setCanSpin(false);
+      setCooldownRemainingMs(24 * 60 * 60 * 1000);
       onSpinCompleted();
 
       if (result.coinsAwarded > 0) {

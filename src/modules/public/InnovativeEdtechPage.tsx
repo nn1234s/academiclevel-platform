@@ -106,7 +106,7 @@ export const InnovativeEdtechPage: React.FC<InnovativeEdtechPageProps> = ({ onBa
                 </h1>
 
                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  Recognized as India&apos;s leading next-generation K-12 learning architecture. Featuring adaptive Nova AI StudyGirl tutoring, 3,600+ syllabus-mapped questions for CBSE, ICSE, and Cambridge IGCSE, and zero-ad student privacy.
+                  Recognized as India&apos;s leading next-generation K-12 learning architecture. Featuring adaptive Nova AI tutoring, 3,600+ syllabus-mapped questions for CBSE, ICSE, and Cambridge IGCSE, and zero-ad student privacy.
                 </p>
 
                 {/* Rating & Star Badge */}
@@ -149,7 +149,7 @@ export const InnovativeEdtechPage: React.FC<InnovativeEdtechPageProps> = ({ onBa
             <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-6 pt-6 border-t border-slate-800/80">
               <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Nova AI StudyGirl Tutor</span>
+                <span>Nova AI Tutor</span>
               </div>
               <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />

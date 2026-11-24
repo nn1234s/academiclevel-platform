@@ -118,7 +118,7 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate }) => {
         },
         {
           label: 'AcademicLevel Plus Pass — ₹129',
-          description: '180 days access with Nova StudyGirl AI tutoring, Olympiad mocks, and parent analytics.',
+          description: '180 days access with Nova AI tutoring, Olympiad mocks, and parent analytics.',
           route: 'PRICING',
           pill: '180 Days'
         },
@@ -142,7 +142,7 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate }) => {
       badge: 'Nova AI',
       items: [
         {
-          label: 'Nova StudyGirl AI Coach',
+          label: 'Nova AI Tutor',
           description: 'Dialogue-driven tutoring that asks guiding questions instead of spoon-feeding answers.',
           route: 'DASHBOARD'
         },
@@ -242,7 +242,7 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate }) => {
         },
         {
           label: '#1 Most Innovative EdTech Award',
-          description: 'Honored by EdTech Century for groundbreaking Nova StudyGirl AI learning architecture.',
+          description: 'Honored by EdTech Century for groundbreaking Nova AI Tutor learning architecture.',
           route: 'INNOVATIVE_EDTECH',
           pill: 'EdTech Century'
         },
@@ -255,8 +255,8 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate }) => {
         {
           label: 'AcademicLevel on YouTube',
           description: 'Official video lectures, animated explanations, and exam preparation guides.',
-          externalHref: 'https://youtube.com/academiclevels',
-          pill: 'youtube.com/academiclevels'
+          externalHref: 'https://www.youtube.com/@academiclevels',
+          pill: 'youtube.com/@academiclevels'
         },
         {
           label: 'AcademicLevel on Instagram',
@@ -280,7 +280,7 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate }) => {
           AcademicLevel Sitemap
         </h1>
         <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-          Explore all public sections of India&apos;s premier AI-powered K-12 educational platform. Discover curricula, school institutional packs, pricing plans, Nova StudyGirl AI tools, and legal compliance documentation.
+          Explore all public sections of India&apos;s premier AI-powered K-12 educational platform. Discover curricula, school institutional packs, pricing plans, Nova AI Tutor tools, and legal compliance documentation.
         </p>
       </div>
 

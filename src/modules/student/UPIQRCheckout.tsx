@@ -110,7 +110,7 @@ export const UPIQRCheckout: React.FC<UPIQRCheckoutProps> = ({
             Membership Activated Instantly!
           </h2>
           <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
-            Welcome to <strong className="text-slate-900">{plan.name}</strong>! Your account has been upgraded with full unlimited syllabus access, 24/7 Nova StudyGirl AI Buddy, and physical rewards eligibility.
+            Welcome to <strong className="text-slate-900">{plan.name}</strong>! Your account has been upgraded with full unlimited syllabus access, 24/7 Nova AI Tutor, and physical rewards eligibility.
           </p>
         </div>
 

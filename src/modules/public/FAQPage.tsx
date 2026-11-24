@@ -9,7 +9,7 @@ interface FAQItem {
 const FAQS: FAQItem[] = [
   {
     q: 'What is included in the Concept Booster plan?',
-    a: 'Every student receives 60 days of full, unlimited adaptive AI quizzes across all subjects. To unlock extended access, Olympiad mock tests, verified parent analytics, and 1-on-1 StudyGirl tutoring, you can upgrade to PLUS (₹129 for 180 days). Your certificates, coin balances, and study profile remain 100% safe.'
+    a: 'Every student receives 60 days of full, unlimited adaptive AI quizzes across all subjects. To unlock extended access, Olympiad mock tests, verified parent analytics, and 1-on-1 Nova AI tutoring, you can upgrade to PLUS (₹129 for 180 days). Your certificates, coin balances, and study profile remain 100% safe.'
   },
   {
     q: 'Which school boards are supported?',
@@ -29,7 +29,7 @@ const FAQS: FAQItem[] = [
   },
   {
     q: 'What is Nova AI Tutor?',
-    a: 'Nova is our built-in Nova StudyGirl AI coach. Instead of just giving away answers, Nova asks guiding questions, diagnoses conceptual mistakes, and adapts to your age tier (playful for primary, exam-focused for high school).'
+    a: 'Nova is our built-in 24/7 AI Tutor. Instead of just giving away answers, Nova asks guiding questions, diagnoses conceptual mistakes, and adapts to your age tier (playful for primary, exam-focused for high school).'
   },
   {
     q: 'What if my internet connection is slow or drops?',

@@ -197,7 +197,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   const aiPlatformEngines = [
     {
-      title: 'Nova StudyGirl AI Buddy',
+      title: 'Nova AI Tutor',
       category: 'Autonomous AI Guidance',
       badge: '24/7 Available',
       highlight: 'Friendly Study Bestie',
@@ -422,7 +422,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </h2>
 
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Accelerate K-12 academic growth with our autonomous AI curriculum. Bridge learning gaps before term exams with daily AI diagnostic quizzes, 1-on-1 friendly StudyGirl feedback, and real-time concept clarity with zero human delays.
+                Accelerate K-12 academic growth with our autonomous AI curriculum. Bridge learning gaps before term exams with daily AI diagnostic quizzes, 1-on-1 friendly Nova AI Tutor feedback, and real-time concept clarity with zero human delays.
               </p>
 
               {/* 3 Pillars */}
@@ -464,7 +464,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Nova StudyGirl AI Problem Solver</span>
+                  <span>Nova AI Problem Solver</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
@@ -767,7 +767,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
             <div className="px-5 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
               <div className="text-2xl font-black text-emerald-600">24/7</div>
-              <div className="text-[11px] text-slate-500 font-medium">Nova StudyGirl AI Buddy</div>
+              <div className="text-[11px] text-slate-500 font-medium">Nova AI Tutor 24/7</div>
             </div>
             <div className="px-5 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
               <div className="text-2xl font-black text-amber-500 flex items-center justify-center gap-1">
@@ -909,7 +909,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Instant Friendly StudyGirl Hints</span>
+                  <span>Instant Friendly Nova AI Hints</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -956,7 +956,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <span>Nova StudyGirl AI Buddy 24/7</span>
+                  <span>Nova AI Tutor 24/7</span>
                 </li>
               </ul>
             </div>

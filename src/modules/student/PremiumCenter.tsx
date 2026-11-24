@@ -76,7 +76,7 @@ export const PremiumCenter: React.FC<PremiumCenterProps> = ({
             Elevate Your Academic Trajectory
           </h2>
           <p className="text-xs text-slate-300 mt-1 max-w-md">
-            Unlock unlimited AI quizzes, Olympiad challenges, Nova StudyGirl tutoring, and verified certificates.
+            Unlock unlimited AI quizzes, Olympiad challenges, Nova AI tutoring, and verified certificates.
           </p>
         </div>
 

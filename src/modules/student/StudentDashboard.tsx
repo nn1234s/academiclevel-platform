@@ -924,8 +924,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
             <Zap className="w-5 h-5" />
           </div>
-          <p className="text-xs font-bold text-slate-900">Nova StudyGirl 🎀</p>
-          <span className="text-[10px] text-slate-500">24/7 Study Bestie</span>
+          <p className="text-xs font-bold text-slate-900">Nova AI Tutor 🎀</p>
+          <span className="text-[10px] text-slate-500">24/7 AI Concept Tutor</span>
         </button>
 
         <button

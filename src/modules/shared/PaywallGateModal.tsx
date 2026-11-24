@@ -84,7 +84,7 @@ export const PaywallGateModal: React.FC<PaywallGateModalProps> = ({
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
-                  <span>Nova AI StudyGirl Tutor 24/7 🎀</span>
+                  <span>Nova AI Tutor 24/7 🎀</span>
                 </li>
               </ul>
             </div>

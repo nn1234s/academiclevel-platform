@@ -250,7 +250,7 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
               </div>
             )}
             <ul className="list-disc pl-5 space-y-2">
-              <li>A paid subscription plan (AcademicLevel Lite ₹49, Plus ₹129, 1-Year Gold VIP ₹205) or an authorized school institutional A-Code voucher is mandatory to unlock complete daily quizzes, syllabus progression, verifiable certificates, and 24/7 Nova StudyGirl AI tutoring.</li>
+              <li>A paid subscription plan (AcademicLevel Lite ₹49, Plus ₹129, 1-Year Gold VIP ₹205) or an authorized school institutional A-Code voucher is mandatory to unlock complete daily quizzes, syllabus progression, verifiable certificates, and 24/7 Nova AI tutoring.</li>
               <li>AcademicLevel Lite is listed at ₹49 for 2 months (60 days); AcademicLevel Plus is listed at ₹129 for 6 months (180 days); AcademicLevel 1-Year Gold is listed at ₹205 for 365 days. The price and plan shown at checkout should be checked before paying.</li>
               <li>Payments are processed securely via our integrated UPI Payment Gateway (UPIPG) and authorized checkout links. A parent or guardian must supervise purchases by a child.</li>
               <li>Gateway transactions and payment confirmations are verified and recorded securely. Subscriptions activate instantly upon successful gateway completion or verified payment confirmation.</li>

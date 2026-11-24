@@ -881,7 +881,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 <div>
                   <h4 className="text-base font-black text-slate-900">Unlimited Nova AI Active</h4>
                   <p className="text-xs text-slate-600 max-w-sm mx-auto mt-1 leading-relaxed">
-                    You have active <strong className="text-emerald-700 font-semibold">{quota?.planTier || (learner as any)?.activePlan || 'PLUS'} Scholar</strong> status. All daily StudyGirl AI query caps are lifted!
+                    You have active <strong className="text-emerald-700 font-semibold">{quota?.planTier || (learner as any)?.activePlan || 'PLUS'} Scholar</strong> status. All daily Nova AI Tutor query caps are lifted!
                   </p>
                 </div>
                 <div className="pt-2">

@@ -39,9 +39,18 @@ export class ApiClient {
   private static async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const adminToken = this.getAdminToken();
     const studentToken = this.getStudentToken();
+    const adminPasskey = typeof window !== 'undefined'
+      ? (sessionStorage.getItem('al_admin_passkey') || localStorage.getItem('al_admin_passkey') || '')
+      : '';
+    const adminEmail = typeof window !== 'undefined'
+      ? (sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email') || '')
+      : '';
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(adminToken ? { 'x-admin-token': adminToken } : {}),
+      ...(adminPasskey ? { 'x-admin-passkey': adminPasskey } : {}),
+      ...(adminEmail ? { 'x-admin-email': adminEmail } : {}),
       ...(studentToken ? { 'x-session-token': studentToken } : {}),
       ...((options.headers as Record<string, string>) || {})
     };

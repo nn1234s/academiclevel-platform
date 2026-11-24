@@ -226,7 +226,7 @@ class StorageRLSLayerClass {
           ...headers
         },
         body: JSON.stringify({ key, value })
-      });
+      }).catch(() => {});
     } catch {
       // Graceful offline fallback
     }
@@ -471,6 +471,9 @@ class StorageRLSLayerClass {
   }
 
   public saveSubscription(sub: Subscription): void {
+    if (!sub.invoiceNumber) {
+      sub.invoiceNumber = 'INV-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    }
     const all = this.readRaw<Subscription[]>(STORAGE_KEYS.SUBSCRIPTIONS, []);
     const idx = all.findIndex(s => s.id === sub.id);
     if (idx >= 0) {

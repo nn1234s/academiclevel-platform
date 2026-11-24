@@ -51,7 +51,7 @@ export const KidFounderGlazeShowcase: React.FC<KidFounderGlazeShowcaseProps> = (
     },
     {
       id: 'studygirl-ai',
-      title: 'Nova StudyGirl AI Tutoring',
+      title: 'Nova AI Tutoring',
       badge: '🤖 Pedagogical AI',
       subtitle: 'Instant Hints • Step-by-Step Guidance',
       desc: 'Zero rote answers — Nova asks guiding guided questions that help students discover solutions through their own reasoning.',
