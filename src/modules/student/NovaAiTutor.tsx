@@ -294,11 +294,16 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom of messages
+  // Auto-scroll within the inner chat messages container only (scoped strictly to the chat box, NEVER the window or page!)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   }, [messages, isTyping]);
 
   // Check if learner is an active subscriber with unlimited access
@@ -543,6 +548,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
 
         <div className="flex items-center space-x-2">
           <button
+            type="button"
             onClick={() => {
               if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
               initWelcome();
@@ -555,6 +561,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
 
           {learner && (
             <button
+              type="button"
               onClick={() => {
                 setRefillStatus(null);
                 setShowRefillModal(true);
@@ -574,6 +581,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
 
           {onClose && (
             <button
+              type="button"
               onClick={onClose}
               className="text-xs text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 transition-colors cursor-pointer shadow-xs"
             >
@@ -590,6 +598,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
           <span>Preset Question Library ({PRESET_QUESTIONS.length} Questions)</span>
         </div>
         <button
+          type="button"
           onClick={() => setShowPresetDrawer(prev => !prev)}
           className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 font-semibold text-[11px] transition-all cursor-pointer"
         >
@@ -613,6 +622,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
               { id: 'EXAM', label: '🎯 Exam Strategy' },
             ].map(cat => (
               <button
+                type="button"
                 key={cat.id}
                 onClick={() => setActivePresetCategory(cat.id as any)}
                 className={`px-2.5 py-1 rounded-full whitespace-nowrap font-bold transition-all cursor-pointer ${
@@ -630,6 +640,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {filteredPresets.map(preset => (
               <button
+                type="button"
                 key={preset.id}
                 onClick={() => {
                   setShowPresetDrawer(false);
@@ -651,7 +662,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       )}
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/50">
+      <div ref={messagesContainerRef} className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/50">
         {messages.map(msg => (
           <div
             key={msg.id}
@@ -691,7 +702,11 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                   <div className="flex items-center space-x-2">
                     {/* Read Out Loud Button */}
                     <button
-                      onClick={() => handleToggleSpeak(msg.id, msg.text)}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleToggleSpeak(msg.id, msg.text);
+                      }}
                       className="hover:text-indigo-600 text-slate-500 transition-colors flex items-center space-x-1 cursor-pointer"
                       title="Read explanation out loud"
                     >
@@ -710,7 +725,11 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
 
                     {/* Copy Button */}
                     <button
-                      onClick={() => handleCopyText(msg.id, msg.text)}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleCopyText(msg.id, msg.text);
+                      }}
                       className="hover:text-indigo-600 text-slate-500 transition-colors flex items-center space-x-1 cursor-pointer"
                       title="Copy explanation to clipboard"
                     >
@@ -739,38 +758,57 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
             <span>nova is preparing a cute, simple explanation for you... 🎀✨</span>
           </div>
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Suggested Quick Prompts */}
       <div className="px-4 py-2 bg-gradient-to-r from-pink-50/60 via-purple-50/60 to-indigo-50/60 border-t border-pink-100 flex items-center space-x-2 overflow-x-auto text-[11px] no-scrollbar">
         <button
-          onClick={handleTriggerBestieCheer}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            handleTriggerBestieCheer();
+          }}
           className="whitespace-nowrap px-3 py-1.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold transition-all cursor-pointer shadow-xs flex items-center space-x-1 active:scale-95 shrink-0"
           title="100 preloaded brain study motivation messages"
         >
           <span>🎀 bestie study vibe (100 inside)</span>
         </button>
         <button
-          onClick={() => executeSend(`tell me about our comprehensive practice worksheets and how i can redeem them with 30 coins!`)}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            executeSend(`tell me about our comprehensive practice worksheets and how i can redeem them with 30 coins!`);
+          }}
           className="whitespace-nowrap px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border border-amber-300 text-amber-900 font-bold transition-colors cursor-pointer shadow-xs shrink-0 flex items-center space-x-1"
         >
           <span>📄 practice worksheets (30 coins)</span>
         </button>
         <button
-          onClick={() => executeSend(`can you simplify the hardest concept in ${activeSubject || 'this chapter'} with a super cute example?`)}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            executeSend(`can you simplify the hardest concept in ${activeSubject || 'this chapter'} with a super cute example?`);
+          }}
           className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs shrink-0"
         >
           💡 simplify concept
         </button>
         <button
-          onClick={() => executeSend(`give me a fun brain study tip to remember formulas easily!`)}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            executeSend(`give me a fun brain study tip to remember formulas easily!`);
+          }}
           className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs shrink-0"
         >
           🧠 brain memory hack
         </button>
         <button
-          onClick={() => executeSend(`what's a silly mistake students make in ${activeSubject || 'our syllabus'} exams?`)}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            executeSend(`what's a silly mistake students make in ${activeSubject || 'our syllabus'} exams?`);
+          }}
           className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs shrink-0"
         >
           ⚠️ silly mistakes to avoid
@@ -800,6 +838,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
         <div className="absolute inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="max-w-md w-full bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl relative text-left">
             <button
+              type="button"
               onClick={() => {
                 setShowRefillModal(false);
                 setRefillStatus(null);
@@ -847,6 +886,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 </div>
                 <div className="pt-2">
                   <button
+                    type="button"
                     onClick={() => setShowRefillModal(false)}
                     className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all cursor-pointer"
                   >
@@ -870,6 +910,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                       </p>
                     </div>
                     <button
+                      type="button"
                       onClick={() => handleBuyMessages('PACK_5')}
                       disabled={isRefilling}
                       className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-black text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-40"
@@ -892,6 +933,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                       </p>
                     </div>
                     <button
+                      type="button"
                       onClick={() => handleBuyMessages('PACK_12')}
                       disabled={isRefilling}
                       className="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-black text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-40"

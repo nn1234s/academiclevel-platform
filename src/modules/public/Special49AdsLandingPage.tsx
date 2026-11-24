@@ -2032,7 +2032,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
             <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-500 to-indigo-600 flex items-center justify-center text-white font-black text-xs shadow-md">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-black text-xs shadow-md">
                 AL
               </div>
               <div>

@@ -594,16 +594,16 @@ export const App: React.FC = () => {
         {/* ======================================================== */}
         {/* HEADER / NAVIGATION BAR (Zero Admin Links)               */}
         {/* ======================================================== */}
-        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 sm:px-8 py-2.5 sm:py-3.5 shadow-xs">
+        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 sm:px-8 py-2 sm:py-3.5 shadow-xs">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             {/* Brand Logo & Desktop Nav grouped closely together */}
-            <div className="flex items-center space-x-3.5 lg:space-x-5 min-w-0">
+            <div className="flex items-center space-x-2.5 sm:space-x-3.5 lg:space-x-5 min-w-0 shrink-0 flex-shrink-0">
               <div
                 onClick={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
-                className="flex items-center space-x-2.5 cursor-pointer group shrink-0"
+                className="flex items-center space-x-2 sm:space-x-2.5 cursor-pointer group shrink-0 flex-shrink-0 min-w-[36px]"
                 title="AcademicLevel"
               >
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-extrabold text-base shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-extrabold text-sm sm:text-base shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0 flex-shrink-0">
                   AL
                 </div>
                 {!isAuthenticated && (
@@ -1035,11 +1035,12 @@ export const App: React.FC = () => {
           </div>
 
           {/* User Profile / Auth Action Buttons */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-              {/* Language Switcher Pill */}
+          <div className="flex items-center space-x-1 sm:space-x-1.5 shrink-0 flex-shrink-0">
+              {/* Language Switcher Pill (Hidden on mobile/phone screens, placed in mobile drawer & footer) */}
               <button
+                type="button"
                 onClick={() => setShowPromptModal(true)}
-                className="flex items-center space-x-1 px-2.5 py-1.5 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200 shadow-2xs cursor-pointer shrink-0"
+                className="hidden md:flex items-center space-x-1 px-2.5 py-1.5 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200 shadow-2xs cursor-pointer shrink-0"
                 title="Change UI Language (Hindi / English)"
                 aria-label="Change UI Language"
               >
@@ -1051,6 +1052,7 @@ export const App: React.FC = () => {
               {!isAuthenticated ? (
                 <>
                   <button
+                    type="button"
                     onClick={() => {
                       setAuthModalMode('LOGIN');
                       setAuthModalOpen(true);
@@ -1060,36 +1062,39 @@ export const App: React.FC = () => {
                     Sign In
                   </button>
                   <button
+                    type="button"
                     onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
-                    className="px-3.5 sm:px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs rounded-xl shadow-md transition-all cursor-pointer"
+                    className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs rounded-xl shadow-md transition-all cursor-pointer shrink-0"
                   >
                     Special ₹49
                   </button>
                 </>
               ) : (
-                <div className="flex items-center space-x-1.5 sm:space-x-2">
+                <div className="flex items-center space-x-1 sm:space-x-1.5 shrink-0 flex-shrink-0">
                   {/* 1-Year Gold VIP Pass Badge - Just a sleek crown icon */}
                   {currentLearner?.activePlan === 'GOLD' && (
                     <button
+                      type="button"
                       onClick={() => navigateTo('PROFILE')}
-                      className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 text-amber-950 font-black shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer border border-amber-300 shrink-0"
+                      className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 text-amber-950 font-black shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer border border-amber-300 shrink-0 flex-shrink-0"
                       title="1-Year Gold VIP Pass Active (365 Days Access)"
                       aria-label="Gold Pass Active"
                     >
-                      <Crown className="w-4 h-4 text-amber-950 fill-amber-900" />
+                      <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-950 fill-amber-900" />
                     </button>
                   )}
 
                   {/* Mailbox Badge - Just a sleek mail icon */}
                   <button
+                    type="button"
                     onClick={() => setGlobalMailboxOpen(true)}
                     title="Student Mailbox & Diagnostic Reports"
                     aria-label="Student Mailbox"
-                    className="relative inline-flex items-center justify-center w-9 h-9 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0 touch-manipulation"
+                    className="relative inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0 flex-shrink-0 touch-manipulation"
                   >
-                    <Mail className="w-4 h-4 text-purple-600" />
+                    <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />
                     {currentLearner && StorageRLSLayer.getUnreadMailboxCount(currentLearner.id) > 0 && (
-                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-amber-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white animate-pulse shadow-xs">
+                      <span className="absolute -top-1 -right-1 min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] px-1 bg-amber-500 text-white text-[9px] sm:text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white animate-pulse shadow-xs">
                         {StorageRLSLayer.getUnreadMailboxCount(currentLearner.id)}
                       </span>
                     )}
@@ -1097,12 +1102,13 @@ export const App: React.FC = () => {
 
                   {/* Coin Badge */}
                   <button
+                    type="button"
                     onClick={() => navigateTo('GIFT_STORE')}
                     title="Open Scholar's Gift Store"
                     aria-label="Study Coins Balance"
-                    className="flex items-center space-x-1 px-2.5 py-1.5 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold hover:bg-amber-100 transition-all shadow-2xs cursor-pointer shrink-0"
+                    className="flex items-center space-x-1 px-2 sm:px-2.5 py-1 sm:py-1.5 h-8 sm:h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold hover:bg-amber-100 transition-all shadow-2xs cursor-pointer shrink-0 flex-shrink-0"
                   >
-                    <StudyCoinIcon className="w-4 h-4 shrink-0" glow />
+                    <StudyCoinIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" glow />
                     <span className="font-extrabold text-[11px] sm:text-xs">
                       {currentLearner?.coinBalance ? (currentLearner.coinBalance >= 100000 ? `${Math.floor(currentLearner.coinBalance / 1000)}k` : currentLearner.coinBalance.toLocaleString()) : 0}
                     </span>
@@ -1110,10 +1116,11 @@ export const App: React.FC = () => {
 
                   {/* Profile Button */}
                   <button
+                    type="button"
                     onClick={() => navigateTo('PROFILE')}
                     title={`Student Profile (${currentLearner?.fullName || 'Student'})`}
                     aria-label="Student Profile"
-                    className="flex items-center space-x-1.5 px-2.5 py-1.5 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-all shrink-0 cursor-pointer"
+                    className="flex items-center justify-center sm:space-x-1.5 w-8 h-8 sm:w-auto sm:px-2.5 sm:py-1.5 sm:h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-all shrink-0 flex-shrink-0 cursor-pointer"
                   >
                     <User className="w-3.5 h-3.5 text-slate-600 shrink-0" />
                     <span className="hidden xl:inline truncate max-w-[90px]">
@@ -1121,13 +1128,14 @@ export const App: React.FC = () => {
                     </span>
                   </button>
 
-                  {/* Logout Button */}
+                  {/* Logout Button (Hidden on small screens, accessible in mobile menu) */}
                   <button
+                    type="button"
                     onClick={() => {
                       logout();
                       navigateTo('HOME');
                     }}
-                    className="w-9 h-9 flex items-center justify-center text-slate-500 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors shrink-0 cursor-pointer"
+                    className="hidden sm:flex w-9 h-9 items-center justify-center text-slate-500 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors shrink-0 flex-shrink-0 cursor-pointer"
                     title="Log Out"
                     aria-label="Log Out"
                   >
@@ -1138,11 +1146,12 @@ export const App: React.FC = () => {
 
               {/* Mobile Drawer Toggle */}
               <button
+                type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 text-slate-600 hover:text-slate-900 rounded-xl bg-slate-100 min-w-[36px] min-h-[36px] flex items-center justify-center cursor-pointer active:scale-95 transition-all"
+                className="lg:hidden p-1.5 sm:p-2 text-slate-600 hover:text-slate-900 rounded-xl bg-slate-100 w-8 h-8 sm:w-9 sm:h-9 min-w-[32px] sm:min-w-[36px] flex items-center justify-center cursor-pointer active:scale-95 transition-all shrink-0 flex-shrink-0"
                 aria-label="Toggle navigation menu"
               >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {mobileMenuOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
             </div>
           </div>
@@ -1898,158 +1907,91 @@ export const App: React.FC = () => {
         {/* ======================================================== */}
         {/* PUBLIC FOOTER (Modern Light Mode Multi-Column)            */}
         {/* ======================================================== */}
-        <footer className="bg-white text-slate-600 border-t border-slate-200 pt-16 pb-12 px-4 sm:px-6 lg:px-8 text-xs">
-          <div className="max-w-7xl mx-auto">
-            {/* Top Multi-Column Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-10">
-              {/* Brand Column (2 cols wide on desktop) */}
-              <div className="lg:col-span-2 space-y-3">
-                <div className="flex items-center space-x-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white font-black text-xs shadow-md">
-                    AL
-                  </div>
-                  <div>
-                    <span className="font-black text-slate-900 text-base tracking-widest uppercase block leading-none">
-                      AcademicLevel
-                    </span>
-                    <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
-                      Learn in your era
-                    </span>
-                  </div>
+        <footer className="bg-white text-slate-600 border-t border-slate-200 pt-12 pb-14 px-4 sm:px-6 lg:px-8 text-xs font-sans">
+          <div className="max-w-6xl mx-auto space-y-8">
+            {/* Top Brand Header Row */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0">
+                  AL
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed max-w-sm">
-                  India&apos;s premier AI-powered K-12 learning ecosystem. CBSE, ICSE, and Cambridge IGCSE daily interactive quizzes, Nova StudyGirl AI tutoring, and physical reward store.
-                </p>
-                <div className="text-[11px] text-slate-500 space-y-0.5 font-mono">
-                  <p>Operated by ZingQuark (ZQ Technology)</p>
-                  <p>UDYAM Reg: UDYAM-OD-19-0189385</p>
+                <div>
+                  <span className="font-black text-slate-900 text-sm sm:text-base tracking-wider uppercase block leading-none">
+                    AcademicLevel
+                  </span>
+                  <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase">
+                    Learn in your era • Special Offer
+                  </span>
                 </div>
               </div>
 
-              {/* Column 1: PLATFORM & AI */}
-              <div className="space-y-3">
-                <h4 className="text-slate-900 font-black tracking-wider text-xs uppercase">
-                  Platform &amp; AI
-                </h4>
-                <ul className="space-y-2 text-xs">
-                  <li>
-                    <button
-                      onClick={() => navigateTo('NOVA_AI')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
-                    >
-                      Nova StudyGirl AI 🎀
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => navigateTo(isAuthenticated ? 'COURSES' : 'PUBLIC_COURSES')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
-                    >
-                      Daily Adaptive Quizzes
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => navigateTo('GIFT_STORE')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
-                    >
-                      Study Coin Rewards
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => navigateTo('GIFT_STORE')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
-                    >
-                      Physical Gift Store
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => navigateTo('INNOVATIVE_EDTECH')}
-                      className="text-amber-600 hover:text-amber-700 font-semibold transition-colors cursor-pointer text-left flex items-center gap-1"
-                    >
-                      <span>★ #1 Innovative EdTech</span>
-                    </button>
-                  </li>
-                </ul>
+              <div className="text-[11px] text-slate-500 font-mono space-y-0.5 sm:text-right">
+                <p>Operated by ZingQuark (ZQ Technology)</p>
+                <p>UDYAM Reg: UDYAM-OD-19-0189385 • Contact: academiclevels@gmail.com</p>
               </div>
+            </div>
 
-              {/* Column 2: CURRICULUM (Dedicated Separate URLs) */}
-              <div className="space-y-3">
-                <h4 className="text-slate-900 font-black tracking-wider text-xs uppercase">
-                  Curriculum
-                </h4>
-                <ul className="space-y-2 text-xs">
+            {/* 4 Standard Columns */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-xs">
+              {/* 1. CURRICULUM */}
+              <div className="space-y-2.5">
+                <h4 className="text-slate-900 font-extrabold uppercase text-[11px] tracking-wider">Curriculum</h4>
+                <ul className="space-y-2 text-slate-600">
                   <li>
                     <button
+                      type="button"
                       onClick={() => navigateTo('CURRICULUM_CBSE')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left font-medium"
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       CBSE Classes 1–12
                     </button>
                   </li>
                   <li>
                     <button
+                      type="button"
                       onClick={() => navigateTo('CURRICULUM_ICSE')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left font-medium"
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
-                      ICSE / CISCE Board
+                      ICSE Board
                     </button>
                   </li>
                   <li>
                     <button
+                      type="button"
                       onClick={() => navigateTo('CURRICULUM_CAMBRIDGE')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left font-medium"
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Cambridge IGCSE
                     </button>
                   </li>
                   <li>
                     <button
+                      type="button"
                       onClick={() => navigateTo('CURRICULUM_OLYMPIAD')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left font-medium"
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Olympiad &amp; Foundations
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => navigateTo('FAQ')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left font-medium"
-                    >
-                      Curriculum FAQs
                     </button>
                   </li>
                 </ul>
               </div>
 
-              {/* Column 3: MEMBERSHIPS */}
-              <div className="space-y-3">
-                <h4 className="text-slate-900 font-black tracking-wider text-xs uppercase">
-                  Memberships
-                </h4>
-                <ul className="space-y-2 text-xs">
+              {/* 2. MEMBERSHIPS */}
+              <div className="space-y-2.5">
+                <h4 className="text-slate-900 font-extrabold uppercase text-[11px] tracking-wider">Memberships</h4>
+                <ul className="space-y-2 text-slate-600">
                   <li>
                     <button
-                      onClick={() => {
-                        setCheckoutPlanTier('LITE');
-                        if (!isAuthenticated) {
-                          setAuthModalMode('REGISTER');
-                          setAuthModalOpen(true);
-                        } else if (!quota?.hasActiveSubscription) {
-                          setPaywallModalOpen(true);
-                        } else {
-                          navigateTo('DASHBOARD');
-                        }
-                      }}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                      type="button"
+                      onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
-                      Lite Pass (₹49 / 60D)
+                      Special ₹49 Pass
                     </button>
                   </li>
                   <li>
                     <button
+                      type="button"
                       onClick={() => {
                         setCheckoutPlanTier('PLUS');
                         if (!isAuthenticated) {
@@ -2061,13 +2003,14 @@ export const App: React.FC = () => {
                           navigateTo('DASHBOARD');
                         }
                       }}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
-                      Plus Pass (₹129 / 180D)
+                      Plus Pass (₹129)
                     </button>
                   </li>
                   <li>
                     <button
+                      type="button"
                       onClick={() => {
                         setCheckoutPlanTier('GOLD');
                         if (!isAuthenticated) {
@@ -2079,105 +2022,111 @@ export const App: React.FC = () => {
                           navigateTo('DASHBOARD');
                         }
                       }}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       1-Year Gold VIP (₹205)
                     </button>
                   </li>
                   <li>
                     <button
+                      type="button"
                       onClick={() => navigateTo('SCHOOL_PORTAL')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
-                      Institutional School Pack
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => navigateTo('PRICING')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
-                    >
-                      Pricing Overview
+                      School Portal
                     </button>
                   </li>
                 </ul>
               </div>
 
-              {/* Column 4: COMPANY & LEGAL */}
-              <div className="space-y-3">
-                <h4 className="text-slate-900 font-black tracking-wider text-xs uppercase">
-                  About &amp; Legal
-                </h4>
-                <ul className="space-y-2 text-xs">
+              {/* 3. FEATURES */}
+              <div className="space-y-2.5">
+                <h4 className="text-slate-900 font-extrabold uppercase text-[11px] tracking-wider">Features</h4>
+                <ul className="space-y-2 text-slate-600">
                   <li>
                     <button
-                      onClick={() => navigateTo('ABOUT')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                      type="button"
+                      onClick={() => navigateTo('NOVA_AI')}
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
-                      About AcademicLevel
+                      Nova StudyGirl AI
                     </button>
                   </li>
                   <li>
                     <button
+                      type="button"
+                      onClick={() => navigateTo('GIFT_STORE')}
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                    >
+                      Scholar&apos;s Gift Store
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => navigateTo('VERIFY_CERTIFICATE')}
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                    >
+                      Verify Certificate
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => navigateTo('SITEMAP')}
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                    >
+                      Sitemap Directory
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              {/* 4. LEGAL & SAFETY */}
+              <div className="space-y-2.5">
+                <h4 className="text-slate-900 font-extrabold uppercase text-[11px] tracking-wider">Legal &amp; Safety</h4>
+                <ul className="space-y-2 text-slate-600">
+                  <li>
+                    <button
+                      type="button"
                       onClick={() => navigateTo('PRIVACY')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Policies &amp; Privacy
                     </button>
                   </li>
                   <li>
                     <button
+                      type="button"
                       onClick={() => navigateTo('TERMS')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Terms of Service
                     </button>
                   </li>
                   <li>
                     <button
+                      type="button"
                       onClick={() => navigateTo('TERMS')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
-                      20-Minute Refund Policy
+                      20-Min Refund Policy
                     </button>
                   </li>
                   <li>
                     <button
+                      type="button"
                       onClick={() => navigateTo('SAFETY')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Child Safety Protocol
                     </button>
                   </li>
                   <li>
                     <button
-                      onClick={() => navigateTo('HALL_OF_FAME')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
-                    >
-                      Security &amp; Bug Bounty
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => navigateTo('VERIFY_CERTIFICATE')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
-                    >
-                      Certificate Verification (/verify)
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => navigateTo('SITEMAP')}
-                      className="text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer text-left"
-                    >
-                      Sitemap &amp; Directory
-                    </button>
-                  </li>
-                  <li>
-                    <button
+                      type="button"
                       onClick={() => navigateTo('ACCOUNT_DELETION')}
-                      className="text-rose-600 hover:text-rose-700 transition-colors cursor-pointer text-left"
-                      title="Google Play Mandated Account & Data Deletion Portal (/delacc)"
+                      className="hover:text-rose-600 transition-colors cursor-pointer text-left font-medium"
                     >
                       Delete Account (/delacc)
                     </button>
@@ -2186,91 +2135,71 @@ export const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Divider Line */}
-            <div className="w-full border-t border-slate-200 my-8 sm:my-10" />
-
-            {/* Bottom Row: Centered Circular Outline Social Icons & Copyright */}
-            <div className="flex flex-col items-center justify-center text-center space-y-4">
-              {/* Circular Social Media Icons */}
-              <div className="flex items-center space-x-3">
-                {/* YouTube */}
-                <a
-                  href="https://youtube.com/academiclevels"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full border border-slate-300 hover:border-slate-800 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center transition-all hover:scale-110"
-                  title="AcademicLevel YouTube: https://youtube.com/academiclevels"
-                  aria-label="YouTube"
-                >
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                  </svg>
-                </a>
-
-                {/* Instagram */}
-                <a
-                  href="https://instagram.com/academiclevel1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full border border-slate-300 hover:border-slate-800 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center transition-all hover:scale-110"
-                  title="AcademicLevel Instagram: https://instagram.com/academiclevel1"
-                  aria-label="Instagram"
-                >
-                  <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-                  </svg>
-                </a>
-
-                {/* Email Support */}
-                <a
-                  href="mailto:academiclevels@gmail.com"
-                  className="w-10 h-10 rounded-full border border-slate-300 hover:border-slate-800 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center transition-all hover:scale-110"
-                  title="Support Email: academiclevels@gmail.com"
-                  aria-label="Email Support"
-                >
-                  <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-                    <rect width="20" height="16" x="2" y="4" rx="2" />
-                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                  </svg>
-                </a>
-
-                {/* Security & Bug Bounty */}
+            {/* Bottom Row: Language Switcher, Social Links, and Copyright */}
+            <div className="pt-6 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                {/* Language Switcher Pill in Footer (Moved here to declutter mobile navbar) */}
                 <button
                   type="button"
-                  onClick={() => navigateTo('HALL_OF_FAME')}
-                  className="w-10 h-10 rounded-full border border-slate-300 hover:border-slate-800 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
-                  title="Security & Bug Bounty Hall of Fame"
-                  aria-label="Security"
+                  onClick={() => setShowPromptModal(true)}
+                  className="flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 text-slate-700 hover:text-indigo-700 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                  title="Change UI Language"
                 >
-                  <ShieldCheck className="w-4 h-4" />
+                  <Globe className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>{language === 'hi' ? '🇮🇳 भाषा: हिन्दी (Change)' : '🌐 Language: English (Change)'}</span>
                 </button>
 
-                {/* Global Website */}
-                <button
-                  type="button"
-                  onClick={() => navigateTo('HOME')}
-                  className="w-10 h-10 rounded-full border border-slate-300 hover:border-slate-800 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
-                  title="AcademicLevel Platform Home"
-                  aria-label="Homepage"
-                >
-                  <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="2" x2="22" y1="12" y2="12" />
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                  </svg>
-                </button>
+                {/* Social media links */}
+                <div className="flex items-center space-x-2">
+                  <a
+                    href="https://youtube.com/academiclevels"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-full border border-slate-200 hover:border-slate-800 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all"
+                    title="YouTube"
+                    aria-label="YouTube"
+                  >
+                    <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                    </svg>
+                  </a>
+                  <a
+                    href="https://instagram.com/academiclevel1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-full border border-slate-200 hover:border-slate-800 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all"
+                    title="Instagram"
+                    aria-label="Instagram"
+                  >
+                    <svg className="w-3.5 h-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                    </svg>
+                  </a>
+                  <a
+                    href="mailto:academiclevels@gmail.com"
+                    className="w-8 h-8 rounded-full border border-slate-200 hover:border-slate-800 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all"
+                    title="Support Email: academiclevels@gmail.com"
+                    aria-label="Email Support"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-slate-500" />
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => navigateTo('HALL_OF_FAME')}
+                    className="w-8 h-8 rounded-full border border-slate-200 hover:border-slate-800 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all cursor-pointer"
+                    title="Security & Bug Bounty Hall of Fame"
+                    aria-label="Security"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
-              {/* Copyright & Legal Subtext */}
-              <div className="space-y-1">
-                <p className="text-xs text-slate-700 font-medium">
-                  ©Copyright. All rights reserved.
-                </p>
-                <p className="text-[10px] text-slate-400 font-mono">
-                  © 2020–{new Date().getFullYear()} AcademicLevel • Operated by ZingQuark (ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385)
-                </p>
+              {/* Exact Copyright line */}
+              <div className="text-slate-500 text-xs text-center md:text-right">
+                &copy; {new Date().getFullYear()} AcademicLevel (ZingQuark). All rights reserved.
               </div>
             </div>
           </div>
