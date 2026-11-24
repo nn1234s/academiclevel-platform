@@ -53,6 +53,9 @@ import { UPIQRCheckout } from './modules/student/UPIQRCheckout';
 import { WorldwideScholarships } from './modules/student/WorldwideScholarships';
 import { PokemonVaultHub } from './modules/pokemon/PokemonVaultHub';
 import { StudentMailboxModal } from './modules/student/StudentMailboxModal';
+import { MistakeVault } from './modules/student/MistakeVault';
+import { QuizDuelArena } from './modules/student/QuizDuelArena';
+import { ScholarLeagues } from './modules/student/ScholarLeagues';
 
 // Icons
 import {
@@ -84,7 +87,8 @@ import {
   ArrowRight,
   XOctagon,
   Globe,
-  Home
+  Home,
+  Swords
 } from 'lucide-react';
 
 // Code-split Super-Admin Vault Shell (unlinked from public navigation)
@@ -117,7 +121,15 @@ const PROTECTED_STUDENT_ROUTES: Record<string, string> = {
   '/premium': 'PREMIUM',
   '/qotd': 'QOTD',
   '/challenges': 'CHALLENGES',
-  '/scholarships': 'SCHOLARSHIPS'
+  '/scholarships': 'SCHOLARSHIPS',
+  '/mistakes': 'MISTAKE_VAULT',
+  '/mistake-vault': 'MISTAKE_VAULT',
+  '/error-notebook': 'MISTAKE_VAULT',
+  '/duel': 'DUEL_ARENA',
+  '/duels': 'DUEL_ARENA',
+  '/arena': 'DUEL_ARENA',
+  '/leagues': 'LEAGUES',
+  '/scholar-leagues': 'LEAGUES'
 };
 
 const ADS_ROUTES: Record<string, boolean> = {
@@ -277,6 +289,9 @@ function getPathForRoute(route: string): string {
     case 'QOTD': return '/qotd';
     case 'CHALLENGES': return '/challenges';
     case 'SCHOLARSHIPS': return '/scholarships';
+    case 'MISTAKE_VAULT': return '/mistakes';
+    case 'DUEL_ARENA': return '/arena';
+    case 'LEAGUES': return '/leagues';
     default: return '/';
   }
 }
@@ -1441,6 +1456,60 @@ export const App: React.FC = () => {
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
+                    navigateTo('MISTAKE_VAULT');
+                  }}
+                  className={`w-full text-left p-3 rounded-xl flex items-center justify-between min-h-[44px] transition-colors ${
+                    currentRoute === 'MISTAKE_VAULT' ? 'bg-rose-50 text-rose-700 font-bold' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <BookOpen className="w-4 h-4 text-rose-500" />
+                    <span>{t('nav_mistake_vault')}</span>
+                  </div>
+                  <span className="text-[9px] bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-bold">
+                    +10 Coins
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('DUEL_ARENA');
+                  }}
+                  className={`w-full text-left p-3 rounded-xl flex items-center justify-between min-h-[44px] transition-colors ${
+                    currentRoute === 'DUEL_ARENA' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <Swords className="w-4 h-4 text-indigo-600" />
+                    <span>{t('nav_duel_arena')}</span>
+                  </div>
+                  <span className="text-[9px] bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full font-bold">
+                    Live 1v1
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('LEAGUES');
+                  }}
+                  className={`w-full text-left p-3 rounded-xl flex items-center justify-between min-h-[44px] transition-colors ${
+                    currentRoute === 'LEAGUES' ? 'bg-amber-50 text-amber-800 font-bold' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <Trophy className="w-4 h-4 text-amber-600" />
+                    <span>{t('nav_leagues')}</span>
+                  </div>
+                  <span className="text-[9px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">
+                    Diamond
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
                     navigateTo('REFERRAL');
                   }}
                   className="w-full text-left p-3 rounded-xl text-slate-700 hover:bg-slate-100 flex items-center justify-between min-h-[44px] transition-colors"
@@ -1793,6 +1862,35 @@ export const App: React.FC = () => {
               )}
 
               {currentRoute === 'COMMUNITY' && <StudentPacks learner={currentLearner} />}
+
+              {currentRoute === 'MISTAKE_VAULT' && (
+                <MistakeVault
+                  learner={currentLearner}
+                  onOpenNovaAi={ctx => {
+                    setNovaQuestionContext(ctx || null);
+                    navigateTo('NOVA_AI');
+                  }}
+                  onCoinsUpdated={() => refreshCurrentLearner()}
+                  onBackToDashboard={() => navigateTo('DASHBOARD')}
+                />
+              )}
+
+              {currentRoute === 'DUEL_ARENA' && (
+                <QuizDuelArena
+                  learner={currentLearner}
+                  onCoinsUpdated={() => refreshCurrentLearner()}
+                  onBackToDashboard={() => navigateTo('DASHBOARD')}
+                />
+              )}
+
+              {currentRoute === 'LEAGUES' && (
+                <ScholarLeagues
+                  learner={currentLearner}
+                  onCoinsUpdated={() => refreshCurrentLearner()}
+                  onNavigateTo={r => navigateTo(r as any)}
+                  onBackToDashboard={() => navigateTo('DASHBOARD')}
+                />
+              )}
 
               {currentRoute === 'SPIN_WHEEL' && (
                 <DailySpinWheel

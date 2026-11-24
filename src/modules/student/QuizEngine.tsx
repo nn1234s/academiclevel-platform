@@ -362,6 +362,19 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
     const isCorrect = selectedOption === Number(currentQuestion.correctIndex);
     if (isCorrect) {
       setScore(prev => prev + 1);
+    } else if (learner?.id) {
+      StorageRLSLayer.logMistake(learner.id, {
+        questionId: currentQuestion.id,
+        questionText: currentQuestion.text,
+        options: currentQuestion.options,
+        correctOptionIndex: Number(currentQuestion.correctIndex),
+        chosenOptionIndex: selectedOption,
+        explanation: currentQuestion.explanation,
+        subjectId: currentQuestion.subjectId || subjectId,
+        board: learner.board,
+        grade: learner.grade,
+        chapterId: currentQuestion.chapterId || currentQuestion.topicTag
+      });
     }
 
     setAnswersLog(prev => [
@@ -1084,7 +1097,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
                 {isAnswerSubmitted && isThisSelected && !isThisCorrect && (
                   <span className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-300">
                     <XCircle className="w-3.5 h-3.5 text-rose-600" />
-                    <span>{isHinglish ? 'Aapka Answer' : 'Your Answer'}</span>
+                    <span>{isHinglish ? 'Aapka Answer (Mistake Vault me save 📓)' : 'Your Answer (Saved to Mistake Vault 📓)'}</span>
                   </span>
                 )}
                 {!isAnswerSubmitted && isThisSelected && (

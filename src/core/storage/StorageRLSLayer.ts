@@ -13,7 +13,11 @@ import {
   AuditLogEntry,
   Scholarship,
   ScholarshipClaim,
-  MailboxMessage
+  MailboxMessage,
+  MistakeVaultEntry,
+  QuizDuel,
+  ScholarLeagueStanding,
+  ScholarLeagueTier
 } from '../types';
 
 /**
@@ -38,6 +42,9 @@ const STORAGE_KEYS = {
   AUDIT_LOGS: 'al_prod_security_audit_logs_v1',
   CURRENT_SESSION: 'al_prod_session_v1',
   MAILBOX_MESSAGES: 'al_prod_mailbox_messages_v1',
+  MISTAKE_VAULT: 'al_prod_mistake_vault_v1',
+  QUIZ_DUELS: 'al_prod_quiz_duels_v1',
+  SCHOLAR_LEAGUES: 'al_prod_scholar_leagues_v1',
 };
 
 export const SUPER_ADMIN_EMAIL = 'admin@academiclevel.in';
@@ -949,6 +956,181 @@ class StorageRLSLayerClass {
   public getUnreadMailboxCount(learnerId: string): number {
     const all = this.readRaw<MailboxMessage[]>(STORAGE_KEYS.MAILBOX_MESSAGES, []);
     return all.filter(m => m.learnerId === learnerId && !m.isRead).length;
+  }
+
+  // ==========================================
+  // Mistake Vault ("Error Notebook" / Cuo Ti Ben)
+  // ==========================================
+  public logMistake(
+    learnerId: string,
+    data: {
+      questionId: string;
+      questionText: string;
+      options: string[];
+      correctOptionIndex: number;
+      chosenOptionIndex: number;
+      explanation: string;
+      subjectId: string;
+      board: string;
+      grade: number;
+      chapterId?: string;
+    }
+  ): void {
+    const all = this.readRaw<MistakeVaultEntry[]>(STORAGE_KEYS.MISTAKE_VAULT, []);
+    const existingIdx = all.findIndex(
+      m => m.learnerId === learnerId && (m.questionId === data.questionId || m.questionText === data.questionText)
+    );
+
+    const nowIso = new Date().toISOString();
+    if (existingIdx >= 0) {
+      all[existingIdx].mistakeCount += 1;
+      all[existingIdx].consecutiveCorrect = 0;
+      all[existingIdx].isMastered = false;
+      all[existingIdx].lastAttemptedAt = nowIso;
+      all[existingIdx].chosenOptionIndex = data.chosenOptionIndex;
+    } else {
+      const newEntry: MistakeVaultEntry = {
+        id: 'mv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+        learnerId,
+        questionId: data.questionId,
+        questionText: data.questionText,
+        options: data.options,
+        correctOptionIndex: data.correctOptionIndex,
+        chosenOptionIndex: data.chosenOptionIndex,
+        explanation: data.explanation,
+        subjectId: data.subjectId,
+        board: data.board,
+        grade: data.grade,
+        chapterId: data.chapterId,
+        mistakeCount: 1,
+        consecutiveCorrect: 0,
+        isMastered: false,
+        lastAttemptedAt: nowIso
+      };
+      all.unshift(newEntry);
+    }
+    this.writeRaw(STORAGE_KEYS.MISTAKE_VAULT, all);
+  }
+
+  public getMistakesForLearner(learnerId: string): MistakeVaultEntry[] {
+    const all = this.readRaw<MistakeVaultEntry[]>(STORAGE_KEYS.MISTAKE_VAULT, []);
+    return all.filter(m => m.learnerId === learnerId);
+  }
+
+  public recordMistakeAttempt(
+    learnerId: string,
+    mistakeId: string,
+    wasCorrect: boolean
+  ): { isNowMastered: boolean; consecutiveCorrect: number; coinsAwarded: number } {
+    const all = this.readRaw<MistakeVaultEntry[]>(STORAGE_KEYS.MISTAKE_VAULT, []);
+    const idx = all.findIndex(m => m.id === mistakeId && m.learnerId === learnerId);
+    if (idx === -1) return { isNowMastered: false, consecutiveCorrect: 0, coinsAwarded: 0 };
+
+    const entry = all[idx];
+    const nowIso = new Date().toISOString();
+    entry.lastAttemptedAt = nowIso;
+
+    let coinsAwarded = 0;
+    if (wasCorrect) {
+      entry.consecutiveCorrect += 1;
+      if (entry.consecutiveCorrect >= 2 && !entry.isMastered) {
+        entry.isMastered = true;
+        entry.masteredAt = nowIso;
+        coinsAwarded = 10;
+      }
+    } else {
+      entry.consecutiveCorrect = 0;
+      entry.mistakeCount += 1;
+    }
+
+    all[idx] = entry;
+    this.writeRaw(STORAGE_KEYS.MISTAKE_VAULT, all);
+    return { isNowMastered: entry.isMastered, consecutiveCorrect: entry.consecutiveCorrect, coinsAwarded };
+  }
+
+  // ==========================================
+  // 1v1 Quiz Duels ("Blitz Arena")
+  // ==========================================
+  public getDuelsForLearner(learnerId: string): QuizDuel[] {
+    const all = this.readRaw<QuizDuel[]>(STORAGE_KEYS.QUIZ_DUELS, []);
+    return all.filter(d => d.challengerId === learnerId || d.opponentId === learnerId);
+  }
+
+  public recordDuelResult(duel: QuizDuel): void {
+    const all = this.readRaw<QuizDuel[]>(STORAGE_KEYS.QUIZ_DUELS, []);
+    all.unshift(duel);
+    this.writeRaw(STORAGE_KEYS.QUIZ_DUELS, all.slice(0, 100));
+  }
+
+  // ==========================================
+  // Scholar Leagues (Bronze -> Silver -> Gold -> Diamond)
+  // ==========================================
+  public getScholarLeagueStandings(learnerId: string): {
+    tier: ScholarLeagueTier;
+    weeklyCoins: number;
+    standings: ScholarLeagueStanding[];
+    promotionZoneCutoff: number;
+    daysRemainingInSeason: number;
+  } {
+    const ledger = this.getCoinLedger(learnerId, learnerId);
+    const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const weeklyCoins = ledger
+      .filter(e => e.transactionType === 'CREDIT' && new Date(e.timestampUtc).getTime() > oneWeekAgo)
+      .reduce((acc, e) => acc + (e.amount || 0), 0);
+
+    let tier: ScholarLeagueTier = 'BRONZE';
+    if (weeklyCoins >= 500) tier = 'DIAMOND';
+    else if (weeklyCoins >= 250) tier = 'GOLD';
+    else if (weeklyCoins >= 100) tier = 'SILVER';
+
+    const learner = this.getLearnerById(learnerId, learnerId);
+    const userName = learner?.fullName || 'Scholar';
+
+    const cohortNames = [
+      'Aarav Sharma', 'Diya Patel', 'Rohan Gupta', 'Ananya Iyer', 'Kabir Verma',
+      'Isha Mehra', 'Aditya Singh', 'Sara Khan', 'Vihaan Joshi', 'Tanvi Rao',
+      'Arjun Nair', 'Meera Pillai', 'Reyansh Das', 'Prisha Sen', 'Devansh Roy'
+    ];
+
+    const currentDay = new Date().getDay();
+    const daysRemaining = currentDay === 0 ? 0 : 7 - currentDay;
+
+    const baseVariance = tier === 'DIAMOND' ? 520 : tier === 'GOLD' ? 260 : tier === 'SILVER' ? 120 : 35;
+    const standings: ScholarLeagueStanding[] = cohortNames.slice(0, 14).map((name, i) => {
+      const score = Math.max(0, baseVariance + Math.floor(Math.sin((i + 1) * 1.7) * (baseVariance * 0.4)));
+      return {
+        learnerId: 'peer_' + i,
+        learnerName: name,
+        tier,
+        weeklyCoinsEarned: score,
+        rank: i + 1,
+        avatarFrame: i < 3 ? 'GOLDEN_WREATH' : null,
+        isCurrentUser: false
+      };
+    });
+
+    standings.push({
+      learnerId,
+      learnerName: userName,
+      tier,
+      weeklyCoinsEarned: weeklyCoins,
+      rank: 1,
+      avatarFrame: learner?.avatarFrame || null,
+      isCurrentUser: true
+    });
+
+    standings.sort((a, b) => b.weeklyCoinsEarned - a.weeklyCoinsEarned);
+    standings.forEach((s, idx) => {
+      s.rank = idx + 1;
+    });
+
+    return {
+      tier,
+      weeklyCoins,
+      standings,
+      promotionZoneCutoff: 5,
+      daysRemainingInSeason: daysRemaining
+    };
   }
 }
 

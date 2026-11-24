@@ -41,7 +41,8 @@ import {
   MapPin,
   Crown,
   Mail,
-  Printer
+  Printer,
+  Swords
 } from 'lucide-react';
 import { StudentMailboxModal } from './StudentMailboxModal';
 import { MailboxMessage } from '../../core/types';
@@ -91,6 +92,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const [latestReportMsg, setLatestReportMsg] = useState<MailboxMessage | null>(() => {
     const msgs = StorageRLSLayer.getMailboxMessages(learner.id);
     return msgs.find(m => m.category === 'QUIZ_REPORT') || null;
+  });
+  const [activeMistakesCount, setActiveMistakesCount] = useState<number>(() => {
+    try {
+      const mistakes = StorageRLSLayer.getMistakesForLearner(learner.id);
+      return mistakes.filter(m => !m.isMastered).length;
+    } catch {
+      return 0;
+    }
   });
 
   // Practice Worksheets Modal & Unlock State (30 Coins / Redeem in 2 Quizzes)
@@ -894,7 +903,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       )}
 
       {/* 5. Quick Launch Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4">
+        {/* 1. Daily Spin Wheel */}
         <button
           onClick={() => onNavigate('SPIN_WHEEL')}
           className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-2xl p-4 text-left transition-all group shadow-xs cursor-pointer"
@@ -906,6 +916,58 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <span className="text-[10px] text-slate-500">24h UTC Cooldown</span>
         </button>
 
+        {/* 2. 1v1 Coin Duel Arena */}
+        <button
+          onClick={() => onNavigate('DUEL_ARENA')}
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-400 rounded-2xl p-4 text-left transition-all group relative overflow-hidden shadow-xs cursor-pointer"
+        >
+          <span className="absolute top-3 right-3 px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-black rounded-full uppercase tracking-wider">
+            Live 1v1
+          </span>
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <Swords className="w-5 h-5" />
+          </div>
+          <p className="text-xs font-bold text-slate-900">1v1 Quiz Duel ⚔️</p>
+          <span className="text-[10px] text-slate-500">Wager Coins &amp; Win Pot</span>
+        </button>
+
+        {/* 3. Mistake Vault */}
+        <button
+          onClick={() => onNavigate('MISTAKE_VAULT')}
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-rose-400 rounded-2xl p-4 text-left transition-all group relative overflow-hidden shadow-xs cursor-pointer"
+        >
+          {activeMistakesCount > 0 ? (
+            <span className="absolute top-3 right-3 px-1.5 py-0.5 bg-rose-100 text-rose-700 text-[9px] font-black rounded-full">
+              {activeMistakesCount} Tricky
+            </span>
+          ) : (
+            <span className="absolute top-3 right-3 px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[9px] font-black rounded-full">
+              Clean 🎯
+            </span>
+          )}
+          <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <BookOpen className="w-5 h-5" />
+          </div>
+          <p className="text-xs font-bold text-slate-900">Mistake Vault 📓</p>
+          <span className="text-[10px] text-slate-500">Redeem +10 Coins Each</span>
+        </button>
+
+        {/* 4. Scholar Leagues */}
+        <button
+          onClick={() => onNavigate('LEAGUES')}
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-2xl p-4 text-left transition-all group relative overflow-hidden shadow-xs cursor-pointer"
+        >
+          <span className="absolute top-3 right-3 px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[9px] font-black rounded-full uppercase tracking-wider">
+            Diamond
+          </span>
+          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <Trophy className="w-5 h-5" />
+          </div>
+          <p className="text-xs font-bold text-slate-900">Scholar Leagues 🏆</p>
+          <span className="text-[10px] text-slate-500">Weekly Tier Promotion</span>
+        </button>
+
+        {/* 5. Question of Day */}
         <button
           onClick={() => onNavigate('QOTD')}
           className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-400 rounded-2xl p-4 text-left transition-all group shadow-xs cursor-pointer"
@@ -917,6 +979,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <span className="text-[10px] text-slate-500">Streak Booster</span>
         </button>
 
+        {/* 6. Nova AI Tutor */}
         <button
           onClick={() => onNavigate('NOVA_AI')}
           className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-violet-400 rounded-2xl p-4 text-left transition-all group shadow-xs cursor-pointer"
@@ -928,6 +991,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <span className="text-[10px] text-slate-500">24/7 AI Concept Tutor</span>
         </button>
 
+        {/* 7. Student Mailbox */}
         <button
           onClick={() => handleOpenMailboxModal(null)}
           className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-purple-400 rounded-2xl p-4 text-left transition-all group relative overflow-hidden shadow-xs cursor-pointer"
@@ -944,6 +1008,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <span className="text-[10px] text-slate-500">Quiz Diagnostic Reports</span>
         </button>
 
+        {/* 8. Rewards Store */}
         <button
           onClick={() => onNavigate('GIFT_STORE')}
           className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-emerald-400 rounded-2xl p-4 text-left transition-all group shadow-xs cursor-pointer"

@@ -1439,7 +1439,10 @@ apiRouter.post('/coins/transact', (req, res) => {
       'STREAK_MILESTONE',
       'SCHOLARSHIP_AWARD',
       'POKEMON_GUESS_REWARD',
-      'REFERRAL_SIGNUP_QUALIFIED'
+      'REFERRAL_SIGNUP_QUALIFIED',
+      'MISTAKE_VAULT_MASTERY',
+      'QUIZ_DUEL_WIN',
+      'LEAGUE_PROMOTION_REWARD'
     ];
 
     const isAllowedStudentCredit = (isAuthorizedStudent || Boolean(learner)) && ALLOWED_STUDENT_CREDIT_REASONS.includes(reasonCode);
@@ -1464,6 +1467,15 @@ apiRouter.post('/coins/transact', (req, res) => {
       }
       if (reasonCode === 'POKEMON_GUESS_REWARD' && numAmount > 1) {
         return res.status(400).json({ success: false, error: 'Exceeded maximum Pokemon guess reward of 1 coin.' });
+      }
+      if (reasonCode === 'MISTAKE_VAULT_MASTERY' && numAmount > 10) {
+        return res.status(400).json({ success: false, error: 'Exceeded maximum mistake vault mastery reward of 10 coins.' });
+      }
+      if (reasonCode === 'QUIZ_DUEL_WIN' && numAmount > 60) {
+        return res.status(400).json({ success: false, error: 'Exceeded maximum duel reward of 60 coins.' });
+      }
+      if (reasonCode === 'LEAGUE_PROMOTION_REWARD' && numAmount > 100) {
+        return res.status(400).json({ success: false, error: 'Exceeded maximum league promotion reward of 100 coins.' });
       }
     }
 

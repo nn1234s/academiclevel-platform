@@ -92,7 +92,58 @@ export type CoinReasonCode =
   | 'POKEMON_GUESS_REWARD' // +1
   | 'MALL_PURCHASE' // -X
   | 'GIFT_STORE_REDEMPTION' // -X
+  | 'MISTAKE_VAULT_MASTERY' // +10
+  | 'QUIZ_DUEL_WIN' // +X
+  | 'QUIZ_DUEL_ENTRY' // -X
+  | 'LEAGUE_PROMOTION_REWARD' // +25, +50, +100
   | 'ADMIN_ADJUSTMENT'; // +/-X
+
+export interface MistakeVaultEntry {
+  id: string;
+  learnerId: string;
+  questionId: string;
+  questionText: string;
+  options: string[];
+  correctOptionIndex: number;
+  chosenOptionIndex: number;
+  explanation: string;
+  subjectId: string;
+  board: string;
+  grade: number;
+  chapterId?: string;
+  mistakeCount: number;
+  consecutiveCorrect: number;
+  isMastered: boolean;
+  lastAttemptedAt: string;
+  masteredAt?: string;
+}
+
+export interface QuizDuel {
+  id: string;
+  challengerId: string;
+  challengerName: string;
+  opponentId: string;
+  opponentName: string;
+  subjectId: string;
+  wagerCoins: number;
+  winnerId: string | null;
+  challengerScore: number;
+  opponentScore: number;
+  status: 'COMPLETED' | 'IN_PROGRESS';
+  createdAt: string;
+}
+
+export type ScholarLeagueTier = 'BRONZE' | 'SILVER' | 'GOLD' | 'DIAMOND';
+
+export interface ScholarLeagueStanding {
+  learnerId: string;
+  learnerName: string;
+  tier: ScholarLeagueTier;
+  weeklyCoinsEarned: number;
+  rank: number;
+  avatarFrame?: string | null;
+  isCurrentUser?: boolean;
+}
 
 export interface CoinLedgerEntry {
   entryId: string;
@@ -142,6 +193,7 @@ export interface Question {
   hint: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   topicTag: string;
+  chapterId?: string;
   source?: 'GEMINI_LIVE' | 'CURATED_OFFLINE';
 }
 
