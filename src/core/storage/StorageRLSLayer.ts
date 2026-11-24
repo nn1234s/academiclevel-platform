@@ -963,6 +963,136 @@ class StorageRLSLayerClass {
   }
 
   // ==========================================
+  // Nova 20-Min Cute Mail & Outside Mode
+  // ==========================================
+  public isOutsideModeActive(learnerId: string): boolean {
+    if (typeof window === 'undefined') return false;
+    try {
+      const raw = localStorage.getItem(`al_outside_mode_${learnerId}`);
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      if (parsed.active && parsed.expiresAt > Date.now()) {
+        return true;
+      }
+      if (parsed.expiresAt <= Date.now()) {
+        localStorage.removeItem(`al_outside_mode_${learnerId}`);
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  public setOutsideMode(learnerId: string, active: boolean): void {
+    if (typeof window === 'undefined') return;
+    try {
+      if (active) {
+        localStorage.setItem(
+          `al_outside_mode_${learnerId}`,
+          JSON.stringify({
+            active: true,
+            expiresAt: Date.now() + 3 * 60 * 60 * 1000,
+            pausedAt: Date.now()
+          })
+        );
+      } else {
+        localStorage.removeItem(`al_outside_mode_${learnerId}`);
+      }
+    } catch {}
+  }
+
+  public checkAndDeliverNovaMailboxNotes(learnerId: string): MailboxMessage | null {
+    if (this.isOutsideModeActive(learnerId)) {
+      return null;
+    }
+
+    const storageKey = `al_nova_mail_last_tick_${learnerId}`;
+    const now = Date.now();
+    let lastTick = 0;
+
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (raw) lastTick = Number(raw) || 0;
+      } catch {}
+    }
+
+    const TWENTY_MINUTES_MS = 20 * 60 * 1000;
+    // Deliver if never sent or 20 minutes have passed
+    if (lastTick === 0 || now - lastTick >= TWENTY_MINUTES_MS) {
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(storageKey, String(now));
+        } catch {}
+      }
+
+      const templates = [
+        {
+          subject: "psst... bestie! 2-min brain boost? 🌸",
+          preview: "psst... do you have 120 seconds? let's do a cute mini quiz together 🎀",
+          body: "psst... hey bestie! 🎧✨\n\ni know you're super busy being amazing, but how about a quick 2-minute study boost?\ndoing just 1 short syllabus quiz right now keeps your memory fresh and stacks up your Study Coins for the Rewards Store! 🪙\n\nready to show off your brain power? tap the button below and let's crush it together! 🌸🧸",
+          quizActionSubject: 'math'
+        },
+        {
+          subject: "psst... secret formula trick inside! ✨",
+          preview: "here is a tiny brain hack so you never forget formulas in exams 🎀",
+          body: "psst... bestie, open up! 💌\n\ndid you know that taking a quick 3-question quiz within 20 minutes of learning doubles your long-term memory?\nit's pure brain science, no cap! 🧠💡\n\nlet's do a quick quiz together right now before the concept slips away! 🌸✨",
+          quizActionSubject: 'science'
+        },
+        {
+          subject: "psst... your Study Coins miss you! 🪙",
+          preview: "come win 10 quick coins with me before the hour ends! 🎀",
+          body: "psst... knock knock! 🚪🌸\n\nyour coins wallet is waiting to grow! did you know that 1 quick quiz or duel gives you enough coins to grab cute stickers, badges or toys in the Rewards Store? 🧸🎒\n\nlet's earn some coins together right now! 🎀🪙",
+          quizActionSubject: 'math'
+        },
+        {
+          subject: "psst... hydration + quiz check! 🥤✨",
+          preview: "take a sip of water and let's solve 3 quick questions 🌸",
+          body: "psst... quick study check-in! 🥤🎀\n\ntake a nice deep breath, drink a sip of water, and let's do a cute 3-question syllabus blitz.\ni promise it'll only take 90 seconds! you've got this! ✨🎧",
+          quizActionSubject: 'science'
+        },
+        {
+          subject: "psst... streak alert! don't let it freeze 🔥",
+          preview: "your daily streak is looking iconic! keep the fire burning 🎀",
+          body: "psst... bestie! 🏃‍♀️💨\n\nyour study streak is looking so iconic right now! just one quick quiz today keeps your streak fire burning bright!\nlet's do it right now so you can chill guilt-free later! 🎀✨",
+          quizActionSubject: 'english'
+        },
+        {
+          subject: "psst... pop quiz challenge from nova! 🎀",
+          preview: "i bet you can get 3/3 on this cute mini syllabus quiz! 🌸",
+          body: "psst... bet you can't beat this! 🎯🎀\n\ni hand-picked a super cute 3-question challenge for your grade. get all 3 right and earn bonus coins!\nare you in, bestie? tap below to start! 🌸✨",
+          quizActionSubject: 'math'
+        }
+      ];
+
+      const all = this.getMailboxMessages(learnerId);
+      const novaNotesCount = all.filter(m => m.sender === 'NOVA_AI').length;
+      const template = templates[novaNotesCount % templates.length];
+
+      const newMsg: MailboxMessage = {
+        id: 'nova_mail_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        learnerId,
+        sender: 'NOVA_AI',
+        senderName: 'Nova • Your Study Bestie 🎀',
+        senderAvatar: '🎧',
+        subject: template.subject,
+        preview: template.preview,
+        body: template.body,
+        category: 'NOVA_NOTE',
+        isRead: false,
+        createdAt: new Date().toISOString(),
+        quizActionSubject: template.quizActionSubject,
+        isCuteNote: true
+      };
+
+      this.sendMailboxMessage(newMsg);
+      return newMsg;
+    }
+
+    return null;
+  }
+
+  // ==========================================
   // Mistake Vault ("Error Notebook" / Cuo Ti Ben)
   // ==========================================
   public logMistake(

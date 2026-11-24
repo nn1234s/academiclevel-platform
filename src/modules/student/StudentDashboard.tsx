@@ -157,9 +157,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   }, [initialOpenMailbox, initialMailboxReportId]);
 
   useEffect(() => {
+    StorageRLSLayer.checkAndDeliverNovaMailboxNotes(learner.id);
     setUnreadMailCount(StorageRLSLayer.getUnreadMailboxCount(learner.id));
     const msgs = StorageRLSLayer.getMailboxMessages(learner.id);
     setLatestReportMsg(msgs.find(m => m.category === 'QUIZ_REPORT') || null);
+
+    // Periodically check for 20-min Nova mailbox delivery while student is active
+    const interval = setInterval(() => {
+      const newNote = StorageRLSLayer.checkAndDeliverNovaMailboxNotes(learner.id);
+      if (newNote) {
+        setUnreadMailCount(StorageRLSLayer.getUnreadMailboxCount(learner.id));
+      }
+    }, 20000);
+    return () => clearInterval(interval);
   }, [learner.id, isMailboxOpen]);
 
   useEffect(() => {

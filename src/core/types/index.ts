@@ -449,9 +449,11 @@ export interface MailboxMessage {
   subject: string;
   preview: string;
   body: string;
-  category: 'QUIZ_REPORT' | 'ACHIEVEMENT' | 'SYSTEM' | 'REWARD';
+  category: 'QUIZ_REPORT' | 'ACHIEVEMENT' | 'SYSTEM' | 'REWARD' | 'NOVA_NOTE';
   isRead: boolean;
   isStarred?: boolean;
   createdAt: string;
   quizReport?: QuizReportDetail;
+  quizActionSubject?: string;
+  isCuteNote?: boolean;
 }

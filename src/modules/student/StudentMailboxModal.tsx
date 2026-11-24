@@ -37,7 +37,7 @@ interface StudentMailboxModalProps {
   onOpenNovaAi?: (questionText: string, explanation: string) => void;
 }
 
-type FilterCategory = 'ALL' | 'QUIZ_REPORT' | 'REWARD' | 'UNREAD';
+type FilterCategory = 'ALL' | 'QUIZ_REPORT' | 'NOVA_NOTE' | 'REWARD' | 'UNREAD';
 
 export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
   isOpen,
@@ -52,9 +52,19 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
   const [filter, setFilter] = useState<FilterCategory>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [isOutsideMode, setIsOutsideMode] = useState<boolean>(() =>
+    StorageRLSLayer.isOutsideModeActive(learnerId)
+  );
+
+  const handleToggleOutsideMode = () => {
+    const next = !isOutsideMode;
+    StorageRLSLayer.setOutsideMode(learnerId, next);
+    setIsOutsideMode(next);
+  };
 
   // Load messages from local storage & sync with server
   const loadMessages = () => {
+    StorageRLSLayer.checkAndDeliverNovaMailboxNotes(learnerId);
     const local = StorageRLSLayer.getMailboxMessages(learnerId);
     setMessages(local);
     if (initialSelectedMessageId) {
@@ -137,6 +147,7 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
     return messages.filter(m => {
       // Category filter
       if (filter === 'QUIZ_REPORT' && m.category !== 'QUIZ_REPORT') return false;
+      if (filter === 'NOVA_NOTE' && m.category !== 'NOVA_NOTE' && m.sender !== 'NOVA_AI') return false;
       if (filter === 'REWARD' && m.category !== 'REWARD' && m.category !== 'ACHIEVEMENT') return false;
       if (filter === 'UNREAD' && m.isRead) return false;
 
@@ -163,6 +174,10 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
 
   const reportCount = useMemo(() => {
     return messages.filter(m => m.category === 'QUIZ_REPORT').length;
+  }, [messages]);
+
+  const novaNotesCount = useMemo(() => {
+    return messages.filter(m => m.category === 'NOVA_NOTE' || m.sender === 'NOVA_AI').length;
   }, [messages]);
 
   const formatTimestamp = (dateStr: string) => {
@@ -210,6 +225,19 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
           </div>
 
           <div className="flex items-center space-x-2">
+            {/* "I'm outside" Notification Stop Button */}
+            <button
+              onClick={handleToggleOutsideMode}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border shadow-2xs ${
+                isOutsideMode
+                  ? 'bg-amber-100 border-amber-300 text-amber-900 hover:bg-amber-200'
+                  : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
+              }`}
+              title={isOutsideMode ? "Click to resume Nova study notifications" : "Stop notifications while outside or away"}
+            >
+              <span>{isOutsideMode ? "🏠 I'm Back Home" : "🚶 I'm Outside"}</span>
+            </button>
+
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
@@ -231,6 +259,24 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
           </div>
         </div>
 
+        {/* Outside Mode Warning Banner */}
+        {isOutsideMode && (
+          <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5 flex items-center justify-between text-xs text-amber-900 font-medium shrink-0 animate-in fade-in">
+            <div className="flex items-center space-x-2">
+              <span className="text-base">🚶</span>
+              <span>
+                <strong>Outside Mode Active:</strong> Nova's 20-min mailbox study notifications are paused. Enjoy being outside! 🌳☀️
+              </span>
+            </div>
+            <button
+              onClick={handleToggleOutsideMode}
+              className="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg text-[11px] transition-colors cursor-pointer shrink-0"
+            >
+              Resume Alerts 🏠
+            </button>
+          </div>
+        )}
+
         {/* Search & Filter Nav */}
         <div className="p-3 sm:px-5 border-b border-slate-200 bg-slate-50/70 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 flex-shrink-0">
           <div className="flex items-center space-x-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
@@ -243,6 +289,17 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
               }`}
             >
               All Mail ({messages.length})
+            </button>
+            <button
+              onClick={() => setFilter('NOVA_NOTE')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center space-x-1.5 cursor-pointer ${
+                filter === 'NOVA_NOTE'
+                  ? 'bg-pink-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-pink-300" />
+              <span>Nova Notes 🎀 ({novaNotesCount})</span>
             </button>
             <button
               onClick={() => setFilter('QUIZ_REPORT')}
@@ -702,6 +759,68 @@ export const StudentMailboxModal: React.FC<StudentMailboxModalProps> = ({
                       )}
                     </div>
 
+                  </div>
+                ) : selectedMessage.category === 'NOVA_NOTE' || selectedMessage.sender === 'NOVA_AI' || selectedMessage.isCuteNote ? (
+                  /* Cute Nova Mail Stationery View */
+                  <div className="space-y-5 animate-in fade-in">
+                    <div className="bg-gradient-to-br from-pink-50 via-rose-50/50 to-indigo-50/50 border-2 border-pink-200/80 rounded-3xl p-6 sm:p-7 shadow-sm space-y-5 relative overflow-hidden">
+                      <div className="flex items-center space-x-3 pb-4 border-b border-pink-200/60">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-500 to-indigo-500 flex items-center justify-center text-white shadow-md text-xl shrink-0">
+                          🎧
+                        </div>
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <h4 className="font-black text-sm text-pink-950">nova • your study bestie</h4>
+                            <span className="text-[10px] bg-pink-200/80 text-pink-800 px-2.5 py-0.5 rounded-full font-bold">
+                              20-Min Study Boost 🎀
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-pink-700/80 font-medium mt-0.5">
+                            personalized check-in for you • {formatTimestamp(selectedMessage.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Letter Body */}
+                      <div className="text-sm text-slate-800 leading-relaxed font-normal whitespace-pre-wrap bg-white/70 border border-pink-100 rounded-2xl p-5 shadow-2xs">
+                        {selectedMessage.body}
+                      </div>
+
+                      {/* Cute Action Bar */}
+                      <div className="pt-4 border-t border-pink-200/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                        <div className="text-xs text-pink-800 font-bold flex items-center space-x-1.5">
+                          <Sparkles className="w-4 h-4 text-pink-500 shrink-0" />
+                          <span>Solve 1 quick quiz now to stack up Study Coins! 🪙</span>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          {onNavigateToQuiz && (
+                            <button
+                              onClick={() => {
+                                onClose();
+                                onNavigateToQuiz(selectedMessage.quizActionSubject || 'math');
+                              }}
+                              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-500 via-rose-500 to-indigo-600 hover:from-pink-600 hover:to-indigo-700 text-white font-black text-xs transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-1.5 cursor-pointer transform hover:scale-102"
+                            >
+                              <span>Do Cute 2-Min Quiz 🎀</span>
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          {onOpenNovaAi && (
+                            <button
+                              onClick={() => {
+                                onClose();
+                                onOpenNovaAi("Hey Nova! I got your mailbox note 🎀", "Let's review my syllabus!");
+                              }}
+                              className="px-4 py-2.5 rounded-xl bg-white hover:bg-pink-100/80 text-pink-900 border border-pink-300 font-bold text-xs transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-2xs"
+                            >
+                              <Zap className="w-3.5 h-3.5 text-pink-500" />
+                              <span>Chat with Nova 💬</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   /* Standard text message view */
