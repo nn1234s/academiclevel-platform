@@ -57,26 +57,46 @@ export const ReCaptchaWidget: React.FC<ReCaptchaWidgetProps> = ({
       >
         <div className="w-7 h-7 flex items-center justify-center shrink-0">
           {isVerified ? (
-            /* Verified Green Checkmark */
+            /* Verified Green Checkmark (matches reference Image 3) */
             <svg
-              className="w-7 h-7 text-[#0f9d58] animate-in zoom-in-75 duration-200"
-              viewBox="0 0 24 24"
+              className="w-7 h-7"
+              viewBox="0 0 28 28"
               fill="none"
+              aria-hidden="true"
             >
               <path
-                d="M4.5 12.5L9.5 17.5L20 7"
-                stroke="#0f9d58"
-                strokeWidth="3.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                d="M5.5 14.5L11.2 20.2L22.8 7.8"
+                stroke="#0F9D58"
+                strokeWidth="3.6"
+                strokeLinecap="butt"
+                strokeLinejoin="miter"
               />
             </svg>
           ) : isVerifying ? (
-            /* Verifying Blue Spinner Ring */
-            <div className="w-6 h-6 border-3 border-[#1a73e8] border-t-transparent rounded-full animate-spin" />
+            /* Verifying Blue Spinner Ring (matches reference Image 2) */
+            <svg
+              className="w-7 h-7 animate-spin"
+              viewBox="0 0 32 32"
+              fill="none"
+              aria-hidden="true"
+            >
+              <circle
+                cx="16"
+                cy="16"
+                r="12"
+                stroke="#D2E3FC"
+                strokeWidth="4"
+              />
+              <path
+                d="M16 4 A12 12 0 1 1 5.6 22"
+                stroke="#4285F4"
+                strokeWidth="4"
+                strokeLinecap="round"
+              />
+            </svg>
           ) : (
-            /* Unchecked Standard Box */
-            <div className="w-[26px] h-[26px] bg-white border-2 border-[#c1c1c1] rounded-[2px] group-hover:border-[#b2b2b2] transition-colors shadow-2xs" />
+            /* Unchecked Standard Box (matches reference Image 1) */
+            <div className="w-[28px] h-[28px] bg-white border-2 border-[#C1C1C1] rounded-[2px] group-hover:border-[#B2B2B2] transition-colors" />
           )}
         </div>
 
