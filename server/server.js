@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
+import zlib from 'node:zlib';
 import { apiRouter } from './api.js';
 import { db } from './db.js';
 import { pullAllFromTurso, pushAllToTurso, startPeriodicSync, flushTursoWriteBuffer, runAutomatedMaintenance, TURSO_CONFIG } from './tursoClient.js';
@@ -25,6 +26,25 @@ app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+
+// Lightweight zero-dependency gzip compression for text/JSON/JS/CSS/SVG responses
+// (Cuts Render outbound bandwidth by ~75% to stay well under the 5 GB/month free-tier cap)
+app.use((req, res, next) => {
+  const accept = String(req.headers['accept-encoding'] || '');
+  if (!accept.includes('gzip') || req.method === 'HEAD') return next();
+
+  const origJson = res.json.bind(res);
+  res.json = (body) => {
+    const str = JSON.stringify(body);
+    if (str.length < 1024) return origJson(body);
+    const gz = zlib.gzipSync(Buffer.from(str, 'utf8'));
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Encoding', 'gzip');
+    res.setHeader('Vary', 'Accept-Encoding');
+    return res.send(gz);
+  };
   next();
 });
 
@@ -71,13 +91,18 @@ app.get(['/policies', '/policies/', '/policies.html'], (req, res) => {
   res.status(404).send('Policies page not found.');
 });
 
-// Serve production static assets if dist exists
+// Serve production static assets if dist exists (with aggressive immutable caching for hashed /assets)
 if (fs.existsSync(DIST_PATH)) {
-  app.use(express.static(DIST_PATH));
+  const ASSETS_PATH = path.join(DIST_PATH, 'assets');
+  if (fs.existsSync(ASSETS_PATH)) {
+    app.use('/assets', express.static(ASSETS_PATH, { maxAge: '365d', immutable: true }));
+  }
+  app.use(express.static(DIST_PATH, { maxAge: '1h' }));
 
   // SPA fallback for all GET & HEAD requests outside /api
   app.use((req, res, next) => {
     if ((req.method === 'GET' || req.method === 'HEAD') && !req.url.startsWith('/api')) {
+      res.setHeader('Cache-Control', 'no-cache');
       return res.sendFile(path.join(DIST_PATH, 'index.html'));
     }
     next();
