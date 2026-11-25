@@ -464,7 +464,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
     if ((!queryText.trim() && !attachedPhoto) || isTyping) return;
 
     // Check if daily quota is exhausted (bypassed for active subscribers or guests)
-    if (learner && !isSubscriber && quota && quota.remainingToday <= 0) {
+    if (learner && !isSubscriber && !quota?.isInChatBreak && quota && quota.remainingToday <= 0) {
       setShowRefillModal(true);
       const limitMsg: NovaMessage = {
         id: 'msg_limit_' + Date.now(),
@@ -586,7 +586,29 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
             <RotateCcw className="w-4 h-4" />
           </button>
 
-          {learner && (
+          {quota?.isInChatBreak ? (
+            <div
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-pink-50 text-pink-700 border border-pink-300 shadow-xs"
+              title="Completed 5+ levels today: Free Chat Break Active!"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-pink-500 animate-pulse" />
+              <span>☕ 20-Min Free Chat Break</span>
+              {quota.chatBreakRemainingSeconds ? (
+                <span className="text-[9px] bg-pink-200 text-pink-900 px-1.5 py-0.5 rounded font-black">
+                  {Math.ceil(quota.chatBreakRemainingSeconds / 60)}m left
+                </span>
+              ) : null}
+            </div>
+          ) : quota?.levelsCompletedToday === 4 ? (
+            <div
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-300 shadow-xs"
+              title="Complete 5 levels today to get a 20 min free chat break!"
+            >
+              <span>🔥 4/5 Levels • 1 More for 20-Min Break ☕</span>
+            </div>
+          ) : null}
+
+          {learner && !quota?.isInChatBreak && (
             <button
               type="button"
               onClick={() => {

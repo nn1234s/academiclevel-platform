@@ -212,6 +212,13 @@ export function initDatabaseSchema() {
       createdAt TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS chat_breaks (
+      learnerId TEXT PRIMARY KEY,
+      startedAt INTEGER NOT NULL,
+      expiresAt INTEGER NOT NULL,
+      datePrefix TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_learners_email ON learners(email);
     CREATE INDEX IF NOT EXISTS idx_learners_role ON learners(role);
     CREATE INDEX IF NOT EXISTS idx_subs_learner ON subscriptions(learnerId);
