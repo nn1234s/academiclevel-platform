@@ -3934,6 +3934,49 @@ apiRouter.post('/admin/gifts/:id/dispatch', adminAuth, (req, res) => {
   }
 });
 
+function rejectGiftAndRefundCoins(giftId) {
+  const reqItem = db.prepare('SELECT * FROM gift_requests WHERE id = ?').get(giftId);
+  if (!reqItem) return { notFound: true };
+  if (reqItem.status === 'REJECTED') {
+    return { alreadyRejected: true, gift: reqItem };
+  }
+
+  const now = new Date().toISOString();
+  const refundCoins = Math.max(0, Number(reqItem.coinsCost) || 0);
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    db.prepare(`UPDATE gift_requests SET status = 'REJECTED', updatedAt = ? WHERE id = ?`).run(now, giftId);
+    if (refundCoins > 0 && reqItem.learnerId) {
+      const learner = db.prepare('SELECT id, coinBalance FROM learners WHERE id = ?').get(reqItem.learnerId);
+      if (learner) {
+        const newBal = Number(learner.coinBalance || 0) + refundCoins;
+        db.prepare('UPDATE learners SET coinBalance = ?, updatedAt = ? WHERE id = ?').run(newBal, now, learner.id);
+        db.prepare(`
+          INSERT INTO coin_ledger (
+            entryId, learnerId, amount, transactionType, reasonCode,
+            balanceAfter, metadataJson, timestampUtc, signatureHash
+          ) VALUES (?, ?, ?, 'CREDIT', 'GIFT_REJECTED_REFUND', ?, ?, ?, ?)
+        `).run(
+          'c_tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+          learner.id,
+          refundCoins,
+          newBal,
+          JSON.stringify({ giftRequestId: giftId, itemTitle: reqItem.itemTitle || 'Gift' }),
+          now,
+          'SIG_' + crypto.randomBytes(6).toString('hex')
+        );
+      }
+    }
+    db.exec('COMMIT');
+  } catch (txErr) {
+    try { db.exec('ROLLBACK'); } catch {}
+    throw txErr;
+  }
+  exportDbToJsonStore();
+  const updated = db.prepare('SELECT * FROM gift_requests WHERE id = ?').get(giftId);
+  return { refunded: refundCoins, gift: updated };
+}
+
 apiRouter.post('/admin/gifts/:id/status', adminAuth, (req, res) => {
   try {
     const { status, voucherCode, trackingId, courierName, adminNotes } = req.body;
@@ -3941,6 +3984,10 @@ apiRouter.post('/admin/gifts/:id/status', adminAuth, (req, res) => {
     if (!reqItem) return res.status(404).json({ success: false, error: 'Request not found' });
 
     const newStatus = status || 'SHIPPED';
+    if (newStatus === 'REJECTED') {
+      const out = rejectGiftAndRefundCoins(reqItem.id);
+      return res.json({ success: true, message: `Gift request rejected and ${out.refunded || 0} AL Coins refunded.`, gift: out.gift });
+    }
     const code = voucherCode ? String(voucherCode).trim() : (trackingId ? String(trackingId).trim() : (reqItem.voucherCode || ''));
     
     let updatedAddress = reqItem.shippingAddress || '';
@@ -3968,8 +4015,10 @@ apiRouter.post('/admin/gifts/:id/status', adminAuth, (req, res) => {
 
 apiRouter.post('/admin/gifts/:id/reject', adminAuth, (req, res) => {
   try {
-    db.prepare(`UPDATE gift_requests SET status = 'REJECTED', updatedAt = datetime('now') WHERE id = ?`).run(req.params.id);
-    res.json({ success: true, message: 'Gift request marked as rejected.' });
+    const out = rejectGiftAndRefundCoins(req.params.id);
+    if (out.notFound) return res.status(404).json({ success: false, error: 'Gift request not found.' });
+    if (out.alreadyRejected) return res.json({ success: true, message: 'Gift request was already rejected.', gift: out.gift });
+    res.json({ success: true, message: `Gift request marked as rejected and ${out.refunded} AL Coins refunded.`, gift: out.gift });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

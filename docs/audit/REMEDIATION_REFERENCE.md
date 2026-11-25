@@ -75,3 +75,16 @@
   - Applied **Material Design 1 (2014–2016)** design tokens in `tailwind.config.js`, `src/index.css`, `index.html`, `src/App.tsx`, `src/modules/public/LandingPage.tsx`, `src/modules/student/QuizEngine.tsx`, and `src/modules/shared/AuthModal.tsx` (`Google Sans`, `#EEEEEE` canvas, `dp` elevation shadows, `2px–4px` corners, neutral light-blue Top App Bar).
   - Converted dark-mode public/student pages (`AccountDeletionPage.tsx`, `CertificateVerificationView.tsx`, `InnovativeEdtechPage.tsx`, `NotFoundPika.tsx`, `SchoolPortalPage.tsx`, `Special49AdsLandingPage.tsx`, `OfflineBankView.tsx`) to Light Mode.
   - Added 4-digit **Parent PIN** input to student sign-up (`AuthModal.tsx`), simplified student-facing jargon (`Verified Coin Wallet`, `Safe & Private Study Space`), removed legal compliance marketing from `LandingPage.tsx`, and scoped board UI to **CBSE** only.
+
+---
+
+## 6. Production Readiness Fixes (`03_QUIZ_BANK_DEEP_AUDIT` & `05_REMEDIATION_TRACKER` Closure)
+- **Previous Issues:**
+  - Rejecting a student's gift request via `/api/admin/gifts/:id/reject` or `/api/admin/gifts/:id/status` did not refund `coinsCost` to the student.
+  - Jumping between questions in `QuizEngine.tsx` reset `isAnswerSubmitted`, allowing re-submission of already-answered items, and showed a misleading `NTA Speed Simulator (+4 / -1)` label.
+  - No automated question-bank schema/option/answer-index validator script existed for the 3,600-question SQLite bank.
+- **Fixes Implemented:**
+  - Added atomic `rejectGiftAndRefundCoins` transaction in `server/api.js` (idempotent; refunds `coinsCost` to `learners.coinBalance` and appends `GIFT_REJECTED_REFUND` to `coin_ledger`).
+  - Fixed `handleJumpToQuestion` and `handleSubmitAnswer` in `src/modules/student/QuizEngine.tsx` to restore prior answers from `answersLog` and block duplicate submissions; updated label to `Timed Practice Mode`.
+  - Added `scripts/validate_question_bank.mjs` verifying all 3,600 CBSE rows in `question_bank` (`badOptionsLen=0`, `duplicateOptions=0`, `badCorrectIndex=0`, `missingExplanation=0`).
+  - **Verification:** `scripts/tests/test_rem_prod_readiness.mjs` & `scripts/validate_question_bank.mjs`

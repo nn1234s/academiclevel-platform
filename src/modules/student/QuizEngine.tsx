@@ -377,7 +377,8 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   };
 
   const handleSubmitAnswer = async () => {
-    if (selectedOption === null || !currentQuestion) return;
+    if (selectedOption === null || !currentQuestion || isAnswerSubmitted) return;
+    if (answersLog.some(a => a.question.id === currentQuestion.id)) return;
 
     // Check anti-cheat minimum dwell time (1 second bot-prevention gate)
     if (questionDwellSeconds < 1) {
@@ -444,9 +445,11 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
 
   const handleJumpToQuestion = (idx: number) => {
     if (idx < 0 || idx >= questions.length || idx === currentIndex) return;
+    const targetQ = questions[idx];
+    const prior = targetQ ? answersLog.find(a => a.question.id === targetQ.id) : undefined;
     setCurrentIndex(idx);
-    setSelectedOption(null);
-    setIsAnswerSubmitted(false);
+    setSelectedOption(prior ? prior.chosenIndex : null);
+    setIsAnswerSubmitted(Boolean(prior));
     setQuestionDwellSeconds(0);
     scrollToQuizTop();
   };
@@ -896,7 +899,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         {theme.quizStyle === 'COMPETITIVE_NTA' && (
           <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1 bg-white/25 rounded-full text-xs font-mono font-bold">
             <Atom className="w-3.5 h-3.5 text-cyan-200" />
-            <span>NTA Speed Simulator (+4 / -1)</span>
+            <span>Timed Practice Mode</span>
           </div>
         )}
       </div>
