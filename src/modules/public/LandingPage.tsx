@@ -200,10 +200,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       title: 'Nova AI Tutor',
       category: 'Autonomous AI Guidance',
       badge: '24/7 Available',
-      highlight: 'Friendly Study Bestie',
-      desc: 'Guides students through difficult math & science questions step-by-step with cute, patient hints rather than giving raw answers away.',
-      gradient: 'from-pink-500 via-rose-500 to-indigo-600',
-      icon: '🎀',
+      highlight: 'Interactive Study Helper',
+      desc: 'Guides students through difficult math & science questions step-by-step with clear, patient hints rather than giving raw answers away.',
+      accent: 'bg-[#3F51B5]',
+      icon: '🎓',
     },
     {
       title: '3,600+ Questions Bank Engine',
@@ -275,220 +275,202 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     : parentStudentReviews.filter(r => r.role === activeTab);
 
   return (
-    <div className="space-y-12 sm:space-y-24 text-slate-900 pb-8 sm:pb-12">
+    <div className="space-y-8 sm:space-y-16 text-[#212121] pb-8 sm:pb-12">
       
-      {/* 1. TOP HERO SECTION (MOST ELITE AI QUIZ PLATFORM) */}
-      <section className="relative pt-3 sm:pt-8 pb-8 sm:pb-16 text-center max-w-6xl mx-auto px-1 sm:px-4 overflow-hidden">
-        {/* Glow ambient background */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-10 right-10 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* 1. TOP HERO SECTION (MATERIAL 1 TACTILE PAPER PAPER SHEET) */}
+      <section className="relative pt-4 sm:pt-8 pb-8 sm:pb-12 text-center max-w-6xl mx-auto px-2 sm:px-4">
+        <div className="md-card p-6 sm:p-10 border border-[#E0E0E0]">
+          {/* Announcement Ticker from CMS */}
+          {homeConfig.announcementActive && homeConfig.announcementText && (
+            <div className="mb-6 inline-flex items-center space-x-2 px-4 py-2 rounded-[2px] bg-[#FFF8E1] border border-[#FFE082] text-[#E65100] text-xs font-bold max-w-2xl mx-auto">
+              <Sparkles className="w-4 h-4 text-[#FF6D00] flex-shrink-0" />
+              <span>{homeConfig.announcementText}</span>
+            </div>
+          )}
 
-        {/* Announcement Ticker from CMS */}
-        {homeConfig.announcementActive && homeConfig.announcementText && (
-          <div className="mb-6 inline-flex items-center space-x-2 px-4 py-2 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold animate-in fade-in duration-300 max-w-2xl mx-auto shadow-xs">
-            <Sparkles className="w-4 h-4 text-amber-600 flex-shrink-0" />
-            <span>{homeConfig.announcementText}</span>
+          {/* Top Material 1 Chips */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+            <div className="md-chip inline-flex items-center space-x-2 px-3 py-1 text-xs font-bold bg-[#E8EAF6] border border-[#C5CAE9] text-[#283593]">
+              <Bot className="w-3.5 h-3.5 text-[#3F51B5]" />
+              <span>India&apos;s K-12 AI Learning Platform</span>
+            </div>
+
+            <a
+              href="/most-innovative-edtech"
+              onClick={handleAwardClick}
+              title="Read independent recognition on EdTech Century"
+              className="md-chip inline-flex items-center space-x-1.5 px-3 py-1 text-xs font-bold bg-[#FFF8E1] hover:bg-[#FFECB3] border border-[#FFE082] text-[#E65100] transition-colors cursor-pointer"
+            >
+              <Trophy className="w-3.5 h-3.5 text-[#FF8F00]" />
+              <span>Ranked #1 Most Innovative EdTech (EdTech Century)</span>
+            </a>
+
+            <a
+              href="/halloffame"
+              onClick={handleHallOfFameClick}
+              title="View Security & Bug Bounty Policy"
+              className="md-chip inline-flex items-center space-x-1.5 px-3 py-1 text-xs font-bold bg-[#E3F2FD] hover:bg-[#BBDEFB] border border-[#90CAF9] text-[#1565C0] transition-colors cursor-pointer"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-[#1976D2]" />
+              <span>Security &amp; Bug Bounty</span>
+            </a>
           </div>
-        )}
 
-        {/* Top Badges Ribbon */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6">
-          <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-bold bg-indigo-50 border border-indigo-200 text-indigo-700 shadow-xs">
-            <Bot className="w-3.5 h-3.5 text-indigo-600" />
-            <span>India&apos;s No.1 Premium K-12 Online Learning Platform — Supercharged with AI</span>
+          {/* Main Hero Header */}
+          <div className="space-y-3 sm:space-y-4 max-w-4xl mx-auto">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#212121] leading-tight">
+              {homeConfig.heroTitle ? (
+                <span>{homeConfig.heroTitle}</span>
+              ) : (
+                <>
+                  Master Your School Curriculum. <br className="hidden sm:inline" />
+                  <span className="text-[#3F51B5]">
+                    Supercharged with AI.
+                  </span>
+                </>
+              )}
+            </h1>
+
+            <p className="text-base sm:text-lg text-[#616161] font-normal max-w-3xl mx-auto leading-relaxed">
+              {homeConfig.heroSubtitle || (
+                <>
+                  Live Interaction. Deeper Learning. Stronger Results. <br className="hidden sm:inline" />
+                  <span className="text-[#3F51B5] font-semibold">Nova AI Study Helper</span> identifies your learning gaps and guides you step-by-step across CBSE, ICSE &amp; Cambridge.
+                </>
+              )}
+            </p>
           </div>
 
-          <a
-            href="/most-innovative-edtech"
-            onClick={handleAwardClick}
-            title="Read independent recognition on EdTech Century"
-            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 transition-all group shadow-xs cursor-pointer"
-          >
-            <Trophy className="w-3.5 h-3.5 text-amber-600 group-hover:scale-110 transition-transform" />
-            <span>🏆 Ranked #1 Most Innovative EdTech (EdTech Century)</span>
-          </a>
+          {/* Action CTAs — Classic Material 1 Raised & Flat Buttons */}
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              onClick={() => onOpenAuth('REGISTER')}
+              className="md-btn-raised w-full sm:w-auto px-6 py-3 bg-[#009688] hover:bg-[#00796B] text-white font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center space-x-2 cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-white" />
+              <span>Start Free Practice (3 Levels Free)</span>
+            </button>
 
-          <a
-            href="/halloffame"
-            onClick={handleHallOfFameClick}
-            title="View Security & Bug Bounty Policy"
-            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 transition-all group shadow-xs cursor-pointer"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-blue-600 group-hover:scale-110 transition-transform" />
-            <span>🛡️ Security &amp; Bug Bounty</span>
-          </a>
-        </div>
+            <a
+              href="/special49"
+              className="md-btn-raised w-full sm:w-auto px-6 py-3 bg-[#FF6D00] hover:bg-[#E65100] text-white font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center space-x-2 cursor-pointer tabular-nums"
+            >
+              <span>Claim 60-Day Breakthrough (₹49)</span>
+              <ArrowRight className="w-4 h-4 text-white" />
+            </a>
 
-        {/* Main Hero Header */}
-        <div className="space-y-3 sm:space-y-4 max-w-4xl mx-auto">
-          <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black tracking-tight text-slate-900 leading-tight">
-            {homeConfig.heroTitle ? (
-              <span>{homeConfig.heroTitle}</span>
-            ) : (
-              <>
-                Most Elite AI Quiz Platform. <br className="hidden sm:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-indigo-600">
-                  Supercharged with AI.
-                </span>
-              </>
-            )}
-          </h1>
-
-          <p className="text-base sm:text-xl text-slate-600 font-medium max-w-3xl mx-auto leading-relaxed">
-            {homeConfig.heroSubtitle || (
-              <>
-                Live Interaction. Deeper Learning. Stronger Results. <br className="hidden sm:inline" />
-                <span className="text-indigo-600 font-semibold">India’s Smartest AI Study Buddy</span> knows your gaps and solves them fast. All subjects, one platform, real academic progress.
-              </>
-            )}
-          </p>
-        </div>
-
-        {/* Feature Highlight Pill */}
-        <div className="mt-6 inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm">
-          <div className="flex -space-x-2">
-            <div className="w-6 h-6 rounded-full bg-indigo-500 border border-white flex items-center justify-center text-[10px] text-white font-bold">AI</div>
-            <div className="w-6 h-6 rounded-full bg-amber-500 border border-white flex items-center justify-center text-[9px] text-white font-bold">3.6K</div>
-            <div className="w-6 h-6 rounded-full bg-emerald-500 border border-white flex items-center justify-center text-[10px] text-white font-bold">★</div>
+            <button
+              onClick={() => onOpenAuth('LOGIN')}
+              className="md-btn-flat w-full sm:w-auto px-6 py-3 text-[#3F51B5] border border-[#E0E0E0] font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center cursor-pointer"
+            >
+              Sign In
+            </button>
           </div>
-          <span>Interactive <strong className="text-slate-900">AI Quizzes &amp; Study Buddy</strong> for Classes 1–12</span>
-        </div>
 
-        {/* Action CTAs */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button
-            onClick={() => onOpenAuth('REGISTER')}
-            className="w-full sm:w-auto px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm rounded-2xl shadow-xl shadow-emerald-900/20 transition-all flex items-center justify-center space-x-2 hover:scale-[1.02] cursor-pointer"
-          >
-            <Sparkles className="w-4 h-4 text-white" />
-            <span>Start Free Practice (3 Levels Free)</span>
-          </button>
-
-          <a
-            href="/special49"
-            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-400 hover:to-amber-500 text-white font-black text-sm rounded-2xl shadow-xl shadow-orange-900/20 transition-all flex items-center justify-center space-x-2 hover:scale-[1.02] cursor-pointer"
-          >
-            <span>Claim 60-Day Breakthrough (₹49)</span>
-            <ArrowRight className="w-4 h-4 text-white" />
-          </a>
-
-          <button
-            onClick={() => onOpenAuth('LOGIN')}
-            className="w-full sm:w-auto px-8 py-4 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-sm rounded-2xl transition-all flex items-center justify-center cursor-pointer shadow-xs"
-          >
-            Sign In (Existing User)
-          </button>
-        </div>
-
-        {/* Free Plan Promotion Callout */}
-        <div className="mt-4 flex items-center justify-center">
-          <span className="inline-flex items-center space-x-2 px-4 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-xs">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            <span>100% Free Student Account Available • Master 3 Curriculum Levels Free • No Credit Card Required</span>
-          </span>
-        </div>
-
-        {/* Trust Points */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 font-medium">
-          <div className="flex items-center space-x-1.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>Zero Third-Party Ads</span>
-          </div>
-          <div className="flex items-center space-x-1.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>DPDP Act 2023 Child Safety</span>
-          </div>
-          <div className="flex items-center space-x-1.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>Offline Question Bank Fallback</span>
+          {/* Divider + Trust Points */}
+          <div className="md-divider mt-8 pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-[#616161] font-medium">
+            <div className="flex items-center space-x-1.5">
+              <CheckCircle2 className="w-4 h-4 text-[#009688]" />
+              <span>3 Curriculum Levels Free</span>
+            </div>
+            <div className="flex items-center space-x-1.5">
+              <CheckCircle2 className="w-4 h-4 text-[#009688]" />
+              <span>Zero Third-Party Ads</span>
+            </div>
+            <div className="flex items-center space-x-1.5">
+              <CheckCircle2 className="w-4 h-4 text-[#009688]" />
+              <span>DPDP Act 2023 Child Safety</span>
+            </div>
+            <div className="flex items-center space-x-1.5">
+              <CheckCircle2 className="w-4 h-4 text-[#009688]" />
+              <span>Offline Question Bank Fallback</span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 2. MOST POPULAR CONCEPT BOOSTER COURSE (ADVERT1 MIX) */}
-      <section className="max-w-5xl mx-auto px-4">
-        <div className="relative rounded-3xl bg-gradient-to-br from-indigo-50/80 via-white to-amber-50/80 border-2 border-amber-300 p-6 sm:p-10 shadow-xl overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+      {/* 2. MOST POPULAR CONCEPT BOOSTER COURSE (MATERIAL 1 PAPER CARD) */}
+      <section className="max-w-5xl mx-auto px-2 sm:px-4">
+        <div className="md-card border border-[#E0E0E0] border-t-4 border-t-[#FF6D00] p-6 sm:p-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="space-y-4 max-w-xl text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold uppercase tracking-wider">
-                <Flame className="w-4 h-4 text-amber-600" />
+              <div className="md-chip inline-flex items-center gap-2 px-3 py-1 bg-[#FFF8E1] border border-[#FFE082] text-[#E65100] text-xs font-bold uppercase tracking-wider">
+                <Flame className="w-4 h-4 text-[#FF6D00]" />
                 <span>Most Popular Concept Booster Course</span>
               </div>
 
-              <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                Master Core Concepts in <span className="text-amber-600">60 Days</span>
+              <h2 className="text-2xl sm:text-4xl font-bold text-[#212121] tracking-tight">
+                Master Core Concepts in <span className="text-[#FF6D00] tabular-nums">60 Days</span>
               </h2>
 
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Accelerate K-12 academic growth with our autonomous AI curriculum. Bridge learning gaps before term exams with daily AI diagnostic quizzes, 1-on-1 friendly Nova AI Tutor feedback, and real-time concept clarity with zero human delays.
+              <p className="text-xs sm:text-sm text-[#616161] leading-relaxed">
+                Accelerate K-12 academic growth with our autonomous AI curriculum. Bridge learning gaps before term exams with daily AI diagnostic quizzes, 1-on-1 Nova AI Tutor feedback, and real-time concept clarity.
               </p>
 
               {/* 3 Pillars */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                <div className="p-3 rounded-xl bg-white border border-slate-200 text-center shadow-xs">
-                  <div className="text-amber-700 font-black text-sm">60 Days</div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">Concept Booster Pass</div>
+                <div className="p-3 rounded-[4px] bg-[#FAFAFA] border border-[#E0E0E0] text-center">
+                  <div className="text-[#E65100] font-bold text-sm tabular-nums">60 Days</div>
+                  <div className="text-[11px] text-[#616161] mt-0.5">Concept Booster Pass</div>
                 </div>
-                <div className="p-3 rounded-xl bg-white border border-slate-200 text-center shadow-xs">
-                  <div className="text-indigo-700 font-black text-sm">Autonomous AI</div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">Zero Human Bias</div>
+                <div className="p-3 rounded-[4px] bg-[#FAFAFA] border border-[#E0E0E0] text-center">
+                  <div className="text-[#3F51B5] font-bold text-sm">Autonomous AI</div>
+                  <div className="text-[11px] text-[#616161] mt-0.5">Zero Human Bias</div>
                 </div>
-                <div className="p-3 rounded-xl bg-white border border-slate-200 text-center shadow-xs">
-                  <div className="text-emerald-700 font-black text-sm">Maths &amp; Science</div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">Curriculum Focused</div>
+                <div className="p-3 rounded-[4px] bg-[#FAFAFA] border border-[#E0E0E0] text-center">
+                  <div className="text-[#009688] font-bold text-sm">Maths &amp; Science</div>
+                  <div className="text-[11px] text-[#616161] mt-0.5">Curriculum Focused</div>
                 </div>
               </div>
             </div>
 
-            {/* Special Pricing Card (Advert1 ₹49 Mix) */}
-            <div className="shrink-0 w-full lg:w-80 bg-white border-2 border-amber-400 rounded-2xl p-6 shadow-xl text-center space-y-4">
-              <span className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-[10px] font-mono font-bold tracking-widest uppercase">
+            {/* Special Pricing Card */}
+            <div className="shrink-0 w-full lg:w-80 bg-white border border-[#E0E0E0] border-t-4 border-t-[#3F51B5] rounded-[4px] p-6 shadow-dp4 text-center space-y-4">
+              <span className="md-chip inline-block px-3 py-1 bg-[#FFF8E1] text-[#E65100] text-[10px] font-mono font-bold tracking-widest uppercase">
                 Limited Time Special
               </span>
               <div>
-                <div className="flex items-baseline justify-center gap-1.5">
-                  <span className="text-4xl sm:text-5xl font-black text-slate-900">₹49</span>
-                  <span className="text-xs text-slate-400 line-through">₹499</span>
+                <div className="flex items-baseline justify-center gap-1.5 tabular-nums">
+                  <span className="text-4xl sm:text-5xl font-bold text-[#212121]">₹49</span>
+                  <span className="text-xs text-[#9E9E9E] line-through">₹499</span>
                 </div>
-                <p className="text-[11px] text-emerald-700 font-semibold mt-1">
+                <p className="text-[11px] text-[#00796B] font-semibold mt-1 tabular-nums">
                   Full 60-Day Unrestricted Access (Save 90%)
                 </p>
               </div>
 
-              <div className="space-y-2 text-left text-xs text-slate-600 pt-2 border-t border-slate-200">
+              <div className="md-divider space-y-2 text-left text-xs text-[#616161] pt-3">
                 <div className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-[#009688] shrink-0" />
                   <span>Classes 1 to 12 (CBSE / ICSE / IGCSE)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-[#009688] shrink-0" />
                   <span>Nova AI Problem Solver</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-[#009688] shrink-0" />
                   <span>3,600+ Syllabus-Verified Questions</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Full Study Material &amp; Printable Worksheets (Classes 1–12)</span>
+                  <Check className="w-3.5 h-3.5 text-[#009688] shrink-0" />
+                  <span>Full Study Material &amp; Printable Worksheets</span>
                 </div>
               </div>
 
-              <div className="pt-2 space-y-2">
+              <div className="md-divider pt-3 space-y-2">
                 <a
                   href="/special49"
-                  className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-orange-900/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="md-btn-raised w-full py-3 bg-[#FF6D00] hover:bg-[#E65100] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer tabular-nums"
                 >
                   <span>Enroll Now (₹49)</span>
                   <ArrowRight className="w-4 h-4 text-white" />
                 </a>
                 <a
                   href="/special49"
-                  className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl border border-slate-300 transition-colors flex items-center justify-center"
+                  className="md-btn-flat w-full py-2 text-[#3F51B5] text-xs font-bold uppercase tracking-wider flex items-center justify-center"
                 >
-                  Explore Breakthrough Curriculum
+                  Explore Curriculum
                 </a>
               </div>
             </div>
@@ -497,36 +479,36 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* 3. MOST ELITE AI QUIZ PLATFORM */}
-      <section className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-12 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold uppercase tracking-wider">
-            <Brain className="w-4 h-4 text-amber-600" />
+      <section className="max-w-6xl mx-auto px-2 sm:px-4">
+        <div className="text-center mb-10 space-y-3">
+          <div className="md-chip inline-flex items-center gap-1.5 px-3 py-1 bg-[#E8EAF6] border border-[#C5CAE9] text-[#283593] text-xs font-bold uppercase tracking-wider">
+            <Brain className="w-4 h-4 text-[#3F51B5]" />
             <span>Autonomous Intelligence</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#212121]">
             Most Elite AI Quiz Platform
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto">
+          <p className="text-xs sm:text-sm text-[#616161] max-w-2xl mx-auto">
             AcademicLevel replaces rigid classroom schedules with an autonomous, 24/7 adaptive AI quiz engine tailored precisely to your syllabus, strengths, and pace.
           </p>
 
           {/* 4 Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto pt-6">
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
-              <div className="text-2xl sm:text-3xl font-black text-amber-600">3,600+</div>
-              <div className="text-xs text-slate-500 font-medium mt-1">Verified Questions</div>
+            <div className="md-card p-4 border border-[#E0E0E0] text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-[#FF6D00] tabular-nums">3,600+</div>
+              <div className="text-xs text-[#616161] font-medium mt-1">Verified Questions</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
-              <div className="text-2xl sm:text-3xl font-black text-indigo-600">100% AI</div>
-              <div className="text-xs text-slate-500 font-medium mt-1">Autonomous Study Buddy Tutoring</div>
+            <div className="md-card p-4 border border-[#E0E0E0] text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-[#3F51B5] tabular-nums">100% AI</div>
+              <div className="text-xs text-[#616161] font-medium mt-1">Autonomous Study Helper</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-600">24/7 Instant</div>
-              <div className="text-xs text-slate-500 font-medium mt-1">Study Doubts Solved</div>
+            <div className="md-card p-4 border border-[#E0E0E0] text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-[#009688] tabular-nums">24/7</div>
+              <div className="text-xs text-[#616161] font-medium mt-1">Study Doubts Solved</div>
             </div>
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
-              <div className="text-2xl sm:text-3xl font-black text-rose-600">98.6%</div>
-              <div className="text-xs text-slate-500 font-medium mt-1">Positive Rating</div>
+            <div className="md-card p-4 border border-[#E0E0E0] text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-[#212121] tabular-nums">98.6%</div>
+              <div className="text-xs text-[#616161] font-medium mt-1">Positive Rating</div>
             </div>
           </div>
         </div>
@@ -536,36 +518,36 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {aiPlatformEngines.map((engine, idx) => (
             <div
               key={idx}
-              className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:border-slate-300 hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+              className="md-card md-card-interactive border border-[#E0E0E0] p-6 flex flex-col justify-between space-y-4"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                  <span className="md-chip px-2.5 py-0.5 text-[10px] font-mono font-bold bg-[#F5F5F5] text-[#424242] border border-[#E0E0E0]">
                     {engine.badge}
                   </span>
-                  <span className="text-[11px] text-indigo-600 font-semibold">{engine.highlight}</span>
+                  <span className="text-[11px] text-[#3F51B5] font-semibold">{engine.highlight}</span>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <span className="text-2xl">{engine.icon}</span>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">{engine.title}</h3>
-                    <p className="text-xs font-medium text-slate-500">{engine.category}</p>
+                    <h3 className="text-lg font-bold text-[#212121]">{engine.title}</h3>
+                    <p className="text-xs font-medium text-[#616161]">{engine.category}</p>
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-600 leading-relaxed pt-2 border-t border-slate-100">
+                <p className="text-xs text-[#616161] leading-relaxed pt-3 md-divider">
                   {engine.desc}
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-                <span className="flex items-center gap-1.5 text-emerald-600 font-semibold">
+              <div className="pt-3 md-divider flex items-center justify-between text-[11px] text-[#616161]">
+                <span className="flex items-center gap-1.5 text-[#009688] font-semibold">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Autonomous AI Verified</span>
                 </span>
-                <span className="text-amber-500 flex items-center gap-1 font-semibold">
-                  <Star className="w-3 h-3 fill-amber-400" />
+                <span className="text-[#FF8F00] flex items-center gap-1 font-semibold tabular-nums">
+                  <Star className="w-3 h-3 fill-[#FFC107]" />
                   <span>5.0 / 5.0</span>
                 </span>
               </div>

@@ -664,7 +664,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
             <button
               onClick={handleScrollToStudyMaterial}
-              className="bg-white/20 hover:bg-white/30 text-white font-extrabold px-3 py-1 rounded-full text-xs shadow-xs transition-all cursor-pointer flex items-center space-x-1 border border-white/30 hover:scale-105"
+              className="bg-white/20 hover:bg-white/30 text-[#212121] font-extrabold px-3 py-1 rounded-full text-xs shadow-xs transition-all cursor-pointer flex items-center space-x-1 border border-white/30 hover:scale-105"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>📚 Get Study Material</span>
@@ -708,7 +708,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     </button>
                   </div>
 
-                  <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-snug text-white">
+                  <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-snug text-[#212121]">
                     {adsConfig.mainHeading || 'CONCEPT BOOSTER COURSE'}
                   </h1>
                   <p className="text-xs sm:text-sm font-bold text-[#ffea79] mt-0.5">
@@ -716,7 +716,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   </p>
 
                   {/* Live Enrolled Student Pill */}
-                  <div className="mt-3.5 bg-black/40 backdrop-blur-md rounded-full px-3.5 py-1 text-[11px] text-white flex items-center space-x-2 border border-white/10 w-fit max-w-full">
+                  <div className="mt-3.5 bg-black/40 backdrop-blur-md rounded-full px-3.5 py-1 text-[11px] text-[#212121] flex items-center space-x-2 border border-white/10 w-fit max-w-full">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping flex-shrink-0" />
                     <span className="truncate font-semibold">{LIVE_ENROLLMENTS[tickerIndex]}</span>
                   </div>
@@ -751,10 +751,10 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     </div>
 
                     <div className="flex items-center justify-center flex-shrink-0">
-                      <div className="w-20 h-20 rounded-2xl bg-white/15 backdrop-blur-md border-2 border-amber-300 shadow-xl flex flex-col items-center justify-center text-amber-200 font-black text-center p-1.5 leading-none">
+                      <div className="w-20 h-20 rounded-2xl bg-white/15 backdrop-blur-md border-2 border-amber-300 shadow-xl flex flex-col items-center justify-center text-[#E65100] font-black text-center p-1.5 leading-none">
                         <Sparkles className="w-6 h-6 text-amber-300 mb-1 fill-amber-300" />
-                        <span className="text-[11px] text-white font-black">AI QUIZ</span>
-                        <span className="text-[9px] text-amber-200 font-mono mt-0.5">24/7 ACCESS</span>
+                        <span className="text-[11px] text-[#212121] font-black">AI QUIZ</span>
+                        <span className="text-[9px] text-[#E65100] font-mono mt-0.5">24/7 ACCESS</span>
                       </div>
                     </div>
                   </div>
@@ -787,11 +787,11 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       <div key={r.id} className="bg-white p-3.5 rounded-2xl border border-slate-200/90 shadow-sm text-xs">
                         <div className="flex items-center justify-between mb-1.5">
                           <div className="flex items-center space-x-2">
-                            <div className={`w-6 h-6 rounded-full text-white font-bold text-[10px] flex items-center justify-center ${r.avatarBg}`}>
+                            <div className={`w-6 h-6 rounded-full text-[#212121] font-bold text-[10px] flex items-center justify-center ${r.avatarBg}`}>
                               {r.name.charAt(0)}
                             </div>
                             <span className="font-bold text-slate-800">{r.name}</span>
-                            <span className="text-[10px] text-slate-400">({r.role})</span>
+                            <span className="text-[10px] text-[#616161]">({r.role})</span>
                           </div>
                           <div className="flex text-amber-400 text-[10px]">
                             {'★'.repeat(r.stars)}
@@ -846,7 +846,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       </div>
                       <div className="flex items-baseline space-x-1 mt-0.5">
                         <span className="text-lg sm:text-xl font-black text-slate-900">₹49</span>
-                        <span className="text-[10px] text-slate-400 line-through">₹499</span>
+                        <span className="text-[10px] text-[#616161] line-through">₹499</span>
                       </div>
                       <p className="text-[9px] text-slate-500 font-medium mt-0.5 leading-tight">
                         ~₹24.50/mo
@@ -868,7 +868,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       </div>
                       <div className="flex items-baseline space-x-1 mt-0.5">
                         <span className="text-lg sm:text-xl font-black text-emerald-950">₹129</span>
-                        <span className="text-[10px] text-slate-400 line-through">₹1,299</span>
+                        <span className="text-[10px] text-[#616161] line-through">₹1,299</span>
                       </div>
                       <p className="text-[9px] text-emerald-800 font-bold mt-0.5 leading-tight">
                         ~₹21.50/mo
@@ -893,7 +893,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       </div>
                       <div className="flex items-baseline space-x-1 mt-0.5">
                         <span className="text-lg sm:text-xl font-black text-amber-950">₹205</span>
-                        <span className="text-[10px] text-slate-400 line-through">₹2,499</span>
+                        <span className="text-[10px] text-[#616161] line-through">₹2,499</span>
                       </div>
                       <p className="text-[9px] text-amber-900 font-black mt-0.5 leading-tight">
                         ~₹17/mo • 56p/day!
@@ -1008,7 +1008,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               <div className="space-y-2">
                 <button
                   onClick={handleScrollToQr}
-                  className={`w-full py-4 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl transition-all hover:scale-[1.02] flex items-center justify-center space-x-2 cursor-pointer ${
+                  className={`w-full py-4 text-[#212121] font-black text-sm sm:text-base rounded-2xl shadow-xl transition-all hover:scale-[1.02] flex items-center justify-center space-x-2 cursor-pointer ${
                     selectedPlanTier === 'GOLD'
                       ? 'bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-amber-500/30'
                       : (selectedPlanTier === 'PLUS'
@@ -1059,7 +1059,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
           <div className="mb-6 p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-yellow-600 text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4 ring-4 ring-amber-400/40">
             <div className="space-y-1.5 text-center md:text-left">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-950 text-amber-300">
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#EEEEEE] text-amber-300">
                   👑 89% OF TOPPERS &amp; PARENTS CHOOSE GOLD
                 </span>
                 <span className="text-[11px] font-bold text-amber-100">
@@ -1076,7 +1076,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             <button
               type="button"
               onClick={() => setSelectedPlanTier('GOLD')}
-              className="px-6 py-3.5 rounded-2xl bg-slate-950 hover:bg-slate-900 text-amber-300 font-black text-xs sm:text-sm shadow-xl transition-all hover:scale-105 cursor-pointer flex-shrink-0 flex items-center space-x-1.5 border border-amber-400"
+              className="px-6 py-3.5 rounded-2xl bg-[#EEEEEE] hover:bg-white text-amber-300 font-black text-xs sm:text-sm shadow-xl transition-all hover:scale-105 cursor-pointer flex-shrink-0 flex items-center space-x-1.5 border border-amber-400"
             >
               <Sparkles className="w-4 h-4 fill-amber-300" />
               <span>Select ₹205 Gold (Best Value)</span>
@@ -1102,7 +1102,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   </span>
                   <div className="flex items-baseline space-x-2">
                     <span className="text-2xl sm:text-3xl font-black text-slate-900">₹49</span>
-                    <span className="text-xs text-slate-400 line-through font-bold">₹499</span>
+                    <span className="text-xs text-[#616161] line-through font-bold">₹499</span>
                     <span className="text-[11px] font-black text-emerald-600 uppercase tracking-wide">90% OFF</span>
                   </div>
                 </div>
@@ -1137,7 +1137,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   </span>
                   <div className="flex items-baseline space-x-2">
                     <span className="text-2xl sm:text-3xl font-black text-emerald-950">₹129</span>
-                    <span className="text-xs text-slate-400 line-through font-bold">₹1,299</span>
+                    <span className="text-xs text-[#616161] line-through font-bold">₹1,299</span>
                     <span className="text-[10px] font-black text-white bg-emerald-700 px-1.5 py-0.5 rounded uppercase tracking-wide">90% OFF</span>
                   </div>
                 </div>
@@ -1177,7 +1177,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   </span>
                   <div className="flex items-baseline space-x-2">
                     <span className="text-3xl sm:text-4xl font-black text-amber-950">₹205</span>
-                    <span className="text-xs text-slate-400 line-through font-bold">₹2,499</span>
+                    <span className="text-xs text-[#616161] line-through font-bold">₹2,499</span>
                     <span className="text-[10px] font-black text-slate-950 bg-amber-400 px-1.5 py-0.5 rounded uppercase tracking-wide">92% OFF</span>
                   </div>
                 </div>
@@ -1354,7 +1354,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   <div>
                     <div className="flex items-center justify-between mb-1">
                       <label className="block font-bold text-slate-700">Account Password *</label>
-                      <span className="text-[10px] text-slate-400 font-normal">Min. 6 characters to log into your account</span>
+                      <span className="text-[10px] text-[#616161] font-normal">Min. 6 characters to log into your account</span>
                     </div>
                     <div className="relative">
                       <input
@@ -1368,7 +1368,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#616161] hover:text-slate-600 p-1 cursor-pointer"
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -1444,7 +1444,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <span className="font-mono font-bold text-emerald-600 uppercase">
                   Class {selectedClass} Sample AI Assessment
                 </span>
-                <span className="font-mono text-slate-400">
+                <span className="font-mono text-[#616161]">
                   Adaptive Level 1
                 </span>
               </div>
@@ -1610,7 +1610,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 {/* Left: Problem Statement */}
                 <div className="md:col-span-8 space-y-3">
                   <div className="flex items-start space-x-2">
-                    <span className="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="w-6 h-6 rounded-full bg-white text-[#212121] text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
                       Q1
                     </span>
                     <div>
@@ -1630,10 +1630,10 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     <span>✍️ Rough Work Scratchpad</span>
                     <span className="text-[9px] text-amber-600">Step Margin</span>
                   </div>
-                  <div className="text-[10px] font-mono text-slate-400 italic py-2">
+                  <div className="text-[10px] font-mono text-[#616161] italic py-2">
                     Space for formulas, step calculations, and diagrams...
                   </div>
-                  <div className="text-[9px] text-slate-400 text-right font-mono">
+                  <div className="text-[9px] text-[#616161] text-right font-mono">
                     Page 1 of 4
                   </div>
                 </div>
@@ -2012,7 +2012,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   className="w-full p-4 sm:p-5 text-left font-bold text-xs sm:text-sm text-slate-900 flex items-center justify-between"
                 >
                   <span>{faq.q}</span>
-                  {activeFaq === idx ? <ChevronUp className="w-4 h-4 text-orange-600" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                  {activeFaq === idx ? <ChevronUp className="w-4 h-4 text-orange-600" /> : <ChevronDown className="w-4 h-4 text-[#616161]" />}
                 </button>
                 {activeFaq === idx && (
                   <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
@@ -2163,7 +2163,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
           <button
             onClick={handleScrollToQr}
-            className={`px-4 sm:px-6 py-2.5 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg transition-all hover:scale-105 flex items-center space-x-1.5 cursor-pointer ${
+            className={`px-4 sm:px-6 py-2.5 text-[#212121] font-black text-xs sm:text-sm rounded-xl shadow-lg transition-all hover:scale-105 flex items-center space-x-1.5 cursor-pointer ${
               selectedPlanTier === 'GOLD'
                 ? 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 shadow-amber-500/30'
                 : (selectedPlanTier === 'PLUS'
@@ -2194,7 +2194,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
           <div className="max-w-lg w-full bg-white rounded-3xl p-6 sm:p-8 shadow-2xl relative border border-slate-200 my-auto max-h-[92vh] overflow-y-auto">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100 cursor-pointer"
+              className="absolute top-5 right-5 p-2 text-[#616161] hover:text-slate-700 rounded-full bg-slate-100 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -2332,7 +2332,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       }`}
                     >
                       <div className="text-[9px] uppercase font-black tracking-wider text-orange-700">60 Days</div>
-                      <div className="text-xs sm:text-sm font-black">₹49 <span className="text-[9px] text-slate-400 line-through font-normal">₹499</span></div>
+                      <div className="text-xs sm:text-sm font-black">₹49 <span className="text-[9px] text-[#616161] line-through font-normal">₹499</span></div>
                     </button>
                     <button
                       type="button"
@@ -2344,7 +2344,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       }`}
                     >
                       <div className="text-[9px] uppercase font-black tracking-wider text-emerald-800">180 Days</div>
-                      <div className="text-xs sm:text-sm font-black text-emerald-950">₹129 <span className="text-[9px] text-slate-400 line-through font-normal">₹1,299</span></div>
+                      <div className="text-xs sm:text-sm font-black text-emerald-950">₹129 <span className="text-[9px] text-[#616161] line-through font-normal">₹1,299</span></div>
                     </button>
                     <button
                       type="button"
@@ -2359,7 +2359,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                         👑 BEST
                       </div>
                       <div className="text-[9px] uppercase font-black tracking-wider text-amber-900">365D Gold</div>
-                      <div className="text-xs sm:text-sm font-black text-amber-950">₹205 <span className="text-[9px] text-slate-400 line-through font-normal">₹2,499</span></div>
+                      <div className="text-xs sm:text-sm font-black text-amber-950">₹205 <span className="text-[9px] text-[#616161] line-through font-normal">₹2,499</span></div>
                       <div className="text-[8px] text-amber-800 font-bold">~56p/day!</div>
                     </button>
                   </div>
@@ -2458,7 +2458,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <label className="block font-bold text-slate-700">Account Password *</label>
-                          <span className="text-[10px] text-slate-400 font-normal">Min. 6 chars to log in later</span>
+                          <span className="text-[10px] text-[#616161] font-normal">Min. 6 chars to log in later</span>
                         </div>
                         <div className="relative">
                           <input
@@ -2472,7 +2472,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#616161] hover:text-slate-600 p-1 cursor-pointer"
                             aria-label={showPassword ? 'Hide password' : 'Show password'}
                           >
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -2494,7 +2494,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     <div>
                       <div className="flex justify-between items-center mb-1">
                         <label className="block font-bold text-slate-900">UPI PG Reference / UTR (Optional)</label>
-                        <span className="text-[10px] text-slate-400 font-normal">Instant Automated Activation</span>
+                        <span className="text-[10px] text-[#616161] font-normal">Instant Automated Activation</span>
                       </div>
                       <input
                         ref={modalUtrInputRef}
@@ -2552,7 +2552,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="block font-bold text-slate-700">Account Password *</label>
-                    <span className="text-[10px] text-slate-400 font-normal">Min. 6 characters</span>
+                    <span className="text-[10px] text-[#616161] font-normal">Min. 6 characters</span>
                   </div>
                   <div className="relative">
                     <input
@@ -2566,7 +2566,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#616161] hover:text-slate-600 p-1"
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -2665,7 +2665,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 setShowUpiCheckout(false);
                 onSuccessRegistered();
               }}
-              className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100"
+              className="absolute top-5 right-5 p-2 text-[#616161] hover:text-slate-700 rounded-full bg-slate-100"
             >
               <X className="w-4 h-4" />
             </button>
@@ -2694,7 +2694,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
           <div className="max-w-2xl w-full bg-white rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[85vh] flex flex-col">
             <button
               onClick={() => setShowAllReviewsModal(false)}
-              className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 rounded-full bg-slate-100"
+              className="absolute top-5 right-5 p-2 text-[#616161] hover:text-slate-700 rounded-full bg-slate-100"
             >
               <X className="w-4 h-4" />
             </button>
@@ -2713,12 +2713,12 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 <div key={r.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs">
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center space-x-2">
-                      <div className={`w-7 h-7 rounded-full text-white font-bold text-xs flex items-center justify-center ${r.avatarBg}`}>
+                      <div className={`w-7 h-7 rounded-full text-[#212121] font-bold text-xs flex items-center justify-center ${r.avatarBg}`}>
                         {r.name.charAt(0)}
                       </div>
                       <div>
                         <span className="font-bold text-slate-900 block">{r.name}</span>
-                        <span className="text-[10px] text-slate-400">{r.role} • {r.date}</span>
+                        <span className="text-[10px] text-[#616161]">{r.role} • {r.date}</span>
                       </div>
                     </div>
                     <div className="text-amber-400 text-xs">
@@ -2740,33 +2740,33 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       {/* ======================================================== */}
       {showPostPaymentPopup && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 overflow-y-auto">
-          <div className="max-w-lg w-full bg-slate-900 border-2 border-emerald-400 rounded-3xl p-6 sm:p-8 shadow-2xl relative text-slate-100 my-8">
+          <div className="max-w-lg w-full bg-white border-2 border-emerald-400 rounded-3xl p-6 sm:p-8 shadow-2xl relative text-slate-100 my-8">
             <button
               onClick={() => setShowPostPaymentPopup(false)}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full bg-slate-800 transition-colors"
+              className="absolute top-4 right-4 p-2 text-[#616161] hover:text-white rounded-full bg-[#F5F5F5] transition-colors"
               aria-label="Close dialog"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="text-center space-y-2 mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border-2 border-emerald-400 text-emerald-400 flex items-center justify-center mx-auto shadow-lg shadow-emerald-950/40">
-                <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border-2 border-emerald-400 text-[#00796B] flex items-center justify-center mx-auto shadow-lg shadow-emerald-950/40">
+                <CheckCircle2 className="w-8 h-8 text-[#00796B]" />
               </div>
-              <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-400 uppercase bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full inline-block">
+              <span className="text-[10px] font-mono font-bold tracking-widest text-[#00796B] uppercase bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full inline-block">
                 ⚡ UPI PG Transaction Tracked
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+              <h2 className="text-2xl sm:text-3xl font-black text-[#212121] leading-tight">
                 Payment OK. Make Student Account:-
               </h2>
-              <p className="text-xs text-slate-300 max-w-sm mx-auto">
+              <p className="text-xs text-[#424242] max-w-sm mx-auto">
                 Enter your details below to create your student account. Your <strong>{selectedPlanTier === 'GOLD' ? 'Gold Pass (365 Days / ₹205)' : (selectedPlanTier === 'PLUS' ? 'Plus Plan (180 Days / ₹129)' : 'Concept Booster (60 Days / ₹49)')}</strong> pass will be activated instantly!
               </p>
             </div>
 
             {paymentSuccess ? (
               <div className="bg-emerald-950/60 border border-emerald-500/50 rounded-2xl p-5 text-center space-y-3">
-                <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
+                <CheckCircle2 className="w-12 h-12 text-[#00796B] mx-auto" />
                 <h3 className="text-lg font-black text-emerald-300">
                   Account Created &amp; Pass Activated!
                 </h3>
@@ -2795,82 +2795,82 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Student Full Name *</label>
+                    <label className="block text-[#424242] font-bold mb-1">Student Full Name *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. Aarav Sharma"
                       value={studentName}
                       onChange={e => setStudentName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none"
+                      className="w-full bg-[#EEEEEE] border border-[#E0E0E0] focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Mobile or Email *</label>
+                    <label className="block text-[#424242] font-bold mb-1">Mobile or Email *</label>
                     <input
                       type="text"
                       required
                       placeholder="e.g. 9876543210 or name@gmail.com"
                       value={emailOrPhone}
                       onChange={e => setEmailOrPhone(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none"
+                      className="w-full bg-[#EEEEEE] border border-[#E0E0E0] focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Create Password *</label>
+                    <label className="block text-[#424242] font-bold mb-1">Create Password *</label>
                     <input
                       type="password"
                       required
                       placeholder="Minimum 6 characters"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none"
+                      className="w-full bg-[#EEEEEE] border border-[#E0E0E0] focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Parent Name (Optional)</label>
+                    <label className="block text-[#424242] font-bold mb-1">Parent Name (Optional)</label>
                     <input
                       type="text"
                       placeholder="e.g. Rajesh Sharma"
                       value={parentName}
                       onChange={e => setParentName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none"
+                      className="w-full bg-[#EEEEEE] border border-[#E0E0E0] focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Class / Grade</label>
+                    <label className="block text-[#424242] font-bold mb-1">Class / Grade</label>
                     <select
                       value={selectedClass}
                       onChange={e => setSelectedClass(Number(e.target.value) as Grade)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-bold focus:outline-none"
+                      className="w-full bg-[#EEEEEE] border border-[#E0E0E0] rounded-xl px-3 py-2.5 text-white font-bold focus:outline-none"
                     >
                       {[1,2,3,4,5,6,7,8,9,10,11,12].map(c => (
-                        <option key={c} value={c} className="bg-slate-900 text-white">Class {c}</option>
+                        <option key={c} value={c} className="bg-white text-[#212121]">Class {c}</option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-slate-300 font-bold mb-1">Education Board</label>
+                    <label className="block text-[#424242] font-bold mb-1">Education Board</label>
                     <select
                       value={selectedBoard}
                       onChange={e => setSelectedBoard(e.target.value as Board)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-bold focus:outline-none"
+                      className="w-full bg-[#EEEEEE] border border-[#E0E0E0] rounded-xl px-3 py-2.5 text-white font-bold focus:outline-none"
                     >
                       {['CBSE', 'ICSE', 'STATE_BOARD'].map(b => (
-                        <option key={b} value={b} className="bg-slate-900 text-white">{b.replace('_', ' ')}</option>
+                        <option key={b} value={b} className="bg-white text-[#212121]">{b.replace('_', ' ')}</option>
                       ))}
                     </select>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 text-[11px] mb-1">
+                  <label className="block text-[#616161] text-[11px] mb-1">
                     UPI PG Reference / UTR Number (Optional)
                   </label>
                   <input
@@ -2879,7 +2879,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     placeholder="e.g. 12-digit UTR from payment screen (optional)"
                     value={utrNumber}
                     onChange={e => setUtrNumber(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white font-mono placeholder-slate-500 text-xs focus:outline-none"
+                    className="w-full bg-[#EEEEEE] border border-[#E0E0E0] focus:border-emerald-400 rounded-xl px-3 py-2.5 text-white font-mono placeholder-slate-500 text-xs focus:outline-none"
                   />
                 </div>
 

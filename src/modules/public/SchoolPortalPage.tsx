@@ -424,9 +424,9 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-20 selection:bg-amber-500 selection:text-slate-950">
+    <div className="min-h-screen bg-[#EEEEEE] text-slate-100 pb-20 selection:bg-amber-500 selection:text-slate-950">
       {/* Top Header Navigation */}
-      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3.5">
+      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-[#E0E0E0] px-4 sm:px-8 py-3.5">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div
             onClick={() => onNavigate(isAuthenticated ? 'DASHBOARD' : 'HOME')}
@@ -436,7 +436,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
               AL
             </div>
             <div>
-              <span className="font-extrabold text-sm tracking-tight text-white block leading-none">
+              <span className="font-extrabold text-sm tracking-tight text-[#212121] block leading-none">
                 AcademicLevel
               </span>
               <span className="text-[10px] text-amber-400 font-semibold">
@@ -448,7 +448,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
           <div className="flex items-center space-x-3 text-xs font-bold">
             <button
               onClick={() => onNavigate(isAuthenticated ? 'DASHBOARD' : 'HOME')}
-              className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl bg-[#F5F5F5] hover:bg-slate-700 text-slate-200 transition-colors cursor-pointer"
             >
               ← Back to {isAuthenticated ? 'Dashboard' : 'Home'}
             </button>
@@ -464,7 +464,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
               </a>
             ) : (
               <span className="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[11px] font-mono font-bold flex items-center space-x-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#00796B]" />
                 <span>Verified Teacher Admin</span>
               </span>
             )}
@@ -480,7 +480,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
             <span>{isTeacherDashboard ? 'TEACHER ADMIN DASHBOARD' : 'ACADEMICLEVEL FOR SCHOOLS & EDUCATORS'}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto">
+          <h1 className="text-3xl sm:text-5xl font-black text-[#212121] tracking-tight leading-tight max-w-4xl mx-auto">
             {isTeacherDashboard ? (
               <>
                 Classroom Vouchers &amp; <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">Teacher Portal</span>
@@ -492,7 +492,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
             )}
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-[#424242] max-w-2xl mx-auto leading-relaxed">
             {isTeacherDashboard
               ? `Manage your classroom voucher keys, track live student quiz performance, and identify conceptual bottlenecks across Class 10.`
               : `Equip your entire classroom with 40 Lite (60 Days) or 20 Plus (180 Days) A-Codes, live quiz tracking, and automated conceptual weak point diagnostics.`}
@@ -507,7 +507,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
                     activeTab === 'OFFER'
                       ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
-                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                      : 'bg-white border border-[#E0E0E0] text-[#424242] hover:text-[#212121]'
                   }`}
                 >
                   🎟️ School Pack Offer (₹2,499)
@@ -517,7 +517,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
                     activeTab === 'TRACKER'
                       ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
-                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                      : 'bg-white border border-[#E0E0E0] text-[#424242] hover:text-[#212121]'
                   }`}
                 >
                   📊 Live Quiz Tracker Preview
@@ -527,7 +527,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
                     activeTab === 'WEAK_POINTS'
                       ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
-                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                      : 'bg-white border border-[#E0E0E0] text-[#424242] hover:text-[#212121]'
                   }`}
                 >
                   🎯 Student Weak Points Preview
@@ -537,7 +537,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 ${
                     activeTab === 'ACODES'
                       ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
-                      : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                      : 'bg-white border border-[#E0E0E0] text-[#616161] hover:text-[#212121]'
                   }`}
                 >
                   <Lock className="w-3.5 h-3.5 text-amber-400" />
@@ -551,7 +551,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   className={`px-5 py-2.5 rounded-xl transition-all cursor-pointer flex items-center space-x-2 ${
                     activeTab === 'ACODES'
                       ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black shadow-lg shadow-amber-500/30 ring-2 ring-amber-400/50'
-                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                      : 'bg-white border border-[#E0E0E0] text-[#424242] hover:text-[#212121]'
                   }`}
                 >
                   <KeyRound className="w-4 h-4 text-slate-950" />
@@ -562,7 +562,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   className={`px-5 py-2.5 rounded-xl transition-all cursor-pointer flex items-center space-x-2 ${
                     activeTab === 'TRACKER'
                       ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
-                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                      : 'bg-white border border-[#E0E0E0] text-[#424242] hover:text-[#212121]'
                   }`}
                 >
                   <BarChart3 className="w-4 h-4" />
@@ -573,7 +573,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   className={`px-5 py-2.5 rounded-xl transition-all cursor-pointer flex items-center space-x-2 ${
                     activeTab === 'WEAK_POINTS'
                       ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
-                      : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+                      : 'bg-white border border-[#E0E0E0] text-[#424242] hover:text-[#212121]'
                   }`}
                 >
                   <TrendingDown className="w-4 h-4" />
@@ -590,19 +590,19 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
         {isTeacherDashboard && (
           <div className="p-5 bg-gradient-to-r from-emerald-950/60 via-slate-900 to-indigo-950/60 border-2 border-emerald-500/40 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
             <div className="flex items-center space-x-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-[#00796B] flex items-center justify-center shrink-0">
                 <School className="w-6 h-6" />
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <h3 className="text-base font-black text-white">
+                  <h3 className="text-base font-black text-[#212121]">
                     {currentLearner?.fullName || teacherName || 'Teacher Admin'}
                   </h3>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
                     Classroom Admin
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 mt-0.5">
+                <p className="text-xs text-[#424242] mt-0.5">
                   Institutional School License Active • Batch: <strong className="text-amber-400">{selectedPack === 'PLUS_20' ? '20 Plus A-Codes (180 Days)' : '40 Lite A-Codes (60 Days)'}</strong>
                 </p>
               </div>
@@ -611,9 +611,9 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
             <div className="flex items-center space-x-2 text-xs">
               <button
                 onClick={handleCopyAllCodes}
-                className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer"
+                className="px-3.5 py-2 bg-[#F5F5F5] hover:bg-slate-700 text-slate-200 font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer"
               >
-                {copiedAll ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                {copiedAll ? <Check className="w-3.5 h-3.5 text-[#00796B]" /> : <Copy className="w-3.5 h-3.5 text-[#616161]" />}
                 <span>{copiedAll ? 'Copied!' : 'Copy Vouchers'}</span>
               </button>
               <button
@@ -636,10 +636,10 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   <span className="px-3 py-1 rounded-full text-[10px] font-mono font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40">
                     👑 Bulk Classroom License
                   </span>
-                  <h2 className="text-2xl sm:text-3xl font-black text-white">
+                  <h2 className="text-2xl sm:text-3xl font-black text-[#212121]">
                     School &amp; Tutor Institutional Pack (₹2,499)
                   </h2>
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#424242] leading-relaxed">
                     Designed for schools, coaching institutes, and tuition centers. Get an all-in-one license with your choice of bulk student access passes.
                   </p>
 
@@ -650,15 +650,15 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                       onClick={() => setSelectedPack('LITE_40')}
                       className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                         selectedPack === 'LITE_40'
-                          ? 'bg-amber-500/20 border-amber-400 text-amber-200 ring-2 ring-amber-500/30'
-                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                          ? 'bg-amber-500/20 border-amber-400 text-[#E65100] ring-2 ring-amber-500/30'
+                          : 'bg-[#EEEEEE] border-[#E0E0E0] text-[#616161] hover:border-[#E0E0E0]'
                       }`}
                     >
                       <div className="flex justify-between items-center">
-                        <span className="font-extrabold text-sm text-white">Option B: 40 Lite A-Codes</span>
+                        <span className="font-extrabold text-sm text-[#212121]">Option B: 40 Lite A-Codes</span>
                         <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/30 text-amber-300 font-bold">60 Days</span>
                       </div>
-                      <p className="text-[11px] text-slate-300 mt-1">
+                      <p className="text-[11px] text-[#424242] mt-1">
                         2 Months Unlimited Quizzes &amp; Nova AI Tutor for 40 students. (~₹62.47 / student).
                       </p>
                     </button>
@@ -669,14 +669,14 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                       className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                         selectedPack === 'PLUS_20'
                           ? 'bg-indigo-500/20 border-indigo-400 text-indigo-200 ring-2 ring-indigo-500/30'
-                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                          : 'bg-[#EEEEEE] border-[#E0E0E0] text-[#616161] hover:border-[#E0E0E0]'
                       }`}
                     >
                       <div className="flex justify-between items-center">
-                        <span className="font-extrabold text-sm text-white">Option A: 20 Plus A-Codes</span>
+                        <span className="font-extrabold text-sm text-[#212121]">Option A: 20 Plus A-Codes</span>
                         <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-300 font-bold">180 Days</span>
                       </div>
-                      <p className="text-[11px] text-slate-300 mt-1">
+                      <p className="text-[11px] text-[#424242] mt-1">
                         6 Months Full Access + Olympiad reasoning track for 20 students. (~₹124.95 / student).
                       </p>
                     </button>
@@ -684,20 +684,20 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                 </div>
 
                 {/* Price Box */}
-                <div className="bg-slate-950 border border-slate-800 p-6 rounded-3xl text-center min-w-[240px] space-y-2 self-stretch md:self-auto flex flex-col justify-center">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest block">Flat Institutional Fee</span>
+                <div className="bg-[#EEEEEE] border border-[#E0E0E0] p-6 rounded-3xl text-center min-w-[240px] space-y-2 self-stretch md:self-auto flex flex-col justify-center">
+                  <span className="text-[10px] font-mono text-[#616161] uppercase tracking-widest block">Flat Institutional Fee</span>
                   <div className="text-4xl font-black text-amber-400">₹2,499</div>
-                  <span className="text-[11px] text-emerald-400 font-bold block">
+                  <span className="text-[11px] text-[#00796B] font-bold block">
                     {selectedPack === 'PLUS_20' ? 'Only ~₹124.95 / student (6 mo)' : 'Only ~₹62.47 / student (2 mo)'}
                   </span>
-                  <div className="pt-2 text-[10px] text-slate-400 font-medium">
+                  <div className="pt-2 text-[10px] text-[#616161] font-medium">
                     Includes Teacher Dashboard, Live Quiz Tracker, Weak Points Diagnostics &amp; {selectedPack === 'PLUS_20' ? '20' : '40'} Student Vouchers.
                   </div>
                 </div>
               </div>
 
               {/* 2-STEP REAL UPI PG CHECKOUT & PAYMENT OK SCREEN (MATCHING STUDENT FLOW) */}
-              <div className="border-t border-slate-800 pt-6 space-y-4">
+              <div className="border-t border-[#E0E0E0] pt-6 space-y-4">
                 <div className="flex items-center space-x-2 text-sm font-bold text-amber-400">
                   <Sparkles className="w-4 h-4 text-amber-400" />
                   <span>Instant Payment &amp; Automated Teacher Admin Activation Flow</span>
@@ -705,48 +705,48 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {/* STEP 1: OPEN SECURE UPI PG GATEWAY */}
-                  <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
+                  <div className="p-5 bg-[#EEEEEE] rounded-2xl border border-[#E0E0E0] space-y-3 flex flex-col justify-between">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-amber-300 flex items-center space-x-1.5">
                           <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[11px] font-black">1</span>
                           <span>Step 1: Open Secure Gateway</span>
                         </span>
-                        <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                        <span className="text-[10px] font-mono text-[#00796B] font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
                           Official CIT UPI PG Gateway
                         </span>
                       </div>
 
                       {/* Payment Return Notice with English & Hinglish Toggle */}
-                      <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-2 text-left">
+                      <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-[#E65100] space-y-2 text-left">
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center space-x-1.5 font-bold text-amber-300">
                             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                             <span>Payment Return Notice</span>
                           </div>
-                          <div className="flex bg-slate-900 rounded-lg p-0.5 text-[10px] font-bold border border-slate-700 shrink-0">
+                          <div className="flex bg-white rounded-lg p-0.5 text-[10px] font-bold border border-[#E0E0E0] shrink-0">
                             <button
                               type="button"
                               onClick={() => setNoticeLang('EN')}
-                              className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'EN' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+                              className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'EN' ? 'bg-amber-400 text-slate-950 font-black' : 'text-[#616161] hover:text-white'}`}
                             >
                               English
                             </button>
                             <button
                               type="button"
                               onClick={() => setNoticeLang('HINGLISH')}
-                              className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'HINGLISH' ? 'bg-amber-400 text-slate-950 font-black' : 'text-slate-400 hover:text-white'}`}
+                              className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${noticeLang === 'HINGLISH' ? 'bg-amber-400 text-slate-950 font-black' : 'text-[#616161] hover:text-white'}`}
                             >
                               Hinglish
                             </button>
                           </div>
                         </div>
                         {noticeLang === 'EN' ? (
-                          <p className="text-[11px] leading-relaxed text-amber-200/90 font-medium">
+                          <p className="text-[11px] leading-relaxed text-[#E65100] font-medium">
                             ⚠️ <strong>AFTER you have paid in UPI PG</strong>, instead of being stuck on that page, <strong>CLICK back and return here</strong>, otherwise we will forget your payment as we track payments and accounts by the pay now button click.
                           </p>
                         ) : (
-                          <p className="text-[11px] leading-relaxed text-amber-200/90 font-medium">
+                          <p className="text-[11px] leading-relaxed text-[#E65100] font-medium">
                             ⚠️ <strong>UPI PG mein payment complete karne ke baad</strong>, wahan page par ruke rehne ke bajaye <strong>CLICK back karke yahan wapas aaiye</strong>, warna hum aapki payment bhool sakte hain kyunki hum payments aur accounts ko Pay Now button click ke through track karte hain.
                           </p>
                         )}
@@ -763,21 +763,21 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                     </div>
 
                     {/* Gateway Link Preview & Copy */}
-                    <div className="flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-800 text-[11px] font-mono text-slate-400 mt-2">
+                    <div className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-[#E0E0E0] text-[11px] font-mono text-[#616161] mt-2">
                       <span className="truncate pr-2">{PaymentService.getSchoolGatewayUrl()}</span>
                       <button
                         type="button"
                         onClick={handleCopyLink}
-                        className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold rounded-lg text-[10px] transition-colors flex items-center space-x-1 flex-shrink-0 cursor-pointer"
+                        className="px-2.5 py-1 bg-[#F5F5F5] hover:bg-slate-700 text-amber-300 font-bold rounded-lg text-[10px] transition-colors flex items-center space-x-1 flex-shrink-0 cursor-pointer"
                       >
                         {copiedLink ? (
                           <>
-                            <Check className="w-3 h-3 text-emerald-400" />
+                            <Check className="w-3 h-3 text-[#00796B]" />
                             <span className="text-emerald-300">Copied!</span>
                           </>
                         ) : (
                           <>
-                            <Copy className="w-3 h-3 text-slate-400" />
+                            <Copy className="w-3 h-3 text-[#616161]" />
                             <span>Copy Link</span>
                           </>
                         )}
@@ -786,14 +786,14 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                   </div>
 
                   {/* STEP 2: PAYMENT OK SCREEN FOR TEACHER ADMIN ACCOUNT */}
-                  <div className="p-5 bg-slate-950 rounded-2xl border border-emerald-500/40 space-y-3 flex flex-col justify-between">
+                  <div className="p-5 bg-[#EEEEEE] rounded-2xl border border-emerald-500/40 space-y-3 flex flex-col justify-between">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-emerald-300 flex items-center space-x-1.5">
-                          <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[11px] font-black">2</span>
+                          <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-[#00796B] flex items-center justify-center text-[11px] font-black">2</span>
                           <span>{hasOpenedGateway ? 'Payment OK. Complete Activation:-' : 'Step 2: Instant Teacher Admin Activation'}</span>
                         </span>
-                        <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                        <span className="text-[10px] font-mono text-[#00796B] font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
                           Zero Wait Time
                         </span>
                       </div>
@@ -805,14 +805,14 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                             <span>Student Account Detected ({currentLearner?.fullName})</span>
                           </div>
-                          <p className="text-[11px] text-amber-200/90 leading-relaxed">
+                          <p className="text-[11px] text-[#E65100] leading-relaxed">
                             To prevent quiz answer tampering and protect classroom assessments, <strong>Teacher Admin accounts are strictly isolated from student learner accounts</strong>. Student accounts cannot view teacher answer keys or class diagnostics. Please set up your separate Educator account below.
                           </p>
                           <div className="flex items-center space-x-2 pt-1">
                             <button
                               type="button"
                               onClick={() => logout()}
-                              className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-[10px] transition-colors cursor-pointer"
+                              className="px-3 py-1 bg-[#F5F5F5] hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-[10px] transition-colors cursor-pointer"
                             >
                               Sign Out of Student Account
                             </button>
@@ -822,75 +822,75 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
 
                       {/* If user is NOT a verified Teacher yet: Dedicated Educator Setup */}
                       {(!isAuthenticated || (currentLearner && currentLearner.role !== 'TEACHER' && currentLearner.role !== 'SUPER_ADMIN')) ? (
-                        <div className="space-y-2.5 bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
-                          <div className="flex items-center space-x-2 text-xs font-bold text-white">
+                        <div className="space-y-2.5 bg-slate-900/80 p-3.5 rounded-xl border border-[#E0E0E0]">
+                          <div className="flex items-center space-x-2 text-xs font-bold text-[#212121]">
                             <UserCheck className="w-4 h-4 text-amber-400" />
                             <span>Setup Dedicated Teacher Admin Account (Isolated from Student Accounts)</span>
                           </div>
-                          <p className="text-[11px] text-slate-400">
+                          <p className="text-[11px] text-[#616161]">
                             Create your official educator credentials to access the Teacher Dashboard, live quiz tracker, and distribute your {selectedPack === 'PLUS_20' ? '20' : '40'} A-Codes.
                           </p>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
-                              <label className="block text-[10px] font-semibold text-slate-400 mb-0.5">Teacher Name</label>
+                              <label className="block text-[10px] font-semibold text-[#616161] mb-0.5">Teacher Name</label>
                               <input
                                 type="text"
                                 placeholder="e.g. Mrs. Sunita Sharma"
                                 value={teacherName}
                                 onChange={e => setTeacherName(e.target.value)}
-                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
+                                className="w-full bg-[#EEEEEE] border border-[#E0E0E0] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
                               />
                             </div>
                             <div>
-                              <label className="block text-[10px] font-semibold text-slate-400 mb-0.5">School Email</label>
+                              <label className="block text-[10px] font-semibold text-[#616161] mb-0.5">School Email</label>
                               <input
                                 type="email"
                                 placeholder="teacher@dps-school.edu.in"
                                 value={teacherEmail}
                                 onChange={e => setTeacherEmail(e.target.value)}
-                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
+                                className="w-full bg-[#EEEEEE] border border-[#E0E0E0] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
                               />
                             </div>
                           </div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
-                              <label className="block text-[10px] font-semibold text-slate-400 mb-0.5">Account Password</label>
+                              <label className="block text-[10px] font-semibold text-[#616161] mb-0.5">Account Password</label>
                               <input
                                 type="password"
                                 placeholder="Choose login password"
                                 value={teacherPassword}
                                 onChange={e => setTeacherPassword(e.target.value)}
-                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
+                                className="w-full bg-[#EEEEEE] border border-[#E0E0E0] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
                               />
                             </div>
                             <div>
-                              <label className="block text-[10px] font-semibold text-slate-400 mb-0.5">School / Center Name</label>
+                              <label className="block text-[10px] font-semibold text-[#616161] mb-0.5">School / Center Name</label>
                               <input
                                 type="text"
                                 placeholder="e.g. Delhi Public School"
                                 value={schoolName}
                                 onChange={e => setSchoolName(e.target.value)}
-                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
+                                className="w-full bg-[#EEEEEE] border border-[#E0E0E0] rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400"
                               />
                             </div>
                           </div>
                         </div>
                       ) : (
                         <div className="p-3 bg-slate-900/90 rounded-xl border border-emerald-500/30 text-xs space-y-1">
-                          <div className="flex items-center space-x-1.5 text-emerald-400 font-bold">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                          <div className="flex items-center space-x-1.5 text-[#00796B] font-bold">
+                            <CheckCircle2 className="w-4 h-4 text-[#00796B]" />
                             <span>Verified Educator Account: {currentLearner?.fullName}</span>
                           </div>
-                          <p className="text-[11px] text-slate-300">
+                          <p className="text-[11px] text-[#424242]">
                             Teacher Admin role confirmed ({currentLearner?.email}). Ready to unlock classroom license.
                           </p>
                         </div>
                       )}
 
                       <div>
-                        <label className="block text-[11px] text-slate-400 mb-1">
+                        <label className="block text-[11px] text-[#616161] mb-1">
                           12-Digit UPI PG Reference / UTR *
                         </label>
                         <input
@@ -899,7 +899,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                           placeholder="Enter 12-digit UTR number from payment receipt"
                           value={customRef}
                           onChange={e => setCustomRef(e.target.value.replace(/[^0-9]/g, '').slice(0, 12))}
-                          className="w-full bg-slate-900 border border-slate-800 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 font-mono focus:outline-none"
+                          className="w-full bg-white border border-[#E0E0E0] focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-[#212121] placeholder-slate-500 font-mono focus:outline-none"
                         />
                       </div>
                     </div>
@@ -932,32 +932,32 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
 
             {/* Feature Highlights Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+              <div className="p-5 bg-white border border-[#E0E0E0] rounded-2xl space-y-2">
                 <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
                   <BarChart3 className="w-5 h-5 text-amber-400" />
                 </div>
-                <h4 className="font-bold text-sm text-white">Live Student Quiz Tracker</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <h4 className="font-bold text-sm text-[#212121]">Live Student Quiz Tracker</h4>
+                <p className="text-xs text-[#616161] leading-relaxed">
                   Real-time classroom monitoring. See student attempts, scores, and accuracy percentages as they practice.
                 </p>
               </div>
 
-              <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+              <div className="p-5 bg-white border border-[#E0E0E0] rounded-2xl space-y-2">
                 <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center">
                   <TrendingDown className="w-5 h-5 text-rose-400" />
                 </div>
-                <h4 className="font-bold text-sm text-white">Student Weak Point Diagnostics</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <h4 className="font-bold text-sm text-[#212121]">Student Weak Point Diagnostics</h4>
+                <p className="text-xs text-[#616161] leading-relaxed">
                   Automated learning gap detection. Identify exactly which topics students struggle with before term exams.
                 </p>
               </div>
 
-              <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
-                  <KeyRound className="w-5 h-5 text-indigo-400" />
+              <div className="p-5 bg-white border border-[#E0E0E0] rounded-2xl space-y-2">
+                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-[#3F51B5] flex items-center justify-center">
+                  <KeyRound className="w-5 h-5 text-[#3F51B5]" />
                 </div>
-                <h4 className="font-bold text-sm text-white">Bulk Voucher Generator</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <h4 className="font-bold text-sm text-[#212121]">Bulk Voucher Generator</h4>
+                <p className="text-xs text-[#616161] leading-relaxed">
                   Mint 20 Plus or 40 Lite A-Codes with 1 click. Copy, print, or share via WhatsApp with parents and students.
                 </p>
               </div>
@@ -975,16 +975,16 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
 
         {/* PUBLIC VIEW: A-CODES LOCKED TEASER (IF SOMEONE CLICKS ACODES BEFORE PAYMENT) */}
         {!isTeacherDashboard && activeTab === 'ACODES' && (
-          <div className="bg-slate-900 border-2 border-dashed border-amber-500/40 rounded-3xl p-8 sm:p-12 text-center space-y-5 shadow-2xl">
+          <div className="bg-white border-2 border-dashed border-amber-500/40 rounded-3xl p-8 sm:p-12 text-center space-y-5 shadow-2xl">
             <div className="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto shadow-lg shadow-amber-950/40">
               <Lock className="w-8 h-8" />
             </div>
 
             <div className="max-w-md mx-auto space-y-2">
-              <h3 className="text-xl font-black text-white">
+              <h3 className="text-xl font-black text-[#212121]">
                 🔒 Classroom A-Codes Vault is Locked
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#424242] leading-relaxed">
                 To protect institutional passes, student A-codes are not displayed in the open. 
                 Complete payment for the <strong>School Pack (₹2,499)</strong> and activate your Teacher Admin account to reveal and distribute your <strong>40 Lite (or 20 Plus) A-Codes</strong>.
               </p>
@@ -1004,21 +1004,21 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
 
         {/* TAB: A-CODES VAULT IN TEACHER DASHBOARD (REVEALED ONLY IN TEACHER DASHBOARD) */}
         {isTeacherDashboard && activeTab === 'ACODES' && (
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-5">
+          <div className="bg-white border border-[#E0E0E0] rounded-3xl p-6 sm:p-8 shadow-xl space-y-5">
             {activationMessage && (
               <div className="p-3 bg-emerald-950/80 border border-emerald-500/40 rounded-xl text-xs text-emerald-300 flex items-center space-x-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#00796B] shrink-0" />
                 <span>{activationMessage.text}</span>
               </div>
             )}
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
-                <h3 className="text-lg font-black text-white flex items-center space-x-2">
+                <h3 className="text-lg font-black text-[#212121] flex items-center space-x-2">
                   <KeyRound className="w-5 h-5 text-amber-400" />
                   <span>Classroom A-Codes Voucher Vault ({totalCodesCount} Keys)</span>
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-[#616161] mt-0.5">
                   Distribute these unique voucher keys to your students. They can enter their code on the payment page or student profile for instant pass activation.
                 </p>
               </div>
@@ -1042,19 +1042,19 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
             </div>
 
             {/* Voucher Counter & Filter Bar */}
-            <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
+            <div className="p-4 bg-[#EEEEEE] rounded-2xl border border-[#E0E0E0] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
               <div className="flex items-center space-x-4">
                 <div>
-                  <span className="text-[10px] text-slate-400 uppercase font-mono block">Total Minted</span>
-                  <span className="text-base font-black text-white">{totalCodesCount}</span>
+                  <span className="text-[10px] text-[#616161] uppercase font-mono block">Total Minted</span>
+                  <span className="text-base font-black text-[#212121]">{totalCodesCount}</span>
                 </div>
-                <div className="border-l border-slate-800 pl-4">
-                  <span className="text-[10px] text-emerald-400 uppercase font-mono block">Available</span>
-                  <span className="text-base font-black text-emerald-400">{availableCount}</span>
+                <div className="border-l border-[#E0E0E0] pl-4">
+                  <span className="text-[10px] text-[#00796B] uppercase font-mono block">Available</span>
+                  <span className="text-base font-black text-[#00796B]">{availableCount}</span>
                 </div>
-                <div className="border-l border-slate-800 pl-4">
-                  <span className="text-[10px] text-slate-400 uppercase font-mono block">Redeemed</span>
-                  <span className="text-base font-black text-slate-300">{redeemedCount}</span>
+                <div className="border-l border-[#E0E0E0] pl-4">
+                  <span className="text-[10px] text-[#616161] uppercase font-mono block">Redeemed</span>
+                  <span className="text-base font-black text-[#424242]">{redeemedCount}</span>
                 </div>
               </div>
 
@@ -1066,26 +1066,26 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                     placeholder="Search code or student..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    className="bg-slate-900 border border-slate-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 w-44"
+                    className="bg-white border border-[#E0E0E0] rounded-xl pl-8 pr-3 py-1.5 text-xs text-[#212121] placeholder-slate-500 focus:outline-none focus:border-amber-400 w-44"
                   />
                 </div>
 
-                <div className="flex bg-slate-900 rounded-xl p-1 border border-slate-700 text-[10px] font-bold">
+                <div className="flex bg-white rounded-xl p-1 border border-[#E0E0E0] text-[10px] font-bold">
                   <button
                     onClick={() => setCodeFilter('ALL')}
-                    className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${codeFilter === 'ALL' ? 'bg-amber-400 text-slate-950' : 'text-slate-400'}`}
+                    className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${codeFilter === 'ALL' ? 'bg-amber-400 text-slate-950' : 'text-[#616161]'}`}
                   >
                     All
                   </button>
                   <button
                     onClick={() => setCodeFilter('AVAILABLE')}
-                    className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${codeFilter === 'AVAILABLE' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400'}`}
+                    className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${codeFilter === 'AVAILABLE' ? 'bg-emerald-500 text-slate-950 font-black' : 'text-[#616161]'}`}
                   >
                     Available
                   </button>
                   <button
                     onClick={() => setCodeFilter('REDEEMED')}
-                    className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${codeFilter === 'REDEEMED' ? 'bg-slate-700 text-white' : 'text-slate-400'}`}
+                    className={`px-2 py-1 rounded-lg transition-colors cursor-pointer ${codeFilter === 'REDEEMED' ? 'bg-slate-700 text-[#212121]' : 'text-[#616161]'}`}
                   >
                     Redeemed
                   </button>
@@ -1096,17 +1096,17 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
             {/* Grid of A-Codes */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {displayCodes.map((c) => (
-                <div key={c.code} className="p-3 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-between text-xs hover:border-slate-700 transition-colors">
+                <div key={c.code} className="p-3 bg-[#EEEEEE] border border-[#E0E0E0] rounded-2xl flex items-center justify-between text-xs hover:border-[#E0E0E0] transition-colors">
                   <div className="pr-2">
                     <div className="flex items-center space-x-1.5">
                       <span className="font-mono font-bold text-amber-300">{c.code}</span>
                       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                        c.isRedeemed ? 'bg-slate-800 text-slate-400' : 'bg-emerald-500/20 text-emerald-300'
+                        c.isRedeemed ? 'bg-[#F5F5F5] text-[#616161]' : 'bg-emerald-500/20 text-emerald-300'
                       }`}>
                         {c.isRedeemed ? 'REDEEMED' : 'AVAILABLE'}
                       </span>
                     </div>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">
+                    <span className="text-[10px] text-[#616161] block mt-0.5">
                       {c.planTier || 'LITE'} ({c.durationDays || 60} Days) • {c.isRedeemed ? 'Student: ' : 'Assigned: '}
                       <strong className={c.isRedeemed ? 'text-emerald-300 font-semibold' : 'text-slate-200'}>
                         {c.studentName || 'Unassigned'}
@@ -1116,10 +1116,10 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
 
                   <button
                     onClick={() => handleCopySingleCode(c.code)}
-                    className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-colors cursor-pointer shrink-0"
+                    className="p-2 bg-[#F5F5F5] hover:bg-slate-700 text-[#424242] hover:text-white rounded-xl transition-colors cursor-pointer shrink-0"
                     title="Copy Voucher Code"
                   >
-                    {copiedCode === c.code ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedCode === c.code ? <Check className="w-3.5 h-3.5 text-[#00796B]" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               ))}
@@ -1129,19 +1129,19 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
 
         {/* TAB 2: LIVE STUDENT QUIZ TRACKER */}
         {activeTab === 'TRACKER' && (
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-4">
+          <div className="bg-white border border-[#E0E0E0] rounded-3xl p-6 sm:p-8 shadow-xl space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
-                <h3 className="text-lg font-black text-white flex items-center space-x-2">
+                <h3 className="text-lg font-black text-[#212121] flex items-center space-x-2">
                   <BarChart3 className="w-5 h-5 text-amber-400" />
                   <span>Classroom Live Quiz Activity Feed</span>
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-[#616161] mt-0.5">
                   Real-time monitoring of Class 10 student assessments and quiz scores.
                 </p>
               </div>
               <div className="flex items-center space-x-2 text-xs">
-                <span className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg font-mono font-bold">
+                <span className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-[#00796B] rounded-lg font-mono font-bold">
                   ● Live Feed Active
                 </span>
               </div>
@@ -1149,7 +1149,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-950/80 text-slate-400 font-mono uppercase text-[10px] border-b border-slate-800">
+                <thead className="bg-slate-950/80 text-[#616161] font-mono uppercase text-[10px] border-b border-[#E0E0E0]">
                   <tr>
                     <th className="p-3">Student Name</th>
                     <th className="p-3">Subject &amp; Class</th>
@@ -1163,19 +1163,19 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                 <tbody className="divide-y divide-slate-800">
                   {sampleScores.map(s => (
                     <tr key={s.id} className="hover:bg-slate-800/40 transition-colors">
-                      <td className="p-3 font-bold text-white flex items-center space-x-2">
+                      <td className="p-3 font-bold text-[#212121] flex items-center space-x-2">
                         <span className="w-6 h-6 rounded-full bg-indigo-600/30 text-indigo-300 flex items-center justify-center text-[10px] font-bold">
                           {s.name.charAt(0)}
                         </span>
                         <span>{s.name}</span>
                       </td>
-                      <td className="p-3 text-slate-300">
+                      <td className="p-3 text-[#424242]">
                         {s.subject} (Cl. {s.grade})
                       </td>
-                      <td className="p-3 text-slate-300 font-medium">
+                      <td className="p-3 text-[#424242] font-medium">
                         {s.topic}
                       </td>
-                      <td className="p-3 text-center font-mono font-bold text-white">
+                      <td className="p-3 text-center font-mono font-bold text-[#212121]">
                         {s.score} / {s.maxScore}
                       </td>
                       <td className="p-3 text-center font-mono font-bold">
@@ -1186,7 +1186,7 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                           {s.accuracy}%
                         </span>
                       </td>
-                      <td className="p-3 text-slate-400 text-[11px] font-mono">
+                      <td className="p-3 text-[#616161] text-[11px] font-mono">
                         {s.date}
                       </td>
                       <td className="p-3 text-right">
@@ -1207,13 +1207,13 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
 
         {/* TAB 3: STUDENT WEAK POINTS DIAGNOSTICS */}
         {activeTab === 'WEAK_POINTS' && (
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-5">
+          <div className="bg-white border border-[#E0E0E0] rounded-3xl p-6 sm:p-8 shadow-xl space-y-5">
             <div>
-              <h3 className="text-lg font-black text-white flex items-center space-x-2">
+              <h3 className="text-lg font-black text-[#212121] flex items-center space-x-2">
                 <TrendingDown className="w-5 h-5 text-rose-400" />
                 <span>Automated Conceptual Weak Point Diagnostics</span>
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#616161] mt-0.5">
                 AI diagnostic scanner identifies chapters and concepts where multiple students failed mastery thresholds.
               </p>
             </div>
@@ -1232,10 +1232,10 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <span className="text-[10px] font-mono font-bold uppercase text-slate-400">
+                      <span className="text-[10px] font-mono font-bold uppercase text-[#616161]">
                         {w.subject} • Class {w.grade}
                       </span>
-                      <h4 className="font-extrabold text-sm text-white mt-0.5">
+                      <h4 className="font-extrabold text-sm text-[#212121] mt-0.5">
                         {w.topic}
                       </h4>
                     </div>
@@ -1247,18 +1247,18 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
                     </span>
                   </div>
 
-                  <div className="text-xs text-slate-300 space-y-1">
-                    <p className="text-slate-400">
-                      Struggling Students: <strong className="text-white">{w.strugglingCount} of {w.totalStudents}</strong>
+                  <div className="text-xs text-[#424242] space-y-1">
+                    <p className="text-[#616161]">
+                      Struggling Students: <strong className="text-[#212121]">{w.strugglingCount} of {w.totalStudents}</strong>
                     </p>
-                    <p className="text-[11px] text-slate-300 leading-relaxed italic bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                    <p className="text-[11px] text-[#424242] leading-relaxed italic bg-slate-950/60 p-2.5 rounded-xl border border-[#E0E0E0]">
                       💡 <strong>Teacher Diagnostic:</strong> {w.remedialNote}
                     </p>
                   </div>
 
                   <button
                     onClick={() => alert(`Launching 5-question remedial practice quiz for "${w.topic}". This will be assigned to all ${w.strugglingCount} struggling students!`)}
-                    className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                    className="w-full py-2 bg-[#F5F5F5] hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
                   >
                     <span>Launch 5-Question Remedial Quiz</span>
                     <ArrowRight className="w-3.5 h-3.5 text-amber-400" />

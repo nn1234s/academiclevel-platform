@@ -32,10 +32,10 @@ export const OfflineBankView: React.FC<OfflineBankViewProps> = ({ learner }) => 
             <WifiOff className="w-3 h-3" />
             <span>Zero-Latency Fallback Engine</span>
           </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-2">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#212121] mt-2">
             Offline Question Bank
           </h2>
-          <p className="text-xs text-slate-300 mt-1 max-w-md">
+          <p className="text-xs text-[#424242] mt-1 max-w-md">
             Guarantees uninterrupted learning even during 2G/3G network drops or connection interruptions. Seamlessly activates whenever offline or when remote network is unavailable.
           </p>
         </div>
@@ -50,12 +50,12 @@ export const OfflineBankView: React.FC<OfflineBankViewProps> = ({ learner }) => 
         </button>
       </div>
 
-      <div className="p-3 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-between text-xs text-slate-400">
+      <div className="p-3 bg-[#EEEEEE] border border-[#E0E0E0] rounded-2xl flex items-center justify-between text-xs text-[#616161]">
         <div className="flex items-center space-x-2">
-          <HardDrive className="w-4 h-4 text-emerald-400" />
+          <HardDrive className="w-4 h-4 text-[#00796B]" />
           <span>Status: <strong className="text-slate-200">{syncStatus}</strong></span>
         </div>
-        <span className="text-[10px] font-mono bg-slate-900 px-2.5 py-1 rounded-lg text-cyan-300">
+        <span className="text-[10px] font-mono bg-white px-2.5 py-1 rounded-lg text-cyan-300">
           {learner.board} Class {learner.grade}
         </span>
       </div>
@@ -69,7 +69,7 @@ export const OfflineBankView: React.FC<OfflineBankViewProps> = ({ learner }) => 
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all ${
               activeSubject === subj
                 ? 'bg-indigo-600 text-white shadow-md'
-                : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                : 'bg-white border border-[#E0E0E0] text-[#616161] hover:text-[#212121]'
             }`}
           >
             {subj}
@@ -78,15 +78,15 @@ export const OfflineBankView: React.FC<OfflineBankViewProps> = ({ learner }) => 
       </div>
 
       {/* Questions Preview */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-        <h3 className="text-sm font-bold text-white flex items-center justify-between">
+      <div className="bg-white border border-[#E0E0E0] rounded-3xl p-6 shadow-xl space-y-4">
+        <h3 className="text-sm font-bold text-[#212121] flex items-center justify-between">
           <span>Cached Syllabus Questions ({questions.length})</span>
-          <span className="text-xs font-normal text-slate-400">{activeNode} Tier</span>
+          <span className="text-xs font-normal text-[#616161]">{activeNode} Tier</span>
         </h3>
 
         <div className="space-y-3">
           {questions.map((q, idx) => (
-            <div key={q.id || idx} className="bg-slate-950 border border-slate-800/80 rounded-2xl p-4 text-xs space-y-2">
+            <div key={q.id || idx} className="bg-[#EEEEEE] border border-[#E0E0E0] rounded-2xl p-4 text-xs space-y-2">
               <div className="flex justify-between items-start">
                 <span className="font-mono text-[10px] text-cyan-400 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-800/50">
                   {q.topicTag || 'Core Topic'}
@@ -101,7 +101,7 @@ export const OfflineBankView: React.FC<OfflineBankViewProps> = ({ learner }) => 
                     className={`p-2 rounded-xl border text-[11px] ${
                       oIdx === q.correctIndex
                         ? 'border-emerald-500/50 bg-emerald-950/20 text-emerald-300 font-bold'
-                        : 'border-slate-800/80 text-slate-400'
+                        : 'border-[#E0E0E0] text-[#616161]'
                     }`}
                   >
                     {String.fromCharCode(65 + oIdx)}. {opt}

@@ -65,16 +65,16 @@ export const CertificateVerificationView: React.FC<CertificateVerificationViewPr
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 text-slate-100">
       {/* Header Bar */}
-      <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-800">
+      <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#E0E0E0]">
         <button
           onClick={onNavigateHome}
-          className="flex items-center space-x-2 text-xs font-bold text-slate-400 hover:text-white transition-colors"
+          className="flex items-center space-x-2 text-xs font-bold text-[#616161] hover:text-[#212121] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Return to AcademicLevel</span>
         </button>
 
-        <div className="flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+        <div className="flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[#00796B] text-xs font-semibold">
           <ShieldCheck className="w-3.5 h-3.5" />
           <span>Official Public Registry</span>
         </div>
@@ -85,10 +85,10 @@ export const CertificateVerificationView: React.FC<CertificateVerificationViewPr
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center text-white mx-auto shadow-xl shadow-indigo-950 mb-3">
           <Award className="w-7 h-7" />
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#212121] tracking-tight">
           Academic Credential Verification
         </h1>
-        <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-lg mx-auto">
+        <p className="text-xs sm:text-sm text-[#616161] mt-1 max-w-lg mx-auto">
           Verify authentic course mastery awards and annual master honors issued by AcademicLevel Council.
         </p>
 
@@ -105,7 +105,7 @@ export const CertificateVerificationView: React.FC<CertificateVerificationViewPr
             placeholder="Enter token (e.g. tok_... or CERT-...)"
             value={tokenInput}
             onChange={(e) => setTokenInput(e.target.value)}
-            className="flex-1 bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none"
+            className="flex-1 bg-white border border-[#E0E0E0] focus:border-indigo-500 rounded-xl px-4 py-2.5 text-xs text-[#212121] placeholder-slate-500 focus:outline-none"
           />
           <button
             type="submit"
@@ -123,42 +123,42 @@ export const CertificateVerificationView: React.FC<CertificateVerificationViewPr
           <div className="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
           {/* Verification Badge */}
-          <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
-            <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs">
+          <div className="flex items-center justify-between pb-4 border-b border-[#E0E0E0] mb-6">
+            <div className="flex items-center space-x-2 text-[#00796B] font-bold text-xs">
               <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
               <span>OFFICIALLY VERIFIED &amp; VALID CREDENTIAL</span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 bg-slate-800 px-2.5 py-1 rounded-md">
+            <span className="text-[10px] font-mono text-[#616161] bg-[#F5F5F5] px-2.5 py-1 rounded-md">
               ID: {result.certificateId}
             </span>
           </div>
 
           <div className="space-y-4">
             <div>
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest block">Recipient Scholar</span>
-              <h2 className="text-xl sm:text-2xl font-black text-white mt-0.5">{result.learnerName}</h2>
+              <span className="text-[10px] font-mono text-[#616161] uppercase tracking-widest block">Recipient Scholar</span>
+              <h2 className="text-xl sm:text-2xl font-black text-[#212121] mt-0.5">{result.learnerName}</h2>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-              <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80">
-                <span className="text-[10px] text-slate-400 block font-medium">Curriculum</span>
+              <div className="p-3 bg-slate-950/60 rounded-xl border border-[#E0E0E0]">
+                <span className="text-[10px] text-[#616161] block font-medium">Curriculum</span>
                 <span className="text-xs font-bold text-slate-200 mt-0.5 block">{result.board}</span>
               </div>
-              <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80">
-                <span className="text-[10px] text-slate-400 block font-medium">Grade / Class</span>
+              <div className="p-3 bg-slate-950/60 rounded-xl border border-[#E0E0E0]">
+                <span className="text-[10px] text-[#616161] block font-medium">Grade / Class</span>
                 <span className="text-xs font-bold text-slate-200 mt-0.5 block">Class {result.grade}</span>
               </div>
-              <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80">
-                <span className="text-[10px] text-slate-400 block font-medium">Subject</span>
+              <div className="p-3 bg-slate-950/60 rounded-xl border border-[#E0E0E0]">
+                <span className="text-[10px] text-[#616161] block font-medium">Subject</span>
                 <span className="text-xs font-bold text-slate-200 mt-0.5 block capitalize">{result.subjectName}</span>
               </div>
-              <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80">
-                <span className="text-[10px] text-slate-400 block font-medium">Honor Tier</span>
+              <div className="p-3 bg-slate-950/60 rounded-xl border border-[#E0E0E0]">
+                <span className="text-[10px] text-[#616161] block font-medium">Honor Tier</span>
                 <span className="text-xs font-bold text-amber-300 mt-0.5 block">{result.levelName || 'Mastery'}</span>
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-slate-400 gap-2">
+            <div className="pt-4 border-t border-[#E0E0E0] flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-[#616161] gap-2">
               <div>
                 <span>Academic Year: <strong className="text-slate-200">{result.academicYear}</strong></span>
                 <span className="mx-2">•</span>
@@ -174,10 +174,10 @@ export const CertificateVerificationView: React.FC<CertificateVerificationViewPr
 
       {/* Error / Not Found Card */}
       {hasSearched && !loading && error && (
-        <div className="bg-slate-900 border border-red-500/30 rounded-3xl p-6 sm:p-8 text-center text-slate-300 shadow-xl space-y-3">
+        <div className="bg-white border border-red-500/30 rounded-3xl p-6 sm:p-8 text-center text-[#424242] shadow-xl space-y-3">
           <XCircle className="w-10 h-10 text-red-400 mx-auto" />
-          <h3 className="text-base font-bold text-white">Verification Failed</h3>
-          <p className="text-xs text-slate-400 max-w-md mx-auto">{error}</p>
+          <h3 className="text-base font-bold text-[#212121]">Verification Failed</h3>
+          <p className="text-xs text-[#616161] max-w-md mx-auto">{error}</p>
         </div>
       )}
     </div>

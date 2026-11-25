@@ -280,7 +280,7 @@ export const NotFoundPika: React.FC<NotFoundPikaProps> = ({
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center p-4 sm:p-8 bg-slate-950">
+    <div className="min-h-[85vh] flex items-center justify-center p-4 sm:p-8 bg-[#EEEEEE]">
       {/* Main Container Card — Google 404 Aesthetic with AcademicLevel Polish */}
       <div className="w-full max-w-4xl bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6 sm:p-12 items-center">
@@ -389,7 +389,7 @@ export const NotFoundPika: React.FC<NotFoundPikaProps> = ({
                   <Zap className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
                   Tall Grass Bush
                 </span>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] text-[#616161]">
                   {bushClickCount === 0
                     ? 'Click the bush to rustle it!'
                     : `Rustled ${bushClickCount} ${bushClickCount === 1 ? 'time' : 'times'}! (Keep shaking!)`}
@@ -411,11 +411,11 @@ export const NotFoundPika: React.FC<NotFoundPikaProps> = ({
                   placeholder="e.g. CBSE Class 10 Science, ICSE Math, IGCSE Biology..."
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm"
                 />
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                <Search className="w-4 h-4 text-[#616161] absolute left-3.5 top-3" />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3 top-2.5 text-[#616161] hover:text-slate-600"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -442,7 +442,7 @@ export const NotFoundPika: React.FC<NotFoundPikaProps> = ({
                                 {course.board}
                               </span>
                             </div>
-                            <div className="text-[10px] text-slate-400 truncate max-w-xs mt-0.5">
+                            <div className="text-[10px] text-[#616161] truncate max-w-xs mt-0.5">
                               {course.topics.slice(0, 3).join(' • ')}
                             </div>
                           </div>
@@ -530,7 +530,7 @@ export const NotFoundPika: React.FC<NotFoundPikaProps> = ({
             {/* Modal Header */}
             <div className="p-5 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Gamepad2 className="w-6 h-6 text-white" />
+                <Gamepad2 className="w-6 h-6 text-[#212121]" />
                 <div>
                   <h3 className="font-extrabold text-base leading-tight">Secret Boredom Relief Zone</h3>
                   <p className="text-[11px] text-amber-100">AcademicLevel Easter Egg Vault • Pokémon Edition</p>
@@ -538,7 +538,7 @@ export const NotFoundPika: React.FC<NotFoundPikaProps> = ({
               </div>
               <button
                 onClick={() => setShowBoredModal(false)}
-                className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors"
+                className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-[#212121] transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -583,7 +583,7 @@ export const NotFoundPika: React.FC<NotFoundPikaProps> = ({
                 </div>
 
                 {/* Game Field */}
-                <div className="relative w-full h-32 bg-slate-900 rounded-xl overflow-hidden border border-emerald-300/50">
+                <div className="relative w-full h-32 bg-white rounded-xl overflow-hidden border border-emerald-300/50">
                   {gameActive ? (
                     <button
                       onClick={handleCatchSpark}
@@ -593,11 +593,11 @@ export const NotFoundPika: React.FC<NotFoundPikaProps> = ({
                       <Zap className="w-5 h-5 text-slate-950 fill-slate-950" />
                     </button>
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 text-xs">
+                    <div className="w-full h-full flex flex-col items-center justify-center text-[#616161] text-xs">
                       {gameScore > 0 ? (
                         <div className="text-center">
-                          <p className="text-emerald-400 font-bold text-sm">🎉 Game Over! Final Score: {gameScore} Sparks!</p>
-                          <p className="text-[11px] text-slate-400 mt-0.5">Ash Ketchum would be proud of your lightning reflexes!</p>
+                          <p className="text-[#00796B] font-bold text-sm">🎉 Game Over! Final Score: {gameScore} Sparks!</p>
+                          <p className="text-[11px] text-[#616161] mt-0.5">Ash Ketchum would be proud of your lightning reflexes!</p>
                         </div>
                       ) : (
                         <p>Click "Start" to catch wild lightning sparks!</p>
@@ -658,7 +658,7 @@ export const NotFoundPika: React.FC<NotFoundPikaProps> = ({
                   />
                   <button
                     type="submit"
-                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition-all"
+                    className="px-3 py-1.5 bg-[#F5F5F5] hover:bg-white text-white font-bold text-xs rounded-xl transition-all"
                   >
                     Enter Code
                   </button>
@@ -679,7 +679,7 @@ export const NotFoundPika: React.FC<NotFoundPikaProps> = ({
               </span>
               <button
                 onClick={() => setShowBoredModal(false)}
-                className="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl"
+                className="px-4 py-1.5 bg-[#F5F5F5] hover:bg-slate-700 text-white font-bold text-xs rounded-xl"
               >
                 Close Arcade
               </button>

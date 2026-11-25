@@ -98,9 +98,9 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-red-500 selection:text-white">
+    <div className="min-h-screen bg-[#EEEEEE] text-slate-100 flex flex-col selection:bg-red-500 selection:text-white">
       {/* Top Header */}
-      <header className="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40">
+      <header className="bg-slate-900/90 backdrop-blur-md border-b border-[#E0E0E0] sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-red-600 to-rose-500 flex items-center justify-center text-white font-black shadow-md shadow-red-950">
@@ -110,7 +110,7 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
               <span className="text-[10px] font-mono font-bold tracking-widest text-red-400 uppercase block">
                 PRIVACY &amp; DATA SAFETY
               </span>
-              <h1 className="text-base font-bold text-white tracking-tight">
+              <h1 className="text-base font-bold text-[#212121] tracking-tight">
                 AcademicLevel Account Deletion
               </h1>
             </div>
@@ -118,7 +118,7 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
 
           <button
             onClick={onBackToApp}
-            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl border border-slate-700 transition-all flex items-center space-x-1.5 cursor-pointer"
+            className="px-3 py-1.5 bg-[#F5F5F5] hover:bg-slate-700 text-white text-xs font-semibold rounded-xl border border-[#E0E0E0] transition-all flex items-center space-x-1.5 cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to App</span>
@@ -130,61 +130,61 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-1 w-full space-y-8">
         {/* Compliance Badges */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono font-bold flex items-center space-x-1.5">
+          <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-[#00796B] border border-emerald-500/20 text-xs font-mono font-bold flex items-center space-x-1.5">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Google Play Policy Compliant</span>
           </span>
-          <span className="px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-mono font-bold flex items-center space-x-1.5">
+          <span className="px-2.5 py-1 rounded-full bg-indigo-500/10 text-[#3F51B5] border border-indigo-500/20 text-xs font-mono font-bold flex items-center space-x-1.5">
             <ShieldAlert className="w-3.5 h-3.5" />
             <span>DPDP Act 2023 Safe</span>
           </span>
-          <span className="px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-xs font-mono">
+          <span className="px-2.5 py-1 rounded-full bg-[#F5F5F5] text-[#616161] border border-[#E0E0E0] text-xs font-mono">
             URL: academiclevel.in/delacc
           </span>
         </div>
 
         {/* Hero Title */}
         <div className="space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#212121] tracking-tight">
             Request Permanent Account &amp; Data Deletion
           </h2>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-[#424242] leading-relaxed">
             In compliance with Google Play&apos;s Account Deletion Policy, users and guardians may request complete and permanent deletion of their AcademicLevel student account and all associated personal data at any time.
           </p>
         </div>
 
         {/* What gets deleted breakdown */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-          <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+        <div className="bg-white border border-[#E0E0E0] rounded-3xl p-6 shadow-xl space-y-4">
+          <h3 className="text-sm font-bold text-[#212121] flex items-center space-x-2">
             <Trash2 className="w-4 h-4 text-red-400" />
             <span>What happens when you delete your account?</span>
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-300">
-            <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800/80 space-y-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-[#424242]">
+            <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-[#E0E0E0] space-y-1">
               <strong className="text-red-400 block font-bold">1. Profile &amp; Identifiers</strong>
-              <p className="text-slate-400 leading-normal">
+              <p className="text-[#616161] leading-normal">
                 Your name, email address, grade, school board, parent phone number, and password hashes are permanently erased.
               </p>
             </div>
 
-            <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800/80 space-y-1">
+            <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-[#E0E0E0] space-y-1">
               <strong className="text-red-400 block font-bold">2. Learning Progress &amp; Quizzes</strong>
-              <p className="text-slate-400 leading-normal">
+              <p className="text-[#616161] leading-normal">
                 All course completions, quiz attempts, answer history, Nova AI chat transcripts, and streak records are wiped.
               </p>
             </div>
 
-            <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800/80 space-y-1">
+            <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-[#E0E0E0] space-y-1">
               <strong className="text-red-400 block font-bold">3. Study Coins &amp; Rewards</strong>
-              <p className="text-slate-400 leading-normal">
+              <p className="text-[#616161] leading-normal">
                 Unspent Study Coin balances, coin transaction ledgers, prize requests, and referral codes are permanently voided.
               </p>
             </div>
 
-            <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800/80 space-y-1">
+            <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-[#E0E0E0] space-y-1">
               <strong className="text-red-400 block font-bold">4. Certificates &amp; Active Logins</strong>
-              <p className="text-slate-400 leading-normal">
+              <p className="text-[#616161] leading-normal">
                 Earned certificates become invalid, and all active login sessions on any mobile device or browser are immediately terminated.
               </p>
             </div>
@@ -201,12 +201,12 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
         {/* Success Confirmation Card */}
         {successInfo ? (
           <div className="bg-gradient-to-b from-emerald-950/40 to-slate-900 border-2 border-emerald-500/60 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-4 animate-in zoom-in-95">
-            <div className="w-14 h-14 bg-emerald-500/20 rounded-2xl border border-emerald-500/40 flex items-center justify-center mx-auto text-emerald-400">
+            <div className="w-14 h-14 bg-emerald-500/20 rounded-2xl border border-emerald-500/40 flex items-center justify-center mx-auto text-[#00796B]">
               <CheckCircle2 className="w-8 h-8" />
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-xl font-bold text-white">
+              <h3 className="text-xl font-bold text-[#212121]">
                 Account Deletion Completed
               </h3>
               <p className="text-xs text-emerald-300 max-w-md mx-auto">
@@ -214,18 +214,18 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
               </p>
             </div>
 
-            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 font-mono text-xs max-w-sm mx-auto text-left space-y-1">
+            <div className="bg-[#EEEEEE] p-4 rounded-2xl border border-[#E0E0E0] font-mono text-xs max-w-sm mx-auto text-left space-y-1">
               <div className="flex justify-between">
                 <span className="text-slate-500">Reference ID:</span>
-                <span className="text-emerald-400 font-bold">{successInfo.referenceId}</span>
+                <span className="text-[#00796B] font-bold">{successInfo.referenceId}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Processed At:</span>
-                <span className="text-slate-300">{successInfo.timestamp}</span>
+                <span className="text-[#424242]">{successInfo.timestamp}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Status:</span>
-                <span className="text-emerald-400 font-bold">PERMANENTLY_PURGED</span>
+                <span className="text-[#00796B] font-bold">PERMANENTLY_PURGED</span>
               </div>
             </div>
 
@@ -238,12 +238,12 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
           </div>
         ) : (
           /* Deletion Request Form */
-          <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
-            <div className="border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white">
+          <form onSubmit={handleSubmit} className="bg-white border border-[#E0E0E0] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
+            <div className="border-b border-[#E0E0E0] pb-3">
+              <h3 className="text-base font-bold text-[#212121]">
                 {learner ? 'Confirm Your Account Deletion' : 'Web Deletion Request Form'}
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#616161] mt-0.5">
                 {learner
                   ? `Signed in as ${learner.fullName} (${learner.email || learner.phone})`
                   : 'Enter your registered details to initiate account and data purge.'}
@@ -259,8 +259,8 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center space-x-1.5">
-                  <Mail className="w-3.5 h-3.5 text-slate-400" />
+                <label className="block text-xs font-medium text-[#424242] mb-1.5 flex items-center space-x-1.5">
+                  <Mail className="w-3.5 h-3.5 text-[#616161]" />
                   <span>Registered Account Email or Mobile Number <span className="text-red-400">*</span></span>
                 </label>
                 <input
@@ -270,14 +270,14 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
                   value={emailOrPhone}
                   onChange={e => setEmailOrPhone(e.target.value)}
                   disabled={Boolean(learner)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-red-500 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none disabled:opacity-75 font-mono"
+                  className="w-full bg-[#EEEEEE] border border-[#E0E0E0] focus:border-red-500 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none disabled:opacity-75 font-mono"
                 />
               </div>
 
               {!learner && (
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center space-x-1.5">
-                    <User className="w-3.5 h-3.5 text-slate-400" />
+                  <label className="block text-xs font-medium text-[#424242] mb-1.5 flex items-center space-x-1.5">
+                    <User className="w-3.5 h-3.5 text-[#616161]" />
                     <span>Registered Student Name (Optional)</span>
                   </label>
                   <input
@@ -285,14 +285,14 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
                     placeholder="e.g. Aarav Sharma"
                     value={learnerName}
                     onChange={e => setLearnerName(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-red-500 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none"
+                    className="w-full bg-[#EEEEEE] border border-[#E0E0E0] focus:border-red-500 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center space-x-1.5">
-                  <Lock className="w-3.5 h-3.5 text-slate-400" />
+                <label className="block text-xs font-medium text-[#424242] mb-1.5 flex items-center space-x-1.5">
+                  <Lock className="w-3.5 h-3.5 text-[#616161]" />
                   <span>Account Password or 4-digit Parent PIN</span>
                 </label>
                 <input
@@ -300,7 +300,7 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
                   placeholder="Required for instant verification (or leave blank for manual review)"
                   value={passwordOrPin}
                   onChange={e => setPasswordOrPin(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-red-500 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none font-mono"
+                  className="w-full bg-[#EEEEEE] border border-[#E0E0E0] focus:border-red-500 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none font-mono"
                 />
                 <span className="text-[11px] text-slate-500 mt-1 block">
                   Providing your password or 4-digit PIN allows instantaneous automatic purge.
@@ -308,14 +308,14 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5 flex items-center space-x-1.5">
-                  <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
+                <label className="block text-xs font-medium text-[#424242] mb-1.5 flex items-center space-x-1.5">
+                  <HelpCircle className="w-3.5 h-3.5 text-[#616161]" />
                   <span>Reason for Deletion (Optional)</span>
                 </label>
                 <select
                   value={reason}
                   onChange={e => setReason(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-red-500 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none"
+                  className="w-full bg-[#EEEEEE] border border-[#E0E0E0] focus:border-red-500 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none"
                 >
                   <option value="No longer using the app">No longer using the app</option>
                   <option value="Privacy concerns">Privacy concerns</option>
@@ -332,9 +332,9 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
                     type="checkbox"
                     checked={agreed}
                     onChange={e => setAgreed(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 rounded text-red-600 focus:ring-red-500 border-slate-700 bg-slate-950"
+                    className="mt-0.5 w-4 h-4 rounded text-red-600 focus:ring-red-500 border-[#E0E0E0] bg-[#EEEEEE]"
                   />
-                  <span className="text-xs text-slate-300 leading-relaxed">
+                  <span className="text-xs text-[#424242] leading-relaxed">
                     I understand that deleting my account will permanently remove all my profile details, quiz histories, certificates, and earned Study Coins, and that this action cannot be undone.
                   </span>
                 </label>
@@ -356,7 +356,7 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
         <div className="text-center text-xs text-slate-500 space-y-1">
           <p>
             Need assistance or have privacy inquiries? Contact our Data Protection Officer at{' '}
-            <a href="mailto:academiclevels@gmail.com" className="text-indigo-400 hover:underline">
+            <a href="mailto:academiclevels@gmail.com" className="text-[#3F51B5] hover:underline">
               academiclevels@gmail.com
             </a>
           </p>

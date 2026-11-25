@@ -607,9 +607,9 @@ export const App: React.FC = () => {
     <ErrorBoundary fallbackTitle="AcademicLevel Platform Error">
       <div className="min-h-screen bg-[#EEEEEE] text-[#212121] flex flex-col selection:bg-[#3F51B5] selection:text-white">
         {/* ======================================================== */}
-        {/* MATERIAL 1 TOP APP BAR (Android 5.0 / Classroom Style)    */}
+        {/* MATERIAL 1 TOP APP BAR (Neutral Light Blue)              */}
         {/* ======================================================== */}
-        <header className="sticky top-0 z-40 bg-[#3F51B5] text-white md-appbar px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center">
+        <header className="sticky top-0 z-40 bg-[#E8F0FE] text-[#1E293B] border-b border-[#C5CAE9] md-appbar px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center">
           <div className="max-w-7xl w-full mx-auto flex items-center justify-between gap-2">
             {/* Brand Logo & Desktop Nav grouped closely together */}
             <div className="flex items-center space-x-2 sm:space-x-3.5 lg:space-x-5 min-w-0">
@@ -618,19 +618,19 @@ export const App: React.FC = () => {
                 className="flex items-center space-x-2 sm:space-x-2.5 cursor-pointer group shrink-0 min-w-[36px]"
                 title="AcademicLevel"
               >
-                <div className="w-9 h-9 rounded-[3px] bg-[#303F9F] border border-white/25 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-dp1 group-hover:bg-[#283593] transition-colors shrink-0">
+                <div className="w-9 h-9 rounded-[3px] bg-[#3F51B5] flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-dp1 group-hover:bg-[#303F9F] transition-colors shrink-0">
                   AL
                 </div>
                 {!isAuthenticated ? (
                   <div className="min-w-0">
-                    <span className="font-bold text-sm sm:text-base tracking-tight text-white block leading-none truncate">
+                    <span className="font-bold text-sm sm:text-base tracking-tight text-[#1E293B] block leading-none truncate">
                       AcademicLevel
                     </span>
-                    <span className="text-[10px] text-indigo-100 font-medium hidden sm:block">Learn in your era</span>
+                    <span className="text-[10px] text-[#475569] font-medium hidden sm:block">Learn in your era</span>
                   </div>
                 ) : (
                   <div className="hidden sm:block lg:hidden">
-                    <span className="font-bold text-sm tracking-tight text-white block leading-none">
+                    <span className="font-bold text-sm tracking-tight text-[#1E293B] block leading-none">
                       AcademicLevel
                     </span>
                   </div>
@@ -646,8 +646,8 @@ export const App: React.FC = () => {
                     onClick={() => navigateTo('HOME')}
                     className={`px-3 py-2 rounded-[3px] transition-colors cursor-pointer ${
                       currentRoute === 'HOME'
-                        ? 'text-white font-bold bg-white/20 border-b-2 border-white'
-                        : 'text-indigo-100 hover:text-white hover:bg-white/10'
+                        ? 'text-[#3F51B5] font-bold bg-white shadow-2xs border-b-2 border-[#3F51B5]'
+                        : 'text-[#334155] hover:text-[#1E293B] hover:bg-white/60'
                     }`}
                   >
                     Home
@@ -666,14 +666,14 @@ export const App: React.FC = () => {
                         currentRoute === 'SPECIAL_49_FUNNEL' ||
                         currentRoute === 'SCHOOL_PORTAL' ||
                         currentRoute === 'PRICING'
-                          ? 'text-white font-bold bg-white/20 border-b-2 border-amber-300'
-                          : 'text-indigo-100 hover:text-white hover:bg-white/10'
+                          ? 'text-[#3F51B5] font-bold bg-white shadow-2xs border-b-2 border-[#3F51B5]'
+                          : 'text-[#334155] hover:text-[#1E293B] hover:bg-white/60'
                       }`}
                     >
                       <span>Curriculum &amp; Offers</span>
                       <ChevronDown
                         className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                          activeDropdown === 'OFFERS' ? 'rotate-180 text-amber-300' : 'text-indigo-200'
+                          activeDropdown === 'OFFERS' ? 'rotate-180 text-[#3F51B5]' : 'text-[#64748B]'
                         }`}
                       />
                     </button>
@@ -845,21 +845,21 @@ export const App: React.FC = () => {
                   >
                     <button
                       onClick={() => setActiveDropdown(activeDropdown === 'ABOUT' ? null : 'ABOUT')}
-                      className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer ${
+                      className={`px-3 py-2 rounded-[3px] transition-colors flex items-center space-x-1.5 cursor-pointer ${
                         currentRoute === 'ABOUT' ||
                         currentRoute === 'FAQ' ||
                         currentRoute === 'HALL_OF_FAME' ||
                         currentRoute === 'INNOVATIVE_EDTECH' ||
                         currentRoute === 'PRIVACY' ||
                         currentRoute === 'SITEMAP'
-                          ? 'text-indigo-600 font-bold bg-indigo-50'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                          ? 'text-[#3F51B5] font-bold bg-white shadow-2xs border-b-2 border-[#3F51B5]'
+                          : 'text-[#334155] hover:text-[#1E293B] hover:bg-white/60'
                       }`}
                     >
                       <span>About &amp; Trust</span>
                       <ChevronDown
                         className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                          activeDropdown === 'ABOUT' ? 'rotate-180 text-indigo-600' : 'text-slate-400'
+                          activeDropdown === 'ABOUT' ? 'rotate-180 text-[#3F51B5]' : 'text-[#64748B]'
                         }`}
                       />
                     </button>
@@ -1004,7 +1004,7 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => navigateTo('DASHBOARD')}
                     className={`px-3 py-2 rounded-[3px] transition-colors ${
-                      currentRoute === 'DASHBOARD' ? 'text-white font-bold bg-white/20 border-b-2 border-white' : 'text-indigo-100 hover:text-white hover:bg-white/10'
+                      currentRoute === 'DASHBOARD' ? 'text-[#3F51B5] font-bold bg-white shadow-2xs border-b-2 border-[#3F51B5]' : 'text-[#334155] hover:text-[#1E293B] hover:bg-white/60'
                     }`}
                   >
                     {t('nav_dashboard')}
@@ -1012,7 +1012,7 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => navigateTo('COURSES')}
                     className={`px-3 py-2 rounded-[3px] transition-colors ${
-                      currentRoute === 'COURSES' || currentRoute === 'LEVELS' ? 'text-white font-bold bg-white/20 border-b-2 border-white' : 'text-indigo-100 hover:text-white hover:bg-white/10'
+                      currentRoute === 'COURSES' || currentRoute === 'LEVELS' ? 'text-[#3F51B5] font-bold bg-white shadow-2xs border-b-2 border-[#3F51B5]' : 'text-[#334155] hover:text-[#1E293B] hover:bg-white/60'
                     }`}
                   >
                     {t('nav_courses')}
@@ -1020,7 +1020,7 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => navigateTo('NOVA_AI')}
                     className={`px-3 py-2 rounded-[3px] transition-colors ${
-                      currentRoute === 'NOVA_AI' ? 'text-white font-bold bg-white/20 border-b-2 border-white' : 'text-indigo-100 hover:text-white hover:bg-white/10'
+                      currentRoute === 'NOVA_AI' ? 'text-[#3F51B5] font-bold bg-white shadow-2xs border-b-2 border-[#3F51B5]' : 'text-[#334155] hover:text-[#1E293B] hover:bg-white/60'
                     }`}
                   >
                     {t('nav_nova_ai')}
@@ -1028,7 +1028,7 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => navigateTo('COMMUNITY')}
                     className={`px-3 py-2 rounded-[3px] transition-colors ${
-                      currentRoute === 'COMMUNITY' ? 'text-white font-bold bg-white/20 border-b-2 border-white' : 'text-indigo-100 hover:text-white hover:bg-white/10'
+                      currentRoute === 'COMMUNITY' ? 'text-[#3F51B5] font-bold bg-white shadow-2xs border-b-2 border-[#3F51B5]' : 'text-[#334155] hover:text-[#1E293B] hover:bg-white/60'
                     }`}
                   >
                     {t('nav_student_packs')}
@@ -1036,16 +1036,16 @@ export const App: React.FC = () => {
                   <button
                     onClick={() => navigateTo('GIFT_STORE')}
                     className={`px-3 py-2 rounded-[3px] transition-colors flex items-center space-x-1.5 ${
-                      currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' ? 'text-white font-bold bg-white/20 border-b-2 border-amber-300' : 'text-indigo-100 hover:text-white hover:bg-white/10'
+                      currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' ? 'text-[#E65100] font-bold bg-white shadow-2xs border-b-2 border-[#FF6D00]' : 'text-[#334155] hover:text-[#1E293B] hover:bg-white/60'
                     }`}
                   >
-                    <Gift className="w-3.5 h-3.5 text-amber-300" />
+                    <Gift className="w-3.5 h-3.5 text-[#FF6D00]" />
                     <span>{t('nav_gift_store')}</span>
                   </button>
                   <button
                     onClick={() => navigateTo('CERTIFICATES')}
                     className={`px-3 py-2 rounded-[3px] transition-colors ${
-                      currentRoute === 'CERTIFICATES' || currentRoute === 'MASTER_CERT' ? 'text-white font-bold bg-white/20 border-b-2 border-white' : 'text-indigo-100 hover:text-white hover:bg-white/10'
+                      currentRoute === 'CERTIFICATES' || currentRoute === 'MASTER_CERT' ? 'text-[#3F51B5] font-bold bg-white shadow-2xs border-b-2 border-[#3F51B5]' : 'text-[#334155] hover:text-[#1E293B] hover:bg-white/60'
                     }`}
                   >
                     {t('nav_certificates')}
@@ -1061,11 +1061,11 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPromptModal(true)}
-                className="hidden md:flex items-center space-x-1 px-2.5 py-1.5 h-9 rounded-[3px] bg-white/15 hover:bg-white/25 text-white text-xs font-bold transition-colors border border-white/20 cursor-pointer shrink-0"
+                className="hidden md:flex items-center space-x-1 px-2.5 py-1.5 h-9 rounded-[3px] bg-white hover:bg-[#F8FAFC] text-[#1E293B] text-xs font-bold transition-colors border border-[#CBD5E1] shadow-2xs cursor-pointer shrink-0"
                 title="Change UI Language (Hindi / English)"
                 aria-label="Change UI Language"
               >
-                <Globe className="w-3.5 h-3.5 text-white flex-shrink-0" />
+                <Globe className="w-3.5 h-3.5 text-[#3F51B5] flex-shrink-0" />
                 <span className="text-[11px] font-bold">
                   {language === 'hi' ? 'HI' : 'EN'}
                 </span>
@@ -1078,14 +1078,14 @@ export const App: React.FC = () => {
                       setAuthModalMode('LOGIN');
                       setAuthModalOpen(true);
                     }}
-                    className="hidden sm:inline-flex items-center text-xs font-bold text-white hover:bg-white/15 px-3.5 py-2 rounded-[3px] border border-white/35 transition-colors cursor-pointer uppercase tracking-wider"
+                    className="hidden sm:inline-flex items-center text-xs font-bold text-[#3F51B5] bg-white hover:bg-[#F8FAFC] px-3.5 py-2 rounded-[3px] border border-[#C5CAE9] shadow-2xs transition-colors cursor-pointer uppercase tracking-wider"
                   >
                     Sign In
                   </button>
                   <button
                     type="button"
                     onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
-                    className="md-btn-raised px-3 sm:px-4 py-1.5 sm:py-2 bg-[#FF6D00] hover:bg-[#FF8F00] text-white font-bold text-xs rounded-[3px] uppercase tracking-wider cursor-pointer shrink-0 tabular-nums"
+                    className="md-btn-raised px-3 sm:px-4 py-1.5 sm:py-2 bg-[#FF6D00] hover:bg-[#E65100] text-white font-bold text-xs rounded-[3px] uppercase tracking-wider cursor-pointer shrink-0 tabular-nums"
                   >
                     Special ₹49
                   </button>
@@ -1111,9 +1111,9 @@ export const App: React.FC = () => {
                     onClick={() => setGlobalMailboxOpen(true)}
                     title="Student Mailbox & Diagnostic Reports"
                     aria-label="Student Mailbox"
-                    className="relative inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-[3px] bg-white/15 hover:bg-white/25 text-white border border-white/20 transition-colors cursor-pointer shrink-0 flex-shrink-0 touch-manipulation"
+                    className="relative inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-[3px] bg-white hover:bg-[#F8FAFC] text-[#3F51B5] border border-[#CBD5E1] shadow-2xs transition-colors cursor-pointer shrink-0 flex-shrink-0 touch-manipulation"
                   >
-                    <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                    <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#3F51B5]" />
                     {currentLearner && StorageRLSLayer.getUnreadMailboxCount(currentLearner.id) > 0 && (
                       <span className="absolute -top-1 -right-1 min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] px-1 bg-[#FF6D00] text-white text-[9px] sm:text-[10px] font-bold rounded-[2px] flex items-center justify-center border border-white tabular-nums shadow-dp1">
                         {StorageRLSLayer.getUnreadMailboxCount(currentLearner.id)}
@@ -1141,9 +1141,9 @@ export const App: React.FC = () => {
                     onClick={() => navigateTo('PROFILE')}
                     title={`Student Profile (${currentLearner?.fullName || 'Student'})`}
                     aria-label="Student Profile"
-                    className="flex items-center justify-center sm:space-x-1.5 w-8 h-8 sm:w-auto sm:px-2.5 sm:py-1.5 sm:h-9 rounded-[3px] bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition-colors shrink-0 flex-shrink-0 cursor-pointer border border-white/20"
+                    className="flex items-center justify-center sm:space-x-1.5 w-8 h-8 sm:w-auto sm:px-2.5 sm:py-1.5 sm:h-9 rounded-[3px] bg-white hover:bg-[#F8FAFC] text-[#1E293B] text-xs font-semibold transition-colors shrink-0 flex-shrink-0 cursor-pointer border border-[#CBD5E1] shadow-2xs"
                   >
-                    <User className="w-3.5 h-3.5 text-white shrink-0" />
+                    <User className="w-3.5 h-3.5 text-[#3F51B5] shrink-0" />
                     <span className="hidden xl:inline truncate max-w-[90px]">
                       {currentLearner?.fullName.split(' ')[0]}
                     </span>
@@ -1156,7 +1156,7 @@ export const App: React.FC = () => {
                       logout();
                       navigateTo('HOME');
                     }}
-                    className="hidden sm:flex w-9 h-9 items-center justify-center text-indigo-100 hover:text-white rounded-[3px] hover:bg-white/15 transition-colors shrink-0 flex-shrink-0 cursor-pointer"
+                    className="hidden sm:flex w-9 h-9 items-center justify-center text-[#475569] hover:text-[#1E293B] rounded-[3px] bg-white hover:bg-[#F8FAFC] border border-[#CBD5E1] transition-colors shrink-0 flex-shrink-0 cursor-pointer"
                     title="Log Out"
                     aria-label="Log Out"
                   >
@@ -1169,7 +1169,7 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-1.5 sm:p-2 text-white hover:bg-white/15 rounded-[3px] bg-white/10 w-8 h-8 sm:w-9 sm:h-9 min-w-[32px] sm:min-w-[36px] flex items-center justify-center cursor-pointer transition-colors shrink-0 flex-shrink-0"
+                className="lg:hidden p-1.5 sm:p-2 text-[#1E293B] hover:bg-white rounded-[3px] bg-white/80 border border-[#CBD5E1] w-8 h-8 sm:w-9 sm:h-9 min-w-[32px] sm:min-w-[36px] flex items-center justify-center cursor-pointer transition-colors shrink-0 flex-shrink-0"
                 aria-label="Toggle navigation menu"
               >
                 {mobileMenuOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
