@@ -209,7 +209,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       title: '3,600+ Questions Bank Engine',
       category: 'Curriculum-Mapped Bank',
       badge: 'Classes 1–12',
-      highlight: 'CBSE • ICSE • Cambridge',
+      highlight: 'CBSE Classes 1–12',
       desc: 'Comprehensive chapter-wise practice across Foundation concepts, Applications, Board Exam PYQs, and Olympiad HOTS challenges.',
       gradient: 'from-purple-600 to-pink-700',
       icon: '📚',
@@ -335,7 +335,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {homeConfig.heroSubtitle || (
                 <>
                   Live Interaction. Deeper Learning. Stronger Results. <br className="hidden sm:inline" />
-                  <span className="text-[#3F51B5] font-semibold">Nova AI Study Helper</span> identifies your learning gaps and guides you step-by-step across CBSE, ICSE &amp; Cambridge.
+                  <span className="text-[#3F51B5] font-semibold">Nova AI Study Helper</span> identifies your learning gaps and guides you step-by-step across the CBSE curriculum.
                 </>
               )}
             </p>
@@ -379,7 +379,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
             <div className="flex items-center space-x-1.5">
               <CheckCircle2 className="w-4 h-4 text-[#009688]" />
-              <span>DPDP Act 2023 Child Safety</span>
+              <span>Instant AI Feedback</span>
             </div>
             <div className="flex items-center space-x-1.5">
               <CheckCircle2 className="w-4 h-4 text-[#009688]" />
@@ -442,7 +442,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="md-divider space-y-2 text-left text-xs text-[#616161] pt-3">
                 <div className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-[#009688] shrink-0" />
-                  <span>Classes 1 to 12 (CBSE / ICSE / IGCSE)</span>
+                  <span>Classes 1 to 12 (CBSE)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-[#009688] shrink-0" />
@@ -637,7 +637,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-2">Select Your Board</label>
               <div className="grid grid-cols-3 gap-2">
-                {(['CBSE', 'ICSE', 'IGCSE'] as Board[]).map(b => (
+                {(['CBSE'] as Board[]).map(b => (
                   <button
                     key={b}
                     onClick={() => setSelectedBoard(b)}
@@ -887,7 +887,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>All 12 Classes (CBSE, ICSE, IGCSE)</span>
+                  <span>All 12 Classes (CBSE)</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />

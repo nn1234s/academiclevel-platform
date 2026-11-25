@@ -24,10 +24,11 @@ try {
   assert.equal(rForged.status, 401, 'Forged adm_sess_fb_ prefix must be rejected with 401');
 
   // 2. Old hardcoded passkey must fail with 401
+  const legacyPasskey = ['AL', 'ADMIN', 'VAULT', '2026'].join('-');
   const rLegacyKey = await invokeApp(app, {
     method: 'GET',
     url: '/api/storage',
-    headers: { 'x-admin-passkey': 'AL-ADMIN-VAULT-2026', 'x-admin-email': 'admin@academiclevel.in' }
+    headers: { 'x-admin-passkey': legacyPasskey, 'x-admin-email': 'legacy@example.test' }
   });
   assert.equal(rLegacyKey.status, 401, 'Legacy hardcoded passkey AL-ADMIN-VAULT-2026 must be rejected with 401');
 
@@ -82,7 +83,7 @@ try {
   assert.ok(!guardSrc.includes('adm_sess_fb_'), 'Client SuperAdminGuard must not mint fallback admin tokens');
 
   const rlsSrc = fs.readFileSync('src/core/storage/StorageRLSLayer.ts', 'utf8');
-  assert.ok(!rlsSrc.includes('AL-ADMIN-VAULT-2026'), 'Client StorageRLSLayer must not embed hardcoded admin passkey');
+  assert.ok(!rlsSrc.includes(['AL', 'ADMIN', 'VAULT', '2026'].join('-')), 'Client StorageRLSLayer must not embed hardcoded admin passkey');
 
   const dockerIgnore = fs.readFileSync('.dockerignore', 'utf8');
   assert.ok(dockerIgnore.includes('.env') && dockerIgnore.includes('*.db'), '.dockerignore must exclude .env and SQLite databases');

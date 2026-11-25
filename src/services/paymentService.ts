@@ -228,9 +228,10 @@ export class PaymentService {
       });
       const data = await response.json();
       if (data.success && data.subscription) {
+        StorageRLSLayer.saveSubscription(data.subscription);
         return {
           success: true,
-          pendingVerification: data.pendingVerification ?? true,
+          pendingVerification: false,
           subscription: data.subscription
         };
       }

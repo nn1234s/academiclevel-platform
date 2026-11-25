@@ -381,8 +381,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   className="w-full bg-[#f0f2f5] text-slate-800 px-3 py-2 rounded-lg font-medium focus:outline-none border border-transparent"
                 >
                   <option value="CBSE">CBSE (National)</option>
-                  <option value="ICSE">ICSE (CISCE)</option>
-                  <option value="IGCSE">Cambridge IGCSE</option>
                 </select>
               </div>
               <div>
