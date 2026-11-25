@@ -114,15 +114,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         setErrorMessage(res.error || 'Registration failed.');
       }
     } else {
-      // Login
+      // Login: Always verify credentials through server authentication (no client passwordless admin bypass)
       const cleanEmail = email.trim().toLowerCase();
-      if (cleanEmail === SUPER_ADMIN_EMAIL.toLowerCase() || StorageRLSLayer.isAdminAuthorized(cleanEmail)) {
-        loginSuperAdmin(cleanEmail);
-        setIsSubmitting(false);
-        onSuccess?.('LOGIN');
-        onClose();
-        return;
-      }
 
       if (!password) {
         setErrorMessage('Please enter your password.');
@@ -449,7 +442,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-2.5 bg-[#ff4b2b] hover:bg-[#ff3b1b] active:scale-95 text-white font-bold text-xs uppercase tracking-wider rounded-full shadow-lg shadow-[#ff4b2b]/30 transition-all cursor-pointer disabled:opacity-50 mt-1 text-center"
+              className="md-btn-raised w-full py-2.5 bg-[#3F51B5] hover:bg-[#303F9F] text-white font-bold text-xs uppercase tracking-wider rounded-[3px] transition-all cursor-pointer disabled:opacity-50 mt-1 text-center"
             >
               {isSubmitting ? 'CREATING ACCOUNT...' : 'START FREE ACCOUNT (3 LEVELS)'}
             </button>

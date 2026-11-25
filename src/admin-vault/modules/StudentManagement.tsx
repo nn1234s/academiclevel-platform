@@ -92,10 +92,8 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ initialLea
   const refreshList = async () => {
     try {
       const adminToken = sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token');
-      const passkey = sessionStorage.getItem('al_admin_passkey') || localStorage.getItem('al_admin_passkey') || 'AL-ADMIN-VAULT-2026';
       const email = sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email') || SUPER_ADMIN_EMAIL;
       const headers: Record<string, string> = {
-        'x-admin-passkey': passkey,
         'x-admin-email': email
       };
       if (adminToken) headers['x-admin-token'] = adminToken;

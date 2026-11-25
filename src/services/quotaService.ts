@@ -44,9 +44,6 @@ export class QuotaService {
         if (s.learnerId === learnerId) return true;
         if (cleanEmail && (s.learnerId.toLowerCase() === cleanEmail || s.learnerId.toLowerCase().includes(cleanEmail))) return true;
         if (cleanPhone && (s.learnerId.includes(cleanPhone) || (s.payerUpiId && s.payerUpiId.includes(cleanPhone)))) return true;
-        // Specific verified legacy accounts
-        if (cleanEmail === 'prabir2gmailc@gmail.com' && (s.learnerId === 'lrn_mw9asujp_rzun' || s.learnerId === 'lrn_prabir_alias_norm')) return true;
-        if (cleanPhone === '9861439460' && s.learnerId === 'lrn_special49_9861439460') return true;
         return false;
       });
 
@@ -64,9 +61,8 @@ export class QuotaService {
   public static evaluateQuota(learner: Learner): QuotaStatus {
     // 1. Super-Admin is never paywall locked (strictly check learner identity, NOT client localStorage!)
     const cleanEmail = (learner.email || '').trim().toLowerCase();
-    const isSuperAdmin = learner.role === 'SUPER_ADMIN' || 
-      cleanEmail === SUPER_ADMIN_EMAIL.toLowerCase() || 
-      cleanEmail === 'naitiknanda1235@gmail.com';
+    const isSuperAdmin = learner.role === 'SUPER_ADMIN' ||
+      cleanEmail === SUPER_ADMIN_EMAIL.toLowerCase();
 
     if (isSuperAdmin) {
       return {

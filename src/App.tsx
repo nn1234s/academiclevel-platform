@@ -605,12 +605,12 @@ export const App: React.FC = () => {
 
   return (
     <ErrorBoundary fallbackTitle="AcademicLevel Platform Error">
-      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-indigo-500 selection:text-white">
+      <div className="min-h-screen bg-[#EEEEEE] text-[#212121] flex flex-col selection:bg-[#3F51B5] selection:text-white">
         {/* ======================================================== */}
-        {/* HEADER / NAVIGATION BAR (Zero Admin Links)               */}
+        {/* MATERIAL 1 TOP APP BAR (Android 5.0 / Classroom Style)    */}
         {/* ======================================================== */}
-        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 shadow-xs">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+        <header className="sticky top-0 z-40 bg-[#3F51B5] text-white md-appbar px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center">
+          <div className="max-w-7xl w-full mx-auto flex items-center justify-between gap-2">
             {/* Brand Logo & Desktop Nav grouped closely together */}
             <div className="flex items-center space-x-2 sm:space-x-3.5 lg:space-x-5 min-w-0">
               <div
@@ -618,19 +618,19 @@ export const App: React.FC = () => {
                 className="flex items-center space-x-2 sm:space-x-2.5 cursor-pointer group shrink-0 min-w-[36px]"
                 title="AcademicLevel"
               >
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-extrabold text-sm sm:text-base shadow-md shadow-indigo-500/25 group-hover:scale-105 active:scale-95 transition-transform shrink-0">
+                <div className="w-9 h-9 rounded-[3px] bg-[#303F9F] border border-white/25 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-dp1 group-hover:bg-[#283593] transition-colors shrink-0">
                   AL
                 </div>
                 {!isAuthenticated ? (
                   <div className="min-w-0">
-                    <span className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 block leading-none truncate">
+                    <span className="font-bold text-sm sm:text-base tracking-tight text-white block leading-none truncate">
                       AcademicLevel
                     </span>
-                    <span className="text-[10px] text-slate-500 font-medium hidden sm:block">Learn in your era</span>
+                    <span className="text-[10px] text-indigo-100 font-medium hidden sm:block">Learn in your era</span>
                   </div>
                 ) : (
                   <div className="hidden sm:block lg:hidden">
-                    <span className="font-extrabold text-sm tracking-tight text-slate-900 block leading-none">
+                    <span className="font-bold text-sm tracking-tight text-white block leading-none">
                       AcademicLevel
                     </span>
                   </div>
@@ -638,16 +638,16 @@ export const App: React.FC = () => {
               </div>
 
               {/* Desktop Navigation Links with Clean Dropdowns */}
-              <nav ref={navContainerRef} className="hidden lg:flex items-center space-x-1.5 text-xs font-semibold">
+              <nav ref={navContainerRef} className="hidden lg:flex items-center space-x-1 text-xs font-semibold">
               {!isAuthenticated ? (
                 <>
                   {/* Direct Link: Home */}
                   <button
                     onClick={() => navigateTo('HOME')}
-                    className={`px-3 py-2 rounded-xl transition-all cursor-pointer ${
+                    className={`px-3 py-2 rounded-[3px] transition-colors cursor-pointer ${
                       currentRoute === 'HOME'
-                        ? 'text-indigo-600 font-bold bg-indigo-50'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                        ? 'text-white font-bold bg-white/20 border-b-2 border-white'
+                        : 'text-indigo-100 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     Home
@@ -661,19 +661,19 @@ export const App: React.FC = () => {
                   >
                     <button
                       onClick={() => setActiveDropdown(activeDropdown === 'OFFERS' ? null : 'OFFERS')}
-                      className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer ${
+                      className={`px-3 py-2 rounded-[3px] transition-colors flex items-center space-x-1.5 cursor-pointer ${
                         currentRoute === 'PUBLIC_COURSES' ||
                         currentRoute === 'SPECIAL_49_FUNNEL' ||
                         currentRoute === 'SCHOOL_PORTAL' ||
                         currentRoute === 'PRICING'
-                          ? 'text-amber-700 font-bold bg-amber-50'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                          ? 'text-white font-bold bg-white/20 border-b-2 border-amber-300'
+                          : 'text-indigo-100 hover:text-white hover:bg-white/10'
                       }`}
                     >
                       <span>Curriculum &amp; Offers</span>
                       <ChevronDown
                         className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                          activeDropdown === 'OFFERS' ? 'rotate-180 text-amber-600' : 'text-slate-400'
+                          activeDropdown === 'OFFERS' ? 'rotate-180 text-amber-300' : 'text-indigo-200'
                         }`}
                       />
                     </button>
@@ -1003,49 +1003,49 @@ export const App: React.FC = () => {
                 <>
                   <button
                     onClick={() => navigateTo('DASHBOARD')}
-                    className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'DASHBOARD' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    className={`px-3 py-2 rounded-[3px] transition-colors ${
+                      currentRoute === 'DASHBOARD' ? 'text-white font-bold bg-white/20 border-b-2 border-white' : 'text-indigo-100 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     {t('nav_dashboard')}
                   </button>
                   <button
                     onClick={() => navigateTo('COURSES')}
-                    className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'COURSES' || currentRoute === 'LEVELS' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    className={`px-3 py-2 rounded-[3px] transition-colors ${
+                      currentRoute === 'COURSES' || currentRoute === 'LEVELS' ? 'text-white font-bold bg-white/20 border-b-2 border-white' : 'text-indigo-100 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     {t('nav_courses')}
                   </button>
                   <button
                     onClick={() => navigateTo('NOVA_AI')}
-                    className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'NOVA_AI' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    className={`px-3 py-2 rounded-[3px] transition-colors ${
+                      currentRoute === 'NOVA_AI' ? 'text-white font-bold bg-white/20 border-b-2 border-white' : 'text-indigo-100 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     {t('nav_nova_ai')}
                   </button>
                   <button
                     onClick={() => navigateTo('COMMUNITY')}
-                    className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'COMMUNITY' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    className={`px-3 py-2 rounded-[3px] transition-colors ${
+                      currentRoute === 'COMMUNITY' ? 'text-white font-bold bg-white/20 border-b-2 border-white' : 'text-indigo-100 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     {t('nav_student_packs')}
                   </button>
                   <button
                     onClick={() => navigateTo('GIFT_STORE')}
-                    className={`px-3 py-2 rounded-xl transition-all flex items-center space-x-1.5 ${
-                      currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' ? 'text-amber-700 font-bold bg-amber-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    className={`px-3 py-2 rounded-[3px] transition-colors flex items-center space-x-1.5 ${
+                      currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' ? 'text-white font-bold bg-white/20 border-b-2 border-amber-300' : 'text-indigo-100 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <Gift className="w-3.5 h-3.5 text-amber-500" />
+                    <Gift className="w-3.5 h-3.5 text-amber-300" />
                     <span>{t('nav_gift_store')}</span>
                   </button>
                   <button
                     onClick={() => navigateTo('CERTIFICATES')}
-                    className={`px-3 py-2 rounded-xl transition-all ${
-                      currentRoute === 'CERTIFICATES' || currentRoute === 'MASTER_CERT' ? 'text-indigo-600 font-bold bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    className={`px-3 py-2 rounded-[3px] transition-colors ${
+                      currentRoute === 'CERTIFICATES' || currentRoute === 'MASTER_CERT' ? 'text-white font-bold bg-white/20 border-b-2 border-white' : 'text-indigo-100 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     {t('nav_certificates')}
@@ -1057,15 +1057,15 @@ export const App: React.FC = () => {
 
           {/* User Profile / Auth Action Buttons */}
           <div className="flex items-center space-x-1 sm:space-x-1.5 shrink-0 flex-shrink-0">
-              {/* Language Switcher Pill (Hidden on mobile/phone screens, placed in mobile drawer & footer) */}
+              {/* Language Switcher */}
               <button
                 type="button"
                 onClick={() => setShowPromptModal(true)}
-                className="hidden md:flex items-center space-x-1 px-2.5 py-1.5 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200 shadow-2xs cursor-pointer shrink-0"
+                className="hidden md:flex items-center space-x-1 px-2.5 py-1.5 h-9 rounded-[3px] bg-white/15 hover:bg-white/25 text-white text-xs font-bold transition-colors border border-white/20 cursor-pointer shrink-0"
                 title="Change UI Language (Hindi / English)"
                 aria-label="Change UI Language"
               >
-                <Globe className="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" />
+                <Globe className="w-3.5 h-3.5 text-white flex-shrink-0" />
                 <span className="text-[11px] font-bold">
                   {language === 'hi' ? 'HI' : 'EN'}
                 </span>
@@ -1078,44 +1078,44 @@ export const App: React.FC = () => {
                       setAuthModalMode('LOGIN');
                       setAuthModalOpen(true);
                     }}
-                    className="hidden sm:inline-flex items-center text-xs font-bold text-indigo-600 hover:text-indigo-700 px-3.5 py-2 rounded-xl bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition-all cursor-pointer"
+                    className="hidden sm:inline-flex items-center text-xs font-bold text-white hover:bg-white/15 px-3.5 py-2 rounded-[3px] border border-white/35 transition-colors cursor-pointer uppercase tracking-wider"
                   >
                     Sign In
                   </button>
                   <button
                     type="button"
                     onClick={() => navigateTo('SPECIAL_49_FUNNEL')}
-                    className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs rounded-xl shadow-md transition-all cursor-pointer shrink-0"
+                    className="md-btn-raised px-3 sm:px-4 py-1.5 sm:py-2 bg-[#FF6D00] hover:bg-[#FF8F00] text-white font-bold text-xs rounded-[3px] uppercase tracking-wider cursor-pointer shrink-0 tabular-nums"
                   >
                     Special ₹49
                   </button>
                 </>
               ) : (
                 <div className="flex items-center space-x-1 sm:space-x-1.5 shrink-0 flex-shrink-0">
-                  {/* 1-Year Gold VIP Pass Badge - Just a sleek crown icon */}
+                  {/* 1-Year Gold VIP Pass Badge */}
                   {currentLearner?.activePlan === 'GOLD' && (
                     <button
                       type="button"
                       onClick={() => navigateTo('PROFILE')}
-                      className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 text-amber-950 font-black shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer border border-amber-300 shrink-0 flex-shrink-0"
+                      className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-[3px] bg-[#FFC107] text-[#212121] font-bold shadow-dp1 hover:bg-[#FFCA28] transition-colors cursor-pointer shrink-0 flex-shrink-0"
                       title="1-Year Gold VIP Pass Active (365 Days Access)"
                       aria-label="Gold Pass Active"
                     >
-                      <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-950 fill-amber-900" />
+                      <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#212121]" />
                     </button>
                   )}
 
-                  {/* Mailbox Badge - Just a sleek mail icon */}
+                  {/* Mailbox Badge */}
                   <button
                     type="button"
                     onClick={() => setGlobalMailboxOpen(true)}
                     title="Student Mailbox & Diagnostic Reports"
                     aria-label="Student Mailbox"
-                    className="relative inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0 flex-shrink-0 touch-manipulation"
+                    className="relative inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-[3px] bg-white/15 hover:bg-white/25 text-white border border-white/20 transition-colors cursor-pointer shrink-0 flex-shrink-0 touch-manipulation"
                   >
-                    <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-600" />
+                    <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                     {currentLearner && StorageRLSLayer.getUnreadMailboxCount(currentLearner.id) > 0 && (
-                      <span className="absolute -top-1 -right-1 min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] px-1 bg-amber-500 text-white text-[9px] sm:text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white animate-pulse shadow-xs">
+                      <span className="absolute -top-1 -right-1 min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] px-1 bg-[#FF6D00] text-white text-[9px] sm:text-[10px] font-bold rounded-[2px] flex items-center justify-center border border-white tabular-nums shadow-dp1">
                         {StorageRLSLayer.getUnreadMailboxCount(currentLearner.id)}
                       </span>
                     )}
@@ -1127,10 +1127,10 @@ export const App: React.FC = () => {
                     onClick={() => navigateTo('GIFT_STORE')}
                     title="Open Scholar's Gift Store"
                     aria-label="Study Coins Balance"
-                    className="flex items-center space-x-1 px-2 sm:px-2.5 py-1 sm:py-1.5 h-8 sm:h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold hover:bg-amber-100 transition-all shadow-2xs cursor-pointer shrink-0 flex-shrink-0"
+                    className="flex items-center space-x-1 px-2 sm:px-2.5 py-1 sm:py-1.5 h-8 sm:h-9 rounded-[3px] bg-[#FFC107] text-[#212121] text-xs font-bold hover:bg-[#FFCA28] transition-colors shadow-dp1 cursor-pointer shrink-0 flex-shrink-0 tabular-nums"
                   >
                     <StudyCoinIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" glow />
-                    <span className="font-extrabold text-[11px] sm:text-xs">
+                    <span className="font-bold text-[11px] sm:text-xs tabular-nums">
                       {currentLearner?.coinBalance ? (currentLearner.coinBalance >= 100000 ? `${Math.floor(currentLearner.coinBalance / 1000)}k` : currentLearner.coinBalance.toLocaleString()) : 0}
                     </span>
                   </button>
@@ -1141,22 +1141,22 @@ export const App: React.FC = () => {
                     onClick={() => navigateTo('PROFILE')}
                     title={`Student Profile (${currentLearner?.fullName || 'Student'})`}
                     aria-label="Student Profile"
-                    className="flex items-center justify-center sm:space-x-1.5 w-8 h-8 sm:w-auto sm:px-2.5 sm:py-1.5 sm:h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-all shrink-0 flex-shrink-0 cursor-pointer"
+                    className="flex items-center justify-center sm:space-x-1.5 w-8 h-8 sm:w-auto sm:px-2.5 sm:py-1.5 sm:h-9 rounded-[3px] bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition-colors shrink-0 flex-shrink-0 cursor-pointer border border-white/20"
                   >
-                    <User className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                    <User className="w-3.5 h-3.5 text-white shrink-0" />
                     <span className="hidden xl:inline truncate max-w-[90px]">
                       {currentLearner?.fullName.split(' ')[0]}
                     </span>
                   </button>
 
-                  {/* Logout Button (Hidden on small screens, accessible in mobile menu) */}
+                  {/* Logout Button */}
                   <button
                     type="button"
                     onClick={() => {
                       logout();
                       navigateTo('HOME');
                     }}
-                    className="hidden sm:flex w-9 h-9 items-center justify-center text-slate-500 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors shrink-0 flex-shrink-0 cursor-pointer"
+                    className="hidden sm:flex w-9 h-9 items-center justify-center text-indigo-100 hover:text-white rounded-[3px] hover:bg-white/15 transition-colors shrink-0 flex-shrink-0 cursor-pointer"
                     title="Log Out"
                     aria-label="Log Out"
                   >
@@ -1169,7 +1169,7 @@ export const App: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-1.5 sm:p-2 text-slate-600 hover:text-slate-900 rounded-xl bg-slate-100 w-8 h-8 sm:w-9 sm:h-9 min-w-[32px] sm:min-w-[36px] flex items-center justify-center cursor-pointer active:scale-95 transition-all shrink-0 flex-shrink-0"
+                className="lg:hidden p-1.5 sm:p-2 text-white hover:bg-white/15 rounded-[3px] bg-white/10 w-8 h-8 sm:w-9 sm:h-9 min-w-[32px] sm:min-w-[36px] flex items-center justify-center cursor-pointer transition-colors shrink-0 flex-shrink-0"
                 aria-label="Toggle navigation menu"
               >
                 {mobileMenuOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -2527,15 +2527,15 @@ export const App: React.FC = () => {
                   className="flex flex-col items-center justify-center -mt-3 transition-all active:scale-95"
                 >
                   <div
-                    className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-transform ${
+                    className={`md-fab w-12 h-12 rounded-full flex items-center justify-center transition-transform ${
                       currentRoute === 'NOVA_AI'
-                        ? 'bg-gradient-to-tr from-pink-600 via-rose-500 to-indigo-600 text-white ring-4 ring-pink-100 scale-105'
-                        : 'bg-gradient-to-tr from-pink-500 via-rose-500 to-indigo-500 text-white shadow-pink-500/30'
+                        ? 'bg-[#303F9F] text-white ring-2 ring-[#C5CAE9]'
+                        : 'bg-[#3F51B5] text-white'
                     }`}
                   >
                     <Sparkles className="w-5 h-5" />
                   </div>
-                  <span className={`text-[10px] mt-1 leading-none ${currentRoute === 'NOVA_AI' ? 'font-black text-pink-600' : 'font-bold text-slate-700'}`}>
+                  <span className={`text-[10px] mt-1 leading-none ${currentRoute === 'NOVA_AI' ? 'font-bold text-[#3F51B5]' : 'font-semibold text-[#616161]'}`}>
                     Nova AI
                   </span>
                 </button>

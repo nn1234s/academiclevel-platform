@@ -122,9 +122,17 @@ export const ReferralProgramme: React.FC<ReferralProgrammeProps> = ({ learner, o
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
-  // Referrals tracking (classic)
-  const allLearners = StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL);
-  const myReferrals = allLearners.filter(l => l.referredBy === learner.id);
+  // Referrals tracking — fetched from server (safe referral-scoped endpoint, no admin table dump)
+  const [referrals, setReferrals] = React.useState<{ id: string; fullName: string; referralQualified: boolean; board?: string; grade?: number; createdAt?: string }[]>([]);
+  React.useEffect(() => {
+    const token = localStorage.getItem('al_student_token') || sessionStorage.getItem('al_student_token') || '';
+    if (!learner?.id || !token) return;
+    fetch(`/api/students/${learner.id}/referrals`, { headers: { 'x-session-token': token } })
+      .then(r => r.json())
+      .then(d => { if (d.success && d.referrals) setReferrals(d.referrals); })
+      .catch(() => {});
+  }, [learner?.id]);
+  const myReferrals = referrals;
   const qualifiedCount = myReferrals.filter(r => r.referralQualified).length;
   const referralLink = `${window.location.origin}/?ref=${learner.referralCode}`;
 
@@ -451,7 +459,7 @@ export const ReferralProgramme: React.FC<ReferralProgrammeProps> = ({ learner, o
                     <div>
                       <p className="font-semibold text-white">{ref.fullName}</p>
                       <p className="text-[11px] text-slate-400">
-                        {ref.board} • Class {ref.grade} • Joined {new Date(ref.createdAt).toLocaleDateString()}
+                        {ref.board} • Class {ref.grade} • Joined {new Date(ref.createdAt || '').toLocaleDateString()}
                       </p>
                     </div>
 

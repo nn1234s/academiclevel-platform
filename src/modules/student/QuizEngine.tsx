@@ -116,6 +116,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   }
   const [answersLog, setAnswersLog] = useState<AnswerLog[]>([]);
   const [generatedReportId, setGeneratedReportId] = useState<string | null>(null);
+  const [quizSessionId, setQuizSessionId] = useState<string | null>(null);
 
   // Anti-Cheat Timer: Minimum 3 seconds dwell time per question
   const [questionDwellSeconds, setQuestionDwellSeconds] = useState<number>(0);
@@ -228,6 +229,30 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
     };
 
     try {
+      const token = typeof window !== 'undefined' ? (localStorage.getItem('al_student_token') || sessionStorage.getItem('al_student_token') || '') : '';
+      if (learner?.id && token) {
+        try {
+          const sRes = await fetch('/api/quizzes/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-session-token': token },
+            body: JSON.stringify({ learnerId: learner.id, board, grade, subjectId, levelNode, count: targetQCount, chapter })
+          });
+          if (sRes.ok) {
+            const sData = await sRes.json();
+            if (sData.success && sData.sessionId && Array.isArray(sData.questions) && sData.questions.length > 0) {
+              setQuizSessionId(sData.sessionId);
+              setQuestions(sData.questions);
+              setQuizSource('CURATED_OFFLINE');
+              setAiNotice('Verified server-graded assessment session');
+              return;
+            }
+          }
+        } catch {
+          // Fall back to hybrid/offline loader
+        }
+      }
+      setQuizSessionId(null);
+
       const res = await HybridQuizService.getQuestions(board, grade, subjectId, levelNode, targetQCount * 2, chapter);
       let loaded = [...res.questions];
 
@@ -351,7 +376,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
     setSelectedOption(idx);
   };
 
-  const handleSubmitAnswer = () => {
+  const handleSubmitAnswer = async () => {
     if (selectedOption === null || !currentQuestion) return;
 
     // Check anti-cheat minimum dwell time (1 second bot-prevention gate)
@@ -359,28 +384,55 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       setAntiCheatViolations(prev => prev + 1);
     }
 
-    const isCorrect = selectedOption === Number(currentQuestion.correctIndex);
+    let isCorrect = selectedOption === Number(currentQuestion.correctIndex);
+    let revealedQuestion = currentQuestion;
+
+    if (quizSessionId) {
+      try {
+        const token = typeof window !== 'undefined' ? (localStorage.getItem('al_student_token') || sessionStorage.getItem('al_student_token') || '') : '';
+        const res = await fetch('/api/quizzes/submit-answer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-session-token': token },
+          body: JSON.stringify({ sessionId: quizSessionId, questionId: currentQuestion.id, selectedIndex: selectedOption })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            isCorrect = Boolean(data.isCorrect);
+            revealedQuestion = {
+              ...currentQuestion,
+              correctIndex: typeof data.correctIndex === 'number' ? data.correctIndex : currentQuestion.correctIndex,
+              explanation: data.explanation || currentQuestion.explanation
+            };
+            setQuestions(prev => prev.map((q, idx) => idx === currentIndex ? revealedQuestion : q));
+          }
+        }
+      } catch {
+        // Fallback to local evaluation if network drops mid-quiz
+      }
+    }
+
     if (isCorrect) {
       setScore(prev => prev + 1);
     } else if (learner?.id) {
       StorageRLSLayer.logMistake(learner.id, {
-        questionId: currentQuestion.id,
-        questionText: currentQuestion.text,
-        options: currentQuestion.options,
-        correctOptionIndex: Number(currentQuestion.correctIndex),
+        questionId: revealedQuestion.id,
+        questionText: revealedQuestion.text,
+        options: revealedQuestion.options,
+        correctOptionIndex: Number(revealedQuestion.correctIndex ?? 0),
         chosenOptionIndex: selectedOption,
-        explanation: currentQuestion.explanation,
-        subjectId: currentQuestion.subjectId || subjectId,
+        explanation: revealedQuestion.explanation,
+        subjectId: revealedQuestion.subjectId || subjectId,
         board: learner.board,
         grade: learner.grade,
-        chapterId: currentQuestion.chapterId || currentQuestion.topicTag
+        chapterId: revealedQuestion.chapterId || revealedQuestion.topicTag
       });
     }
 
     setAnswersLog(prev => [
-      ...prev.filter(a => a.question.id !== currentQuestion.id),
+      ...prev.filter(a => a.question.id !== revealedQuestion.id),
       {
-        question: currentQuestion,
+        question: revealedQuestion,
         chosenIndex: selectedOption,
         isCorrect,
         dwellSeconds: Math.max(1, questionDwellSeconds)
@@ -441,7 +493,24 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         completedAt: new Date().toISOString()
       };
       StorageRLSLayer.recordQuizAttempt(attempt);
-      ApiClient.recordQuizAttempt(attempt).catch(() => {});
+      if (quizSessionId) {
+        const token = typeof window !== 'undefined' ? (localStorage.getItem('al_student_token') || sessionStorage.getItem('al_student_token') || '') : '';
+        fetch('/api/quizzes/finish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-session-token': token },
+          body: JSON.stringify({
+            sessionId: quizSessionId,
+            learnerId: learner.id,
+            board,
+            grade,
+            subjectId,
+            levelNode,
+            totalDurationSeconds: Math.max(10, questionDwellSeconds)
+          })
+        }).catch(() => {});
+      } else {
+        ApiClient.recordQuizAttempt(attempt).catch(() => {});
+      }
 
       // 3. Save Level Mastery Progress
       const existingList = StorageRLSLayer.getProgressForLearner(learner.id, learner.id);
@@ -1030,9 +1099,9 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
             <button
               onClick={handleSubmitAnswer}
               disabled={selectedOption === null || questionDwellSeconds < 1}
-              className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95 min-h-[40px]"
+              className="md-btn-raised w-full sm:w-auto px-5 py-2.5 bg-[#3F51B5] hover:bg-[#303F9F] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs uppercase tracking-wider rounded-[3px] transition-all flex items-center justify-center space-x-1.5 cursor-pointer min-h-[40px]"
             >
-              <span>{questionDwellSeconds < 1 ? 'Reading... (1s)' : 'Submit Answer'}</span>
+              <span className="tabular-nums">{questionDwellSeconds < 1 ? 'Reading... (1s)' : 'Submit Answer'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           ) : (
@@ -1080,10 +1149,10 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
               key={idx}
               disabled={isAnswerSubmitted}
               onClick={() => handleSelectOption(idx)}
-              className={`w-full text-left p-3.5 sm:p-4 min-h-[54px] rounded-2xl border text-[13px] sm:text-sm font-medium transition-all flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 cursor-pointer active:scale-[0.99] ${btnStyle}`}
+              className={`md-quiz-option w-full text-left p-3.5 sm:p-4 min-h-[54px] rounded-[3px] border text-[13px] sm:text-sm font-medium transition-all flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 cursor-pointer ${btnStyle}`}
             >
               <div className="flex items-center space-x-3 min-w-0 flex-1">
-                <span className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl text-xs font-mono font-bold flex items-center justify-center flex-shrink-0 transition-all ${letterBadgeStyle}`}>
+                <span className={`w-7 h-7 sm:w-8 sm:h-8 rounded-[2px] text-xs font-mono font-bold flex items-center justify-center flex-shrink-0 transition-all ${letterBadgeStyle}`}>
                   {String.fromCharCode(65 + idx)}
                 </span>
                 <span className="break-words leading-snug">{option}</span>

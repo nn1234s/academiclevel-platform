@@ -23,7 +23,6 @@ import {
   Camera
 } from 'lucide-react';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
-import { STUDYGIRL_100_MESSAGES, getRandomStudyGirlMessage } from '../../data/studygirlMessages';
 
 interface NovaAiTutorProps {
   board: Board;
@@ -419,8 +418,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       return;
     }
 
-    const randomMsg = getRandomStudyGirlMessage();
-    welcomeText = `🎀 hey bestie! i'm nova, your cute study buddy ✨\n\n${randomMsg.text}\n\nwhat chapter or puzzle are we solving today? ask me anything or click below to start a quiz! 🌸💖`;
+    welcomeText = `Hello! I'm **Nova**, your AI Study Helper for **${board} Class ${grade}${activeSubject ? ` (${activeSubject})` : ''}**.\n\nAsk me any syllabus question, formula, or concept you'd like to revise step-by-step.`;
 
     setMessages([
       {
@@ -432,15 +430,14 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
     ]);
   };
 
-  const handleTriggerBestieCheer = () => {
-    const msg = getRandomStudyGirlMessage();
-    const bestieMsg: NovaMessage = {
-      id: 'msg_bestie_' + Date.now(),
+  const handleTriggerStudyTip = () => {
+    const tipMsg: NovaMessage = {
+      id: 'msg_tip_' + Date.now(),
       sender: 'NOVA',
-      text: `${msg.emoji} **study bestie message #${msg.id} • ${msg.tag}**\n\n${msg.text}\n\nlet's crush a quiz together right now! click any chapter quiz to start 🌸💖`,
+      text: `**Study Strategy Tip**\n\n1. Break every chapter into core definitions and key formulas.\n2. Solve 3 practice questions right after reading a concept to lock it in.\n3. Review any mistakes in your Mistake Vault before exams.`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
-    setMessages(prev => [...prev, bestieMsg]);
+    setMessages(prev => [...prev, tipMsg]);
   };
 
   useEffect(() => {
@@ -469,7 +466,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       const limitMsg: NovaMessage = {
         id: 'msg_limit_' + Date.now(),
         sender: 'NOVA',
-        text: `🪙 **daily free ai messages reached!**\n\nyou did so many questions today bestie! unlock 5 extra study buddy chats for just 10 AL Coins with the refill button 🌸✨`,
+        text: `**Daily AI Message Limit Reached**\n\nYou've used your free daily AI messages. You can unlock 5 extra study helper messages for 10 AL Coins using the refill button above.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, limitMsg]);
@@ -494,8 +491,19 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
         text: m.text.slice(0, 250)
       }));
 
+      if (attachedPhoto && !queryText.trim()) {
+        setMessages(prev => [...prev, {
+          id: 'msg_photo_note_' + Date.now(),
+          sender: 'NOVA',
+          text: `**Photo Attached**\n\nImage OCR is not active in text-only mode. Please type or paste the question text or numbers from your photo so I can walk you through the exact step-by-step solution.`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }]);
+        setIsTyping(false);
+        return;
+      }
+
       const finalQuery = attachedPhoto
-        ? `[PHOTO DOUBT ANALYSIS] Student uploaded an image of a question/diagram. ${queryText ? `Note from student: "${queryText}".` : ''} Please provide a friendly step-by-step solution in Hinglish with formulas, core concepts, and tips to avoid silly errors!`
+        ? `Student attached a textbook reference photo along with their question: "${queryText}". Provide a clear, step-by-step explanation for ${board} Class ${grade}.`
         : queryText;
 
       const response = await NovaAiService.answerStudentQuery(
@@ -516,11 +524,10 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       setMessages(prev => [...prev, aiMsg]);
       loadQuota();
     } catch {
-      const bestieCheer = getRandomStudyGirlMessage();
       const fallbackMsg: NovaMessage = {
         id: 'msg_err_' + Date.now(),
         sender: 'NOVA',
-        text: `🎀 hey bestie! ${bestieCheer.text}\n\nready to test your brain? let's take a quiz and stack up those coins! 🌸`,
+        text: `I couldn't reach the live tutor right now. Please try again or ask about a specific ${activeSubject || 'syllabus'} concept.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, fallbackMsg]);
@@ -546,30 +553,30 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
   return (
     <div className="flex flex-col h-[calc(100dvh-10.5rem)] sm:h-[650px] min-h-[460px] max-w-3xl mx-auto bg-white border border-slate-200 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl text-slate-900 relative">
       {/* Header */}
-      <div className="bg-gradient-to-r from-pink-50 via-rose-50 to-indigo-50 p-3 sm:p-4 border-b border-pink-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+      <div className="bg-slate-50 p-3 sm:p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div className="flex items-center justify-between sm:justify-start space-x-2.5 sm:space-x-3 min-w-0">
           <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-500 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-pink-900/20 text-base sm:text-lg shrink-0">
-              🎧
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-sm shrink-0">
+              <Bot className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <h3 className="font-black text-sm text-slate-900 flex items-center gap-1">
-                  <span>nova</span>
-                  <span className="text-[10px] sm:text-[11px] font-normal text-slate-500 hidden xs:inline">• study bestie 🎀</span>
+                <h3 className="font-bold text-sm text-slate-900 flex items-center gap-1">
+                  <span>Nova</span>
+                  <span className="text-[10px] sm:text-[11px] font-normal text-slate-500 hidden xs:inline">• AI Study Helper</span>
                 </h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-100 text-pink-700 border border-pink-200">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
                   Class {grade} {board}
                 </span>
                 {!learner && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     Guest Mode
                   </span>
                 )}
               </div>
-              <p className="text-[10px] sm:text-[11px] text-slate-600 flex items-center space-x-1.5 mt-0.5 truncate">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping inline-block shrink-0" />
-                <span className="truncate">100+ study brain boosts • works offline 🌸</span>
+              <p className="text-[10px] sm:text-[11px] text-slate-500 flex items-center space-x-1.5 mt-0.5 truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" />
+                <span className="truncate">Step-by-step syllabus & exam tutor</span>
               </p>
             </div>
           </div>
@@ -611,29 +618,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
             <RotateCcw className="w-4 h-4" />
           </button>
 
-          {quota?.isInChatBreak ? (
-            <div
-              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-pink-50 text-pink-700 border border-pink-300 shadow-xs"
-              title="Completed 5+ levels today: Free Chat Break Active!"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-pink-500 animate-pulse" />
-              <span>☕ 20-Min Free Chat Break</span>
-              {quota.chatBreakRemainingSeconds ? (
-                <span className="text-[9px] bg-pink-200 text-pink-900 px-1.5 py-0.5 rounded font-black">
-                  {Math.ceil(quota.chatBreakRemainingSeconds / 60)}m left
-                </span>
-              ) : null}
-            </div>
-          ) : quota?.levelsCompletedToday === 4 ? (
-            <div
-              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-300 shadow-xs"
-              title="Complete 5 levels today to get a 20 min free chat break!"
-            >
-              <span>🔥 4/5 Levels • 1 More for 20-Min Break ☕</span>
-            </div>
-          ) : null}
-
-          {learner && !quota?.isInChatBreak && (
+          {learner && (
             <button
               type="button"
               onClick={() => {
@@ -833,92 +818,83 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
 
         {isTyping && (
           <div className="flex items-center space-x-2 text-slate-600 text-xs italic p-3 bg-white rounded-2xl border border-slate-200 shadow-xs w-fit animate-pulse">
-            <RefreshCw className="w-3.5 h-3.5 animate-spin text-pink-500" />
-            <span>nova is preparing a cute, simple explanation for you... 🎀✨</span>
+            <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-600" />
+            <span>Nova is preparing a step-by-step explanation...</span>
           </div>
         )}
       </div>
 
       {/* Suggested Quick Prompts */}
-      <div className="px-4 py-2 bg-gradient-to-r from-pink-50/60 via-purple-50/60 to-indigo-50/60 border-t border-pink-100 flex items-center space-x-2 overflow-x-auto text-[11px] no-scrollbar">
+      <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 flex items-center space-x-2 overflow-x-auto text-[11px] no-scrollbar">
         <button
           type="button"
           onClick={(e) => {
             e.preventDefault();
-            handleTriggerBestieCheer();
+            handleTriggerStudyTip();
           }}
-          className="whitespace-nowrap px-3 py-1.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold transition-all cursor-pointer shadow-xs flex items-center space-x-1 active:scale-95 shrink-0"
-          title="100 preloaded brain study motivation messages"
+          className="whitespace-nowrap px-3 py-1.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition-all cursor-pointer shadow-xs flex items-center space-x-1 active:scale-95 shrink-0"
+          title="Quick study strategy tip"
         >
-          <span>🎀 bestie study vibe (100 inside)</span>
+          <Lightbulb className="w-3.5 h-3.5" />
+          <span>Study Tips</span>
         </button>
         <button
           type="button"
           onClick={(e) => {
             e.preventDefault();
-            executeSend(`tell me about our comprehensive practice worksheets and how i can redeem them with 30 coins!`);
-          }}
-          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border border-amber-300 text-amber-900 font-bold transition-colors cursor-pointer shadow-xs shrink-0 flex items-center space-x-1"
-        >
-          <span>📄 practice worksheets (30 coins)</span>
-        </button>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            executeSend(`can you simplify the hardest concept in ${activeSubject || 'this chapter'} with a super cute example?`);
+            executeSend(`Can you simplify the key concept in ${activeSubject || 'this chapter'} with a clear example?`);
           }}
           className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs shrink-0"
         >
-          💡 simplify concept
+          Simplify Concept
         </button>
         <button
           type="button"
           onClick={(e) => {
             e.preventDefault();
-            executeSend(`give me a fun brain study tip to remember formulas easily!`);
+            executeSend(`Give me a clear memory technique to remember formulas in ${activeSubject || 'this subject'}.`);
           }}
           className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs shrink-0"
         >
-          🧠 brain memory hack
+          Formula Memory Tip
         </button>
         <button
           type="button"
           onClick={(e) => {
             e.preventDefault();
-            executeSend(`what's a silly mistake students make in ${activeSubject || 'our syllabus'} exams?`);
+            executeSend(`What are common exam mistakes students make in ${activeSubject || 'this subject'}?`);
           }}
           className="whitespace-nowrap px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors cursor-pointer shadow-xs shrink-0"
         >
-          ⚠️ silly mistakes to avoid
+          Common Exam Mistakes
         </button>
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-pink-100 hover:bg-pink-200 border border-pink-300 text-pink-800 font-bold transition-colors cursor-pointer shadow-xs shrink-0 flex items-center space-x-1"
+          className="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-semibold transition-colors cursor-pointer shadow-xs shrink-0 flex items-center space-x-1"
         >
-          <Camera className="w-3.5 h-3.5 text-pink-600" />
-          <span>📸 Snap & Solve Photo</span>
+          <Camera className="w-3.5 h-3.5 text-indigo-600" />
+          <span>Attach Question Photo</span>
         </button>
       </div>
 
       {/* Photo Preview if attached */}
       {selectedPhoto && (
-        <div className="px-4 py-2 bg-pink-50/90 border-t border-pink-200 flex items-center justify-between text-xs animate-in fade-in">
+        <div className="px-4 py-2 bg-indigo-50/70 border-t border-indigo-200 flex items-center justify-between text-xs animate-in fade-in">
           <div className="flex items-center space-x-2.5">
-            <img src={selectedPhoto} alt="Selected problem" className="w-10 h-10 object-cover rounded-lg border border-pink-300 shadow-xs" />
+            <img src={selectedPhoto} alt="Selected problem" className="w-10 h-10 object-cover rounded-lg border border-indigo-300 shadow-xs" />
             <div>
-              <span className="font-extrabold text-pink-900 block flex items-center gap-1">
-                <Camera className="w-3.5 h-3.5 text-pink-600" />
-                <span>Textbook Photo Attached</span>
+              <span className="font-bold text-indigo-950 block flex items-center gap-1">
+                <Camera className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Photo Attached</span>
               </span>
-              <span className="text-[10px] text-pink-700">Nova will analyze and break this down step-by-step!</span>
+              <span className="text-[10px] text-indigo-700">Type the question text below so Nova can solve it accurately.</span>
             </div>
           </div>
           <button
             type="button"
             onClick={() => setSelectedPhoto(null)}
-            className="p-1 rounded-full hover:bg-pink-200 text-pink-700 transition-colors cursor-pointer"
+            className="p-1 rounded-full hover:bg-indigo-200 text-indigo-700 transition-colors cursor-pointer"
             title="Remove photo"
           >
             <X className="w-4 h-4" />
@@ -939,17 +915,17 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 transition-all flex items-center justify-center space-x-1 cursor-pointer shrink-0 shadow-2xs active:scale-95"
-          title="Snap & Solve: Take photo of textbook problem"
+          className="p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all flex items-center justify-center space-x-1 cursor-pointer shrink-0 shadow-2xs active:scale-95"
+          title="Attach a textbook photo for reference"
         >
           <Camera className="w-4 h-4" />
-          <span className="hidden sm:inline text-[11px] font-bold">Snap & Solve</span>
+          <span className="hidden sm:inline text-[11px] font-semibold">Photo</span>
         </button>
         <input
           type="text"
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
-          placeholder={selectedPhoto ? "Add optional note..." : "Chat with Nova or snap a photo... 🎀"}
+          placeholder={selectedPhoto ? "Type the question from your photo..." : "Ask a study question..."}
           className="flex-1 min-w-0 bg-slate-50 border border-slate-300 focus:border-indigo-500 rounded-xl px-3 sm:px-3.5 py-2.5 min-h-[44px] text-base sm:text-xs text-slate-900 placeholder-slate-400 focus:outline-none"
         />
         <button
@@ -993,10 +969,10 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 className={`p-3 rounded-xl mb-4 text-xs font-semibold flex items-center space-x-2 ${
                   refillStatus.success
                     ? 'bg-emerald-50 border border-emerald-300 text-emerald-800'
-                    : 'bg-rose-50 border border-rose-300 text-rose-800'
+                    : 'bg-red-50 border border-red-300 text-red-800'
                 }`}
               >
-                {refillStatus.success ? <CheckCircle className="w-4 h-4 shrink-0 text-emerald-600" /> : <X className="w-4 h-4 shrink-0 text-rose-600" />}
+                {refillStatus.success ? <CheckCircle className="w-4 h-4 shrink-0 text-emerald-600" /> : <X className="w-4 h-4 shrink-0 text-red-600" />}
                 <span>{refillStatus.text}</span>
               </div>
             )}

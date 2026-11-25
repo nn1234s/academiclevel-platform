@@ -89,15 +89,9 @@ export const AccountDeletionPage: React.FC<AccountDeletionPageProps> = ({
           setErrorMessage(res.message || 'Could not process deletion request. Please check the details and try again.');
         }
       }
-    } catch {
-      // Graceful fallback for offline or mock environment
-      const refId = 'DEL-' + Math.random().toString(36).substring(2, 9).toUpperCase();
-      setSuccessInfo({
-        referenceId: refId,
-        message: 'Your account deletion request has been registered and verified. All associated learner data has been purged from active storage.',
-        timestamp: new Date().toUTCString()
-      });
-      onDeleted?.();
+    } catch (err: any) {
+      // Propagate the error — do not fake a success if the server rejected the deletion request
+      setErrorMessage(err?.message || 'Connection error. Please try again or contact support if the problem persists.');
     } finally {
       setIsSubmitting(false);
     }

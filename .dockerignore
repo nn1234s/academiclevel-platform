@@ -2,4 +2,12 @@ node_modules
 dist
 .git
 .gemini
+.env
+.env.*
+!.env.example
+server/data/*.db
+server/data/*.db-*
+server/data/*.bak*
+backups
+dist-test
 npm-debug.log*

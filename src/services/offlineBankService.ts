@@ -1,10 +1,11 @@
 import { Question, Board, Grade, LevelNode } from '../core/types';
 import { CurriculumService } from './curriculumService';
-import curatedBankJson from '../data/curatedQuestionBank.json';
 
 export class OfflineBankService {
   private static STORAGE_KEY = 'al_prod_offline_question_bank_v1';
-  private static CURATED_BANK: Question[] = (curatedBankJson as unknown as Question[]) || [];
+  // Decoupled static 2.73MB curatedQuestionBank.json from client bundle (REM-P0-03):
+  // questions are served from SQLite via /api/quizzes/session and /api/quizzes/fetch-quiz.
+  private static CURATED_BANK: Question[] = [];
 
   /**
    * Fetches questions dynamically from the secure SQLite server question bank (3,600+ questions),

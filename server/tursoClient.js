@@ -387,14 +387,14 @@ export function startPeriodicSync(localDb, intervalMs = 300000) {
   return timer;
 }
 
-// Automated zero-cost database maintenance to keep Turso storage permanently lean
+// Automated zero-cost database maintenance compliant with 180-day CERT-In retention
 export function runAutomatedMaintenance(localDb) {
   try {
-    // 1. Retain 90 days of security audit logs (safe archival)
-    const auditRes = localDb.prepare("DELETE FROM security_audit_logs WHERE datetime(timestampUtc) < datetime('now', '-90 days')").run();
+    // 1. Retain minimum 180 days of security audit logs per CERT-In Directions
+    const auditRes = localDb.prepare("DELETE FROM security_audit_logs WHERE datetime(timestampUtc) < datetime('now', '-180 days')").run();
     if (auditRes && auditRes.changes > 0) {
-      console.log(`[Maintenance] Purged ${auditRes.changes} historical audit logs older than 90 days.`);
-      executeTurso("DELETE FROM security_audit_logs WHERE datetime(timestampUtc) < datetime('now', '-90 days');").catch(() => {});
+      console.log(`[Maintenance] Purged ${auditRes.changes} historical audit logs older than 180 days.`);
+      executeTurso("DELETE FROM security_audit_logs WHERE datetime(timestampUtc) < datetime('now', '-180 days');").catch(() => {});
     }
 
     // 2. Keep local SQLite WAL file compact

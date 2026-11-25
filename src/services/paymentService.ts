@@ -198,70 +198,67 @@ export class PaymentService {
   }
 
   /**
-   * Activates a subscription immediately via the official automated UPI PG gateway.
-   * Real gateway automation: zero manual admin approval needed.
+   * Submits a payment reference to the backend for admin verification.
+   * STRICT: Creates PENDING_VERIFICATION status only — never auto-grants active subscription.
+   * Falls back to StorageRLS PENDING record when server is unavailable.
    */
   public static async activateGatewayPayment(
     learnerId: string,
     tier: 'LITE' | 'PLUS' | 'GOLD',
     gatewayReference?: string
-  ): Promise<{ success: boolean; subscription: Subscription; error?: string }> {
+  ): Promise<{ success: boolean; subscription: Subscription; pendingVerification?: boolean; error?: string }> {
     const plan = getDynamicPlanPricing(tier);
-    const subId = 'sub_pg_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
-    const now = new Date();
-    const expiry = new Date(now.getTime() + plan.durationDays * 24 * 60 * 60 * 1000);
     const txnRef = (gatewayReference || '').trim() || `UPIPG-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    const subscription: Subscription = {
-      id: subId,
-      learnerId,
-      planTier: tier,
-      status: 'ACTIVE',
-      paymentMethod: 'UPI_QR',
-      utrReference: txnRef,
-      payerUpiId: `scholar_${learnerId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8)}@upipg`,
-      amountInr: plan.priceInr,
-      durationDays: plan.durationDays,
-      startsAt: now.toISOString(),
-      expiresAt: expiry.toISOString(),
-      createdAt: now.toISOString(),
-      verifiedByAdmin: 'UPI_PG_AUTOMATED_GATEWAY',
-      verifiedAt: now.toISOString(),
-      invoiceNumber: `INV-${now.getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`
-    };
+    const token = localStorage.getItem('al_student_token') || sessionStorage.getItem('al_student_token') || '';
 
-    StorageRLSLayer.saveSubscription(subscription);
-
-    // Update learner active subscription state directly
+    // Submit to backend for pending verification
     try {
-      const learners = StorageRLSLayer.getAllLearnersAdmin(SUPER_ADMIN_EMAIL);
-      const target = learners.find(l => l.id === learnerId);
-      if (target) {
-        target.hasActiveSubscription = true;
-        target.activePlan = tier;
-        target.subscriptionExpiresAt = expiry.toISOString();
-        StorageRLSLayer.saveLearner(target, SUPER_ADMIN_EMAIL);
-      }
-    } catch {}
-
-    // Synchronize to backend API if server running
-    try {
-      await fetch('/api/payments/activate-gateway', {
+      const response = await fetch('/api/payments/activate-gateway', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'x-session-token': token } : {})
+        },
         body: JSON.stringify({
           learnerId,
           tier,
-          utrReference: txnRef,
-          payerUpiId: subscription.payerUpiId
+          utrReference: txnRef
         })
-      }).catch(() => {});
-    } catch {}
-
-    return {
-      success: true,
-      subscription
-    };
+      });
+      const data = await response.json();
+      if (data.success && data.subscription) {
+        return {
+          success: true,
+          pendingVerification: data.pendingVerification ?? true,
+          subscription: data.subscription
+        };
+      }
+      return { success: false, error: data.error || 'Payment submission failed.', subscription: data.subscription };
+    } catch (err: any) {
+      // Offline fallback: create local PENDING_VERIFICATION record (no ACTIVE grant)
+      const subId = 'sub_pg_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+      const now = new Date();
+      const subscription: Subscription = {
+        id: subId,
+        learnerId,
+        planTier: tier,
+        status: 'PENDING_VERIFICATION',
+        paymentMethod: 'UPI_QR',
+        utrReference: txnRef,
+        payerUpiId: `scholar_${learnerId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8)}@upipg`,
+        amountInr: plan.priceInr,
+        durationDays: plan.durationDays,
+        startsAt: now.toISOString(),
+        expiresAt: undefined,
+        createdAt: now.toISOString(),
+        verifiedByAdmin: undefined,
+        verifiedAt: undefined,
+        invoiceNumber: `INV-PENDING-${now.getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`
+      };
+      StorageRLSLayer.saveSubscription(subscription);
+      return { success: true, pendingVerification: true, subscription };
+    }
   }
 
   /**

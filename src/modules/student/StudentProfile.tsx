@@ -45,11 +45,8 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
 
   const handleConfirmDelete = async () => {
     const input = deleteConfirmInput.trim();
-    const isPinMatch = input === (learner.parentPin || '1234');
-    const isDeleteWord = input.toUpperCase() === 'DELETE';
-
-    if (!isPinMatch && !isDeleteWord) {
-      setDeleteError('Please type DELETE or enter your 4-digit Parent PIN to confirm.');
+    if (input.toUpperCase() !== 'DELETE') {
+      setDeleteError('Please type DELETE exactly (in capitals) to confirm permanent account deletion.');
       return;
     }
 
@@ -64,9 +61,8 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
       } else {
         setDeleteError(res.message || 'Failed to delete account. Please try again.');
       }
-    } catch {
-      // Local fallback
-      logout();
+    } catch (err: any) {
+      setDeleteError(err?.message || 'Connection error. Please try again.');
     } finally {
       setIsDeleting(false);
     }
@@ -87,7 +83,7 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
 
   const handleUnlockParentView = (e: React.FormEvent) => {
     e.preventDefault();
-    if (parentPinInput === (learner.parentPin || '1234')) {
+    if (parentPinInput === (learner.parentPin || '0000')) {
       setIsParentUnlocked(true);
       setParentPinError('');
     } else {

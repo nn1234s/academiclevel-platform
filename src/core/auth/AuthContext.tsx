@@ -61,17 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           try {
             const studentData = await ApiClient.getStudent(session.learnerId);
             if (studentData.success && studentData.learner && isMounted) {
-              if (localLearner) {
-                if ((localLearner.coinBalance || 0) > (studentData.learner.coinBalance || 0)) {
-                  studentData.learner.coinBalance = localLearner.coinBalance;
-                }
-                if ((localLearner.levelsCompletedCount || 0) > (studentData.learner.levelsCompletedCount || 0)) {
-                  studentData.learner.levelsCompletedCount = localLearner.levelsCompletedCount;
-                }
-                if ((localLearner.quizzesCompletedCount || 0) > (studentData.learner.quizzesCompletedCount || 0)) {
-                  studentData.learner.quizzesCompletedCount = localLearner.quizzesCompletedCount;
-                }
-              }
+              // Trust server as authority for scores/coins — do not silently bump with stale local cache
               if (studentData.activeSub) {
                 StorageRLSLayer.saveSubscription(studentData.activeSub);
                 studentData.learner.hasActiveSubscription = true;
@@ -96,23 +86,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     hydrateAndSyncSession();
 
     // Re-verify immediately on window/tab focus
+    let lastSyncAt = Date.now();
     const onFocusOrVisible = () => {
+      if (Date.now() - lastSyncAt < 300000) return; // Free-tier optimization: throttle focus sync to >= 5 min
       const session = StorageRLSLayer.getCurrentSession();
       if (session && session.learnerId) {
-        const localLearner = StorageRLSLayer.getLearnerById(session.learnerId, session.learnerId);
+        lastSyncAt = Date.now();
         ApiClient.getStudent(session.learnerId).then(studentData => {
           if (studentData.success && studentData.learner && isMounted) {
-            if (localLearner) {
-              if ((localLearner.coinBalance || 0) > (studentData.learner.coinBalance || 0)) {
-                studentData.learner.coinBalance = localLearner.coinBalance;
-              }
-              if ((localLearner.levelsCompletedCount || 0) > (studentData.learner.levelsCompletedCount || 0)) {
-                studentData.learner.levelsCompletedCount = localLearner.levelsCompletedCount;
-              }
-              if ((localLearner.quizzesCompletedCount || 0) > (studentData.learner.quizzesCompletedCount || 0)) {
-                studentData.learner.quizzesCompletedCount = localLearner.quizzesCompletedCount;
-              }
-            }
+            // Trust server as authority for scores/coins on focus re-sync
             if (studentData.activeSub) {
               StorageRLSLayer.saveSubscription(studentData.activeSub);
               studentData.learner.hasActiveSubscription = true;
@@ -140,24 +122,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') onFocusOrVisible();
+    };
     window.addEventListener('focus', onFocusOrVisible);
     window.addEventListener('storage', onStorageChange);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') onFocusOrVisible();
-    });
-
-    // Adaptive visibility-aware auto-poll: only poll when the tab is actively visible to the student
-    const interval = setInterval(() => {
-      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
-        onFocusOrVisible();
-      }
-    }, 45000);
+    document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
       isMounted = false;
       window.removeEventListener('focus', onFocusOrVisible);
       window.removeEventListener('storage', onStorageChange);
-      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, []);
 
@@ -168,17 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const res = await ApiClient.getStudent(targetId);
         if (res.success && res.learner) {
-          // Guard against race conditions where local coin balance or completed levels were just updated
-          const localLearner = StorageRLSLayer.getLearnerById(targetId, targetId);
-          if (localLearner && (localLearner.coinBalance || 0) > (res.learner.coinBalance || 0)) {
-            res.learner.coinBalance = localLearner.coinBalance;
-          }
-          if (localLearner && (localLearner.levelsCompletedCount || 0) > (res.learner.levelsCompletedCount || 0)) {
-            res.learner.levelsCompletedCount = localLearner.levelsCompletedCount;
-          }
-          if (localLearner && (localLearner.quizzesCompletedCount || 0) > (res.learner.quizzesCompletedCount || 0)) {
-            res.learner.quizzesCompletedCount = localLearner.quizzesCompletedCount;
-          }
+          // Trust server as authoritative — no local override
           if (res.activeSub) {
             StorageRLSLayer.saveSubscription(res.activeSub);
             res.learner.hasActiveSubscription = true;
@@ -307,63 +273,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginStudent = async (email: string, password?: string) => {
     const cleanEmail = email.trim().toLowerCase();
 
-    // Check if founder/admin email is logging in via student portal
     try {
-      let emailHash = '';
-      try {
-        const enc = new TextEncoder().encode(cleanEmail);
-        const buf = await window.crypto.subtle.digest('SHA-256', enc);
-        emailHash = Array.from(new Uint8Array(buf))
-          .map(b => b.toString(16).padStart(2, '0'))
-          .join('');
-      } catch {}
-
-      if (
-        cleanEmail === 'naitiknanda1235@gmail.com' ||
-        cleanEmail === 'admin@academiclevel.in' ||
-        emailHash === 'f82f3e631ed2142d54fdeb333e6cf87c4d837d398355d24fc6d83f98f955a87e' ||
-        emailHash === '4c7e6c4ddbbefea23b9d0347895e7b39670f5e7146cead23e590eb7707e7b68a'
-      ) {
-        let adminLearner: Learner | null = StorageRLSLayer.getLearnerByEmail(cleanEmail);
-        if (!adminLearner) {
-          adminLearner = {
-            id: 'usr_super_admin_001',
-            email: cleanEmail,
-            fullName: 'Super Administrator',
-            board: 'CBSE',
-            grade: 12,
-            role: 'SUPER_ADMIN',
-            isActive: true,
-            referralCode: 'AL-ADMIN-VAULT',
-            coinBalance: 99999,
-            quizzesCompletedCount: 99,
-            levelsCompletedCount: 99,
-            currentStreakDays: 99,
-            longestStreakDays: 99,
-            referralQualified: true,
-            classChangesUsedPremium: 0,
-            classChangesUsedPostExpiry: 0,
-            streakFreezesAvailable: 5,
-            createdAt: new Date().toISOString()
-          };
-          StorageRLSLayer.saveLearner(adminLearner, adminLearner.id);
-        }
-        StorageRLSLayer.setSession({
-          learnerId: adminLearner.id,
-          email: adminLearner.email,
-          role: adminLearner.role
-        });
-        setCurrentLearner(adminLearner);
-        return { success: true };
-      }
-    } catch {}
-
-    try {
-      // 1. Query real SQLite backend REST API
+      // Query authoritative SQLite backend REST API (never bypass server password verification)
       const res = await ApiClient.login(cleanEmail, password);
       if (res.success && res.learner) {
         if (res.token && typeof window !== 'undefined') {
-          try { localStorage.setItem('al_student_token', res.token); } catch {}
+          try {
+            if (res.learner.role === 'SUPER_ADMIN') {
+              sessionStorage.setItem('al_admin_token', res.token);
+              sessionStorage.setItem('al_admin_email', res.learner.email);
+            } else {
+              localStorage.setItem('al_student_token', res.token);
+            }
+          } catch {}
         }
         if (res.activeSub) {
           StorageRLSLayer.saveSubscription(res.activeSub);
@@ -392,22 +314,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: true };
       }
     } catch (apiErr: any) {
-      // Fallback: check local storage if server offline
-      await StorageRLSLayer.syncWithServer();
-      const learner = StorageRLSLayer.getLearnerByEmail(cleanEmail);
-      if (learner) {
-        if (!learner.isActive) {
-          return { success: false, error: 'This account is currently suspended. Contact support.' };
-        }
-        StorageRLSLayer.setSession({
-          learnerId: learner.id,
-          email: learner.email,
-          role: learner.role
-        });
-        setCurrentLearner(learner);
-        return { success: true };
-      }
-      return { success: false, error: apiErr.message || 'No student account found with this email. Please register.' };
+      return { success: false, error: apiErr.message || 'Invalid credentials or unable to reach authentication server.' };
     }
 
     return { success: false, error: 'No student account found with this email. Please register.' };
@@ -455,6 +362,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    // Terminate server session BEFORE clearing client storage headers
+    ApiClient.logout().catch(() => {});
     if (typeof window !== 'undefined') {
       try {
         sessionStorage.removeItem('al_admin_token');
@@ -468,8 +377,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('al_prod_session_v1');
       } catch {}
     }
-    // Terminate server session asynchronously
-    ApiClient.logout().catch(() => {});
     StorageRLSLayer.setSession(null);
     setCurrentLearner(null);
   };
@@ -528,14 +435,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ? (sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token'))
     : null;
 
-  const storedAdminEmail = (typeof window !== 'undefined'
-    ? (sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email') || '')
-    : '').toLowerCase();
-
   const isSuperAdmin = Boolean(
-    adminToken ||
-    currentLearner?.role === 'SUPER_ADMIN' ||
-    (currentLearner?.email && [SUPER_ADMIN_EMAIL.toLowerCase(), storedAdminEmail].filter(Boolean).includes(currentLearner.email.toLowerCase()))
+    adminToken && !adminToken.startsWith('adm_sess_fb_') && currentLearner?.role === 'SUPER_ADMIN'
   );
 
   return (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../core/auth/AuthContext';
 import { ApiClient } from '../../core/api/apiClient';
+import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { PaymentService } from '../../services/paymentService';
 import { WhatsDifferentFromChatGPT } from '../shared/WhatsDifferentFromChatGPT';
 import {
@@ -162,37 +163,74 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
       const isAlreadyTeacher = currentLearner?.role === 'TEACHER' || currentLearner?.role === 'SUPER_ADMIN';
       let activeLearnerId = isAlreadyTeacher ? currentLearner?.id : null;
 
-      // 1. If not a verified Teacher yet (or currently a student), register a dedicated Teacher Admin account
+      // 1. If not a verified Teacher yet (or currently a student), register or sign in to a dedicated Teacher Admin account
       if (!activeLearnerId) {
         if (!teacherName.trim() || !teacherEmail.trim() || !teacherPassword.trim()) {
           setAuthError('Please fill in your Full Name, School Email, and Account Password to create your dedicated Teacher Admin account.');
           setIsActivating(false);
           return;
         }
+        if (teacherPassword.trim().length < 6) {
+          setAuthError('Account Password must be at least 6 characters long.');
+          setIsActivating(false);
+          return;
+        }
 
-        const regRes = await ApiClient.register({
-          fullName: teacherName.trim(),
-          email: teacherEmail.trim(),
-          board: 'CBSE',
-          grade: 10,
-          parentName: schoolName.trim() || 'School Administration',
-          parentPin: '1234',
-          password: teacherPassword.trim(),
-          role: 'TEACHER'
-        } as any);
+        const cleanUtrInput = customRef.trim();
+        if (!/^[0-9]{12}$/.test(cleanUtrInput)) {
+          setAuthError('Please enter a valid 12-digit UPI UTR / Reference number from your payment receipt.');
+          setIsActivating(false);
+          return;
+        }
 
-        if (regRes.success && regRes.learner) {
-          activeLearnerId = regRes.learner.id;
+        let authResult: { success: boolean; learner?: any; token?: string; error?: string } | null = null;
+        try {
+          authResult = await ApiClient.register({
+            fullName: teacherName.trim(),
+            email: teacherEmail.trim(),
+            board: 'CBSE',
+            grade: 10,
+            parentName: schoolName.trim() || 'School Administration',
+            parentPin: '1234',
+            password: teacherPassword.trim()
+          });
+        } catch (regErr: any) {
+          const msg = String(regErr?.message || '');
+          if (msg.toLowerCase().includes('already exists')) {
+            // Existing account from a prior attempt — sign in with the provided password
+            authResult = await ApiClient.login(teacherEmail.trim(), teacherPassword.trim());
+          } else {
+            throw regErr;
+          }
+        }
+
+        if (authResult?.success && authResult.learner) {
+          activeLearnerId = authResult.learner.id;
+          if (authResult.token && typeof window !== 'undefined') {
+            try { localStorage.setItem('al_student_token', authResult.token); } catch {}
+          }
+          StorageRLSLayer.saveLearner(authResult.learner, authResult.learner.id);
+          StorageRLSLayer.setSession({
+            learnerId: authResult.learner.id,
+            email: authResult.learner.email,
+            role: authResult.learner.role
+          });
           if (onSuccessAuth) onSuccessAuth();
           await refreshCurrentLearner();
         } else {
-          setAuthError((regRes as any).error || 'Failed to initialize teacher account.');
+          setAuthError((authResult as any)?.error || 'Failed to initialize teacher account.');
           setIsActivating(false);
           return;
         }
       }
 
-      // 2. Call server to mint the 40 Lite or 20 Plus A-Codes and unlock Teacher Dashboard
+      if (!activeLearnerId) {
+        setAuthError('Failed to resolve teacher account ID.');
+        setIsActivating(false);
+        return;
+      }
+
+      // 2. Call server to submit/activate the 40 Lite or 20 Plus A-Codes pack
       const packRes = await ApiClient.activateSchoolPack({
         teacherId: activeLearnerId,
         packType: selectedPack,
@@ -200,7 +238,12 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
         schoolName: schoolName.trim() || 'Classroom Administration'
       });
 
-      if (packRes.success && packRes.acodes) {
+      if (packRes.success && (packRes as any).pendingVerification) {
+        setActivationMessage({
+          type: 'success',
+          text: packRes.message || 'Institutional Classroom Pack payment reference queued for administrator verification. Your A-Codes will be minted upon approval.'
+        });
+      } else if (packRes.success && packRes.acodes) {
         setServerAcodes(packRes.acodes);
         setIsTeacherDashboard(true);
         setIsTeacherActive(true);
@@ -848,13 +891,14 @@ export const SchoolPortalPage: React.FC<SchoolPortalPageProps> = ({ onNavigate, 
 
                       <div>
                         <label className="block text-[11px] text-slate-400 mb-1">
-                          UPI PG Reference / UTR (Optional)
+                          12-Digit UPI PG Reference / UTR *
                         </label>
                         <input
                           type="text"
-                          placeholder="e.g. Transaction ID from payment receipt (optional)"
+                          maxLength={12}
+                          placeholder="Enter 12-digit UTR number from payment receipt"
                           value={customRef}
-                          onChange={e => setCustomRef(e.target.value)}
+                          onChange={e => setCustomRef(e.target.value.replace(/[^0-9]/g, '').slice(0, 12))}
                           className="w-full bg-slate-900 border border-slate-800 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 font-mono focus:outline-none"
                         />
                       </div>

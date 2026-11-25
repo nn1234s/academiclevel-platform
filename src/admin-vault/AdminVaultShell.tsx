@@ -241,14 +241,6 @@ const AdminVaultShellContent: React.FC<AdminVaultShellProps> = ({ onExitVault })
 
           <button
             onClick={() => {
-              try {
-                sessionStorage.removeItem('al_admin_token');
-                sessionStorage.removeItem('al_admin_email');
-                sessionStorage.removeItem('al_admin_passkey');
-                localStorage.removeItem('al_admin_token');
-                localStorage.removeItem('al_admin_email');
-                localStorage.removeItem('al_admin_passkey');
-              } catch {}
               logout();
               onExitVault();
             }}

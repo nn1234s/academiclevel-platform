@@ -12,12 +12,14 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 font-sans transition-colors duration-150;
-    font-family: 'Google Sans Flex', 'Google Sans', 'Google Sans Text', 'Product Sans', system-ui, -apple-system, sans-serif;
+    background-color: #EEEEEE;
+    color: #212121;
+    font-family: 'Google Sans', 'Google Sans Flex', 'Google Sans Text', 'Product Sans', system-ui, -apple-system, sans-serif;
     font-optical-sizing: auto;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   button, a, [role="button"] {
@@ -26,7 +28,7 @@
 
   h1, h2, h3, h4, h5, h6, .font-heading, .font-display {
     font-family: 'Google Sans', 'Google Sans Flex', 'Product Sans', system-ui, -apple-system, sans-serif;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.01em;
   }
 
   button, .btn, [role="button"], .tab-item {
@@ -34,13 +36,125 @@
   }
 
   p, span, li, label, input, textarea, select {
-    font-family: 'Google Sans Flex', 'Google Sans', 'Google Sans Text', sans-serif;
+    font-family: 'Google Sans', 'Google Sans Flex', 'Google Sans Text', sans-serif;
     font-optical-sizing: auto;
   }
 
   code, pre, kbd, samp, .font-mono {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
   }
+
+  /* Material Design 1 (2014-2016) Structural Radii Enforcement:
+     Inputs, textareas, selects, and standard buttons stay crisp 3px-4px (never Material 3 pills). */
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    border-radius: 3px !important;
+  }
+
+  button:not(.md-fab):not(.md-avatar):not(.rounded-circle),
+  [role="button"]:not(.md-fab):not(.md-avatar):not(.rounded-circle) {
+    border-radius: 3px;
+  }
+
+  /* Disable frosted glassmorphism globally in favor of tactile opaque paper */
+  [class*="backdrop-blur"] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+@layer components {
+  /* Classic 2016 Material Card (2dp resting -> 8dp interactive hover) */
+  .md-card {
+    background-color: #FFFFFF;
+    border-radius: 4px;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.20);
+    transition: box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .md-card-interactive:hover {
+    box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.20);
+  }
+  .md-divider {
+    border-top: 1px solid #E0E0E0;
+  }
+
+  /* Classic Android 5.0 Solid Top App Bar (4dp elevation) */
+  .md-appbar {
+    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.20);
+  }
+
+  /* Material 1 Raised Button (3px radius, 2dp -> 4dp hover) */
+  .md-btn-raised {
+    min-height: 36px;
+    border-radius: 3px !important;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.20);
+    transition: box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1), background-color 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .md-btn-raised:hover:not(:disabled) {
+    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.20);
+  }
+
+  /* Material 1 Flat Button */
+  .md-btn-flat {
+    min-height: 36px;
+    border-radius: 3px !important;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    background-color: transparent;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .md-btn-flat:hover:not(:disabled) {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  /* Material 1 Floating Action Button (56x56 circular, 6dp shadow) */
+  .md-fab {
+    width: 56px;
+    height: 56px;
+    border-radius: 50% !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.20);
+    transition: box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .md-fab:hover {
+    box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.20);
+  }
+
+  /* Classic Material 1 Chip (2px radius) */
+  .md-chip {
+    border-radius: 2px !important;
+  }
+
+  /* Material 1 Quiz Option Tile */
+  .md-quiz-option {
+    border-radius: 3px !important;
+    border: 1px solid #E0E0E0;
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.20);
+    transition: box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms ease, background-color 150ms ease;
+  }
+  .md-quiz-option:hover:not(:disabled) {
+    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.20);
+  }
+}
+
+/* Override over-rounded pill badges/chips cleanly across utility classes */
+.rounded-full.px-2,
+.rounded-full.px-2\.5,
+.rounded-full.px-3,
+.rounded-full.px-4,
+.rounded-full.px-5,
+.rounded-full.px-6 {
+  border-radius: 2px !important;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Custom scrollbars */
@@ -50,16 +164,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #E0E0E0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 9999px;
+  background: #BDBDBD;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #9E9E9E;
 }
 
 /* Mobile-first utilities */
@@ -87,7 +201,7 @@
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.18s ease-out forwards;
+  animation: fadeIn 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* Print layout for Certificates */

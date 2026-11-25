@@ -200,8 +200,6 @@ class StorageRLSLayerClass {
       return (
         sessionStorage.getItem('al_admin_token') ||
         localStorage.getItem('al_admin_token') ||
-        sessionStorage.getItem('al_admin_passkey') ||
-        localStorage.getItem('al_admin_passkey') ||
         ''
       );
     } catch {
@@ -212,23 +210,21 @@ class StorageRLSLayerClass {
   private getAdminHeaders(): Record<string, string> {
     if (typeof window === 'undefined') return {};
     const token = sessionStorage.getItem('al_admin_token') || localStorage.getItem('al_admin_token') || '';
-    const passkey = sessionStorage.getItem('al_admin_passkey') || localStorage.getItem('al_admin_passkey') || 'AL-ADMIN-VAULT-2026';
-    const email = sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email') || SUPER_ADMIN_EMAIL;
+    const email = sessionStorage.getItem('al_admin_email') || localStorage.getItem('al_admin_email') || '';
     const headers: Record<string, string> = {};
     if (token) headers['x-admin-token'] = token;
-    headers['x-admin-passkey'] = passkey;
     if (email) headers['x-admin-email'] = email;
     return headers;
   }
 
   /**
-   * Syncs a single key to the backend database
+   * Syncs a single key to the backend database (only when verified admin token active)
    */
   private async syncToServer(key: string, value: any): Promise<void> {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
     try {
       const headers = this.getAdminHeaders();
-      if (!headers['x-admin-token'] && !headers['x-admin-passkey']) return; // Non-admin clients do not post to raw storage
+      if (!headers['x-admin-token']) return;
 
       await fetch('/api/storage', {
         method: 'POST',
@@ -244,14 +240,13 @@ class StorageRLSLayerClass {
   }
 
   /**
-   * Synchronizes entire database state between backend server and browser localStorage.
-   * Merges server-side records so any account registered on ANY browser (Chrome/Edge/Firefox/Mobile)
-   * is instantly recognized across ALL browsers!
+   * Synchronizes database state for authenticated Super-Admin sessions only.
    */
   public async syncWithServer(): Promise<boolean> {
     if (typeof window === 'undefined' || typeof fetch === 'undefined') return false;
     try {
       const headers = this.getAdminHeaders();
+      if (!headers['x-admin-token']) return false;
 
       const res = await fetch('/api/storage', { headers });
       if (!res.ok) return false;
