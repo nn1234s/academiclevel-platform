@@ -34,14 +34,14 @@ export const WhatsDifferentFromChatGPT: React.FC<WhatsDifferentFromChatGPTProps>
     {
       feature: 'Curriculum & Syllabus Alignment',
       chatgpt: 'Hallucinates formulas; gives US/UK college-level answers out of Indian syllabus.',
-      academiclevel: '100% strictly aligned with CBSE, ICSE & IGCSE (Classes 1–12) with 3,600+ verified NCERT questions.',
+      academiclevel: '100% strictly aligned with CBSE (Classes 1–12) with 3,600+ verified NCERT questions.',
       icon: BookOpen,
       highlight: true
     },
     {
       feature: 'True Learning vs "Homework Copying"',
       chatgpt: 'Dumps the final answer immediately. Kids blindly copy without understanding and fail school exams.',
-      academiclevel: 'Nova AI Tutor never gives away answers. She asks friendly hints, cute analogies, and guides step-by-step thinking.',
+      academiclevel: 'Nova AI Tutor never gives away raw answers. It asks helpful hints, clear analogies, and guides step-by-step thinking.',
       icon: Brain,
       highlight: true
     },
@@ -78,27 +78,23 @@ export const WhatsDifferentFromChatGPT: React.FC<WhatsDifferentFromChatGPTProps>
   ];
 
   return (
-    <div className={`rounded-3xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 p-6 sm:p-10 shadow-2xl relative overflow-hidden ${className}`}>
-      {/* Glow Effects */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-
+    <div className={`md-card rounded-[4px] border border-[#E0E0E0] bg-white p-6 sm:p-10 ${className}`}>
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3 mb-8">
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 text-amber-300 text-xs font-black shadow-sm">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+        <div className="md-chip inline-flex items-center space-x-2 px-3 py-1 bg-[#FFF8E1] border border-[#FFE082] text-[#E65100] text-xs font-bold uppercase tracking-wider">
+          <Sparkles className="w-3.5 h-3.5 text-[#FF6D00]" />
           <span>{"WHAT'S DIFFERENT FROM CHATGPT?"}</span>
         </div>
 
-        <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        <h2 className="text-2xl sm:text-4xl font-bold text-[#212121] tracking-tight">
           {isTeacher
-            ? <>Why Schools &amp; Tutors Choose AcademicLevel Over <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-amber-600">Free ChatGPT</span></>
-            : <>Why Free ChatGPT Fails Students While <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600">AcademicLevel</span> Builds Toppers</>}
+            ? <>Why Schools &amp; Tutors Choose AcademicLevel Over <span className="text-[#D32F2F]">Free ChatGPT</span></>
+            : <>Why Free ChatGPT Fails Students While <span className="text-[#3F51B5]">AcademicLevel</span> Builds Toppers</>}
         </h2>
 
-        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-xs sm:text-sm text-[#616161] leading-relaxed max-w-2xl mx-auto">
           {isTeacher
-            ? 'Kids use generic ChatGPT to blindly copy homework answers without learning. AcademicLevel stops cheating with guided bestie reasoning, real CBSE/ICSE curriculum diagnostics, and isolated Teacher Admin accounts.'
+            ? 'Kids use generic ChatGPT to blindly copy homework answers without learning. AcademicLevel stops cheating with step-by-step reasoning, real CBSE curriculum diagnostics, and isolated Teacher Admin accounts.'
             : 'Generic ChatGPT does homework FOR kids, killing their exam performance. AcademicLevel is the only syllabus-locked platform with Nova AI Tutor guidance, exam timers, and real motivation.'}
         </p>
       </div>
@@ -179,7 +175,7 @@ export const WhatsDifferentFromChatGPT: React.FC<WhatsDifferentFromChatGPTProps>
           <button
             type="button"
             onClick={onCtaClick}
-            className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-white font-black rounded-xl shadow-md transition-all flex items-center space-x-1.5 cursor-pointer shrink-0"
+            className="md-btn-raised px-5 py-2.5 bg-[#FF6D00] hover:bg-[#E65100] text-white font-bold rounded-[3px] uppercase tracking-wider text-xs transition-all flex items-center space-x-1.5 cursor-pointer shrink-0 tabular-nums"
           >
             <span>{isTeacher ? 'Get School Pack (₹2,499) ↗' : 'Start for Just ₹49 ↗'}</span>
             <ArrowRight className="w-3.5 h-3.5 text-white" />
