@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-// Exact reCAPTCHA v2 logo provided by user as self-contained data URI
-const RECAPTCHA_LOGO =
-  'data:image/png;base64,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';
-
 interface ReCaptchaWidgetProps {
   isVerified: boolean;
   onVerify: (verified: boolean) => void;
@@ -17,7 +13,6 @@ export const ReCaptchaWidget: React.FC<ReCaptchaWidgetProps> = ({
 }) => {
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // Sync internal state when parent resets
   useEffect(() => {
     if (!isVerified) {
       setIsVerifying(false);
@@ -26,9 +21,7 @@ export const ReCaptchaWidget: React.FC<ReCaptchaWidgetProps> = ({
 
   const handleClick = () => {
     if (isVerified || isVerifying) return;
-
     setIsVerifying(true);
-    // Realistic verification latency simulation (650ms)
     setTimeout(() => {
       setIsVerifying(false);
       onVerify(true);
@@ -37,14 +30,15 @@ export const ReCaptchaWidget: React.FC<ReCaptchaWidgetProps> = ({
 
   return (
     <div
-      className={`w-full max-w-[304px] h-[78px] bg-[#f9f9f9] border ${
-        hasError ? 'border-red-500 shadow-sm shadow-red-200' : 'border-[#d3d3d3]'
-      } rounded-[3px] shadow-[0_0_4px_1px_rgba(0,0,0,0.08)] flex items-center justify-between px-3 py-2 select-none font-sans mx-auto transition-all`}
+      className={`w-[304px] max-w-full h-[74px] bg-[#f9f9f9] border ${
+        hasError ? 'border-red-500' : 'border-[#d3d3d3]'
+      } rounded-[3px] shadow-[0_0_4px_1px_rgba(0,0,0,0.08)] flex items-center justify-between px-[12px] select-none mx-auto`}
+      style={{ fontFamily: 'Roboto, helvetica, arial, sans-serif' }}
     >
       {/* Left Checkbox & Label */}
       <div
         onClick={handleClick}
-        className="flex items-center gap-3 cursor-pointer group py-1"
+        className="flex items-center gap-[12px] cursor-pointer group py-1"
         role="checkbox"
         aria-checked={isVerified}
         tabIndex={0}
@@ -55,17 +49,11 @@ export const ReCaptchaWidget: React.FC<ReCaptchaWidgetProps> = ({
           }
         }}
       >
-        <div className="w-7 h-7 flex items-center justify-center shrink-0">
+        <div className="w-[28px] h-[28px] flex items-center justify-center shrink-0">
           {isVerified ? (
-            /* Verified Green Checkmark (matches reference Image 3) */
-            <svg
-              className="w-7 h-7"
-              viewBox="0 0 28 28"
-              fill="none"
-              aria-hidden="true"
-            >
+            <svg className="w-[28px] h-[28px]" viewBox="0 0 28 28" fill="none" aria-hidden="true">
               <path
-                d="M5.5 14.5L11.2 20.2L22.8 7.8"
+                d="M5 14.5L11 20.5L23.5 7.5"
                 stroke="#0F9D58"
                 strokeWidth="3.6"
                 strokeLinecap="butt"
@@ -73,50 +61,52 @@ export const ReCaptchaWidget: React.FC<ReCaptchaWidgetProps> = ({
               />
             </svg>
           ) : isVerifying ? (
-            /* Verifying Blue Spinner Ring (matches reference Image 2) */
-            <svg
-              className="w-7 h-7 animate-spin"
-              viewBox="0 0 32 32"
-              fill="none"
-              aria-hidden="true"
-            >
-              <circle
-                cx="16"
-                cy="16"
-                r="12"
-                stroke="#D2E3FC"
-                strokeWidth="4"
-              />
-              <path
-                d="M16 4 A12 12 0 1 1 5.6 22"
-                stroke="#4285F4"
-                strokeWidth="4"
-                strokeLinecap="round"
-              />
+            <svg className="w-[28px] h-[28px] animate-spin" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+              <circle cx="16" cy="16" r="12" stroke="#D2E3FC" strokeWidth="4" />
+              <path d="M16 4 A12 12 0 1 1 5.6 22" stroke="#4285F4" strokeWidth="4" strokeLinecap="round" />
             </svg>
           ) : (
-            /* Unchecked Standard Box (matches reference Image 1) */
-            <div className="w-[28px] h-[28px] bg-white border-2 border-[#C1C1C1] rounded-[2px] group-hover:border-[#B2B2B2] transition-colors" />
+            <div className="w-[28px] h-[28px] bg-white border-2 border-[#c1c1c1] rounded-[2px] group-hover:border-[#b2b2b2] transition-colors" />
           )}
         </div>
 
-        <span className="text-[14px] text-[#282727] font-normal tracking-tight">
+        <span
+          className="text-[14px] text-[#000000] font-normal leading-[17px]"
+          style={{ fontFamily: 'Roboto, helvetica, arial, sans-serif' }}
+        >
           I&apos;m not a robot
         </span>
       </div>
 
-      {/* Right reCAPTCHA Brand & Badge */}
-      <div className="flex flex-col items-center justify-center shrink-0 pl-2">
-        <img
-          src={RECAPTCHA_LOGO}
-          alt="reCAPTCHA"
-          className="w-7 h-auto object-contain"
-          loading="eager"
-        />
-        <span className="text-[10px] text-[#555555] font-semibold tracking-wider mt-0.5">
+      {/* Right reCAPTCHA Transparent Vector Logo & Links */}
+      <div className="flex flex-col items-center justify-center shrink-0 w-[58px]">
+        <svg className="w-[32px] h-[32px]" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          {/* Top-left light blue arrow */}
+          <path
+            d="M32 10C21.5 10 12.8 17.2 10.6 27H19.4C21.3 21.8 26.2 18 32 18C35.8 18 39.2 19.6 41.6 22.1L36 27H53V10L47.5 14.8C43.5 11.8 38 10 32 10Z"
+            fill="#4285F4"
+          />
+          {/* Right dark navy arrow */}
+          <path
+            d="M53.4 27H44.6C44.9 28.6 45 30.3 45 32C45 37.8 41.2 42.7 36 44.6V53.4C45.8 51.2 53 42.5 53 32C53 30.3 53.2 28.6 53.4 27Z"
+            fill="#1C3AA9"
+          />
+          {/* Bottom-left grey arrow */}
+          <path
+            d="M22.4 41.9C20 39.4 18.5 35.9 18.5 32C18.5 30.3 18.8 28.6 19.4 27H10.6C10.2 28.6 10 30.3 10 32C10 38 12.5 43.4 16.5 47.4L11 53H28V36L22.4 41.9Z"
+            fill="#ABABAB"
+          />
+        </svg>
+        <span
+          className="text-[10px] text-[#555555] font-normal leading-[10px] mt-[4px]"
+          style={{ fontFamily: 'Roboto, helvetica, arial, sans-serif' }}
+        >
           reCAPTCHA
         </span>
-        <div className="flex items-center gap-1 text-[8px] text-[#555555] mt-[1px]">
+        <div
+          className="flex items-center gap-[3px] text-[8px] text-[#555555] leading-[9px] mt-[2px]"
+          style={{ fontFamily: 'Roboto, helvetica, arial, sans-serif' }}
+        >
           <a
             href="/policies.html#privacy"
             target="_blank"
