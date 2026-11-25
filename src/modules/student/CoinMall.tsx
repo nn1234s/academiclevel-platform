@@ -85,7 +85,7 @@ export const CoinMall: React.FC<CoinMallProps> = ({ learner, onRefreshLearner, o
             Redeem Your Hard-Earned Coins
           </h2>
           <p className="text-xs text-slate-600 mt-1 max-w-md">
-            Every coin is verified against the append-only ledger. Power up your profile, safeguard streaks, and download premium revisions.
+            Every coin in your Study Wallet is verified! Power up your profile, protect your study streaks, and unlock extra practice sheets.
           </p>
         </div>
 

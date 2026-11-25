@@ -28,7 +28,7 @@ export const CertificateVault: React.FC<CertificateVaultProps> = ({ learner }) =
             The Certificate Vault
           </h2>
           <p className="text-xs text-slate-600 mt-1 max-w-md">
-            All level mastery awards and annual master honors issued to {learner.fullName}. Each credential carries a globally verifiable cryptographic token.
+            All level mastery awards and annual master honors earned by {learner.fullName}. Each certificate has a unique verification code!
           </p>
         </div>
 

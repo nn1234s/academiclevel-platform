@@ -399,7 +399,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="block text-slate-700 font-semibold mb-0.5">Parent Name</label>
                 <input
@@ -407,17 +407,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   placeholder="e.g. S. Sen"
                   value={parentName}
                   onChange={e => setParentName(e.target.value)}
-                  className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 px-3 py-2 rounded-lg font-medium focus:outline-none border border-transparent"
+                  className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 px-3 py-2 rounded-[3px] font-medium focus:outline-none border border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-700 font-semibold mb-0.5">Parent PIN *</label>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={4}
+                  required
+                  placeholder="4 digits"
+                  value={parentPin}
+                  onChange={e => setParentPin(e.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
+                  className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 px-3 py-2 rounded-[3px] font-mono tabular-nums focus:outline-none font-medium border border-transparent"
                 />
               </div>
               <div>
                 <label className="block text-slate-700 font-semibold mb-0.5">Referral Code</label>
                 <input
                   type="text"
-                  placeholder="AL-XXX-XXXX"
+                  placeholder="AL-XXX"
                   value={referralCode}
                   onChange={e => setReferralCode(e.target.value.toUpperCase())}
-                  className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 px-3 py-2 rounded-lg font-mono uppercase focus:outline-none font-medium border border-transparent"
+                  className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 px-3 py-2 rounded-[3px] font-mono uppercase focus:outline-none font-medium border border-transparent"
                 />
               </div>
             </div>

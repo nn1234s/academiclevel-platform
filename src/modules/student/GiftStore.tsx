@@ -698,15 +698,15 @@ ${recipientName.trim()}`;
           <div className="bg-white border border-amber-300 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-center w-full lg:w-auto lg:min-w-[200px] shadow-sm flex lg:block items-center justify-between">
             <div className="text-left lg:text-center">
               <span className="text-[11px] text-slate-500 block font-medium">Your Study Coins</span>
-              <span className="text-[10px] text-slate-400 block font-mono lg:hidden">Append-Only Ledger Verified</span>
+              <span className="text-[10px] text-slate-500 block font-mono lg:hidden">Verified Coin Wallet</span>
             </div>
             <div className="flex items-center justify-center space-x-2 lg:mt-1">
               <StudyCoinIcon className="w-6 h-6 sm:w-7 sm:h-7" glow />
-              <span className="text-2xl sm:text-3xl font-black text-amber-600 font-mono">
+              <span className="text-2xl sm:text-3xl font-black text-amber-600 font-mono tabular-nums">
                 {learner.coinBalance.toLocaleString()}
               </span>
             </div>
-            <span className="text-[10px] text-slate-400 hidden lg:block mt-1 font-mono">Append-Only Ledger Verified</span>
+            <span className="text-[10px] text-slate-500 hidden lg:block mt-1 font-mono">Verified Coin Wallet</span>
           </div>
         </div>
 

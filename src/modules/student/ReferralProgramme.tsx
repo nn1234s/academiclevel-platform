@@ -224,7 +224,7 @@ export const ReferralProgramme: React.FC<ReferralProgrammeProps> = ({ learner, o
             <StudyCoinIcon className="w-6 h-6" glow />
             <span>+{totalCoinsEarned}</span>
           </p>
-          <span className="text-[10px] text-slate-500 font-medium">Append-Only Ledger</span>
+          <span className="text-[10px] text-slate-500 font-medium">Verified Coin Wallet</span>
         </div>
       </div>
 

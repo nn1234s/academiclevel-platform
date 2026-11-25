@@ -114,7 +114,7 @@ export const StudentPacks: React.FC<StudentPacksProps> = ({ learner }) => {
         <div>
           <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-700 uppercase bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full flex items-center space-x-1 w-fit">
             <Shield className="w-3 h-3" />
-            <span>DPDP Act 2023 Compliant Safe Space</span>
+            <span>Safe &amp; Private Study Space</span>
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
             StudentPacks Community
