@@ -1087,9 +1087,9 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
                   <span>{isHinglish ? 'Shabash! Sahi Answer! (+1 Score)' : 'Correct Answer! (+1 Score)'}</span>
                 </span>
               ) : (
-                <span className="text-rose-800 flex items-center space-x-1.5 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg">
-                  <XCircle className="w-4 h-4 text-rose-600" />
-                  <span>{isHinglish ? 'Galat Answer. Niche step-by-step solution dekhein.' : 'Incorrect. See step-by-step solution below.'}</span>
+                <span className="text-[#E65100] flex items-center space-x-1.5 bg-[#FFF8E1] border border-[#FFE082] px-2.5 py-1 rounded-[2px]">
+                  <Lightbulb className="w-4 h-4 text-[#FF6D00]" />
+                  <span>{isHinglish ? 'Koi baat nahi! Niche step-by-step hint dekhein.' : "Almost there! Let's see the step-by-step solution below."}</span>
                 </span>
               )}
             </span>

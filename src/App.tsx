@@ -706,46 +706,6 @@ export const App: React.FC = () => {
                           <button
                             onClick={() => {
                               setActiveDropdown(null);
-                              navigateTo('CURRICULUM_ICSE');
-                            }}
-                            className="w-full flex items-start space-x-3 p-2 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
-                          >
-                            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-blue-50 border border-blue-200 text-blue-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
-                              <BookOpen className="w-3.5 h-3.5" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                                ICSE / CISCE Board
-                              </p>
-                              <p className="text-[10px] text-slate-500 leading-tight">
-                                Analytical problem solving &amp; step marking
-                              </p>
-                            </div>
-                          </button>
-
-                          <button
-                            onClick={() => {
-                              setActiveDropdown(null);
-                              navigateTo('CURRICULUM_CAMBRIDGE');
-                            }}
-                            className="w-full flex items-start space-x-3 p-2 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
-                          >
-                            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-purple-50 border border-purple-200 text-purple-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
-                              <BookOpen className="w-3.5 h-3.5" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-slate-900 group-hover:text-purple-600 transition-colors">
-                                Cambridge IGCSE
-                              </p>
-                              <p className="text-[10px] text-slate-500 leading-tight">
-                                International inquiry-based critical thinking
-                              </p>
-                            </div>
-                          </button>
-
-                          <button
-                            onClick={() => {
-                              setActiveDropdown(null);
                               navigateTo('CURRICULUM_OLYMPIAD');
                             }}
                             className="w-full flex items-start space-x-3 p-2 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"

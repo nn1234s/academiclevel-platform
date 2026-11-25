@@ -229,26 +229,6 @@ export const CurriculumPage: React.FC<CurriculumPageProps> = ({
             📘 CBSE Classes 1–12
           </button>
           <button
-            onClick={() => onNavigate('CURRICULUM_ICSE')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              track === 'ICSE'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            🏛️ ICSE / CISCE
-          </button>
-          <button
-            onClick={() => onNavigate('CURRICULUM_CAMBRIDGE')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              track === 'CAMBRIDGE'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            🌐 Cambridge IGCSE
-          </button>
-          <button
             onClick={() => onNavigate('CURRICULUM_OLYMPIAD')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               track === 'OLYMPIAD'

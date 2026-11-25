@@ -98,12 +98,12 @@ const DEFAULT_CONFIG: SiteConfig = {
   },
   home: {
     heroTitle: 'Master Your School Curriculum with Adaptive AI Quizzes',
-    heroSubtitle: 'CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant friendly Nova AI Tutor guidance, verifiable certificates, and an earnable Study Coin economy.',
+    heroSubtitle: 'CBSE Classes 1 to 12. Instant step-by-step Nova AI Tutor guidance, verifiable certificates, and an earnable Study Coin economy.',
     announcementActive: true,
-    announcementText: '🚀 3,600+ Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
+    announcementText: '🚀 3,600+ CBSE Questions for Classes 1-12 live! Start free or unlock full Concept Booster access.',
     statsStudents: 'Nova AI Tutor 24/7',
     statsQuizzes: '3,600+ Questions',
-    statsPassRate: 'CBSE • ICSE • IGCSE',
+    statsPassRate: 'CBSE Classes 1–12',
     bannerCtaText: 'Start Free Practice Now'
   },
   legal: {
@@ -117,7 +117,7 @@ const DEFAULT_CONFIG: SiteConfig = {
   },
   ads: {
     mainHeading: 'Score 95%+ in School Exams Without Expensive Tuitions',
-    subHeading: 'CBSE & ICSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Nova AI Tutor & Real Study Coin Rewards.',
+    subHeading: 'CBSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Nova AI Tutor & Real Study Coin Rewards.',
     offerPriceInr: 49,
     originalPriceInr: 999,
     discountPercent: 95,

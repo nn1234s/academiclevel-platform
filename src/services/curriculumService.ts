@@ -9,7 +9,7 @@ export class CurriculumService {
       color: 'from-blue-600 to-indigo-600',
       description: 'Arithmetic, Algebra, Geometry, Trigonometry, Calculus & Mathematical Reasoning.',
       grades: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-      boards: ['CBSE', 'ICSE', 'IGCSE']
+      boards: ['CBSE']
     },
     {
       id: 'science',
@@ -18,7 +18,7 @@ export class CurriculumService {
       color: 'from-emerald-600 to-teal-600',
       description: 'Environmental Science, Natural World, Matter, Living Organisms, Energy & Everyday Science.',
       grades: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-      boards: ['CBSE', 'ICSE', 'IGCSE']
+      boards: ['CBSE']
     },
     {
       id: 'social',
@@ -27,7 +27,7 @@ export class CurriculumService {
       color: 'from-amber-600 to-orange-600',
       description: 'History, Civics, Geography, Economics, Cultural Heritage & General Knowledge.',
       grades: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-      boards: ['CBSE', 'ICSE', 'IGCSE']
+      boards: ['CBSE']
     },
     {
       id: 'english',
@@ -36,7 +36,7 @@ export class CurriculumService {
       color: 'from-sky-600 to-cyan-600',
       description: 'Grammar mechanics, vocabulary enrichment, critical comprehension & literary composition.',
       grades: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-      boards: ['CBSE', 'ICSE', 'IGCSE']
+      boards: ['CBSE']
     },
     {
       id: 'physics',
@@ -45,7 +45,7 @@ export class CurriculumService {
       color: 'from-violet-600 to-purple-600',
       description: 'Mechanics, Electromagnetism, Optics, Modern Physics & Wave Phenomena.',
       grades: [11, 12],
-      boards: ['CBSE', 'ICSE', 'IGCSE']
+      boards: ['CBSE']
     },
     {
       id: 'chemistry',
@@ -54,7 +54,7 @@ export class CurriculumService {
       color: 'from-rose-600 to-pink-600',
       description: 'Physical, Organic, Inorganic Chemistry, Chemical Bonding & Thermodynamics.',
       grades: [11, 12],
-      boards: ['CBSE', 'ICSE', 'IGCSE']
+      boards: ['CBSE']
     },
     {
       id: 'biology',
@@ -63,7 +63,7 @@ export class CurriculumService {
       color: 'from-emerald-500 to-green-600',
       description: 'Genetics, Cell Physiology, Ecology, Human Physiology & Biotechnology.',
       grades: [11, 12],
-      boards: ['CBSE', 'ICSE', 'IGCSE']
+      boards: ['CBSE']
     },
     {
       id: 'humanities',
@@ -72,7 +72,7 @@ export class CurriculumService {
       color: 'from-amber-700 to-yellow-600',
       description: 'History, Geography, Political Science, Economics & Global Human Societies.',
       grades: [11, 12],
-      boards: ['CBSE', 'ICSE', 'IGCSE']
+      boards: ['CBSE']
     }
   ];
 
