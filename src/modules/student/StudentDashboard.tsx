@@ -289,7 +289,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const daysToBoardExam = Math.max(1, Math.ceil((boardExamDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
 
   return (
-    <div className="space-y-6 text-slate-900">
+    <div className="space-y-4 sm:space-y-6 text-slate-900">
       {/* Super-Admin ONLY: Multi-Class Visual Preview Bar (Hidden for all students) */}
       {isSuperAdmin && (
         <ClassSwitcherBar
@@ -299,11 +299,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       )}
 
       {/* 2. Class-Specific Hero Banner */}
-      <div className={`rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden transition-all duration-500 bg-gradient-to-r ${theme.gradientHero}`}>
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className={`rounded-2xl sm:rounded-3xl p-4 sm:p-8 text-white shadow-xl sm:shadow-2xl relative overflow-hidden transition-all duration-500 bg-gradient-to-r ${theme.gradientHero}`}>
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
           <div className="max-w-2xl">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 text-white">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
+              <span className="px-2.5 sm:px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 text-white">
                 <span className="text-sm">{theme.mascot.emoji}</span>
                 <span>{learner.board} • Class {activeGrade} • {theme.name}</span>
               </span>
@@ -314,7 +314,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
               {quota.hasActiveSubscription && (
                 quota.activePlan === 'GOLD' ? (
-                  <span className="px-3 py-1 bg-gradient-to-r from-amber-500/30 via-yellow-500/20 to-amber-500/30 border border-amber-400/40 backdrop-blur-md rounded-full text-[10px] font-black tracking-wider text-amber-200 flex items-center space-x-1.5 shadow-lg shadow-amber-950/40">
+                  <span className="px-2.5 sm:px-3 py-1 bg-gradient-to-r from-amber-500/30 via-yellow-500/20 to-amber-500/30 border border-amber-400/40 backdrop-blur-md rounded-full text-[10px] font-black tracking-wider text-amber-200 flex items-center space-x-1.5 shadow-lg shadow-amber-950/40">
                     <Crown className="w-3.5 h-3.5 text-amber-300 flex-shrink-0" />
                     <span>👑 1-YEAR GOLD VIP PASS (365d) ACTIVE</span>
                   </span>
@@ -327,64 +327,64 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               )}
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-black mt-2 leading-tight drop-shadow-sm">
+            <h1 className="text-xl sm:text-3xl lg:text-4xl font-black mt-1.5 sm:mt-2 leading-tight drop-shadow-sm">
               {isHinglish ? 'Wapas Swagat Hai' : 'Welcome back'}, {learner.fullName.split(' ')[0]}! {theme.mascot.emoji}
             </h1>
 
-            <p className="text-xs sm:text-sm text-white/95 mt-2 leading-relaxed max-w-xl font-medium">
+            <p className="text-xs sm:text-sm text-white/95 mt-1.5 sm:mt-2 leading-relaxed max-w-xl font-medium">
               &quot;{theme.motto}&quot;
             </p>
 
             {/* Mascot Tip / Speech Bubble */}
-            <div className="mt-4 inline-flex items-center space-x-2.5 bg-black/30 backdrop-blur-md border border-white/20 px-3.5 py-2 rounded-2xl text-xs text-white/90 shadow-md">
-              <span className="text-base flex-shrink-0">{theme.mascot.emoji}</span>
-              <span className="italic">
+            <div className="mt-3 sm:mt-4 inline-flex items-center space-x-2 bg-black/30 backdrop-blur-md border border-white/20 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-2xl text-[11px] sm:text-xs text-white/90 shadow-md">
+              <span className="text-sm sm:text-base flex-shrink-0">{theme.mascot.emoji}</span>
+              <span className="italic line-clamp-2 sm:line-clamp-none">
                 <strong>{theme.mascot.name}:</strong> &quot;{theme.greetingPhrases[0]}&quot;
               </span>
             </div>
           </div>
 
-          {/* Quick Metrics Pod */}
-          <div className="flex flex-col items-stretch gap-2.5 bg-black/30 backdrop-blur-md p-4 rounded-3xl border border-white/20 w-full lg:w-auto lg:min-w-[220px] shadow-xl">
-            <div className="flex items-center space-x-3 w-full justify-between">
-              <span className="text-xs font-bold text-white/80">{isHinglish ? 'Study Streak:' : 'Study Streak:'}</span>
-              <div className="flex items-center space-x-1 font-black text-amber-300">
+          {/* Quick Metrics Pod: Sleek 2x2 grid on mobile/tablet, crisp vertical stack on desktop */}
+          <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-2.5 bg-black/30 backdrop-blur-md p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-white/20 w-full lg:w-auto lg:min-w-[220px] shadow-xl">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between bg-white/10 lg:bg-transparent p-2.5 lg:p-0 rounded-xl">
+              <span className="text-[11px] lg:text-xs font-bold text-white/80">{isHinglish ? 'Study Streak:' : 'Study Streak'}</span>
+              <div className="flex items-center space-x-1 font-black text-amber-300 mt-0.5 lg:mt-0 text-sm lg:text-xs">
                 <Flame className="w-4 h-4 fill-amber-300" />
                 <span>{learner.currentStreakDays} {isHinglish ? 'Din' : 'Days'}</span>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3 w-full justify-between pt-2 border-t border-white/10">
-              <span className="text-xs font-bold text-white/80">{isHinglish ? 'Study Coins:' : 'Study Coins:'}</span>
-              <div className="flex items-center space-x-1.5 font-black text-amber-300">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between bg-white/10 lg:bg-transparent p-2.5 lg:p-0 rounded-xl lg:pt-2 lg:border-t lg:border-white/10">
+              <span className="text-[11px] lg:text-xs font-bold text-white/80">{isHinglish ? 'Study Coins:' : 'Study Coins'}</span>
+              <div className="flex items-center space-x-1.5 font-black text-amber-300 mt-0.5 lg:mt-0 text-sm lg:text-xs">
                 <StudyCoinIcon className="w-4 h-4" glow />
                 <span>{learner.coinBalance.toLocaleString()}</span>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3 w-full justify-between pt-2 border-t border-white/10">
-              <span className="text-xs font-bold text-white/80">{isHinglish ? 'Question Bank:' : 'Questions Bank:'}</span>
-              <span className="font-mono text-xs font-bold bg-white/20 px-2 py-0.5 rounded-full text-white">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between bg-white/10 lg:bg-transparent p-2.5 lg:p-0 rounded-xl lg:pt-2 lg:border-t lg:border-white/10">
+              <span className="text-[11px] lg:text-xs font-bold text-white/80">{isHinglish ? 'Question Bank:' : 'Questions'}</span>
+              <span className="font-mono text-[11px] lg:text-xs font-bold bg-white/20 px-2 py-0.5 rounded-full text-white w-fit mt-1 lg:mt-0">
                 300 Quizzes
               </span>
             </div>
 
             <button
               onClick={() => handleOpenMailboxModal(null)}
-              className="flex items-center space-x-3 w-full justify-between pt-2 border-t border-white/10 hover:bg-white/10 p-1.5 rounded-xl transition-all cursor-pointer group text-left"
+              className="flex flex-col lg:flex-row lg:items-center justify-between bg-white/15 hover:bg-white/25 lg:bg-transparent lg:hover:bg-white/10 p-2.5 lg:p-1.5 rounded-xl lg:pt-2 lg:border-t lg:border-white/10 transition-all cursor-pointer group text-left active:scale-[0.98]"
               title="Open Student Mailbox"
             >
-              <span className="text-xs font-bold text-white/90 flex items-center space-x-1.5">
-                <Mail className="w-3.5 h-3.5 text-indigo-300 group-hover:scale-110 transition-transform" />
-                <span>{isHinglish ? 'Mailbox:' : 'Mailbox:'}</span>
+              <span className="text-[11px] lg:text-xs font-bold text-white/95 flex items-center space-x-1.5">
+                <Mail className="w-3.5 h-3.5 text-indigo-200 group-hover:scale-110 transition-transform" />
+                <span>{isHinglish ? 'Mailbox' : 'Mailbox'}</span>
               </span>
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-1 mt-1 lg:mt-0">
                 {unreadMailCount > 0 ? (
-                  <span className="font-mono text-xs font-black bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full animate-pulse shadow-sm">
+                  <span className="font-mono text-[10px] lg:text-xs font-black bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full animate-pulse shadow-sm">
                     {unreadMailCount} {isHinglish ? 'Naye' : 'New'}
                   </span>
                 ) : (
-                  <span className="font-mono text-xs font-bold bg-white/20 px-2 py-0.5 rounded-full text-white group-hover:bg-white/30 transition-colors">
+                  <span className="font-mono text-[10px] lg:text-xs font-bold bg-white/20 px-2 py-0.5 rounded-full text-white group-hover:bg-white/30 transition-colors">
                     Reports
                   </span>
                 )}
@@ -947,121 +947,153 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       />
 
       {/* 5. Quick Launch Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* 1. Daily Spin Wheel */}
         <button
           onClick={() => onNavigate('SPIN_WHEEL')}
-          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-2xl p-4 text-left transition-all group shadow-xs cursor-pointer"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-2xl p-3.5 sm:p-4 text-left transition-all group shadow-xs cursor-pointer active:scale-[0.98] flex flex-col justify-between"
         >
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-            <StudyCoinIcon className="w-6 h-6" glow />
+          <div className="flex items-start justify-between gap-1.5 mb-2">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+              <StudyCoinIcon className="w-5 h-5 sm:w-6 sm:h-6" glow />
+            </div>
           </div>
-          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Daily Spin Wheel 🎡' : 'Daily Spin Wheel'}</p>
-          <span className="text-[10px] text-slate-500">{isHinglish ? 'Har 24 ghante me free spin' : '24h UTC Cooldown'}</span>
+          <div>
+            <p className="text-xs font-bold text-slate-900 leading-snug">{isHinglish ? 'Daily Spin Wheel 🎡' : 'Daily Spin Wheel'}</p>
+            <span className="text-[10px] text-slate-500 block mt-0.5">{isHinglish ? 'Har 24 ghante me free spin' : '24h UTC Cooldown'}</span>
+          </div>
         </button>
 
         {/* 2. 1v1 Coin Duel Arena */}
         <button
           onClick={() => onNavigate('DUEL_ARENA')}
-          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-400 rounded-2xl p-4 text-left transition-all group relative overflow-hidden shadow-xs cursor-pointer"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-400 rounded-2xl p-3.5 sm:p-4 text-left transition-all group shadow-xs cursor-pointer active:scale-[0.98] flex flex-col justify-between"
         >
-          <span className="absolute top-3 right-3 px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-black rounded-full uppercase tracking-wider">
-            {isHinglish ? 'Live 1v1' : 'Live 1v1'}
-          </span>
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-            <Swords className="w-5 h-5" />
+          <div className="flex items-start justify-between gap-1.5 mb-2">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+              <Swords className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
+            <span className="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-black rounded-full uppercase tracking-wider shrink-0">
+              {isHinglish ? 'Live 1v1' : 'Live 1v1'}
+            </span>
           </div>
-          <p className="text-xs font-bold text-slate-900">{isHinglish ? '1v1 Quiz Duel ⚔️' : '1v1 Quiz Duel ⚔️'}</p>
-          <span className="text-[10px] text-slate-500">{isHinglish ? 'Coins wager karke pot jeeto' : 'Wager Coins & Win Pot'}</span>
+          <div>
+            <p className="text-xs font-bold text-slate-900 leading-snug">{isHinglish ? '1v1 Quiz Duel ⚔️' : '1v1 Quiz Duel ⚔️'}</p>
+            <span className="text-[10px] text-slate-500 block mt-0.5">{isHinglish ? 'Coins wager karke pot jeeto' : 'Wager Coins & Win Pot'}</span>
+          </div>
         </button>
 
         {/* 3. Mistake Vault */}
         <button
           onClick={() => onNavigate('MISTAKE_VAULT')}
-          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-rose-400 rounded-2xl p-4 text-left transition-all group relative overflow-hidden shadow-xs cursor-pointer"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-rose-400 rounded-2xl p-3.5 sm:p-4 text-left transition-all group shadow-xs cursor-pointer active:scale-[0.98] flex flex-col justify-between"
         >
-          {activeMistakesCount > 0 ? (
-            <span className="absolute top-3 right-3 px-1.5 py-0.5 bg-rose-100 text-rose-700 text-[9px] font-black rounded-full">
-              {activeMistakesCount} {isHinglish ? 'Tricky' : 'Tricky'}
-            </span>
-          ) : (
-            <span className="absolute top-3 right-3 px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[9px] font-black rounded-full">
-              {isHinglish ? 'Clean 🎯' : 'Clean 🎯'}
-            </span>
-          )}
-          <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-            <BookOpen className="w-5 h-5" />
+          <div className="flex items-start justify-between gap-1.5 mb-2">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
+            {activeMistakesCount > 0 ? (
+              <span className="px-1.5 py-0.5 bg-rose-100 text-rose-700 text-[9px] font-black rounded-full shrink-0">
+                {activeMistakesCount} {isHinglish ? 'Tricky' : 'Tricky'}
+              </span>
+            ) : (
+              <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[9px] font-black rounded-full shrink-0">
+                {isHinglish ? 'Clean 🎯' : 'Clean 🎯'}
+              </span>
+            )}
           </div>
-          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Mistake Vault (Galati Sudharo) 📓' : 'Mistake Vault 📓'}</p>
-          <span className="text-[10px] text-slate-500">{isHinglish ? 'Har galat question par +10 Coins' : 'Redeem +10 Coins Each'}</span>
+          <div>
+            <p className="text-xs font-bold text-slate-900 leading-snug">{isHinglish ? 'Mistake Vault 📓' : 'Mistake Vault 📓'}</p>
+            <span className="text-[10px] text-slate-500 block mt-0.5">{isHinglish ? 'Har galat sawal par +10 Coins' : 'Redeem +10 Coins Each'}</span>
+          </div>
         </button>
 
         {/* 4. Scholar Leagues */}
         <button
           onClick={() => onNavigate('LEAGUES')}
-          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-2xl p-4 text-left transition-all group relative overflow-hidden shadow-xs cursor-pointer"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-amber-400 rounded-2xl p-3.5 sm:p-4 text-left transition-all group shadow-xs cursor-pointer active:scale-[0.98] flex flex-col justify-between"
         >
-          <span className="absolute top-3 right-3 px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[9px] font-black rounded-full uppercase tracking-wider">
-            Diamond
-          </span>
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-            <Trophy className="w-5 h-5" />
+          <div className="flex items-start justify-between gap-1.5 mb-2">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+              <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
+            <span className="px-1.5 py-0.5 bg-amber-100 text-amber-800 text-[9px] font-black rounded-full uppercase tracking-wider shrink-0">
+              Diamond
+            </span>
           </div>
-          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Scholar Leagues 🏆' : 'Scholar Leagues 🏆'}</p>
-          <span className="text-[10px] text-slate-500">{isHinglish ? 'Weekly ranking aur tier promotion' : 'Weekly Tier Promotion'}</span>
+          <div>
+            <p className="text-xs font-bold text-slate-900 leading-snug">{isHinglish ? 'Scholar Leagues 🏆' : 'Scholar Leagues 🏆'}</p>
+            <span className="text-[10px] text-slate-500 block mt-0.5">{isHinglish ? 'Weekly ranking aur promotion' : 'Weekly Tier Promotion'}</span>
+          </div>
         </button>
 
         {/* 5. Question of Day */}
         <button
           onClick={() => onNavigate('QOTD')}
-          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-400 rounded-2xl p-4 text-left transition-all group shadow-xs cursor-pointer"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-indigo-400 rounded-2xl p-3.5 sm:p-4 text-left transition-all group shadow-xs cursor-pointer active:scale-[0.98] flex flex-col justify-between"
         >
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-            <Compass className="w-5 h-5" />
+          <div className="flex items-start justify-between gap-1.5 mb-2">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+              <Compass className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
           </div>
-          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Aaj Ka Sawal (QOTD) ⚡' : 'Question of Day'}</p>
-          <span className="text-[10px] text-slate-500">{isHinglish ? 'Daily streak booster question' : 'Streak Booster'}</span>
+          <div>
+            <p className="text-xs font-bold text-slate-900 leading-snug">{isHinglish ? 'Aaj Ka Sawal (QOTD) ⚡' : 'Question of Day'}</p>
+            <span className="text-[10px] text-slate-500 block mt-0.5">{isHinglish ? 'Daily streak booster question' : 'Streak Booster'}</span>
+          </div>
         </button>
 
         {/* 6. Nova AI Tutor */}
         <button
           onClick={() => onNavigate('NOVA_AI')}
-          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-violet-400 rounded-2xl p-4 text-left transition-all group shadow-xs cursor-pointer"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-violet-400 rounded-2xl p-3.5 sm:p-4 text-left transition-all group shadow-xs cursor-pointer active:scale-[0.98] flex flex-col justify-between"
         >
-          <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-            <Zap className="w-5 h-5" />
+          <div className="flex items-start justify-between gap-1.5 mb-2">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
           </div>
-          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Nova AI Tutor 🎀' : 'Nova AI Tutor 🎀'}</p>
-          <span className="text-[10px] text-slate-500">{isHinglish ? '24/7 AI Bestie Concept Tutor' : '24/7 AI Concept Tutor'}</span>
+          <div>
+            <p className="text-xs font-bold text-slate-900 leading-snug">{isHinglish ? 'Nova AI Tutor 🎀' : 'Nova AI Tutor 🎀'}</p>
+            <span className="text-[10px] text-slate-500 block mt-0.5">{isHinglish ? '24/7 AI Bestie Concept Tutor' : '24/7 AI Concept Tutor'}</span>
+          </div>
         </button>
 
         {/* 7. Student Mailbox */}
         <button
           onClick={() => handleOpenMailboxModal(null)}
-          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-purple-400 rounded-2xl p-4 text-left transition-all group relative overflow-hidden shadow-xs cursor-pointer"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-purple-400 rounded-2xl p-3.5 sm:p-4 text-left transition-all group shadow-xs cursor-pointer active:scale-[0.98] flex flex-col justify-between"
         >
-          {unreadMailCount > 0 && (
-            <span className="absolute top-3 right-3 px-2 py-0.5 bg-indigo-100 border border-indigo-300 text-indigo-800 text-[10px] font-bold rounded-full animate-pulse">
-              {unreadMailCount} {isHinglish ? 'Naye' : 'New'}
-            </span>
-          )}
-          <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-            <Mail className="w-5 h-5" />
+          <div className="flex items-start justify-between gap-1.5 mb-2">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+              <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
+            {unreadMailCount > 0 && (
+              <span className="px-2 py-0.5 bg-indigo-100 border border-indigo-300 text-indigo-800 text-[9px] font-bold rounded-full animate-pulse shrink-0">
+                {unreadMailCount} {isHinglish ? 'Naye' : 'New'}
+              </span>
+            )}
           </div>
-          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Student Mailbox 📬' : 'Student Mailbox'}</p>
-          <span className="text-[10px] text-slate-500">{isHinglish ? 'Quiz diagnostic reports aur notes' : 'Quiz Diagnostic Reports'}</span>
+          <div>
+            <p className="text-xs font-bold text-slate-900 leading-snug">{isHinglish ? 'Student Mailbox 📬' : 'Student Mailbox'}</p>
+            <span className="text-[10px] text-slate-500 block mt-0.5">{isHinglish ? 'Quiz reports aur notes' : 'Quiz Diagnostic Reports'}</span>
+          </div>
         </button>
 
         {/* 8. Rewards Store */}
         <button
           onClick={() => onNavigate('GIFT_STORE')}
-          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-emerald-400 rounded-2xl p-4 text-left transition-all group shadow-xs cursor-pointer"
+          className="bg-white hover:bg-slate-50 border border-slate-200 hover:border-emerald-400 rounded-2xl p-3.5 sm:p-4 text-left transition-all group shadow-xs cursor-pointer active:scale-[0.98] flex flex-col justify-between"
         >
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-            <Award className="w-5 h-5" />
+          <div className="flex items-start justify-between gap-1.5 mb-2">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+              <Award className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
           </div>
-          <p className="text-xs font-bold text-slate-900">{isHinglish ? 'Rewards Store 🎁' : 'Rewards Store'}</p>
-          <span className="text-[10px] text-slate-500">{isHinglish ? 'Toys, badges aur bottles' : 'Toys, Badges & Bottles'}</span>
+          <div>
+            <p className="text-xs font-bold text-slate-900 leading-snug">{isHinglish ? 'Rewards Store 🎁' : 'Rewards Store'}</p>
+            <span className="text-[10px] text-slate-500 block mt-0.5">{isHinglish ? 'Toys, badges aur bottles' : 'Toys, Badges & Bottles'}</span>
+          </div>
         </button>
       </div>
 
@@ -1172,12 +1204,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {subjects.map(subject => (
             <div
               key={subject.id}
               onClick={() => onNavigate('LEVELS', { subjectId: subject.id, grade: activeGrade })}
-              className={`bg-white border rounded-3xl p-6 cursor-pointer transition-all shadow-sm flex flex-col justify-between group ${theme.cardBorder} ${theme.cardHover}`}
+              className={`bg-white border rounded-2xl sm:rounded-3xl p-4 sm:p-6 cursor-pointer transition-all shadow-sm flex flex-col justify-between group active:scale-[0.99] ${theme.cardBorder} ${theme.cardHover}`}
             >
               <div>
                 <div className="flex items-center justify-between mb-4">

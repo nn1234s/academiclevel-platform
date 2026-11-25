@@ -58,18 +58,18 @@ export const CourseLevels: React.FC<CourseLevelsProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 text-slate-900">
+    <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 text-slate-900">
       <button
         onClick={onBack}
-        className="flex items-center space-x-1.5 text-xs text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+        className="inline-flex items-center space-x-1.5 text-xs text-slate-600 hover:text-slate-900 px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-2xs transition-colors cursor-pointer active:scale-95"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back to Course Catalogue</span>
       </button>
 
-      <div className="bg-gradient-to-r from-indigo-50 via-white to-indigo-50 border border-indigo-200 rounded-3xl p-6 sm:p-8 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-700 uppercase bg-indigo-100 border border-indigo-200 px-3 py-1 rounded-full">
+      <div className="bg-gradient-to-r from-indigo-50 via-white to-indigo-50 border border-indigo-200 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+          <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-700 uppercase bg-indigo-100 border border-indigo-200 px-2.5 sm:px-3 py-1 rounded-full">
             {learner.board} Class {learner.grade} • Syllabus Architecture
           </span>
           <span className="text-xs text-amber-700 font-semibold flex items-center space-x-1">
@@ -77,7 +77,7 @@ export const CourseLevels: React.FC<CourseLevelsProps> = ({
             <span>+25 Coins Reward per Assessment</span>
           </span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
+        <h2 className="text-xl sm:text-3xl font-extrabold text-slate-900 mt-2">
           {subjectId.toUpperCase()} Syllabus Chapters
         </h2>
         <p className="text-xs text-slate-600 mt-1 max-w-xl">

@@ -544,36 +544,61 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
   );
 
   return (
-    <div className="flex flex-col h-[650px] max-w-3xl mx-auto bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl text-slate-900 relative">
+    <div className="flex flex-col h-[calc(100dvh-10.5rem)] sm:h-[650px] min-h-[460px] max-w-3xl mx-auto bg-white border border-slate-200 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl text-slate-900 relative">
       {/* Header */}
-      <div className="bg-gradient-to-r from-pink-50 via-rose-50 to-indigo-50 p-4 border-b border-pink-200/60 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-500 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-pink-900/20 text-lg">
-            🎧
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h3 className="font-black text-sm text-slate-900 flex items-center gap-1.5">
-                <span>nova</span>
-                <span className="text-[11px] font-normal text-slate-500">• your study bestie 🎀</span>
-              </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-100 text-pink-700 border border-pink-200">
-                Class {grade} {board}
-              </span>
-              {!learner && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
-                  Guest Mode
-                </span>
-              )}
+      <div className="bg-gradient-to-r from-pink-50 via-rose-50 to-indigo-50 p-3 sm:p-4 border-b border-pink-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex items-center justify-between sm:justify-start space-x-2.5 sm:space-x-3 min-w-0">
+          <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-500 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-pink-900/20 text-base sm:text-lg shrink-0">
+              🎧
             </div>
-            <p className="text-[11px] text-slate-600 flex items-center space-x-1.5 mt-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping inline-block" />
-              <span>100+ cute study brain boosts preloaded • works offline 🌸</span>
-            </p>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <h3 className="font-black text-sm text-slate-900 flex items-center gap-1">
+                  <span>nova</span>
+                  <span className="text-[10px] sm:text-[11px] font-normal text-slate-500 hidden xs:inline">• study bestie 🎀</span>
+                </h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-100 text-pink-700 border border-pink-200">
+                  Class {grade} {board}
+                </span>
+                {!learner && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                    Guest Mode
+                  </span>
+                )}
+              </div>
+              <p className="text-[10px] sm:text-[11px] text-slate-600 flex items-center space-x-1.5 mt-0.5 truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping inline-block shrink-0" />
+                <span className="truncate">100+ study brain boosts • works offline 🌸</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-1.5 sm:hidden shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
+                initWelcome();
+              }}
+              title="Restart Conversation"
+              className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 shadow-xs active:scale-95"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-xs text-slate-600 px-2.5 py-2 rounded-xl bg-white border border-slate-200 shadow-xs font-semibold active:scale-95"
+              >
+                Close
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <button
             type="button"
             onClick={() => {
@@ -581,14 +606,14 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
               initWelcome();
             }}
             title="Restart Conversation"
-            className="p-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer shadow-xs"
+            className="hidden sm:inline-flex p-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer shadow-xs"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
 
           {quota?.isInChatBreak ? (
             <div
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-pink-50 text-pink-700 border border-pink-300 shadow-xs"
+              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-pink-50 text-pink-700 border border-pink-300 shadow-xs"
               title="Completed 5+ levels today: Free Chat Break Active!"
             >
               <Sparkles className="w-3.5 h-3.5 text-pink-500 animate-pulse" />
@@ -601,7 +626,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
             </div>
           ) : quota?.levelsCompletedToday === 4 ? (
             <div
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-300 shadow-xs"
+              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-300 shadow-xs"
               title="Complete 5 levels today to get a 20 min free chat break!"
             >
               <span>🔥 4/5 Levels • 1 More for 20-Min Break ☕</span>
@@ -615,12 +640,12 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
                 setRefillStatus(null);
                 setShowRefillModal(true);
               }}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 transition-all cursor-pointer shadow-xs"
+              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 transition-all cursor-pointer shadow-xs"
               title="AI Credits Limit: 8,500 Credits"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-600" />
               <span>
-                {quota ? `${quota.remainingToday.toLocaleString()} / 8,500 Credits` : '8,500 Credits'}
+                {quota ? `${quota.remainingToday.toLocaleString()} Credits` : '8,500 Credits'}
               </span>
               <span className="text-[9px] bg-amber-200 text-amber-900 px-1 py-0.5 rounded uppercase font-black">
                 +Refill
@@ -632,7 +657,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="text-xs text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 transition-colors cursor-pointer shadow-xs"
+              className="hidden sm:inline-flex text-xs text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 transition-colors cursor-pointer shadow-xs"
             >
               Close
             </button>
@@ -711,11 +736,11 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       )}
 
       {/* Messages Scroll Area */}
-      <div ref={messagesContainerRef} className="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50/50">
+      <div ref={messagesContainerRef} className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3 sm:space-y-4 bg-slate-50/50 overscroll-contain">
         {messages.map(msg => (
           <div
             key={msg.id}
-            className={`flex items-start space-x-2.5 ${
+            className={`flex items-start space-x-2 sm:space-x-2.5 ${
               msg.sender === 'STUDENT' ? 'flex-row-reverse space-x-reverse' : ''
             }`}
           >
@@ -730,7 +755,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
             </div>
 
             <div
-              className={`max-w-[85%] rounded-2xl p-4 text-xs leading-relaxed whitespace-pre-wrap ${
+              className={`max-w-[88%] sm:max-w-[84%] rounded-2xl p-3 sm:p-4 text-[13px] sm:text-xs leading-relaxed whitespace-pre-wrap ${
                 msg.sender === 'STUDENT'
                   ? 'bg-indigo-600 text-white rounded-tr-none shadow-md'
                   : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none shadow-sm'
@@ -902,7 +927,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       )}
 
       {/* Input Form */}
-      <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-slate-200 flex items-center space-x-2">
+      <form onSubmit={handleSendMessage} className="p-2.5 sm:p-3 bg-white border-t border-slate-200 flex items-center space-x-2">
         <input
           type="file"
           ref={fileInputRef}
@@ -914,7 +939,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="p-2.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 transition-all flex items-center space-x-1 cursor-pointer shrink-0 shadow-2xs"
+          className="p-2.5 min-h-[44px] min-w-[44px] rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 transition-all flex items-center justify-center space-x-1 cursor-pointer shrink-0 shadow-2xs active:scale-95"
           title="Snap & Solve: Take photo of textbook problem"
         >
           <Camera className="w-4 h-4" />
@@ -924,13 +949,13 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
           type="text"
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
-          placeholder={selectedPhoto ? "Add optional note (e.g. explain step 2)..." : "Ask your study bestie or snap a photo problem... 🎀"}
-          className="flex-1 bg-slate-50 border border-slate-300 focus:border-indigo-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none"
+          placeholder={selectedPhoto ? "Add optional note..." : "Chat with Nova or snap a photo... 🎀"}
+          className="flex-1 min-w-0 bg-slate-50 border border-slate-300 focus:border-indigo-500 rounded-xl px-3 sm:px-3.5 py-2.5 min-h-[44px] text-base sm:text-xs text-slate-900 placeholder-slate-400 focus:outline-none"
         />
         <button
           type="submit"
           disabled={(!inputValue.trim() && !selectedPhoto) || isTyping}
-          className="p-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white rounded-xl shadow-md transition-all cursor-pointer shrink-0"
+          className="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white rounded-xl shadow-md transition-all cursor-pointer shrink-0 active:scale-95"
         >
           <Send className="w-4 h-4" />
         </button>

@@ -609,24 +609,30 @@ export const App: React.FC = () => {
         {/* ======================================================== */}
         {/* HEADER / NAVIGATION BAR (Zero Admin Links)               */}
         {/* ======================================================== */}
-        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 sm:px-8 py-2 sm:py-3.5 shadow-xs">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 shadow-xs">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
             {/* Brand Logo & Desktop Nav grouped closely together */}
-            <div className="flex items-center space-x-2.5 sm:space-x-3.5 lg:space-x-5 min-w-0 shrink-0 flex-shrink-0">
+            <div className="flex items-center space-x-2 sm:space-x-3.5 lg:space-x-5 min-w-0">
               <div
                 onClick={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
-                className="flex items-center space-x-2 sm:space-x-2.5 cursor-pointer group shrink-0 flex-shrink-0 min-w-[36px]"
+                className="flex items-center space-x-2 sm:space-x-2.5 cursor-pointer group shrink-0 min-w-[36px]"
                 title="AcademicLevel"
               >
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-extrabold text-sm sm:text-base shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform shrink-0 flex-shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white font-extrabold text-sm sm:text-base shadow-md shadow-indigo-500/25 group-hover:scale-105 active:scale-95 transition-transform shrink-0">
                   AL
                 </div>
-                {!isAuthenticated && (
-                  <div className="hidden sm:block">
-                    <span className="font-extrabold text-base tracking-tight text-slate-900 block leading-none">
+                {!isAuthenticated ? (
+                  <div className="min-w-0">
+                    <span className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 block leading-none truncate">
                       AcademicLevel
                     </span>
-                    <span className="text-[10px] text-slate-500 font-medium">Learn in your era</span>
+                    <span className="text-[10px] text-slate-500 font-medium hidden sm:block">Learn in your era</span>
+                  </div>
+                ) : (
+                  <div className="hidden sm:block lg:hidden">
+                    <span className="font-extrabold text-sm tracking-tight text-slate-900 block leading-none">
+                      AcademicLevel
+                    </span>
                   </div>
                 )}
               </div>
@@ -1172,9 +1178,10 @@ export const App: React.FC = () => {
           </div>
         </header>
 
-        {/* Mobile Navigation Drawer */}
+        {/* Mobile Navigation Drawer (Overlay Sheet) */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-b border-slate-200 p-4 space-y-4 text-xs font-semibold shadow-xl text-slate-800 animate-fadeIn">
+          <div className="lg:hidden fixed top-[57px] sm:top-[65px] inset-x-0 bottom-0 z-50 bg-slate-950/35 backdrop-blur-xs animate-fadeIn">
+            <div className="bg-white border-b border-slate-200 p-4 pb-24 space-y-4 text-xs font-semibold shadow-2xl text-slate-800 max-h-full overflow-y-auto overscroll-contain rounded-b-3xl">
             {!isAuthenticated ? (
               <div className="space-y-3">
                 <button
@@ -1608,13 +1615,14 @@ export const App: React.FC = () => {
                 </button>
               </div>
             )}
+            </div>
           </div>
         )}
 
         {/* ======================================================== */}
         {/* MAIN BODY VIEW CONTAINER                                */}
         {/* ======================================================== */}
-        <main className="flex-1 max-w-7xl mx-auto w-full px-3.5 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <main className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 py-3.5 sm:py-8">
           {/* Public Views */}
           {currentRoute === 'HOME' && (
             <LandingPage
@@ -1710,7 +1718,7 @@ export const App: React.FC = () => {
 
           {/* Public / Guest Accessible Nova AI */}
           {currentRoute === 'NOVA_AI' && !isAuthenticated && (
-            <div className="py-6 px-4">
+            <div className="py-1 sm:py-4">
               <NovaAiTutor
                 board={publicBoardFilter || 'CBSE'}
                 grade={10}
@@ -1725,7 +1733,7 @@ export const App: React.FC = () => {
 
           {/* Public / Guest Accessible Gift Store Showcase */}
           {(currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' || currentRoute === 'STORE') && !isAuthenticated && (
-            <div className="py-6 px-4">
+            <div className="py-2 sm:py-4">
               <div className="max-w-4xl mx-auto mb-6 p-6 rounded-2xl bg-gradient-to-r from-amber-50 via-white to-amber-50 border border-amber-200 text-center text-slate-800 shadow-sm">
                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
                   🎁 Scholar&apos;s Physical Prize Catalog
@@ -2005,7 +2013,7 @@ export const App: React.FC = () => {
         {/* ======================================================== */}
         {/* PUBLIC FOOTER (Modern Light Mode Multi-Column)            */}
         {/* ======================================================== */}
-        <footer className="bg-white text-slate-600 border-t border-slate-200 pt-12 pb-14 px-4 sm:px-6 lg:px-8 text-xs font-sans">
+        <footer className={`bg-white text-slate-600 border-t border-slate-200 pt-10 sm:pt-12 ${currentRoute !== 'QUIZ' ? 'pb-24 lg:pb-14' : 'pb-12'} px-4 sm:px-6 lg:px-8 text-xs font-sans`}>
           <div className="max-w-6xl mx-auto space-y-8">
             {/* Top Brand Header Row */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
@@ -2464,6 +2472,170 @@ export const App: React.FC = () => {
               onCancel={() => setAcodeModalOpen(false)}
             />
           </div>
+        )}
+
+        {/* Persistent App-Style Bottom Navigation Bar (Mobile & Small Tablets Only) */}
+        {currentRoute !== 'QUIZ' && (
+          <nav
+            aria-label="Mobile Navigation"
+            className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200/90 shadow-[0_-6px_24px_-6px_rgba(15,23,42,0.12)] pb-safe"
+          >
+            {isAuthenticated ? (
+              <div className="grid grid-cols-5 h-16 px-1 max-w-lg mx-auto items-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('DASHBOARD');
+                  }}
+                  className={`flex flex-col items-center justify-center py-1.5 rounded-2xl transition-all active:scale-95 ${
+                    currentRoute === 'DASHBOARD' ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <div className={`p-1 rounded-xl ${currentRoute === 'DASHBOARD' ? 'bg-indigo-50' : ''}`}>
+                    <Home className="w-5 h-5" />
+                  </div>
+                  <span className={`text-[10px] mt-0.5 leading-none ${currentRoute === 'DASHBOARD' ? 'font-extrabold' : 'font-semibold'}`}>
+                    {language === 'hi' ? 'Home' : 'Home'}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('COURSES');
+                  }}
+                  className={`flex flex-col items-center justify-center py-1.5 rounded-2xl transition-all active:scale-95 ${
+                    currentRoute === 'COURSES' || currentRoute === 'LEVELS' ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <div className={`p-1 rounded-xl ${currentRoute === 'COURSES' || currentRoute === 'LEVELS' ? 'bg-indigo-50' : ''}`}>
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                  <span className={`text-[10px] mt-0.5 leading-none ${currentRoute === 'COURSES' || currentRoute === 'LEVELS' ? 'font-extrabold' : 'font-semibold'}`}>
+                    {language === 'hi' ? 'Study' : 'Courses'}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('NOVA_AI');
+                  }}
+                  className="flex flex-col items-center justify-center -mt-3 transition-all active:scale-95"
+                >
+                  <div
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-transform ${
+                      currentRoute === 'NOVA_AI'
+                        ? 'bg-gradient-to-tr from-pink-600 via-rose-500 to-indigo-600 text-white ring-4 ring-pink-100 scale-105'
+                        : 'bg-gradient-to-tr from-pink-500 via-rose-500 to-indigo-500 text-white shadow-pink-500/30'
+                    }`}
+                  >
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <span className={`text-[10px] mt-1 leading-none ${currentRoute === 'NOVA_AI' ? 'font-black text-pink-600' : 'font-bold text-slate-700'}`}>
+                    Nova AI
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('GIFT_STORE');
+                  }}
+                  className={`flex flex-col items-center justify-center py-1.5 rounded-2xl transition-all active:scale-95 ${
+                    currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' ? 'text-amber-600' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <div className={`p-1 rounded-xl ${currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' ? 'bg-amber-50' : ''}`}>
+                    <Gift className="w-5 h-5" />
+                  </div>
+                  <span className={`text-[10px] mt-0.5 leading-none ${currentRoute === 'GIFT_STORE' || currentRoute === 'COIN_MALL' ? 'font-extrabold' : 'font-semibold'}`}>
+                    {language === 'hi' ? 'Gifts' : 'Gifts'}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('PROFILE');
+                  }}
+                  className={`flex flex-col items-center justify-center py-1.5 rounded-2xl transition-all active:scale-95 ${
+                    currentRoute === 'PROFILE' ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <div className={`p-1 rounded-xl ${currentRoute === 'PROFILE' ? 'bg-indigo-50' : ''}`}>
+                    <User className="w-5 h-5" />
+                  </div>
+                  <span className={`text-[10px] mt-0.5 leading-none ${currentRoute === 'PROFILE' ? 'font-extrabold' : 'font-semibold'}`}>
+                    Profile
+                  </span>
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-4 h-16 px-2 max-w-md mx-auto items-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('HOME');
+                  }}
+                  className={`flex flex-col items-center justify-center py-1.5 rounded-2xl transition-all active:scale-95 ${
+                    currentRoute === 'HOME' ? 'text-indigo-600 font-extrabold' : 'text-slate-500 font-semibold'
+                  }`}
+                >
+                  <Home className="w-5 h-5" />
+                  <span className="text-[10px] mt-1 leading-none">Home</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('PUBLIC_COURSES');
+                  }}
+                  className={`flex flex-col items-center justify-center py-1.5 rounded-2xl transition-all active:scale-95 ${
+                    currentRoute.startsWith('CURRICULUM') || currentRoute === 'PUBLIC_COURSES' ? 'text-indigo-600 font-extrabold' : 'text-slate-500 font-semibold'
+                  }`}
+                >
+                  <BookOpen className="w-5 h-5" />
+                  <span className="text-[10px] mt-1 leading-none">Syllabus</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('NOVA_AI');
+                  }}
+                  className={`flex flex-col items-center justify-center py-1.5 rounded-2xl transition-all active:scale-95 ${
+                    currentRoute === 'NOVA_AI' ? 'text-pink-600 font-extrabold' : 'text-slate-500 font-semibold'
+                  }`}
+                >
+                  <Sparkles className="w-5 h-5 text-pink-500" />
+                  <span className="text-[10px] mt-1 leading-none">Nova AI</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('SPECIAL_49_FUNNEL');
+                  }}
+                  className={`flex flex-col items-center justify-center py-1.5 rounded-2xl transition-all active:scale-95 ${
+                    currentRoute === 'SPECIAL_49_FUNNEL' ? 'text-amber-600 font-extrabold' : 'text-amber-700 font-bold'
+                  }`}
+                >
+                  <Zap className="w-5 h-5 text-amber-500" />
+                  <span className="text-[10px] mt-1 leading-none">₹49 Pass</span>
+                </button>
+              </div>
+            )}
+          </nav>
         )}
 
         {/* User Language Selection Modal */}

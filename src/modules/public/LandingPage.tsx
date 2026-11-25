@@ -275,10 +275,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     : parentStudentReviews.filter(r => r.role === activeTab);
 
   return (
-    <div className="space-y-24 text-slate-900 pb-12">
+    <div className="space-y-12 sm:space-y-24 text-slate-900 pb-8 sm:pb-12">
       
       {/* 1. TOP HERO SECTION (MOST ELITE AI QUIZ PLATFORM) */}
-      <section className="relative pt-8 pb-16 text-center max-w-6xl mx-auto px-4 overflow-hidden">
+      <section className="relative pt-3 sm:pt-8 pb-8 sm:pb-16 text-center max-w-6xl mx-auto px-1 sm:px-4 overflow-hidden">
         {/* Glow ambient background */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-10 right-10 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -320,8 +320,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         {/* Main Hero Header */}
-        <div className="space-y-4 max-w-4xl mx-auto">
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 leading-tight">
+        <div className="space-y-3 sm:space-y-4 max-w-4xl mx-auto">
+          <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black tracking-tight text-slate-900 leading-tight">
             {homeConfig.heroTitle ? (
               <span>{homeConfig.heroTitle}</span>
             ) : (
@@ -637,8 +637,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* 5. INTERACTIVE BOARD & CLASS SELECTOR (CURRICULUM ENGINE) */}
-      <section className="max-w-4xl mx-auto px-4">
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-lg relative overflow-hidden">
+      <section className="max-w-4xl mx-auto px-1 sm:px-4">
+        <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-10 shadow-lg relative overflow-hidden">
           <div className="text-center mb-8">
             <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-700 uppercase bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full">
               Full Syllabus Coverage
@@ -676,7 +676,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <select
                 value={selectedGrade}
                 onChange={e => setSelectedGrade(Number(e.target.value) as Grade)}
-                className="w-full bg-slate-50 border border-slate-300 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none cursor-pointer"
+                className="w-full bg-slate-50 border border-slate-300 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-base sm:text-xs text-slate-900 focus:outline-none cursor-pointer"
               >
                 {([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as Grade[]).map(g => (
                   <option key={g} value={g}>Class {g}</option>
@@ -696,7 +696,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
             <button
               onClick={() => onExploreCourse(selectedBoard, selectedGrade)}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 whitespace-nowrap cursor-pointer"
+              className="w-full sm:w-auto px-5 py-3 sm:py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-1.5 whitespace-nowrap cursor-pointer active:scale-98"
             >
               <span>Preview Course</span>
               <ArrowRight className="w-3.5 h-3.5" />

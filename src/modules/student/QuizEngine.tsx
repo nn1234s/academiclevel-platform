@@ -790,19 +790,19 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
   const theme = getClassTheme(grade);
 
   return (
-    <div ref={quizContainerRef} className="max-w-3xl mx-auto bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl text-slate-900">
+    <div ref={quizContainerRef} className="max-w-3xl mx-auto bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-xl text-slate-900">
       {/* Class Persona Header */}
-      <div className={`p-4 rounded-2xl mb-6 bg-gradient-to-r ${theme.gradientHero} text-white flex items-center justify-between shadow-xs`}>
-        <div className="flex items-center space-x-3">
-          <span className="text-2xl p-2 rounded-xl bg-white/20 backdrop-blur-md">{theme.mascot.emoji}</span>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="font-extrabold text-sm">{theme.name} • Class {grade}</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/20 uppercase font-bold tracking-wider">
+      <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 bg-gradient-to-r ${theme.gradientHero} text-white flex items-center justify-between shadow-xs`}>
+        <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
+          <span className="text-xl sm:text-2xl p-1.5 sm:p-2 rounded-xl bg-white/20 backdrop-blur-md shrink-0">{theme.mascot.emoji}</span>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span className="font-extrabold text-xs sm:text-sm truncate">{theme.name} • Class {grade}</span>
+              <span className="text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/20 uppercase font-bold tracking-wider">
                 {theme.stageTitle}
               </span>
             </div>
-            <p className="text-xs text-white/90 italic font-medium">{theme.motto}</p>
+            <p className="text-[11px] sm:text-xs text-white/90 italic font-medium line-clamp-1">{theme.motto}</p>
           </div>
         </div>
 
@@ -948,7 +948,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
                 key={qIdx}
                 type="button"
                 onClick={() => handleJumpToQuestion(qIdx)}
-                className={`w-7 h-7 flex-shrink-0 rounded-lg text-xs font-bold font-mono flex items-center justify-center transition-all cursor-pointer ${paletteStyle}`}
+                className={`w-8 h-8 sm:w-7 sm:h-7 flex-shrink-0 rounded-lg text-xs font-bold font-mono flex items-center justify-center transition-all cursor-pointer active:scale-95 ${paletteStyle}`}
                 title={`Jump to Question ${qIdx + 1}: ${q.topicTag || 'Curriculum Focus'} ${isAnswered ? (isCorrect ? '(Correct)' : '(Incorrect)') : '(Unanswered)'}`}
               >
                 {qIdx + 1}
@@ -1080,13 +1080,13 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
               key={idx}
               disabled={isAnswerSubmitted}
               onClick={() => handleSelectOption(idx)}
-              className={`w-full text-left p-4 rounded-2xl border text-xs sm:text-sm font-medium transition-all flex items-center justify-between cursor-pointer ${btnStyle}`}
+              className={`w-full text-left p-3.5 sm:p-4 min-h-[54px] rounded-2xl border text-[13px] sm:text-sm font-medium transition-all flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 cursor-pointer active:scale-[0.99] ${btnStyle}`}
             >
-              <div className="flex items-center space-x-3 min-w-0 pr-2">
-                <span className={`w-7 h-7 rounded-xl text-xs font-mono font-bold flex items-center justify-center flex-shrink-0 transition-all ${letterBadgeStyle}`}>
+              <div className="flex items-center space-x-3 min-w-0 flex-1">
+                <span className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl text-xs font-mono font-bold flex items-center justify-center flex-shrink-0 transition-all ${letterBadgeStyle}`}>
                   {String.fromCharCode(65 + idx)}
                 </span>
-                <span className="break-words">{option}</span>
+                <span className="break-words leading-snug">{option}</span>
               </div>
               <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
                 {isAnswerSubmitted && isThisCorrect && (

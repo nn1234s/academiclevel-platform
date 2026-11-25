@@ -676,16 +676,16 @@ ${recipientName.trim()}`;
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 text-slate-900">
+    <div className="max-w-5xl mx-auto space-y-5 sm:space-y-8 text-slate-900">
       {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-amber-50 via-white to-indigo-50 border border-amber-200 rounded-3xl p-6 sm:p-10 shadow-sm relative overflow-hidden">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-amber-50 via-white to-indigo-50 border border-amber-200 rounded-2xl sm:rounded-3xl p-4 sm:p-10 shadow-sm relative overflow-hidden">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-6">
           <div className="max-w-xl">
-            <span className="text-[10px] font-mono font-bold tracking-widest text-amber-700 uppercase bg-amber-100 border border-amber-300 px-3 py-1 rounded-full inline-flex items-center space-x-1.5 mb-3">
-              <Globe className="w-3.5 h-3.5 text-amber-600" />
-              <span>🌍 Truly Worldwide Rewards • 100% Physical Rewards &amp; Merchandise</span>
+            <span className="text-[10px] font-mono font-bold tracking-widest text-amber-700 uppercase bg-amber-100 border border-amber-300 px-2.5 sm:px-3 py-1 rounded-full inline-flex items-center space-x-1.5 mb-2.5 sm:mb-3">
+              <Globe className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <span>🌍 Worldwide Physical Rewards</span>
             </span>
-            <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+            <h1 className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
               Scholar&apos;s Physical Rewards Store &amp; Global Arena
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
@@ -695,15 +695,18 @@ ${recipientName.trim()}`;
             </p>
           </div>
 
-          <div className="bg-white border border-amber-300 rounded-3xl p-5 text-center min-w-[200px] shadow-sm">
-            <span className="text-[11px] text-slate-500 block font-medium">Your Study Coins</span>
-            <div className="flex items-center justify-center space-x-2 mt-1">
-              <StudyCoinIcon className="w-7 h-7" glow />
-              <span className="text-3xl font-black text-amber-600 font-mono">
+          <div className="bg-white border border-amber-300 rounded-2xl sm:rounded-3xl p-4 sm:p-5 text-center w-full lg:w-auto lg:min-w-[200px] shadow-sm flex lg:block items-center justify-between">
+            <div className="text-left lg:text-center">
+              <span className="text-[11px] text-slate-500 block font-medium">Your Study Coins</span>
+              <span className="text-[10px] text-slate-400 block font-mono lg:hidden">Append-Only Ledger Verified</span>
+            </div>
+            <div className="flex items-center justify-center space-x-2 lg:mt-1">
+              <StudyCoinIcon className="w-6 h-6 sm:w-7 sm:h-7" glow />
+              <span className="text-2xl sm:text-3xl font-black text-amber-600 font-mono">
                 {learner.coinBalance.toLocaleString()}
               </span>
             </div>
-            <span className="text-[10px] text-slate-400 block mt-1 font-mono">Append-Only Ledger Verified</span>
+            <span className="text-[10px] text-slate-400 hidden lg:block mt-1 font-mono">Append-Only Ledger Verified</span>
           </div>
         </div>
 

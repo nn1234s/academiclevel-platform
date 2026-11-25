@@ -144,8 +144,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const isRegister = mode === 'REGISTER';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl relative overflow-hidden min-h-[580px] max-h-[92vh] border border-slate-100 font-sans flex flex-col md:block">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-4xl w-full shadow-2xl relative overflow-y-auto md:overflow-hidden md:min-h-[580px] max-h-[92dvh] border border-slate-100 font-sans flex flex-col md:block overscroll-contain">
         
         {/* Close Button */}
         <button
@@ -219,7 +219,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   setEmail(e.target.value);
                   setErrorMessage('');
                 }}
-                className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 text-xs sm:text-sm px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff4b2b]/50 transition-all font-medium border border-transparent"
+                className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 text-base sm:text-sm px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff4b2b]/50 transition-all font-medium border border-transparent"
                 autoFocus={!isRegister}
               />
             </div>
@@ -234,7 +234,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   setPassword(e.target.value);
                   setErrorMessage('');
                 }}
-                className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 text-xs sm:text-sm px-4 py-3 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-[#ff4b2b]/50 transition-all font-medium border border-transparent"
+                className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 text-base sm:text-sm px-4 py-3 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-[#ff4b2b]/50 transition-all font-medium border border-transparent"
               />
               <button
                 type="button"
@@ -336,7 +336,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 placeholder="e.g. Diya Sen"
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
-                className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff4b2b]/50 font-medium border border-transparent"
+                className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 text-base sm:text-xs px-3 py-2.5 sm:py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff4b2b]/50 font-medium border border-transparent"
                 autoFocus={isRegister}
               />
             </div>
@@ -352,7 +352,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   setEmail(e.target.value);
                   setErrorMessage('');
                 }}
-                className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff4b2b]/50 font-medium border border-transparent"
+                className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 text-base sm:text-xs px-3 py-2.5 sm:py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff4b2b]/50 font-medium border border-transparent"
               />
             </div>
 
@@ -367,7 +367,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   setPassword(e.target.value);
                   setErrorMessage('');
                 }}
-                className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 px-3 py-2 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-[#ff4b2b]/50 font-medium border border-transparent"
+                className="w-full bg-[#f0f2f5] text-slate-800 placeholder-slate-400 text-base sm:text-xs px-3 py-2.5 sm:py-2 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-[#ff4b2b]/50 font-medium border border-transparent"
               />
               <button
                 type="button"
