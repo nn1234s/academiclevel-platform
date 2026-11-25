@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   XCircle,
   HelpCircle,
+  Lightbulb,
   Sparkles,
   ArrowRight,
   ShieldCheck,

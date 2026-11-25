@@ -23,7 +23,7 @@ try {
   const rReg = await invokeApp(app, {
     method: 'POST',
     url: '/api/auth/register',
-    body: { fullName: 'Prod Tester', email: 'prod@test.edu', password: 'Password1!', board: 'CBSE', grade: 10 }
+    body: { fullName: 'Prod Tester', email: `prod_${Date.now()}@test.edu`, password: 'Password1!', board: 'CBSE', grade: 10 }
   });
   const regData = await rReg.json();
   assert.equal(rReg.status, 200);
