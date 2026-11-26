@@ -173,17 +173,15 @@ export class NovaAiService {
 
     if (isPersonalOrRomantic) {
       return (
-        `**Nova • AI Study Helper**\n\n` +
-        `I'm Nova, your AI Study Tutor, so I'm here strictly to help with your **${board} Class ${grade} ${subject}** concepts and exam preparation.\n\n` +
-        `Ask me any chapter question, formula, or problem you'd like to practice!`
+        `Haha, appreciate the good vibes! 😄 I'm your AI study buddy though, so my superpower is helping you ace **${board} Class ${grade} ${subject}**!\n\n` +
+        `Drop any tricky question or chapter doubt and let's crack it together! 🚀`
       );
     }
 
     if (/^(hi|hey|hello|yo|gm|gn|good morning|good afternoon|good evening|good night)[!.\s]*$/i.test(cleanAlpha)) {
       return (
-        `**Nova • AI Study Helper • ${board} Class ${grade}**\n\n` +
-        `Hello! I'm ready to help you study **${subject}**.\n\n` +
-        `Ask me to explain any concept, walk through a formula, or clarify a homework question.`
+        `Hey there! 👋 Ready to knock out some **${subject}**?\n\n` +
+        `Ask me anything — whether it's a weird formula, a tough chapter, or a quick exam hack, I've got you! 😊`
       );
     }
 
