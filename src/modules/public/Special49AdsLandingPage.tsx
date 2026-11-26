@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { SiteConfigService } from '../../services/siteConfigService';
+import { WindowsAppBanner } from '../shared/WindowsAppBanner';
 import {
   Star,
   Check,
@@ -680,6 +681,10 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 pt-4">
+        <WindowsAppBanner compact />
       </div>
 
       {/* ======================================================== */}

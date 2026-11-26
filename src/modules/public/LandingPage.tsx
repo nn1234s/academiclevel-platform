@@ -6,6 +6,7 @@ import { PaymentService } from '../../services/paymentService';
 import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { WhatsDifferentFromChatGPT } from '../shared/WhatsDifferentFromChatGPT';
+import { WindowsAppBanner } from '../shared/WindowsAppBanner';
 import {
   Sparkles,
   Zap,
@@ -385,6 +386,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <CheckCircle2 className="w-4 h-4 text-[#009688]" />
               <span>Offline Question Bank Fallback</span>
             </div>
+          </div>
+
+          <div className="mt-6 text-left">
+            <WindowsAppBanner onOpenDownloads={onNavigate ? () => onNavigate('DOWNLOADS') : undefined} />
           </div>
         </div>
       </section>

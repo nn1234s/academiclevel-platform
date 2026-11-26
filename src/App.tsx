@@ -26,6 +26,7 @@ import { CertificateVerificationView } from './modules/public/CertificateVerific
 import { HallOfFamePage } from './modules/public/HallOfFamePage';
 import { InnovativeEdtechPage } from './modules/public/InnovativeEdtechPage';
 import { BlogPage } from './modules/public/BlogPage';
+import { DownloadsPage } from './modules/public/DownloadsPage';
 import { NotFoundPika } from './modules/public/NotFoundPika';
 import { AccountDeletionPage } from './modules/public/AccountDeletionPage';
 import { SchoolPortalPage } from './modules/public/SchoolPortalPage';
@@ -213,6 +214,7 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
 
   if (p === '/sitemap' || p === '/sitemap.html') return { route: 'SITEMAP' };
   if (p === '/blog' || p.startsWith('/blog/') || p === '/changelog' || p === '/updates') return { route: 'BLOG' };
+  if (p === '/downloads' || p === '/download') return { route: 'DOWNLOADS' };
   
   // Dedicated Curriculum Board Routes with Sample Questions & Free Signup
   if (p === '/curriculum/cbse' || p === '/cbse') return { route: 'CURRICULUM_CBSE' };
@@ -270,6 +272,7 @@ function getPathForRoute(route: string): string {
     case 'HALL_OF_FAME': return '/halloffame';
     case 'INNOVATIVE_EDTECH': return '/most-innovative-edtech';
     case 'BLOG': return '/blog';
+    case 'DOWNLOADS': return '/downloads';
     case 'SITEMAP': return '/sitemap';
     case 'VERIFY_CERTIFICATE': return '/verify';
     case 'DASHBOARD': return '/';
@@ -815,6 +818,7 @@ export const App: React.FC = () => {
                         currentRoute === 'HALL_OF_FAME' ||
                         currentRoute === 'INNOVATIVE_EDTECH' ||
                         currentRoute === 'BLOG' ||
+                        currentRoute === 'DOWNLOADS' ||
                         currentRoute === 'PRIVACY' ||
                         currentRoute === 'SITEMAP'
                           ? 'text-[#3F51B5] font-bold bg-white shadow-2xs border-b-2 border-[#3F51B5]'
@@ -870,6 +874,26 @@ export const App: React.FC = () => {
                               </p>
                               <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
                                 All updates, Nova AI &amp; innovative features
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('DOWNLOADS');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-50 border border-emerald-200 text-emerald-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <Compass className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
+                                Downloads (Windows App)
+                              </p>
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
+                                Get the Windows Desktop (.exe) or Web App
                               </p>
                             </div>
                           </button>
@@ -1707,6 +1731,12 @@ export const App: React.FC = () => {
               onNavigate={(r) => navigateTo(r)}
             />
           )}
+          {currentRoute === 'DOWNLOADS' && (
+            <DownloadsPage
+              onBack={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
+              onOpenWebApp={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
+            />
+          )}
           {currentRoute === 'SITEMAP' && (
             <SitemapPage onNavigate={navigateTo} />
           )}
@@ -2166,6 +2196,15 @@ export const App: React.FC = () => {
                       className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       AcademicLevel Blog
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => navigateTo('DOWNLOADS')}
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                    >
+                      Downloads (Windows App)
                     </button>
                   </li>
                   <li>
