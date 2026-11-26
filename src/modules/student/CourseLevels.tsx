@@ -91,7 +91,7 @@ export const CourseLevels: React.FC<CourseLevelsProps> = ({
               <Zap className="w-4 h-4 text-amber-600 flex-shrink-0" />
               <span>
                 <strong>Free Student Account:</strong> {quota.levelsCompleted} of {quota.maxLevels} curriculum levels completed.
-                {quota.isLocked ? ' (Free limit reached! Upgrade to unlock all levels)' : ' (First 3 levels free)'}
+                {quota.isLocked ? ' (Free limit reached! Upgrade to unlock all levels)' : ' (First 6 levels free)'}
               </span>
             </div>
             <button

@@ -802,7 +802,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div>
             <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
               <Zap className="w-4 h-4 text-amber-500" />
-              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'GOLD' ? (isHinglish ? '👑 1-Year Gold VIP Pass Active' : '👑 1-Year Gold VIP Status') : (quota.activePlan === 'LITE' ? (isHinglish ? 'Concept Booster Plan Active' : 'Concept Booster Status') : `${quota.activePlan} Scholar Status`)) : (isHinglish ? 'Free Student Plan (3 Levels Included)' : 'Free Student Plan (3 Levels Included)')}</span>
+              <span>{quota.hasActiveSubscription ? (quota.activePlan === 'GOLD' ? (isHinglish ? '👑 1-Year Gold VIP Pass Active' : '👑 1-Year Gold VIP Status') : (quota.activePlan === 'LITE' ? (isHinglish ? 'Concept Booster Plan Active' : 'Concept Booster Status') : `${quota.activePlan} Scholar Status`)) : (isHinglish ? 'Free Student Plan (6 Levels Included)' : 'Free Student Plan (6 Levels Included)')}</span>
             </h3>
             <p className="text-xs text-slate-600 mt-0.5">
               {quota.hasActiveSubscription
@@ -817,8 +817,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                         : `${quota.activePlan} Plan Active • Unlimited Access (${quota.daysRemaining} days remaining)`))
                 : (quota.isLocked
                     ? (isHinglish
-                        ? 'Free limit (3 levels) poori ho gayi hai. Sabhi levels aur unlimited quizzes ke liye upgrade karein.'
-                        : 'Free limit of 3 curriculum levels completed. Upgrade to unlock all levels & unlimited quizzes.')
+                        ? 'Free limit (6 levels) poori ho gayi hai. Sabhi levels aur unlimited quizzes ke liye upgrade karein.'
+                        : 'Free limit of 6 curriculum levels completed. Upgrade to unlock all levels & unlimited quizzes.')
                     : (isHinglish
                         ? `Free student tier active. Aap ${quota.maxLevels} curriculum levels bilkul free master kar sakte hain.`
                         : `Free student tier active. You can master up to ${quota.maxLevels} curriculum levels free.`))}
