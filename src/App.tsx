@@ -212,7 +212,7 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
   ) return { route: 'INNOVATIVE_EDTECH' };
 
   if (p === '/sitemap' || p === '/sitemap.html') return { route: 'SITEMAP' };
-  if (p === '/blog' || p === '/changelog' || p === '/updates') return { route: 'BLOG' };
+  if (p === '/blog' || p.startsWith('/blog/') || p === '/changelog' || p === '/updates') return { route: 'BLOG' };
   
   // Dedicated Curriculum Board Routes with Sample Questions & Free Signup
   if (p === '/curriculum/cbse' || p === '/cbse') return { route: 'CURRICULUM_CBSE' };
@@ -1702,6 +1702,7 @@ export const App: React.FC = () => {
           )}
           {currentRoute === 'BLOG' && (
             <BlogPage
+              initialPostSlug={typeof window !== 'undefined' ? window.location.pathname.replace(/^\/blog\/?/, '') : ''}
               onBack={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
               onNavigate={(r) => navigateTo(r)}
             />
