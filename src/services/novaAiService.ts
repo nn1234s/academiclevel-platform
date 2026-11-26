@@ -415,7 +415,7 @@ Write a clear, encouraging, step-by-step explanation in under 100 words.`;
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ role: 'user', parts: [{ text: prompt }] }],
-              generationConfig: { maxOutputTokens: 2048, temperature: 0.4 }
+              generationConfig: { maxOutputTokens: 1024, temperature: 0.4 }
             }),
             signal: controller.signal
           }
@@ -461,7 +461,7 @@ Directives:
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [{ role: 'user', parts: [{ text: prompt }] }],
-              generationConfig: { maxOutputTokens: 2048, temperature: 0.4 }
+              generationConfig: { maxOutputTokens: 1024, temperature: 0.4 }
             }),
             signal: controller.signal
           }

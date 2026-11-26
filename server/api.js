@@ -4888,6 +4888,7 @@ apiRouter.post('/admin/ai/config', adminAuth, (req, res) => {
         VALUES ('gemini_api_keys', ?, ?)
         ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
       `).run(JSON.stringify(keyList), now);
+      safeReplicateAsync('system_settings', { key: 'gemini_api_keys', value: JSON.stringify(keyList), updatedAt: now });
 
       for (let i = 1; i <= 30; i++) {
         const val = keyList[i - 1] || '';
@@ -4896,6 +4897,7 @@ apiRouter.post('/admin/ai/config', adminAuth, (req, res) => {
           VALUES ('gemini_api_key_${i}', ?, ?)
           ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
         `).run(val, now);
+        safeReplicateAsync('system_settings', { key: `gemini_api_key_${i}`, value: val, updatedAt: now });
       }
 
       // Also sync primary key
@@ -4905,6 +4907,7 @@ apiRouter.post('/admin/ai/config', adminAuth, (req, res) => {
         VALUES ('gemini_api_key', ?, ?)
         ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
       `).run(primary, now);
+      safeReplicateAsync('system_settings', { key: 'gemini_api_key', value: primary, updatedAt: now });
     } else if (geminiApiKey !== undefined) {
       const cleanKey = String(geminiApiKey).trim();
       db.prepare(`
@@ -5062,7 +5065,7 @@ Keep the response direct, structured, age-appropriate, and under 140 words.`;
 
     const bodyPayload = {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.4, maxOutputTokens: 2048 }
+      generationConfig: { temperature: 0.4, maxOutputTokens: 1024 }
     };
 
     const result = await callGeminiApiWithMultiKeyFallback(bodyPayload, 20000);
@@ -5487,7 +5490,7 @@ Core Directives:
         parts: [{ text: systemInstruction }]
       },
       contents,
-      generationConfig: { temperature: 0.5, maxOutputTokens: 2048 }
+      generationConfig: { temperature: 0.5, maxOutputTokens: 1024 }
     };
 
     const result = await callGeminiApiWithMultiKeyFallback(bodyPayload, 20000);

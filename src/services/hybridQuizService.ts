@@ -265,7 +265,7 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
       console.warn('[HybridQuizService] Server save failed, saved locally:', err.message);
     }
 
-    return { success: true, message: 'Settings saved to local platform storage.' };
+    return { success: false, message: 'Server save failed (check Admin session) — saved only in browser localStorage, NOT on server/Turso.' };
   }
 
   /**
