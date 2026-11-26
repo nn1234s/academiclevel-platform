@@ -145,6 +145,33 @@ export class NovaAiService {
     return generateDeterministicFallback();
   }
 
+  private static trySolveSimpleMath(rawQuery: string): { expr: string; result: number } | null {
+    let s = (rawQuery || '').toLowerCase().trim();
+    s = s.replace(/^(what is|what's|whats|solve|calculate|compute|find|eval|evaluate)\s+/i, '');
+    s = s.replace(/\?+$/g, '').trim();
+    s = s
+      .replace(/\bplus\b/g, '+')
+      .replace(/\bminus\b/g, '-')
+      .replace(/\b(times|multiplied by)\b/g, '*')
+      .replace(/\bdivided by\b/g, '/')
+      .replace(/(\d)\s*[x×]\s*(\d)/g, '$1 * $2')
+      .replace(/÷/g, '/')
+      .replace(/−/g, '-');
+
+    if (!/\d/.test(s) || !/[+\-*/]/.test(s)) return null;
+    if (!/^[0-9+\-*/().\s]+$/.test(s)) return null;
+    if (s.length > 60) return null;
+
+    try {
+      const val = Function(`"use strict"; return (${s});`)();
+      if (typeof val === 'number' && Number.isFinite(val)) {
+        const rounded = Math.round(val * 10000) / 10000;
+        return { expr: s.replace(/\s+/g, ' ').trim(), result: rounded };
+      }
+    } catch {}
+    return null;
+  }
+
   /**
    * Client-side deterministic Study Helper fallback (zero server cost when offline or fallback).
    */
@@ -155,7 +182,8 @@ export class NovaAiService {
     subject: string,
     _learnerPlan?: string,
     _learnerId?: string,
-    hasImage?: boolean
+    hasImage?: boolean,
+    imageSummary?: string
   ): string {
     const q = (query || '').toLowerCase().trim();
     const cleanAlpha = q.replace(/[^a-z0-9\s]/gi, ' ').replace(/\s+/g, ' ').trim();
@@ -163,9 +191,10 @@ export class NovaAiService {
     const numGrade = Number(grade) || 10;
 
     if (hasImage) {
+      const visualNote = imageSummary ? `\n\n**Offline Photo Scan:** ${imageSummary}` : '';
       return (
-        `Got your photo! 📸✨\n\n` +
-        `I can't read text or objects inside photos in offline fallback mode right now — *psst...* type out the question from your photo (or tell me what's in it, like a math problem, diagram, or even Pokémon cards!) and I'll help you right away! 🚀`
+        `Got your photo! 📸✨${visualNote}\n\n` +
+        `I need live Vision AI to read exact words/objects inside photos — *psst...* if you're offline right now, type the question or tell me what's in the picture and I'll solve it right away! 🚀`
       );
     }
 
@@ -257,8 +286,11 @@ export class NovaAiService {
       );
     }
 
+    const mathSolved = this.trySolveSimpleMath(query);
     let conceptAnswer = '';
-    if (q.includes('regroup') || q.includes('carry over') || q.includes('carrying') || (q.includes('add') && q.includes('+')) || q.includes('addition')) {
+    if (mathSolved) {
+      conceptAnswer = `**Quick Math Solution ✨**\n\n$$${mathSolved.expr} = \\mathbf{${mathSolved.result}}$$\n\n• Step-by-step: Evaluate \`${mathSolved.expr}\` following standard order of operations (BODMAS) to get **${mathSolved.result}**.`;
+    } else if (q.includes('regroup') || q.includes('carry over') || q.includes('carrying') || (q.includes('add') && q.includes('+')) || q.includes('addition')) {
       conceptAnswer = `**Addition & Place Value Regrouping**\n\nEach column (ones, tens, hundreds) holds digits 0–9. When a column sums to 10 or more, write down the ones digit and carry 1 to the next column left.\n\n• Example: $47 + 38 \\rightarrow 7 + 8 = 15$ (write 5, carry 1), then $1 + 4 + 3 = 8$ tens $= \\mathbf{85}$.`;
     } else if (q.includes('subtract across zero') || (q.includes('zero') && q.includes('subtract')) || q.includes('borrow') || q.includes('500 - 267')) {
       conceptAnswer = `**Subtracting Across Zeros (e.g. 500 - 267)**\n\n1. Borrow 1 from 5 hundreds (leaving 4 hundreds) to get 10 tens.\n2. Borrow 1 from 10 tens (leaving 9 tens) to get 10 ones.\n3. Subtract: $10 - 7 = 3$, $9 - 6 = 3$, $4 - 2 = 2 \\rightarrow \\mathbf{233}$.`;
@@ -302,12 +334,13 @@ export class NovaAiService {
     history?: { role: 'user' | 'model'; text: string }[],
     learnerId?: string,
     learnerPlan?: string,
-    imageDataUrl?: string
+    imageDataUrl?: string,
+    imageSummary?: string
   ): Promise<string> {
     const trimmed = query.trim();
 
     const generateDeterministicFallback = (): string => {
-      return this.generateBuiltInAiResponse(trimmed, board, grade, subject, learnerPlan, learnerId, Boolean(imageDataUrl));
+      return this.generateBuiltInAiResponse(trimmed, board, grade, subject, learnerPlan, learnerId, Boolean(imageDataUrl), imageSummary);
     };
 
     if (!HybridQuizService.getPreferLiveAi()) {
@@ -318,7 +351,7 @@ export class NovaAiService {
       const serverCall = fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: trimmed, board, grade, subject, history, learnerId, learnerPlan, imageDataUrl })
+        body: JSON.stringify({ query: trimmed, board, grade, subject, history, learnerId, learnerPlan, imageDataUrl, imageSummary })
       }).then(async (r) => {
         if (r.status === 429) {
           return {

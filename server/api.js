@@ -5372,7 +5372,42 @@ export function generateStudyGirlChatResponse({
     }
   } catch {}
 
+function trySolveSimpleMath(rawQuery) {
+  let s = String(rawQuery || '').toLowerCase().trim();
+  s = s.replace(/^(what is|what's|whats|solve|calculate|compute|find|eval|evaluate)\s+/i, '');
+  s = s.replace(/\?+$/g, '').trim();
+  s = s
+    .replace(/\bplus\b/g, '+')
+    .replace(/\bminus\b/g, '-')
+    .replace(/\b(times|multiplied by)\b/g, '*')
+    .replace(/\bdivided by\b/g, '/')
+    .replace(/(\d)\s*[x×]\s*(\d)/g, '$1 * $2')
+    .replace(/÷/g, '/')
+    .replace(/−/g, '-');
+
+  if (!/\d/.test(s) || !/[+\-*/]/.test(s)) return null;
+  if (!/^[0-9+\-*/().\s]+$/.test(s)) return null;
+  if (s.length > 60) return null;
+
+  try {
+    const val = Function(`"use strict"; return (${s});`)();
+    if (typeof val === 'number' && Number.isFinite(val)) {
+      return { expr: s.replace(/\s+/g, ' ').trim(), result: Math.round(val * 10000) / 10000 };
+    }
+  } catch {}
+  return null;
+}
+
+  const mathSolved = trySolveSimpleMath(cleanQuery);
   let conceptAnswer = '';
+  if (mathSolved) {
+    return (
+      `Hey ${studentFirstName}! Here's the exact answer:\n\n` +
+      `$$${mathSolved.expr} = \\mathbf{${mathSolved.result}}$$\n\n` +
+      `• Step-by-step: Evaluate \`${mathSolved.expr}\` using standard order of operations (BODMAS) to get **${mathSolved.result}**.\n\n` +
+      `*Psst...* try a quick quiz level on this to stack Study Coins! 🪙✨`
+    );
+  }
   if (q.includes('regroup') || q.includes('carry over') || q.includes('carrying') || (q.includes('add') && q.includes('+')) || q.includes('addition')) {
     conceptAnswer = `**Addition & Place Value Regrouping**\n\nIn base-10, each column (ones, tens, hundreds) holds digits 0–9. When a column sums to 10 or more, write the ones digit and carry 1 to the next column left.\n\n• Example: $47 + 38 \\rightarrow 7 + 8 = 15$ (write 5, carry 1), then $1 + 4 + 3 = 8$ tens $= \\mathbf{85}$.`;
   } else if (q.includes('subtract across zero') || (q.includes('zero') && q.includes('subtract')) || q.includes('borrow') || q.includes('500 - 267')) {
@@ -5409,7 +5444,7 @@ export function generateStudyGirlChatResponse({
 
 apiRouter.post('/ai/chat', aiChatLimiter, async (req, res) => {
   try {
-    const { query, board = 'CBSE', grade = 10, subject = 'Mathematics', history, learnerId, learnerPlan, imageDataUrl } = req.body;
+    const { query, board = 'CBSE', grade = 10, subject = 'Mathematics', history, learnerId, learnerPlan, imageDataUrl, imageSummary } = req.body;
     const resolvedLearnerId = learnerId || req.headers['x-learner-id'] || null;
 
     if (!query && !imageDataUrl) {
@@ -5455,7 +5490,7 @@ apiRouter.post('/ai/chat', aiChatLimiter, async (req, res) => {
 
     if (keys.length === 0) {
       const responseText = imageDataUrl
-        ? `Got your photo! 📸✨\n\nSince live AI vision is currently offline, I can't read the contents of the image directly — *psst...* type out the question or tell me what's in the photo (like a math problem, diagram, or even Pokémon cards!) and I'll help right away! 🚀`
+        ? `Got your photo! 📸✨${imageSummary ? `\n\n**Offline Photo Scan:** ${imageSummary}` : ''}\n\nSince live Vision AI is currently offline, I can't read exact words/objects inside photos directly — *psst...* type the question or tell me what's in the photo and I'll help right away! 🚀`
         : generateStudyGirlChatResponse({
             cleanQuery,
             board,
@@ -5550,7 +5585,7 @@ Core Directives:
     if (result.ok && result.data?.candidates?.[0]?.content?.parts?.[0]?.text) {
       replyText = result.data.candidates[0].content.parts[0].text.trim();
     } else if (imageDataUrl) {
-      replyText = `Got your photo! 📸✨\n\nSince live AI vision is currently unavailable, I can't read the contents of the image directly — *psst...* type out the question or tell me what's in the photo (like a math problem, diagram, or even Pokémon cards!) and I'll help right away! 🚀`;
+      replyText = `Got your photo! 📸✨${imageSummary ? `\n\n**Offline Photo Scan:** ${imageSummary}` : ''}\n\nSince live Vision AI is currently unavailable, I can't read exact words/objects inside photos directly — *psst...* type the question or tell me what's in the photo and I'll help right away! 🚀`;
     } else {
       // Fallback seamlessly to the Study Buddy engine so student NEVER sees an error
       replyText = generateStudyGirlChatResponse({

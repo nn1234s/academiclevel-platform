@@ -502,6 +502,52 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
         return;
       }
 
+      let imageSummary: string | undefined;
+      if (attachedPhoto) {
+        try {
+          imageSummary = await new Promise<string>((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              try {
+                const w = 48;
+                const h = 48;
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return resolve(`${img.naturalWidth}×${img.naturalHeight}px image`);
+                ctx.drawImage(img, 0, 0, w, h);
+                const data = ctx.getImageData(0, 0, w, h).data;
+                let brightWhite = 0;
+                let colorful = 0;
+                let darkInk = 0;
+                const total = w * h;
+                for (let i = 0; i < data.length; i += 4) {
+                  const r = data[i], g = data[i + 1], b = data[i + 2];
+                  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+                  const sat = max === 0 ? 0 : (max - min) / max;
+                  if (r > 200 && g > 200 && b > 200) brightWhite++;
+                  if (r < 85 && g < 85 && b < 85) darkInk++;
+                  if (sat > 0.35 && max > 60) colorful++;
+                }
+                const whitePct = Math.round((brightWhite / total) * 100);
+                const colorPct = Math.round((colorful / total) * 100);
+                const kind = whitePct > 45 && darkInk > 20
+                  ? 'looks like a bright textbook/notebook page with dark text'
+                  : colorPct > 30
+                    ? 'looks like a colorful photo (e.g. cards, illustration, or real-world scene)'
+                    : 'general photo';
+                resolve(`${img.naturalWidth}×${img.naturalHeight}px (${kind})`);
+              } catch {
+                resolve(`${img.naturalWidth}×${img.naturalHeight}px image`);
+              }
+            };
+            img.onerror = () => resolve('attached image');
+            img.src = attachedPhoto;
+          });
+        } catch {}
+      }
+
       const response = await NovaAiService.answerStudentQuery(
         queryText || (attachedPhoto ? 'Please help me with this photo.' : ''),
         board,
@@ -510,7 +556,8 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
         historyPayload,
         learner?.id,
         quota?.planTier || learner?.activePlan || 'FREE',
-        attachedPhoto || undefined
+        attachedPhoto || undefined,
+        imageSummary
       );
       const aiMsg: NovaMessage = {
         id: 'msg_nova_' + Date.now(),

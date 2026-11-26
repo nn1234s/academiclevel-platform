@@ -455,7 +455,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               disabled={isSubmitting}
               className="md-btn-raised w-full py-2.5 bg-[#3F51B5] hover:bg-[#303F9F] text-white font-bold text-xs uppercase tracking-wider rounded-[3px] transition-all cursor-pointer disabled:opacity-50 mt-1 text-center"
             >
-              {isSubmitting ? 'CREATING ACCOUNT...' : 'START FREE ACCOUNT (3 LEVELS)'}
+              {isSubmitting ? 'CREATING ACCOUNT...' : 'START FREE ACCOUNT (6 LEVELS)'}
             </button>
           </form>
 
@@ -503,7 +503,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             <div className="mt-6 px-4 py-1.5 bg-black/15 backdrop-blur-md rounded-full text-[11px] text-white/95 font-medium border border-white/20 flex items-center space-x-1.5">
               <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Free Student Plan: 3 Levels Included</span>
+              <span>Free Student Plan: 6 Levels Included</span>
             </div>
 
             <div className="mt-4 pt-3 border-t border-white/20">
