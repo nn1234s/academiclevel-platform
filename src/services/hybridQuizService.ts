@@ -111,93 +111,13 @@ export class HybridQuizService {
   ): Promise<HybridQuizResult> {
     const startTime = Date.now();
 
-    // Check preference: If user explicitly opted out of live AI, jump straight to bank
-    if (!this.getPreferLiveAi() || chapter) {
-      const qList = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, count, chapter);
-      return {
-        questions: qList,
-        source: 'CURATED_OFFLINE',
-        latencyMs: Date.now() - startTime,
-        notice: chapter ? `Practicing Chapter: ${chapter}` : 'Served from Curated Syllabus Bank'
-      };
-    }
-
-    try {
-      // 1. Try server backend endpoint first with an extended race guard accommodating natural Google Gemini latencies (7-12s)
-      const serverFetchPromise = fetch('/api/ai/generate-quiz', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ board, grade, subjectId, levelNode, count, chapter })
-      }).then(async (res) => {
-        if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
-        return res.json();
-      });
-
-      const timeoutPromise = new Promise<{ timeout: true }>((resolve) =>
-        setTimeout(() => resolve({ timeout: true }), 22000)
-      );
-
-      const raceResult = await Promise.race([serverFetchPromise, timeoutPromise]);
-
-      if ('timeout' in raceResult) {
-        console.warn('[HybridQuizService] Server AI call timed out; engaging syllabus bank fallback.');
-        const qList = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, count, chapter);
-        return {
-          questions: qList,
-          source: 'CURATED_OFFLINE',
-          latencyMs: Date.now() - startTime,
-          notice: 'AI generation timed out (Resilient bank loaded)'
-        };
-      }
-
-      if (raceResult.success && Array.isArray(raceResult.questions) && raceResult.questions.length > 0) {
-        let finalQuestions = raceResult.questions;
-        if (finalQuestions.length < count) {
-          const needed = count - finalQuestions.length;
-          const supplement = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, needed, chapter);
-          finalQuestions = [...finalQuestions, ...supplement.filter((s: Question) => !finalQuestions.some((q: Question) => q.id === s.id))];
-        }
-        return {
-          questions: finalQuestions.slice(0, count),
-          source: 'GEMINI_LIVE',
-          model: raceResult.model || 'gemini-3.5-flash-lite',
-          latencyMs: Date.now() - startTime,
-          notice: 'Live AI Generated via Google Gemini'
-        };
-      }
-
-      // If server doesn't have an API key configured, check if browser has a client key
-      const clientKey = this.getClientStoredKey();
-      if (clientKey) {
-        const directResult = await this.generateDirectClientQuestions(
-          clientKey,
-          board,
-          grade,
-          subjectId,
-          levelNode,
-          count
-        );
-        if (directResult) {
-          return {
-            questions: directResult,
-            source: 'GEMINI_LIVE',
-            model: 'gemini-3.5-flash-lite',
-            latencyMs: Date.now() - startTime,
-            notice: 'Live AI Generated via Client Gemini Key'
-          };
-        }
-      }
-    } catch (err: any) {
-      console.warn('[HybridQuizService] Network / AI error:', err.message);
-    }
-
-    // Default Fallback: Instant curated offline question bank from server or local
+    // Quizzes always use our curated SQLite question_bank DB; Gemini API keys are reserved for Nova AI only
     const qList = await OfflineBankService.fetchServerQuestions(board, grade, subjectId, levelNode, count, chapter);
     return {
       questions: qList,
       source: 'CURATED_OFFLINE',
       latencyMs: Date.now() - startTime,
-      notice: 'Curated Syllabus Bank (Verified Zero-Latency)'
+      notice: chapter ? `Practicing Chapter: ${chapter}` : 'Served from Curated Syllabus Bank'
     };
   }
 

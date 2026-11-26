@@ -5023,110 +5023,13 @@ apiRouter.post('/admin/ai/test-connection', adminAuth, async (req, res) => {
   }
 });
 
-apiRouter.post('/ai/generate-quiz', async (req, res) => {
-  try {
-    const { board = 'CBSE', grade = 10, subjectId = 'math', levelNode = 'FOUNDATION', count = 10, chapter } = req.body;
-    const settings = getAiSettings();
-
-    if (!settings.preferLiveAi || !settings.hasApiKey) {
-      return res.json({
-        success: false,
-        fallback: true,
-        reason: !settings.hasApiKey ? 'NO_API_KEY' : 'OFFLINE_PREFERENCE'
-      });
-    }
-
-    const safeCount = Math.min(Math.max(Number(count) || 10, 1), 20);
-
-    const prompt = `You are an expert curriculum assessment creator for Indian education boards (CBSE, ICSE, Cambridge IGCSE) at AcademicLevel.
-Create exactly ${safeCount} challenging, high-quality Multiple Choice Questions (MCQs) for:
-- Board: ${board}
-- Class/Grade: ${grade}
-- Subject: ${subjectId}
-${chapter ? `- Targeted Chapter / Unit: ${chapter}` : ''}
-- Difficulty Level / Progression Node: ${levelNode} (FOUNDATION: core textbook concepts, CONCEPT: application & word problems, EXAM_READY: typical board exam patterns, OLYMPIAD: competitive Olympiad level).
-
-CRITICAL REQUIREMENTS:
-1. Every question must strictly adhere to the authentic Class ${grade} ${board} syllabus.
-2. Provide exactly 4 distinct options per question.
-3. correctIndex MUST be the zero-based index (0, 1, 2, or 3) of the correct answer in the options array.
-4. Provide a clear Socratic step-by-step explanation.
-5. Provide a sharp, helpful hint.
-6. Return a valid JSON array of objects conforming to this schema:
-[
-  {
-    "text": "Question statement here",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "correctIndex": 0,
-    "explanation": "Detailed step-by-step mathematical or scientific proof",
-    "hint": "Pedagogical clue",
-    "difficulty": "EASY" | "MEDIUM" | "HARD",
-    "topicTag": "Specific syllabus topic name"
-  }
-]`;
-
-    const bodyPayload = {
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.3,
-        maxOutputTokens: 2430,
-        responseMimeType: 'application/json'
-      }
-    };
-
-    // 5-Key Cascading Failover: Key 1 -> Key 2 -> Key 3 -> Key 4 -> Key 5
-    const result = await callGeminiApiWithMultiKeyFallback(bodyPayload, 20000);
-    if (!result.ok) {
-      console.warn(`[Hybrid AI] Generation failover exhausted, falling back to offline bank: ${result.error}`);
-      return res.json({ success: false, fallback: true, error: result.error });
-    }
-
-    const rawText = result.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!rawText) {
-      return res.json({ success: false, fallback: true, error: 'Empty response from Gemini' });
-    }
-
-    const cleanedText = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
-    const parsed = JSON.parse(cleanedText);
-
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      return res.json({ success: false, fallback: true, error: 'Invalid JSON array received from Gemini' });
-    }
-
-    const validatedQuestions = parsed.map((item, idx) => ({
-      id: `ai_${board.toLowerCase()}_${grade}_${Date.now()}_${idx}`,
-      board,
-      grade: Number(grade),
-      subjectId,
-      levelNode,
-      text: String(item.text || `Question ${idx + 1}`),
-      options: Array.isArray(item.options) && item.options.length === 4
-        ? item.options.map(String)
-        : ['Option A', 'Option B', 'Option C', 'Option D'],
-      correctIndex: typeof item.correctIndex === 'number' && item.correctIndex >= 0 && item.correctIndex <= 3
-        ? item.correctIndex
-        : 0,
-      explanation: String(item.explanation || 'Verified curriculum solution.'),
-      hint: String(item.hint || 'Review standard definitions.'),
-      difficulty: item.difficulty === 'HARD' || item.difficulty === 'EASY' ? item.difficulty : 'MEDIUM',
-      topicTag: String(item.topicTag || `${subjectId.toUpperCase()} Unit ${idx + 1}`),
-      source: 'GEMINI_LIVE'
-    }));
-
-    return res.json({
-      success: true,
-      source: 'GEMINI_LIVE',
-      model: result.model,
-      questions: validatedQuestions
-    });
-  } catch (err) {
-    console.warn(`[Hybrid AI] Fallback triggered: ${err.message}`);
-    return res.json({
-      success: false,
-      fallback: true,
-      error: err.name === 'AbortError' ? 'AI generation timed out' : err.message
-    });
-  }
+apiRouter.post('/ai/generate-quiz', (req, res) => {
+  // Quizzes always use our curated SQLite question_bank DB; Gemini API keys are reserved for Nova AI only
+  return res.json({
+    success: false,
+    fallback: true,
+    reason: 'DB_ONLY_QUIZZES'
+  });
 });
 
 apiRouter.post('/ai/explain', async (req, res) => {
