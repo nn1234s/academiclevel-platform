@@ -25,6 +25,7 @@ import { LegalPages } from './modules/public/LegalPages';
 import { CertificateVerificationView } from './modules/public/CertificateVerificationView';
 import { HallOfFamePage } from './modules/public/HallOfFamePage';
 import { InnovativeEdtechPage } from './modules/public/InnovativeEdtechPage';
+import { BlogPage } from './modules/public/BlogPage';
 import { NotFoundPika } from './modules/public/NotFoundPika';
 import { AccountDeletionPage } from './modules/public/AccountDeletionPage';
 import { SchoolPortalPage } from './modules/public/SchoolPortalPage';
@@ -211,6 +212,7 @@ function resolveRouteFromPath(path: string, isAuth: boolean): RouteResolution {
   ) return { route: 'INNOVATIVE_EDTECH' };
 
   if (p === '/sitemap' || p === '/sitemap.html') return { route: 'SITEMAP' };
+  if (p === '/blog' || p === '/changelog' || p === '/updates') return { route: 'BLOG' };
   
   // Dedicated Curriculum Board Routes with Sample Questions & Free Signup
   if (p === '/curriculum/cbse' || p === '/cbse') return { route: 'CURRICULUM_CBSE' };
@@ -267,6 +269,7 @@ function getPathForRoute(route: string): string {
     case 'ACCOUNT_DELETION': return '/delacc';
     case 'HALL_OF_FAME': return '/halloffame';
     case 'INNOVATIVE_EDTECH': return '/most-innovative-edtech';
+    case 'BLOG': return '/blog';
     case 'SITEMAP': return '/sitemap';
     case 'VERIFY_CERTIFICATE': return '/verify';
     case 'DASHBOARD': return '/';
@@ -811,6 +814,7 @@ export const App: React.FC = () => {
                         currentRoute === 'FAQ' ||
                         currentRoute === 'HALL_OF_FAME' ||
                         currentRoute === 'INNOVATIVE_EDTECH' ||
+                        currentRoute === 'BLOG' ||
                         currentRoute === 'PRIVACY' ||
                         currentRoute === 'SITEMAP'
                           ? 'text-[#3F51B5] font-bold bg-white shadow-2xs border-b-2 border-[#3F51B5]'
@@ -846,6 +850,26 @@ export const App: React.FC = () => {
                               </p>
                               <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
                                 Mission, Nova AI Tutor methodology &amp; pedagogy
+                              </p>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              navigateTo('BLOG');
+                            }}
+                            className="w-full flex items-start space-x-3 p-2.5 rounded-xl text-left hover:bg-slate-50 transition-colors group cursor-pointer"
+                          >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-50 border border-indigo-200 text-indigo-600 group-hover:scale-105 transition-transform flex-shrink-0 mt-0.5">
+                              <BookOpen className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                                AcademicLevel Blog
+                              </p>
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
+                                All updates, Nova AI &amp; innovative features
                               </p>
                             </div>
                           </button>
@@ -1676,6 +1700,12 @@ export const App: React.FC = () => {
           {currentRoute === 'INNOVATIVE_EDTECH' && (
             <InnovativeEdtechPage onBack={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')} />
           )}
+          {currentRoute === 'BLOG' && (
+            <BlogPage
+              onBack={() => navigateTo(isAuthenticated ? 'DASHBOARD' : 'HOME')}
+              onNavigate={(r) => navigateTo(r)}
+            />
+          )}
           {currentRoute === 'SITEMAP' && (
             <SitemapPage onNavigate={navigateTo} />
           )}
@@ -2126,6 +2156,15 @@ export const App: React.FC = () => {
                       className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >
                       Verify Certificate
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => navigateTo('BLOG')}
+                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
+                    >
+                      AcademicLevel Blog
                     </button>
                   </li>
                   <li>
