@@ -5062,7 +5062,7 @@ Keep the response direct, structured, age-appropriate, and under 140 words.`;
 
     const bodyPayload = {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.4, maxOutputTokens: 400 }
+      generationConfig: { temperature: 0.4, maxOutputTokens: 2048 }
     };
 
     const result = await callGeminiApiWithMultiKeyFallback(bodyPayload, 20000);
@@ -5487,7 +5487,7 @@ Core Directives:
         parts: [{ text: systemInstruction }]
       },
       contents,
-      generationConfig: { temperature: 0.5, maxOutputTokens: 350 }
+      generationConfig: { temperature: 0.5, maxOutputTokens: 2048 }
     };
 
     const result = await callGeminiApiWithMultiKeyFallback(bodyPayload, 20000);
