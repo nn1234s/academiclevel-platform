@@ -51,7 +51,7 @@ const BLOG_POSTS: BlogPost[] = [
   {
     id: 'master-qb-curated-mcqs',
     date: 'Nov 26, 2026',
-    readTime: '3 min read',
+    readTime: '5 min read',
     category: 'UPDATES',
     tag: 'Question Bank',
     title: 'Master Question Bank Upgrade: 3,600 Curated 4-Option MCQs (Classes 1–12)',
@@ -60,20 +60,25 @@ const BLOG_POSTS: BlogPost[] = [
     highlights: [
       '300 curated questions per class across CBSE Classes 1–12 (3,600 total)',
       '100% verified 4 distinct options, exact answer keys, and explanations',
-      'Synced into both curatedQuestionBank.json and SQLite question_bank'
+      'Synced into both curatedQuestionBank.json and SQLite question_bank',
+      'Validated automatically in CI with zero duplicate options or missing keys'
     ],
     sections: [
       {
         heading: 'Why We Upgraded to Curated 4-Option MCQs',
-        body: 'Earlier question imports relied on synthetic distractor generation for some items. With the new Master Question Bank & Curriculum Blueprint, every single question from Class 1 to Class 12 ships with four hand-curated, distinct options (A, B, C, D), an exact verified answer key, and a clear explanation.'
+        body: 'Earlier question bank imports relied on automated distractor generation for some items when only the answer text was available. While that worked as a baseline, great multiple-choice practice depends on realistic, pedagogically sound distractors that reflect actual student misconceptions — like off-by-one arithmetic errors, sign flips, or closely related scientific terms. With the new Master Question Bank & Curriculum Blueprint, every single question from Class 1 to Class 12 now ships with four hand-curated, distinct options (A, B, C, and D), an exact verified answer key, and a clear explanation.'
       },
       {
-        heading: 'Class-Wise Coverage Across CBSE',
-        body: 'Classes 1 through 10 include 75 questions per subject across Mathematics, Science / EVS, Social Science / General Knowledge, and English (300 per class). Classes 11 and 12 include 50 questions per subject across Mathematics, Physics, Chemistry, Biology, English, and Integrated Humanities (300 per class) — totaling 3,600 validated questions.'
+        heading: 'Class-Wise & Subject-Wise Coverage Across CBSE',
+        body: 'Every grade receives balanced, age-appropriate depth. Classes 1 through 10 include 75 questions per subject across Mathematics, Science / EVS, Social Science / General Knowledge, and English — totaling 300 questions per class. For senior secondary students in Classes 11 and 12, the bank expands to stream-specific subjects: Mathematics, Physics, Chemistry, Biology, English, and Integrated Humanities (50 questions per subject, 300 per class). Altogether, 3,600 curated MCQs are immediately available across Foundation, Concept, Exam Ready, and Olympiad levels.'
       },
       {
-        heading: 'Automated Verification Gate',
-        body: 'Every import runs through our automated validator checking option count, case-insensitive option uniqueness, valid answer indices, and non-empty explanations before updating both the offline JSON bank and SQLite database.'
+        heading: 'How Explanations Turn Practice Into Mastery',
+        body: 'Getting a question right is only half of learning; understanding why the other options are wrong is what builds exam confidence. Each record in the upgraded bank includes a teaching explanation that walks through the calculation, grammar rule, historical context, or scientific principle rather than simply repeating the answer letter. When a student misses an item, that exact explanation feeds straight into their Mistake Vault for targeted revision.'
+      },
+      {
+        heading: 'Zero-Trust Automated Verification Pipeline',
+        body: 'Before any question enters production, our import and validation pipeline checks every record programmatically: exactly 4 non-empty options, zero case-insensitive duplicate options, a valid answer index (0–3) matching the keyed answer text, and a non-empty explanation. Both the bundled offline JSON bank and the indexed SQLite question_bank table are updated in sync, keeping quiz loading under a millisecond.'
       }
     ],
     ctaLabel: 'Explore CBSE Courses',
@@ -84,7 +89,7 @@ const BLOG_POSTS: BlogPost[] = [
   {
     id: 'nova-psst-voice',
     date: 'Nov 26, 2026',
-    readTime: '2 min read',
+    readTime: '4 min read',
     category: 'UPDATES',
     tag: 'Nova AI',
     title: 'Nova AI Study Buddy: Playful *Psst...* Secrets & Zero Upsells',
@@ -93,16 +98,25 @@ const BLOG_POSTS: BlogPost[] = [
     highlights: [
       'Instant *Psst...* study tricks for formulas, definitions, and quick revision',
       'Neutral, clean chat UI with warm conversational replies',
-      'Works both with live Gemini AI and zero-cost offline fallback'
+      'Works both with live Gemini AI and zero-cost offline fallback',
+      'Zero paid-plan upsells and strict K–12 child-safe guardrails'
     ],
     sections: [
       {
-        heading: 'Friendly Study Buddy, Never Robotic',
-        body: 'Students learn faster when their AI tutor feels approachable and encouraging rather than like a dry textbook. Nova now greets learners warmly, uses relatable everyday analogies, and drops *Psst...* secret memory tricks to help concepts stick before exams.'
+        heading: 'Why Tone Matters for K–12 Learners',
+        body: 'Students open an AI tutor when they are stuck, tired before a test, or hesitant to ask a question in class. When a tutor responds like a stiff corporate manual, kids close the tab after one message. By giving Nova a warm, upbeat, friend-like voice — complete with playful *Psst...* secret study tricks and relatable analogies — students actually look forward to asking follow-up questions and revising tricky chapters.'
       },
       {
-        heading: 'Child-Safe & Zero Upsells',
-        body: 'Because AcademicLevel serves Class 1–12 learners, Nova keeps all conversations strictly age-appropriate and platonic, and never pressures students to buy paid plans inside the chat window.'
+        heading: 'What *Psst...* Study Secrets Actually Do',
+        body: 'Whenever a student asks about a concept, formula, or quick revision tip, Nova pairs the core academic explanation with a short *Psst...* memory hack: for example, using active-recall 30-second summaries, visual analogies for physics and chemistry, or quick sign-check habits in algebra. Those bite-sized hooks make formulas much easier to recall during timed exams.'
+      },
+      {
+        heading: 'Strict Child-Safe Boundaries & Zero Chat Upsells',
+        body: 'Because AcademicLevel serves students from Class 1 to Class 12, fun never comes at the expense of safety. Nova keeps every conversation strictly platonic and age-appropriate, steers personal off-topic prompts cheerfully back to study goals, and never pushes paid subscription upsells inside the tutor chat. Learning help stays focused 100% on the student.'
+      },
+      {
+        heading: 'Resilient Live + Offline Architecture',
+        body: 'When connected to Gemini, Nova uses your board, class, and active subject context to craft tailored explanations. When offline or on a restricted connection, our deterministic Study Buddy engine responds instantly at zero server cost while preserving the exact same warm tone and syllabus accuracy.'
       }
     ],
     ctaLabel: 'Open Nova AI Tutor',
@@ -113,7 +127,7 @@ const BLOG_POSTS: BlogPost[] = [
   {
     id: 'pfp-emoji-local',
     date: 'Nov 26, 2026',
-    readTime: '2 min read',
+    readTime: '4 min read',
     category: 'UPDATES',
     tag: 'Student Profile',
     title: 'Custom Local Profile Pictures & Cross-Device Preset Emoji PFPs',
@@ -122,16 +136,21 @@ const BLOG_POSTS: BlogPost[] = [
     highlights: [
       '16 Preset Emoji PFPs synced via learner profile at zero extra server cost',
       'Client-side 160×160 photo upload stored strictly in LocalStorage',
-      'Clear pre-save reminder so kids know custom photos stay on that device only'
+      'Clear pre-save reminder so kids know custom photos stay on that device only',
+      'Instant live update in both the Profile page and the top navigation bar'
     ],
     sections: [
       {
-        heading: 'Zero-Cost Personalization That Scales',
-        body: 'Hosting user-uploaded images on a server eats bandwidth and storage quickly. Instead, AcademicLevel gives students two smart options: 16 Preset Emoji PFPs (stored as lightweight text on their profile so they appear on every phone and laptop) and a custom photo uploader.'
+        heading: 'Personalization Without Server Bandwidth Bloat',
+        body: 'Kids love customizing their profile, but storing and serving thousands of user-uploaded images from a backend server quickly consumes storage and outbound bandwidth caps. We designed a hybrid two-tier avatar system that gives students full self-expression while keeping server image bandwidth at zero.'
       },
       {
-        heading: 'Transparent LocalStorage Notice',
-        body: 'When a student chooses a custom photo from their device, AcademicLevel resizes it cleanly in the browser and displays a clear reminder before saving: custom uploaded photos are stored in LocalStorage on that device only and do not sync across other devices.'
+        heading: 'Preset Emoji PFPs That Travel Everywhere',
+        body: 'In Student Profile, learners can choose from 16 expressive Preset Emoji PFPs — from Lion, Tiger, Fox, Panda, and Unicorn to Rocket, Crown, Scholar, and Robo. Because the selection is stored as a tiny string on the learner profile record, switching devices or browsers brings their chosen avatar along automatically.'
+      },
+      {
+        heading: 'Custom Photo Upload with Clear LocalStorage Notice',
+        body: 'Want to use a favorite photo or drawing from your own device? Students can upload any image file, which is resized client-side in an HTML5 canvas to a crisp 160×160 JPEG and stored solely in browser LocalStorage. Before saving, AcademicLevel shows an explicit confirmation box reminding the student that custom uploaded photos stay on this device only and will not sync across other phones or laptops — keeping expectations 100% clear.'
       }
     ],
     ctaLabel: 'Open Student Profile',
@@ -142,7 +161,7 @@ const BLOG_POSTS: BlogPost[] = [
   {
     id: 'duel-arena-blitz',
     date: 'Nov 26, 2026',
-    readTime: '2 min read',
+    readTime: '4 min read',
     category: 'UPDATES',
     tag: 'Quiz Arena',
     title: '1v1 Quiz Duel Arena: Instant Zero-Lag Matchmaking',
@@ -151,16 +170,21 @@ const BLOG_POSTS: BlogPost[] = [
     highlights: [
       'Instant matchmaking with 7 smart scholar challengers',
       '5-question rapid blitz with Study Coin wager tiers',
-      'Zero expired room-code errors or waiting delays'
+      'Zero expired room-code errors or waiting delays',
+      'Automatic Study Quest credit & duel history tracking'
     ],
     sections: [
       {
-        heading: 'Why We Removed Cross-Device Room Codes',
-        body: 'Sharing local room codes across different phones caused invalid-code errors and would require heavy real-time WebSocket servers. Removing the broken room-code flow keeps the arena fast, reliable, and free-tier friendly.'
+        heading: 'Fixing the Cross-Device Room Code Frustration',
+        body: 'Previously, creating a local room code and sharing it over WhatsApp meant friends on separate devices saw an "invalid room code" error because room state lived locally rather than on an expensive real-time WebSocket cluster. Rather than leaving a broken flow or burning server budget on idle sockets, we removed the broken room-code and WhatsApp invite flow completely.'
       },
       {
-        heading: 'Instant 5-Question Blitzes',
-        body: 'Students pick their subject and Study Coin wager tier (from Friendly Spar to Grandmaster Duel), match in 2 seconds with an online scholar challenger, and compete on speed and accuracy.'
+        heading: 'Fast 5-Question Syllabus Blitzes',
+        body: 'Now, jumping into a duel takes two taps: pick your subject and Study Coin wager tier (Friendly Spar at 0 coins, Rookie Clash at 5, Pro Showdown at 15, or Grandmaster Duel at 30), and match within 2 seconds against one of 7 online scholar challengers.'
+      },
+      {
+        heading: 'Speed, Accuracy & Coin Pot Rewards',
+        body: 'Each duel pulls 5 curriculum-matched questions from your active CBSE class and subject with a 15-second timer per question. Winning doubles your coin pot and counts directly toward Today’s Study Quests, turning quick 90-second breaks into high-focus revision.'
       }
     ],
     ctaLabel: 'Enter Quiz Duel Arena',
@@ -171,7 +195,7 @@ const BLOG_POSTS: BlogPost[] = [
   {
     id: 'study-quests-coin-sync',
     date: 'Nov 26, 2026',
-    readTime: '2 min read',
+    readTime: '4 min read',
     category: 'UPDATES',
     tag: 'Study Coins',
     title: 'Today’s Study Quests: Server-Synced Rewards & 4-Quest Daily Cap',
@@ -179,13 +203,22 @@ const BLOG_POSTS: BlogPost[] = [
       'Fixed Today’s Study Quests so completing quizzes, Nova chats, or duels reliably credits Study Coins to the server ledger and supports up to 4 rewarded quests per day.',
     highlights: [
       'Awaited server coin persistence so balances never revert on refresh',
-      'Daily quest cap raised to 4 quests for active learners',
+      'Daily quest cap raised from 3 to 4 quests for active learners',
+      'Clean error surfacing if a ledger sync fails',
       'CI upgraded to Node 24 for faster, greener verification builds'
     ],
     sections: [
       {
-        heading: 'Reliable Coin Ledger Sync',
-        body: 'Previously, quest coin rewards updated locally before server persistence finished, and a 3-quest daily cap blocked the 4th quest. Both client ledger sync and server daily caps were updated so every completed quest credits Study Coins reliably.'
+        heading: 'Why Quest Coins Sometimes Failed to Stick',
+        body: 'Two subtle issues caused Today’s Study Quests to miss coin payouts: first, the client fired coin transactions without awaiting server persistence, so a fast refresh could overwrite the local balance; second, the server’s daily quest reward cap was set to 3 quests even though the dashboard offered 4 daily quests.'
+      },
+      {
+        heading: 'End-to-End Ledger Sync & 4-Quest Cap',
+        body: 'We updated CoinLedgerService to await the backend transaction response before updating UI state and raised the daily quest reward cap to 4 on the server. Now, every completed quest — whether it is a quiz, Nova AI session, or Quiz Duel — reliably credits Study Coins to your persistent balance.'
+      },
+      {
+        heading: 'Upgraded CI on Node.js 24',
+        body: 'Alongside the quest fix, we upgraded our GitHub Actions verification workflow to Node.js 24 so TypeScript, production bundle, and SQLite bank checks run cleanly without deprecation warnings.'
       }
     ],
     icon: <Coins className="w-5 h-5 text-yellow-600" />,
@@ -194,7 +227,7 @@ const BLOG_POSTS: BlogPost[] = [
   {
     id: 'rounded-ui-cbse-popup',
     date: 'Nov 26, 2026',
-    readTime: '2 min read',
+    readTime: '4 min read',
     category: 'UPDATES',
     tag: 'UI & Curriculum',
     title: 'Child-Friendly Rounded UI, 100% CBSE Focus & Popup Checkout',
@@ -203,12 +236,21 @@ const BLOG_POSTS: BlogPost[] = [
     highlights: [
       'Friendly rounded cards and buttons designed for young learners',
       'Consistent CBSE-only curriculum across homepage, ads, and CMS',
-      'One-tap Pay Now button opening a responsive payment popup'
+      'One-tap Pay Now button opening a responsive payment popup',
+      'Cleaner board selector without duplicate or broken options'
     ],
     sections: [
       {
-        heading: 'Designed for Young Learners',
-        body: 'We replaced boxy sharp edges with soft rounded surfaces that feel welcoming to school students, removed stale multi-board copy so every page reflects CBSE Classes 1–12, and simplified the Special ₹49 checkout into a clean responsive popup.'
+        heading: 'Soft, Approachable UI for School Students',
+        body: 'Sharp 2px–3px boxy corners can feel rigid and intimidating for primary and middle-school learners. We updated our global theme and component styles to use warm, rounded geometry that feels inviting on both desktop and mobile screens.'
+      },
+      {
+        heading: 'Unified 100% CBSE Curriculum Messaging',
+        body: 'To eliminate confusion for parents and students, we cleaned up stale multi-board references across the homepage, ad landing pages, and cached CMS defaults so AcademicLevel clearly presents its focused CBSE Classes 1–12 curriculum and single CBSE board selector.'
+      },
+      {
+        heading: 'Streamlined Popup Checkout on Special ₹49',
+        body: 'Instead of cluttering the Special ₹49 page with inline multi-step forms, clicking Pay Now now opens a clean, responsive payment popup directly, reducing friction for parents activating a 60-day pass.'
       }
     ],
     icon: <Palette className="w-5 h-5 text-pink-600" />,
@@ -217,7 +259,7 @@ const BLOG_POSTS: BlogPost[] = [
   {
     id: 'offline-question-bank',
     date: 'Core Innovation',
-    readTime: '3 min read',
+    readTime: '5 min read',
     category: 'INNOVATIONS',
     tag: 'Question Bank',
     title: '3,600+ CBSE Question Bank with Offline-First SQLite Engine',
@@ -226,12 +268,21 @@ const BLOG_POSTS: BlogPost[] = [
     highlights: [
       'Class-wise and chapter-wise progression across Foundation, Mastery, and Exam levels',
       'Built-in question bank integrity validator in CI',
-      'Instant practice even on slow or intermittent mobile connections'
+      'Instant practice even on slow or intermittent mobile connections',
+      'Sub-millisecond SQLite query retrieval with indexed lookups'
     ],
     sections: [
       {
-        heading: 'Sub-Millisecond SQLite + Offline Fallback',
-        body: 'Quiz queries hit an indexed SQLite question_bank table on the backend (delivering 5-question sets in under a millisecond) and fall back seamlessly to the bundled offline bank whenever network connectivity drops.'
+        heading: 'Built for Real-World Indian Connectivity',
+        body: 'Many students practice on shared family phones or variable 4G connections. Waiting several seconds between every quiz question breaks focus. AcademicLevel combines an indexed SQLite question_bank table on the server with a bundled offline fallback bank on the client.'
+      },
+      {
+        heading: 'Structured Mastery Levels (Class 1 to Class 12)',
+        body: 'Instead of dumping random questions into one giant list, every subject is organized into progressive tiers — Foundation, Concept, Exam Ready, and Olympiad — so beginners build confidence first before tackling multi-step board and competitive problems.'
+      },
+      {
+        heading: 'Hints, Explanations & Integrity Guarantees',
+        body: 'Every question includes a conceptual hint before submission and a detailed explanation afterward. Automated CI scripts verify all 3,600+ records on every commit so students never encounter broken options or missing answers.'
       }
     ],
     ctaLabel: 'Browse Question Bank',
@@ -242,7 +293,7 @@ const BLOG_POSTS: BlogPost[] = [
   {
     id: 'mistake-vault-gamification',
     date: 'Core Innovation',
-    readTime: '3 min read',
+    readTime: '5 min read',
     category: 'INNOVATIONS',
     tag: 'Gamification',
     title: 'Mistake Vault, Daily Spin Wheel, Scholar Leagues & Gift Store',
@@ -251,12 +302,21 @@ const BLOG_POSTS: BlogPost[] = [
     highlights: [
       'Automatic Mistake Vault error notebook for smart exam revision',
       'Daily Spin Wheel, QOTD, Weekly Challenges, and Scholar Leagues',
-      'Study Coin economy backed by server-verified ledger transactions'
+      'Study Coin economy backed by server-verified ledger transactions',
+      'Redeemable Scholar’s Gift Store rewards and milestone badges'
     ],
     sections: [
       {
         heading: 'Turning Wrong Answers Into Exam Strength',
-        body: 'Every missed quiz question is captured automatically in the Mistake Vault so students can revisit tricky concepts right before tests. Paired with Study Coins, Daily Spin Wheel, QOTD, Weekly Challenges, and the Scholar’s Gift Store, daily revision stays motivating.'
+        body: 'Most quiz apps show a red X and move on, leaving students to make the exact same mistake a week later. AcademicLevel automatically saves every missed question into the student’s personal Mistake Vault, creating a focused pre-exam revision deck of the exact concepts they need to strengthen.'
+      },
+      {
+        heading: 'Daily Habits That Feel Rewarding',
+        body: 'Consistency beats last-minute cramming. Features like Question of the Day (QOTD), Today’s Study Quests, Daily Spin Wheel, Weekly Challenges, and Scholar Leagues reward students with Study Coins and XP for showing up every day.'
+      },
+      {
+        heading: 'A Server-Verified Study Coin Economy',
+        body: 'Every Study Coin earned from quizzes, quests, or streaks is recorded in a tamper-resistant server coin ledger and can be redeemed in the Scholar’s Gift Store — giving students tangible excitement around learning milestones.'
       }
     ],
     ctaLabel: 'Visit Gift Store',
@@ -267,7 +327,7 @@ const BLOG_POSTS: BlogPost[] = [
   {
     id: 'verifiable-certs-performance',
     date: 'Core Innovation',
-    readTime: '2 min read',
+    readTime: '4 min read',
     category: 'INNOVATIONS',
     tag: 'Trust & Speed',
     title: 'Verifiable Certificates, A-Codes & Lightweight Compressed Delivery',
@@ -276,12 +336,21 @@ const BLOG_POSTS: BlogPost[] = [
     highlights: [
       'Public certificate verification at /verify',
       'Server-side gzip compression & immutable /assets caching for low bandwidth',
-      'Zero third-party ads and strict child-safety defaults'
+      'Zero third-party ads and strict child-safety defaults',
+      'Shareable A-Code referral passes for classmates'
     ],
     sections: [
       {
-        heading: 'Built for Trust & Low-Bandwidth India',
-        body: 'Parents and schools can verify any AcademicLevel certificate publicly at /verify. Under the hood, gzip JSON compression and 1-year immutable asset caching keep page loads fast and bandwidth costs tiny.'
+        heading: 'Verifiable Learning Credentials',
+        body: 'When a student completes curriculum milestones and earns an AcademicLevel certificate, anyone — parents, teachers, or schools — can verify its authenticity publicly at /verify using its unique verification token.'
+      },
+      {
+        heading: 'Engineered for Low Bandwidth & Fast Loads',
+        body: 'Performance is a feature. Our Express server compresses JSON API payloads with gzip and serves hashed static bundles under /assets with 1-year immutable cache headers. Returning students load the app almost instantaneously while using minimal mobile data.'
+      },
+      {
+        heading: 'Zero Third-Party Ads, Ever',
+        body: 'AcademicLevel never embeds third-party ad networks, tracking pixels, or distracting popups inside student study flows. Every screen is dedicated purely to safe, focused learning.'
       }
     ],
     ctaLabel: 'Verify a Certificate',
