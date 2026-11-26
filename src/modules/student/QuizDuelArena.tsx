@@ -3,6 +3,7 @@ import { Learner, Question, QuizDuel, Subject } from '../../core/types';
 import { OfflineBankService } from '../../services/offlineBankService';
 import { CurriculumService } from '../../services/curriculumService';
 import { CoinLedgerService } from '../../services/coinLedgerService';
+import { QuotaService } from '../../services/quotaService';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { useLanguage } from '../../core/i18n/LanguageContext';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
@@ -80,6 +81,10 @@ export const QuizDuelArena: React.FC<QuizDuelArenaProps> = ({
 
   const subjects = CurriculumService.getSubjects(learner.board, learner.grade);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const FREE_DUEL_LIMIT = 3;
+  const isFreePlan = QuotaService.evaluateQuota(learner).activePlan === 'FREE';
+  const isFreeDuelLimitReached = isFreePlan && duelHistory.length >= FREE_DUEL_LIMIT;
+  const freeDuelsRemaining = Math.max(0, FREE_DUEL_LIMIT - duelHistory.length);
 
   useEffect(() => {
     setDuelHistory(StorageRLSLayer.getDuelsForLearner(learner.id));
@@ -88,20 +93,47 @@ export const QuizDuelArena: React.FC<QuizDuelArenaProps> = ({
   // Matchmaking effect
   useEffect(() => {
     if (gameState === 'MATCHMAKING') {
-      const matchTimeout = setTimeout(() => {
-        // Pick random peer
+      let cancelled = false;
+      const matchTimeout = setTimeout(async () => {
+        if (cancelled) return;
+        // Pick random online scholar
         const randomPeer = PEER_OPPONENTS[Math.floor(Math.random() * PEER_OPPONENTS.length)];
         setOpponent(randomPeer);
 
-        // Fetch 5 questions from Curriculum / Bank
-        const qs = OfflineBankService.getQuestions(
+        // Fetch full subject pool from server SQLite bank (or fallback) and avoid repeating questions
+        const pool = await OfflineBankService.fetchServerQuestions(
           learner.board,
           learner.grade,
           selectedSubjectId,
           'FOUNDATION',
-          5
+          50
         );
-        setDuelQuestions(qs.slice(0, 5));
+        if (cancelled) return;
+
+        const seenKey = `al_duel_seen_${learner.id}_${selectedSubjectId}`;
+        let seenIds: string[] = [];
+        try {
+          seenIds = JSON.parse(localStorage.getItem(seenKey) || '[]');
+        } catch {}
+
+        let candidates = pool.filter(q => !seenIds.includes(q.id));
+        if (candidates.length < 5) {
+          candidates = [...pool];
+          seenIds = [];
+        }
+
+        // Fisher-Yates shuffle
+        for (let i = candidates.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+        }
+
+        const picked = candidates.slice(0, 5);
+        try {
+          localStorage.setItem(seenKey, JSON.stringify([...seenIds, ...picked.map(q => q.id)].slice(-60)));
+        } catch {}
+
+        setDuelQuestions(picked);
         setCurrentQIndex(0);
         setUserScore(0);
         setOpponentScore(0);
@@ -111,9 +143,12 @@ export const QuizDuelArena: React.FC<QuizDuelArenaProps> = ({
         setGameState('DUELING');
       }, 2000);
 
-      return () => clearTimeout(matchTimeout);
+      return () => {
+        cancelled = true;
+        clearTimeout(matchTimeout);
+      };
     }
-  }, [gameState, learner.board, learner.grade, selectedSubjectId]);
+  }, [gameState, learner.id, learner.board, learner.grade, selectedSubjectId]);
 
   // Question countdown timer & Opponent answering simulation
   useEffect(() => {
@@ -153,6 +188,15 @@ export const QuizDuelArena: React.FC<QuizDuelArenaProps> = ({
   }, [gameState, currentQIndex, isAnswerSubmitted]);
 
   const handleStartMatchmaking = () => {
+    if (isFreeDuelLimitReached) {
+      alert(
+        isHinglish
+          ? 'Free account me sirf 3 1v1 Quiz Duels allowed hain! Unlimited duels ke liye plan upgrade karein.'
+          : 'Free accounts include up to 3 1v1 Quiz Duels. Upgrade your plan to unlock unlimited duels!'
+      );
+      return;
+    }
+
     // Check coin balance if wagering coins
     if (selectedTier.entryCost > 0) {
       if ((learner.coinBalance || 0) < selectedTier.entryCost) {
@@ -529,14 +573,30 @@ export const QuizDuelArena: React.FC<QuizDuelArenaProps> = ({
               : 'Go head-to-head in a fast 5-question syllabus blitz against online scholars. Speed + accuracy takes the coin pot!'}
           </p>
 
-          <div className="pt-2 flex flex-wrap gap-3">
+          <div className="pt-2 flex flex-wrap items-center gap-3">
             <button
               onClick={handleStartMatchmaking}
-              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 font-black text-sm flex items-center space-x-2 shadow-lg shadow-amber-500/25 active:scale-95 transition-all cursor-pointer"
+              disabled={isFreeDuelLimitReached}
+              className={`px-6 py-3 rounded-2xl font-black text-sm flex items-center space-x-2 shadow-lg transition-all ${
+                isFreeDuelLimitReached
+                  ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 shadow-amber-500/25 active:scale-95 cursor-pointer'
+              }`}
             >
               <Zap className="w-4 h-4" />
-              <span>{isHinglish ? 'Quick Match Shuru Karo' : 'Start Quick Match'}</span>
+              <span>
+                {isFreeDuelLimitReached
+                  ? (isHinglish ? 'Free Limit Reached (3/3)' : 'Free Duel Limit Reached (3/3)')
+                  : (isHinglish ? 'Quick Match Shuru Karo' : 'Start Quick Match')}
+              </span>
             </button>
+            {isFreePlan && (
+              <span className="px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 text-xs font-bold text-amber-200">
+                {isHinglish
+                  ? `Free Duels: ${freeDuelsRemaining}/3 bache hain`
+                  : `Free Duels Left: ${freeDuelsRemaining}/3`}
+              </span>
+            )}
             <button
               onClick={onBackToDashboard}
               className="px-4 py-3 rounded-2xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-bold text-sm transition-all cursor-pointer"

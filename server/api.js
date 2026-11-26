@@ -2217,7 +2217,19 @@ apiRouter.post('/quizzes/submit-answer', (req, res) => {
       return res.status(400).json({ success: false, error: 'sessionId, questionId and selectedIndex required' });
     }
     const session = quizSessions.get(sessionId);
-    if (!session) return res.status(404).json({ success: false, error: 'Session not found or expired' });
+    if (!session) {
+      // Fallback to SQLite question_bank if in-memory session expired (e.g. server restart)
+      const dbRow = db.prepare('SELECT id, correctIndex, explanation, hint FROM question_bank WHERE id = ?').get(questionId);
+      if (!dbRow) return res.status(404).json({ success: false, error: 'Session expired and question not found' });
+      const isCorrect = Number(selectedIndex) === Number(dbRow.correctIndex);
+      return res.json({
+        success: true,
+        isCorrect,
+        correctIndex: Number(dbRow.correctIndex),
+        explanation: dbRow.explanation || '',
+        hint: dbRow.hint || ''
+      });
+    }
     if (!requireSessionOrAdmin(req, res, session.learnerId)) return;
 
     const q = session.questions.find(x => x.id === questionId);

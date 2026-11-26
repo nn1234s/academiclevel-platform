@@ -3,7 +3,7 @@ import { Learner, Subscription } from '../core/types';
 import { ApiClient } from '../core/api/apiClient';
 
 export const FREE_TIER_MAX_QUIZZES = 25;
-export const FREE_TIER_MAX_LEVELS = 3;
+export const FREE_TIER_MAX_LEVELS = 6;
 
 export interface QuotaStatus {
   isLocked: boolean;

@@ -348,7 +348,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               className="md-btn-raised w-full sm:w-auto px-6 py-3 bg-[#009688] hover:bg-[#00796B] text-white font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center space-x-2 cursor-pointer"
             >
               <Sparkles className="w-4 h-4 text-white" />
-              <span>Start Free Practice (3 Levels Free)</span>
+              <span>Start Free Practice (6 Levels Free)</span>
             </button>
 
             <a
@@ -371,7 +371,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="md-divider mt-8 pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-[#616161] font-medium">
             <div className="flex items-center space-x-1.5">
               <CheckCircle2 className="w-4 h-4 text-[#009688]" />
-              <span>3 Curriculum Levels Free</span>
+              <span>6 Curriculum Levels Free</span>
             </div>
             <div className="flex items-center space-x-1.5">
               <CheckCircle2 className="w-4 h-4 text-[#009688]" />
@@ -824,7 +824,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             Start 100% Free • Upgrade When Ready
           </h2>
           <p className="text-xs text-slate-600 mt-1">
-            Master 3 curriculum levels free on any subject, or unlock full unlimited access at less than ₹1 per day.
+            Master 6 curriculum levels free on any subject, or unlock full unlimited access at less than ₹1 per day.
           </p>
         </div>
 
@@ -910,7 +910,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs rounded-xl shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
               >
                 <Sparkles className="w-4 h-4 text-white" />
-                <span>SIGN UP FREE (3 LEVELS) 🚀</span>
+                <span>SIGN UP FREE (6 LEVELS) 🚀</span>
               </button>
             </div>
           </div>

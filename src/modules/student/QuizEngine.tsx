@@ -386,8 +386,11 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
       setAntiCheatViolations(prev => prev + 1);
     }
 
-    let isCorrect = selectedOption === Number(currentQuestion.correctIndex);
+    let isCorrect = typeof currentQuestion.correctIndex === 'number'
+      ? selectedOption === Number(currentQuestion.correctIndex)
+      : false;
     let revealedQuestion = currentQuestion;
+    let verifiedByServer = false;
 
     if (quizSessionId) {
       try {
@@ -400,6 +403,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         if (res.ok) {
           const data = await res.json();
           if (data.success) {
+            verifiedByServer = true;
             isCorrect = Boolean(data.isCorrect);
             revealedQuestion = {
               ...currentQuestion,
@@ -411,6 +415,20 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         }
       } catch {
         // Fallback to local evaluation if network drops mid-quiz
+      }
+    }
+
+    if (!verifiedByServer && typeof revealedQuestion.correctIndex !== 'number') {
+      const localMatch = OfflineBankService.getQuestions(board, grade, subjectId, levelNode, 100)
+        .find(q => q.id === currentQuestion.id || q.text === currentQuestion.text);
+      if (localMatch && typeof localMatch.correctIndex === 'number') {
+        revealedQuestion = {
+          ...currentQuestion,
+          correctIndex: localMatch.correctIndex,
+          explanation: localMatch.explanation || currentQuestion.explanation
+        };
+        isCorrect = selectedOption === Number(localMatch.correctIndex);
+        setQuestions(prev => prev.map((q, idx) => idx === currentIndex ? revealedQuestion : q));
       }
     }
 
