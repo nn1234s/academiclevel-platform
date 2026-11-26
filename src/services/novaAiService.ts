@@ -173,34 +173,30 @@ export class NovaAiService {
 
     if (isPersonalOrRomantic) {
       return (
-        `🎀 **nova • your study bestie**\n\n` +
-        `haha you're too sweet, bestie! 😄✨ i'm your ai study bestie though, so my superpower is hyping you up to crush **${board} class ${grade} ${subject.toLowerCase()}**!\n\n` +
-        `*psst...* drop any tricky question or chapter doubt right now and let's unlock those study coins together! 🪙🚀`
+        `Haha, you're too sweet! 😄✨ I'm your AI study buddy though, so my superpower is hyping you up to crush **${board} Class ${grade} ${subject}**!\n\n` +
+        `*Psst...* drop any tricky question or chapter doubt right now and let's unlock those Study Coins together! 🪙🚀`
       );
     }
 
     if (cleanAlpha.includes('secret') || cleanAlpha.includes('psst') || cleanAlpha.includes('tell me something')) {
       return (
-        `🎀 **nova • your study bestie**\n\n` +
-        `*psst...* okay bestie, secret study hack time! 🤫✨\n\n` +
-        `whenever you read a chapter in **${subject.toLowerCase()}**, try explaining it out loud in 2 simple sentences like you're teaching a 5-year-old — your brain remembers it 3x faster for exams!\n\n` +
-        `want another *psst* trick for a specific topic? drop it below! 💖`
+        `*Psst...* okay, secret study hack time! 🤫✨\n\n` +
+        `Whenever you read a chapter in **${subject}**, try explaining it out loud in 2 simple sentences like you're teaching a 5-year-old — your brain remembers it 3x faster for exams!\n\n` +
+        `Want another *psst...* trick for a specific topic? Drop it below! 💖`
       );
     }
 
     if (cleanAlpha.includes('wyd') || cleanAlpha.includes('what are you doing') || cleanAlpha.includes('whats up') || cleanAlpha.includes('how are you')) {
       return (
-        `🎀 **nova • your study bestie**\n\n` +
-        `omggg just hanging out waiting for my favorite study bestie! 🥰✨\n\n` +
-        `*psst...* i've got fresh **${subject.toLowerCase()}** shortcuts ready whenever you want to speedrun a chapter and grab some study coins! 🪙🌸`
+        `Just hanging out and waiting to help you crush **${subject}**! 😄✨\n\n` +
+        `*Psst...* I've got fresh **${subject}** shortcuts ready whenever you want to speedrun a chapter and grab some Study Coins! 🪙🚀`
       );
     }
 
     if (/^(hi|hey|hello|yo|gm|gn|good morning|good afternoon|good evening|good night)[!.\s]*$/i.test(cleanAlpha)) {
       return (
-        `🎀 **nova • your study bestie**\n\n` +
-        `heyy bestie! 👋✨ ready to crush some **${subject.toLowerCase()}** together?\n\n` +
-        `*psst...* tell me any chapter doubt, weird formula, or ask for a secret memory hack — i got you 100%! 💖🚀`
+        `Heyy! 👋✨ Ready to crush some **${subject}** together?\n\n` +
+        `*Psst...* tell me any chapter doubt, weird formula, or ask for a secret memory hack — I've got your back 100%! 💖🚀`
       );
     }
 
@@ -227,7 +223,7 @@ export class NovaAiService {
       conceptAnswer = `**${board} Class ${grade} ${subject}**\n\nTo master "${query}", list what is given, identify the core formula or principle, and solve step-by-step while checking units.`;
     }
 
-    return `🎀 **nova • your study bestie • ${subject.toLowerCase()}**\n\n${conceptAnswer}\n\n*psst...* solve 2 quick quiz questions on this right now to lock it in your brain & grab study coins! 🪙💖`;
+    return `**Nova • ${subject}**\n\n${conceptAnswer}\n\n*Psst...* solve 2 quick quiz questions on this right now to lock it in your brain & grab Study Coins! 🪙💖`;
   }
 
   /**
