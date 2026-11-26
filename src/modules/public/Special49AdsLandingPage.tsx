@@ -354,6 +354,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
       sessionStorage.setItem('al_pending_account_after_pay', 'true');
       sessionStorage.setItem('al_pay_clicked_time', nowStr);
     } catch {}
+    setShowPostPaymentPopup(true);
   };
 
   useEffect(() => {
@@ -1256,7 +1257,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 className="w-full py-4 px-6 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black text-base sm:text-lg rounded-2xl shadow-xl transition-all flex items-center justify-center space-x-2 cursor-pointer transform hover:scale-[1.01]"
               >
                 <ExternalLink className="w-5 h-5" />
-                <span>BUY NOW (₹{offerAmount}) — UPI PG ↗</span>
+                <span>PAY NOW (₹{offerAmount}) — UPI PG ↗</span>
               </a>
 
               <div className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-orange-200 text-[11px] font-mono text-slate-700">
@@ -1277,8 +1278,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               </div>
             </div>
 
-            {/* Step 2: AFTER PAYMENT DONE: CREATE ACCOUNT & ACTIVATE PASS */}
-            {paymentSuccess ? (
+            {paymentSuccess && (
               <div className="bg-emerald-50 border-2 border-emerald-400 rounded-2xl p-6 text-center space-y-4">
                 <div className="w-14 h-14 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto text-2xl shadow-lg">
                   ✓
@@ -1306,115 +1306,6 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                   Go to Student Dashboard &amp; Start Learning
                 </button>
               </div>
-            ) : (
-              <form onSubmit={handleDirectPaymentSubmit} className="space-y-4 text-xs">
-                <div>
-                  <span className="font-bold text-slate-900 text-sm block mb-0.5">
-                    Step 2: Create Account &amp; Activate Pass
-                  </span>
-                  <p className="text-slate-500 text-[11px]">
-                    After paying on UPI PG, enter your details below to create your account and get your subscription instantly.
-                  </p>
-                </div>
-
-                {errorMessage && (
-                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-start space-x-2">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-rose-600" />
-                    <span>{errorMessage}</span>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Student Full Name *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Aarav Sharma"
-                      value={studentName}
-                      onChange={e => setStudentName(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 text-xs"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Parent Mobile / Email *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="9861439460 or email@domain.com"
-                      value={emailOrPhone}
-                      onChange={e => setEmailOrPhone(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 text-xs"
-                    />
-                  </div>
-                </div>
-
-                {!currentLearner ? (
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block font-bold text-slate-700">Account Password *</label>
-                      <span className="text-[10px] text-[#616161] font-normal">Min. 6 characters to log into your account</span>
-                    </div>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        placeholder="Create password for student login"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 pr-10 text-xs"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#616161] hover:text-slate-600 p-1 cursor-pointer"
-                        aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-2.5 rounded-xl bg-orange-50 border border-orange-200 text-orange-950 text-xs flex items-center justify-between">
-                    <div>
-                      <span className="font-bold block">Connected Scholar Account:</span>
-                      <span className="text-[11px] text-orange-800">{currentLearner.fullName} ({currentLearner.email})</span>
-                    </div>
-                    <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
-                      Logged In
-                    </span>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block font-bold text-slate-900 mb-1 text-xs">
-                    UPI PG Reference / UTR (Optional)
-                  </label>
-                  <input
-                    ref={utrInputRef}
-                    id="onpage-utr-input"
-                    type="text"
-                    placeholder="e.g. Transaction Ref from UPI PG receipt (optional)"
-                    value={utrNumber}
-                    onChange={e => setUtrNumber(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 text-xs font-mono"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black text-sm sm:text-base rounded-xl shadow-lg shadow-emerald-600/30 transition-all hover:scale-[1.01] flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
-                >
-                  <ShieldCheck className="w-5 h-5" />
-                  <span>{isSubmitting ? 'Activating Subscription...' : `I HAVE PAID ₹${offerAmount} — ACTIVATE MY SUBSCRIPTION`}</span>
-                </button>
-
-                <p className="text-[10px] text-center text-slate-500 font-medium">
-                  🔒 Official UPI PG Gateway • Zero Manual Admin Delay • Instant Access Granted
-                </p>
-              </form>
             )}
           </div>
         </div>
