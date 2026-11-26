@@ -2063,7 +2063,17 @@ export const App: React.FC = () => {
               </div>
 
               <div className="text-[11px] text-slate-500 font-mono space-y-0.5 sm:text-right">
-                <p>Operated by ZingQuark (ZQ Technology)</p>
+                <p>
+                  Operated by{' '}
+                  <a
+                    href="https://zingquark.academiclevel.in"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 hover:underline font-semibold"
+                  >
+                    ZingQuark (ZQ Technology)
+                  </a>
+                </p>
                 <p>UDYAM Reg: UDYAM-OD-19-0189385 • Contact: academiclevels@gmail.com</p>
               </div>
             </div>
@@ -2336,7 +2346,16 @@ export const App: React.FC = () => {
 
               {/* Exact Copyright line */}
               <div className="text-slate-500 text-xs text-center md:text-right">
-                &copy; {new Date().getFullYear()} AcademicLevel (ZingQuark). All rights reserved.
+                &copy; {new Date().getFullYear()} AcademicLevel (
+                <a
+                  href="https://zingquark.academiclevel.in"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 hover:underline font-semibold"
+                >
+                  ZingQuark
+                </a>
+                ). All rights reserved.
               </div>
             </div>
           </div>

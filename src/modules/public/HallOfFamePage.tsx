@@ -149,7 +149,18 @@ export const HallOfFamePage: React.FC<HallOfFamePageProps> = ({ onNavigateHome }
         {/* Footer */}
         <footer className="text-center mt-12 pt-6 border-t border-slate-200 text-xs text-slate-500 space-y-1">
           <p>Bounty terms: Exactly one ₹10 Amazon Gift Card (Amazon GC) strictly for verified VERY VERY VERY VERY critical vulnerabilities.</p>
-          <p className="text-slate-400">© 2020–{new Date().getFullYear()} AcademicLevel - ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385. All rights reserved.</p>
+          <p className="text-slate-400">
+            © 2020–{new Date().getFullYear()} AcademicLevel -{' '}
+            <a
+              href="https://zingquark.academiclevel.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-indigo-300 hover:underline font-semibold"
+            >
+              ZingQuark (ZQ Technology)
+            </a>{' '}
+            - UDYAM Reg: UDYAM-OD-19-0189385. All rights reserved.
+          </p>
         </footer>
       </div>
     </div>

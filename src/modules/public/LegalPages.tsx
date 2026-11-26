@@ -97,7 +97,16 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
               </div>
             )}
             <p>
-              AcademicLevel (&quot;AcademicLevel&quot;, &quot;we&quot;, &quot;us&quot;), operated by ZingQuark (ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385), provides online curriculum mastery learning, quizzes, courses, an AI study assistant called Nova, learner profiles, learning points, and paid membership subscription plans (Lite, Plus, 1-Year Gold VIP, and Institutional School Packs) required for active curriculum progression, unlimited practice, and verifiable certificates. Contact:{' '}
+              AcademicLevel (&quot;AcademicLevel&quot;, &quot;we&quot;, &quot;us&quot;), operated by{' '}
+              <a
+                href="https://zingquark.academiclevel.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-indigo-600 hover:underline font-semibold"
+              >
+                ZingQuark (ZQ Technology)
+              </a>{' '}
+              - UDYAM Reg: UDYAM-OD-19-0189385, provides online curriculum mastery learning, quizzes, courses, an AI study assistant called Nova, learner profiles, learning points, and paid membership subscription plans (Lite, Plus, 1-Year Gold VIP, and Institutional School Packs) required for active curriculum progression, unlimited practice, and verifiable certificates. Contact:{' '}
               <a href={`mailto:${legalConfig.contactEmail || 'academiclevels@gmail.com'}`} className="text-indigo-600 hover:underline font-medium">
                 {legalConfig.contactEmail || 'academiclevels@gmail.com'}
               </a>.
@@ -341,7 +350,16 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
               </a>
             </div>
             <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-500 font-mono">
-              AcademicLevel - ZQ Technology - UDYAM Reg: UDYAM-OD-19-0189385
+              AcademicLevel -{' '}
+              <a
+                href="https://zingquark.academiclevel.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-indigo-600 hover:underline font-semibold"
+              >
+                ZingQuark (ZQ Technology)
+              </a>{' '}
+              - UDYAM Reg: UDYAM-OD-19-0189385
             </div>
           </div>
         </div>

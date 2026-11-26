@@ -1935,7 +1935,17 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             </div>
 
             <div className="text-[11px] text-slate-500 font-mono space-y-0.5 sm:text-right">
-              <p>Operated by ZingQuark (ZQ Technology)</p>
+              <p>
+                Operated by{' '}
+                <a
+                  href="https://zingquark.academiclevel.in"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-300 hover:underline font-semibold"
+                >
+                  ZingQuark (ZQ Technology)
+                </a>
+              </p>
               <p>UDYAM Reg: UDYAM-OD-19-0189385 • Contact: academiclevels@gmail.com</p>
             </div>
           </div>
@@ -1984,7 +1994,16 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
           </div>
 
           <div className="pt-4 border-t border-slate-200 text-center text-slate-500 text-[11px]">
-            &copy; {new Date().getFullYear()} AcademicLevel (ZingQuark). All rights reserved.
+            &copy; {new Date().getFullYear()} AcademicLevel (
+            <a
+              href="https://zingquark.academiclevel.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-300 hover:underline font-semibold"
+            >
+              ZingQuark
+            </a>
+            ). All rights reserved.
           </div>
         </div>
       </footer>
