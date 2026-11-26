@@ -525,8 +525,8 @@ export const QuizDuelArena: React.FC<QuizDuelArenaProps> = ({
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
             {isHinglish
-              ? 'Apne syllabus par smart kid-modeled practice bots se fast 5-question blitz khelein. Speed aur accuracy se jeetein coin pot!'
-              : 'Go head-to-head in a fast 5-question syllabus blitz against smart kid-modeled practice bots. Speed + accuracy takes the coin pot!'}
+              ? 'Apne syllabus par online scholars se fast 5-question blitz khelein. Speed aur accuracy se jeetein coin pot!'
+              : 'Go head-to-head in a fast 5-question syllabus blitz against online scholars. Speed + accuracy takes the coin pot!'}
           </p>
 
           <div className="pt-2 flex flex-wrap gap-3">

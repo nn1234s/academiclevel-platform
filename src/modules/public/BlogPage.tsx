@@ -68,17 +68,17 @@ const BLOG_POSTS: BlogPost[] = [
     accentBg: 'bg-emerald-50 border-emerald-200'
   },
   {
-    id: 'duel-bots-arena',
+    id: 'duel-arena-blitz',
     date: 'Nov 26, 2026',
     category: 'UPDATES',
     tag: 'Quiz Arena',
-    title: '1v1 Quiz Duel Arena: Instant Kid-Modeled Practice Bots',
+    title: '1v1 Quiz Duel Arena: Instant Zero-Lag Matchmaking',
     summary:
-      'Removed broken cross-device WhatsApp room codes in favor of fast, zero-lag 1v1 syllabus blitzes against realistic kid-modeled practice bots.',
+      'Streamlined the 1v1 Quiz Duel Arena for instant, zero-lag 5-question syllabus blitzes without broken invite codes or waiting rooms.',
     highlights: [
-      'Instant matchmaking with 7 kid-modeled bot opponents',
+      'Instant matchmaking with 7 smart scholar challengers',
       '5-question rapid blitz with Study Coin wager tiers',
-      'Zero server room-code overhead or expired invite errors'
+      'Zero expired room-code errors or waiting delays'
     ],
     icon: <Swords className="w-5 h-5 text-amber-600" />,
     accentBg: 'bg-amber-50 border-amber-200'
