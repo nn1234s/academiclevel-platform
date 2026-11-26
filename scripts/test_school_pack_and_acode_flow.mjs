@@ -68,7 +68,7 @@ runTest('server/api.js contains school pack activation and pack-status endpoints
 runTest('WhatsDifferentFromChatGPT section is present in all ad pages and teacher pages', () => {
   const compContent = fs.readFileSync(path.join(rootDir, 'src/modules/shared/WhatsDifferentFromChatGPT.tsx'), 'utf8');
   assert(compContent.includes('DIFFERENT FROM CHATGPT'), 'Missing header in WhatsDifferentFromChatGPT');
-  assert(compContent.includes('Socratic AI Tutor'), 'Missing Socratic AI Tutor point');
+  assert(compContent.includes('Nova AI Tutor') || compContent.includes('Socratic AI Tutor'), 'Missing Nova AI Tutor point');
   assert(compContent.includes('Curriculum & Syllabus'), 'Missing Curriculum alignment point');
 
   const adContent = fs.readFileSync(path.join(rootDir, 'src/modules/public/Special49AdsLandingPage.tsx'), 'utf8');

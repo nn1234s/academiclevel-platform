@@ -1059,7 +1059,7 @@ export const App: React.FC = () => {
                       onClick={() => navigateTo('PROFILE')}
                       className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-[3px] bg-[#FFC107] text-[#212121] font-bold shadow-dp1 hover:bg-[#FFCA28] transition-colors cursor-pointer shrink-0 flex-shrink-0"
                       title="1-Year Gold VIP Pass Active (365 Days Access)"
-                      aria-label="Gold Pass Active"
+                      aria-label="GOLD PASS Active"
                     >
                       <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#212121]" />
                     </button>

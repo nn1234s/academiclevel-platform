@@ -1496,7 +1496,7 @@ apiRouter.post('/coins/transact', (req, res) => {
         const alreadyToday = db.prepare(
           `SELECT COUNT(*) as c FROM coin_ledger WHERE learnerId = ? AND reasonCode = ? AND timestampUtc LIKE ?`
         ).get(learnerId, reasonCode, `${todayPrefix}%`)?.c || 0;
-        const cap = reasonCode === 'QUIZ_DUEL_WIN' ? 5 : 1;
+        const cap = reasonCode === 'QUIZ_DUEL_WIN' ? 5 : (reasonCode === 'DAILY_QUESTS_COMPLETE' ? 4 : 1);
         if (alreadyToday >= cap) {
           return res.status(429).json({ success: false, error: `Daily reward limit reached for ${reasonCode}.` });
         }

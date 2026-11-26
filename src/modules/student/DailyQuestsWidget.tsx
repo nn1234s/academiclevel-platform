@@ -43,41 +43,41 @@ export const DailyQuestsWidget: React.FC<DailyQuestsWidgetProps> = ({
   const totalQuests = questState.quests.length;
   const isAllCompleted = completedCount === totalQuests;
 
-  const handleClaim = (questId: string) => {
+  const handleClaim = async (questId: string) => {
     const res = StorageRLSLayer.claimQuestReward(learner.id, questId);
     if (res.success) {
-      CoinLedgerService.appendTransaction(learner.id, res.coinsAwarded, 'DAILY_QUESTS_COMPLETE', { questId });
       setQuestState(StorageRLSLayer.getDailyQuestState(learner.id));
-      onCoinsUpdated();
       try {
         confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
       } catch {}
+      await CoinLedgerService.appendTransactionAsync(learner.id, res.coinsAwarded, 'DAILY_QUESTS_COMPLETE', { questId });
+      onCoinsUpdated();
     }
   };
 
-  const handleClaimAllBonus = () => {
+  const handleClaimAllBonus = async () => {
     const res = StorageRLSLayer.claimAllQuestsBonus(learner.id);
     if (res.success) {
-      CoinLedgerService.appendTransaction(learner.id, res.coinsAwarded, 'DAILY_QUESTS_COMPLETE', { bonus: 'ALL_QUESTS_COMPLETED' });
       setQuestState(StorageRLSLayer.getDailyQuestState(learner.id));
-      onCoinsUpdated();
       try {
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
       } catch {}
+      await CoinLedgerService.appendTransactionAsync(learner.id, res.coinsAwarded, 'DAILY_QUESTS_COMPLETE', { bonus: 'ALL_QUESTS_COMPLETED' });
+      onCoinsUpdated();
     }
   };
 
-  const handleBuyStreakFreeze = () => {
+  const handleBuyStreakFreeze = async () => {
     const res = StorageRLSLayer.purchaseStreakFreeze(learner.id);
     if (res.success) {
-      CoinLedgerService.appendTransaction(learner.id, -50, 'STREAK_FREEZE_PURCHASE', { item: 'STREAK_FREEZE' });
       setQuestState(StorageRLSLayer.getDailyQuestState(learner.id));
-      onCoinsUpdated();
       setFreezeMessage(isHinglish ? '🛡️ Streak Freeze activate ho gaya! Aapki streak safe hai.' : '🛡️ Streak Freeze equipped! Your streak is protected.');
       setTimeout(() => setFreezeMessage(null), 3500);
       try {
         confetti({ particleCount: 40, spread: 50 });
       } catch {}
+      await CoinLedgerService.appendTransactionAsync(learner.id, -50, 'STREAK_FREEZE_PURCHASE', { item: 'STREAK_FREEZE' });
+      onCoinsUpdated();
     } else {
       setFreezeMessage(res.error || 'Failed to purchase');
       setTimeout(() => setFreezeMessage(null), 3000);

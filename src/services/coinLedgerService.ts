@@ -81,6 +81,68 @@ export class CoinLedgerService {
   }
 
   /**
+   * Async variant that awaits server persistence before returning so UI state refresh sees the updated server balance.
+   */
+  public static async appendTransactionAsync(
+    learnerId: string,
+    amount: number,
+    reasonCode: CoinReasonCode,
+    metadata?: Record<string, any>
+  ): Promise<{ success: boolean; newBalance: number; error?: string }> {
+    const learner = StorageRLSLayer.getLearnerById(learnerId, learnerId);
+    if (!learner) {
+      return { success: false, newBalance: 0, error: 'Learner not found.' };
+    }
+
+    const currentBalance = learner.coinBalance || 0;
+    const newBalance = currentBalance + amount;
+    if (newBalance < 0) {
+      return {
+        success: false,
+        newBalance: currentBalance,
+        error: `Insufficient Study Coins. Required: ${Math.abs(amount)}, Available: ${currentBalance}.`
+      };
+    }
+
+    const entryId = 'c_tx_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+    const timestampUtc = new Date().toISOString();
+    const signatureHash = this.generateSignature(entryId, learnerId, amount, newBalance, timestampUtc);
+
+    StorageRLSLayer.appendCoinEntry({
+      entryId,
+      learnerId,
+      amount,
+      transactionType: amount >= 0 ? 'CREDIT' : 'DEBIT',
+      reasonCode,
+      balanceAfter: newBalance,
+      metadata,
+      timestampUtc,
+      signatureHash
+    });
+
+    learner.coinBalance = newBalance;
+    StorageRLSLayer.saveLearner(learner, learnerId);
+
+    try {
+      const serverRes = await ApiClient.transactCoins(
+        learnerId,
+        amount,
+        amount >= 0 ? 'CREDIT' : 'DEBIT',
+        reasonCode,
+        metadata
+      );
+      if (serverRes && typeof (serverRes as any).newBalance === 'number') {
+        learner.coinBalance = (serverRes as any).newBalance;
+        StorageRLSLayer.saveLearner(learner, learnerId);
+        return { success: true, newBalance: (serverRes as any).newBalance };
+      }
+    } catch {
+      // Keep local balance on transient offline error
+    }
+    return { success: true, newBalance };
+  }
+
+  /**
    * Evaluates and awards +25 coins for course level completion.
    * STRICT: Awarded ONLY once per distinct level upon achieving >= 70% accuracy
    * AND passing minimum time-per-question anti-cheat checks.
