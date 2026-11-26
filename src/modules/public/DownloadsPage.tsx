@@ -8,7 +8,7 @@ import {
   Sparkles,
   Zap
 } from 'lucide-react';
-import { isWindowsClient, WINDOWS_INSTALLER_URL } from '../shared/WindowsAppBanner';
+import { isDesktopAppOrWebView, isWindowsClient, WINDOWS_INSTALLER_URL } from '../shared/WindowsAppBanner';
 
 interface DownloadsPageProps {
   onBack: () => void;
@@ -16,7 +16,8 @@ interface DownloadsPageProps {
 }
 
 export const DownloadsPage: React.FC<DownloadsPageProps> = ({ onBack, onOpenWebApp }) => {
-  const isWindows = isWindowsClient();
+  const inApp = isDesktopAppOrWebView();
+  const isWindows = isWindowsClient() && !inApp;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 sm:py-12 space-y-8">
@@ -38,7 +39,7 @@ export const DownloadsPage: React.FC<DownloadsPageProps> = ({ onBack, onOpenWebA
           </span>
           <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-bold text-slate-200">
             <Monitor className="w-3.5 h-3.5 text-emerald-300" />
-            <span>Detected Device: {isWindows ? 'Windows PC' : 'Web Browser'}</span>
+            <span>Detected Device: {inApp ? 'AcademicLevel Desktop App' : isWindows ? 'Windows PC' : 'Web Browser'}</span>
           </span>
         </div>
 
@@ -51,7 +52,12 @@ export const DownloadsPage: React.FC<DownloadsPageProps> = ({ onBack, onOpenWebA
           <strong>academiclevel.in</strong> — and the <strong>Web App</strong> in any browser.
         </p>
 
-        {isWindows && (
+        {inApp ? (
+          <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-2xl bg-emerald-400 text-emerald-950 text-xs sm:text-sm font-black shadow-md">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>You&apos;re already using the AcademicLevel Desktop App!</span>
+          </div>
+        ) : isWindows && (
           <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-2xl bg-amber-400 text-amber-950 text-xs sm:text-sm font-black shadow-md">
             <Sparkles className="w-4 h-4" />
             <span>WINDOWS APP RECOMMENDED FOR YOUR PC — BETTER THAN WEB!</span>

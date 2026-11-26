@@ -3,6 +3,37 @@ import { Download, Monitor, Sparkles } from 'lucide-react';
 
 export const WINDOWS_INSTALLER_URL = '/installers/AcademicLevel_K12_Online_Setup.exe';
 
+export function isDesktopAppOrWebView(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+  const w = window as unknown as {
+    chrome?: { webview?: unknown };
+    __TAURI__?: unknown;
+    __TAURI_INTERNALS__?: unknown;
+    electronAPI?: unknown;
+    process?: { versions?: { electron?: string } };
+  };
+  const ua = navigator.userAgent || '';
+
+  // Microsoft Edge WebView2, Electron, Tauri, Android/generic WebView, or standalone app window
+  if (w.chrome?.webview !== undefined) return true;
+  if (w.__TAURI__ !== undefined || w.__TAURI_INTERNALS__ !== undefined) return true;
+  if (w.electronAPI !== undefined || w.process?.versions?.electron) return true;
+  if (/electron|webview|\bwv\b|academiclevel-desktop/i.test(ua)) return true;
+  if (window.matchMedia?.('(display-mode: standalone)')?.matches) return true;
+  if ((navigator as Navigator & { standalone?: boolean }).standalone === true) return true;
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('app') === 'windows' || params.get('wrapper') === '1') {
+      sessionStorage.setItem('al_in_app_wrapper', '1');
+      return true;
+    }
+    if (sessionStorage.getItem('al_in_app_wrapper') === '1') return true;
+  } catch {}
+
+  return false;
+}
+
 export function isWindowsClient(): boolean {
   if (typeof navigator === 'undefined') return false;
   const uaDataPlatform = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform || '';
@@ -17,7 +48,7 @@ interface WindowsAppBannerProps {
 }
 
 export const WindowsAppBanner: React.FC<WindowsAppBannerProps> = ({ onOpenDownloads, compact = false }) => {
-  if (!isWindowsClient()) return null;
+  if (!isWindowsClient() || isDesktopAppOrWebView()) return null;
 
   return (
     <div
