@@ -966,23 +966,16 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                 {/* Board Selection */}
                 <div className="space-y-2 mb-6">
                   <label className="text-xs font-black text-slate-800 uppercase tracking-wide block">
-                    2. Select Education Board
+                    2. Education Board
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(['CBSE', 'CBSE', 'STATE'] as Board[]).map(b => (
-                      <button
-                        key={b}
-                        type="button"
-                        onClick={() => setSelectedBoard(b)}
-                        className={`min-h-[44px] py-2 px-2 text-xs font-bold rounded-xl transition-all border text-center flex items-center justify-center ${
-                          selectedBoard === b
-                            ? 'bg-indigo-600 text-white border-indigo-600 font-black shadow-sm'
-                            : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
-                        }`}
-                      >
-                        {b} Board
-                      </button>
-                    ))}
+                  <div className="grid grid-cols-1 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedBoard('CBSE')}
+                      className="min-h-[44px] py-2.5 px-4 text-xs font-black rounded-xl transition-all border text-center flex items-center justify-center bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                    >
+                      CBSE Board (Classes 1–12)
+                    </button>
                   </div>
                 </div>
 
@@ -2751,11 +2744,9 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     <select
                       value={selectedBoard}
                       onChange={e => setSelectedBoard(e.target.value as Board)}
-                      className="w-full bg-[#EEEEEE] border border-[#E0E0E0] rounded-xl px-3 py-2.5 text-white font-bold focus:outline-none"
+                      className="w-full bg-[#EEEEEE] border border-[#E0E0E0] rounded-xl px-3 py-2.5 text-[#212121] font-bold focus:outline-none"
                     >
-                      {['CBSE', 'CBSE', 'STATE_BOARD'].map(b => (
-                        <option key={b} value={b} className="bg-white text-[#212121]">{b.replace('_', ' ')}</option>
-                      ))}
+                      <option value="CBSE" className="bg-white text-[#212121]">CBSE</option>
                     </select>
                   </div>
                 </div>

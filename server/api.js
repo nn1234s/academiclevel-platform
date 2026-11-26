@@ -5713,9 +5713,9 @@ const DEFAULT_CONFIG = {
   },
   home: {
     heroTitle: 'Master Your School Curriculum with Adaptive AI Quizzes',
-    heroSubtitle: 'CBSE, ICSE & Cambridge IGCSE for Classes 1 to 12. Instant Socratic guidance, verifiable certificates, and an earnable Study Coin economy.',
+    heroSubtitle: 'CBSE Classes 1 to 12. Instant step-by-step Nova AI guidance, verifiable certificates, and an earnable Study Coin economy.',
     announcementActive: true,
-    announcementText: '🚀 3,600+ Questions across CBSE, ICSE, and Cambridge Classes 1-12 live! Unlimited Concept Booster pass included with every signup.',
+    announcementText: '🚀 3,600+ CBSE Questions for Classes 1-12 live! Start free or unlock full Concept Booster access.',
     statsStudents: '10,000+',
     statsQuizzes: '500,000+',
     statsPassRate: '99.4%',
@@ -5732,7 +5732,7 @@ const DEFAULT_CONFIG = {
   },
   ads: {
     mainHeading: 'Score 95%+ in School Exams Without Expensive Tuitions',
-    subHeading: 'CBSE & ICSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Socratic Nova AI Tutor & Real Study Coin Rewards.',
+    subHeading: 'CBSE Classes 1 to 12: Adaptive Daily Quizzes, 24/7 Nova AI Tutor & Real Study Coin Rewards.',
     offerPriceInr: 49,
     originalPriceInr: 999,
     discountPercent: 95,
@@ -5743,13 +5743,29 @@ const DEFAULT_CONFIG = {
   }
 };
 
+function sanitizeCmsBoardCopy(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  const cleanStr = (v) => typeof v === 'string'
+    ? v
+        .replace(/CBSE,?\s*ICSE\s*(&|and|\/)\s*Cambridge(\s*IGCSE)?/gi, 'CBSE')
+        .replace(/CBSE,?\s*ICSE,?\s*and\s*Cambridge/gi, 'CBSE')
+        .replace(/CBSE\s*(&|and|\/)\s*ICSE/gi, 'CBSE')
+        .replace(/ICSE|IGCSE|Cambridge/gi, 'CBSE')
+    : v;
+  const out = {};
+  for (const [k, v] of Object.entries(obj)) {
+    out[k] = cleanStr(v);
+  }
+  return out;
+}
+
 function getStoredConfigGroup(groupKey) {
   const normKey = groupKey.toLowerCase();
   try {
     const row = db.prepare('SELECT value FROM system_settings WHERE key = ?').get(`cfg_${normKey}`);
     if (row && row.value) {
       const parsed = JSON.parse(row.value);
-      return { ...DEFAULT_CONFIG[normKey], ...parsed };
+      return sanitizeCmsBoardCopy({ ...DEFAULT_CONFIG[normKey], ...parsed });
     }
   } catch {}
 

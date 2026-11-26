@@ -141,6 +141,19 @@ class SiteConfigServiceClass {
     }
   }
 
+  private sanitizeGroup<T extends Record<string, any>>(obj: T): T {
+    const clean = (v: any) => typeof v === 'string'
+      ? v
+          .replace(/CBSE,?\s*ICSE\s*(&|and|\/)\s*Cambridge(\s*IGCSE)?/gi, 'CBSE')
+          .replace(/CBSE,?\s*ICSE,?\s*and\s*Cambridge/gi, 'CBSE')
+          .replace(/CBSE\s*(&|and|\/)\s*ICSE/gi, 'CBSE')
+          .replace(/ICSE|IGCSE|Cambridge/gi, 'CBSE')
+      : v;
+    const out: Record<string, any> = {};
+    for (const [k, v] of Object.entries(obj || {})) out[k] = clean(v);
+    return out as T;
+  }
+
   private loadFromStorage() {
     if (typeof window === 'undefined') return;
     try {
@@ -149,9 +162,9 @@ class SiteConfigServiceClass {
         const parsed = JSON.parse(raw);
         this.cache = {
           pricing: { ...DEFAULT_CONFIG.pricing, ...parsed.pricing },
-          home: { ...DEFAULT_CONFIG.home, ...parsed.home },
+          home: this.sanitizeGroup({ ...DEFAULT_CONFIG.home, ...parsed.home }),
           legal: { ...DEFAULT_CONFIG.legal, ...parsed.legal },
-          ads: { ...DEFAULT_CONFIG.ads, ...parsed.ads }
+          ads: this.sanitizeGroup({ ...DEFAULT_CONFIG.ads, ...parsed.ads })
         };
       }
     } catch {}
