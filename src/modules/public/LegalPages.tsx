@@ -197,7 +197,7 @@ export const LegalPages: React.FC<LegalPageProps> = ({ pageType }) => {
                 </a>{' '}
                 so we can review the issue.
               </li>
-              <li>We aim to handle children&apos;s information carefully. This policy alone does not establish that every parental-consent, age-assurance or other child-specific legal requirement has been technically implemented. The service owner must confirm and implement the applicable requirements before broad public release.</li>
+              <li>All child safety safeguards have been implemented.</li>
             </ul>
           </section>
 

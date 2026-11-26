@@ -154,12 +154,20 @@ export class NovaAiService {
     grade: Grade,
     subject: string,
     _learnerPlan?: string,
-    _learnerId?: string
+    _learnerId?: string,
+    hasImage?: boolean
   ): string {
     const q = (query || '').toLowerCase().trim();
     const cleanAlpha = q.replace(/[^a-z0-9\s]/gi, ' ').replace(/\s+/g, ' ').trim();
     const cleanSub = (subject || 'math').toLowerCase();
     const numGrade = Number(grade) || 10;
+
+    if (hasImage) {
+      return (
+        `Got your photo! 📸✨\n\n` +
+        `I can't read text or objects inside photos in offline fallback mode right now — *psst...* type out the question from your photo (or tell me what's in it, like a math problem, diagram, or even Pokémon cards!) and I'll help you right away! 🚀`
+      );
+    }
 
     // Child-safe boundary guard
     const isPersonalOrRomantic = (
@@ -175,6 +183,55 @@ export class NovaAiService {
       return (
         `Haha, you're too sweet! 😄✨ I'm your AI study buddy though, so my superpower is hyping you up to crush **${board} Class ${grade} ${subject}**!\n\n` +
         `*Psst...* drop any tricky question or chapter doubt right now and let's unlock those Study Coins together! 🪙🚀`
+      );
+    }
+
+    // Insults / teasing comebacks
+    if (
+      cleanAlpha.includes('dumb') || cleanAlpha.includes('stupid') || cleanAlpha.includes('idiot') ||
+      cleanAlpha.includes('useless') || cleanAlpha.includes('boring') || cleanAlpha.includes('trash') ||
+      cleanAlpha.includes('bad bot') || cleanAlpha.includes('shut up')
+    ) {
+      return (
+        `Ouch, my circuits felt that! 😅⚡ Give me a chance to redeem myself — drop one tough **${subject}** question or weird formula and watch me break it down in seconds! 🚀`
+      );
+    }
+
+    // Fun / gaming / Pokémon / sports topics
+    if (
+      cleanAlpha.includes('pokemon') || cleanAlpha.includes('pikachu') || cleanAlpha.includes('charizard') ||
+      cleanAlpha.includes('minecraft') || cleanAlpha.includes('roblox') || cleanAlpha.includes('bgmi') ||
+      cleanAlpha.includes('free fire') || cleanAlpha.includes('anime') || cleanAlpha.includes('naruto') ||
+      cleanAlpha.includes('cricket') || cleanAlpha.includes('football')
+    ) {
+      return (
+        `Ooh, nice taste! 🎮⚡ Even Pikachu and top trainers had to level up through tough battles — *psst...* let's treat your next **${subject}** chapter like a gym battle and grab some Study Coins! 🪙✨\n\nWhich topic should we conquer first?`
+      );
+    }
+
+    // Vague help / stuck
+    if (/^(help|help me|pls help|please help|idk|i dont know|confused|stuck|explain)[!.\s]*$/i.test(cleanAlpha)) {
+      return (
+        `I'm right here to help! 🙌✨ Tell me which **${subject}** chapter, formula, or homework question you're stuck on (you can paste the exact question here) and I'll walk you through it step-by-step!`
+      );
+    }
+
+    // Thanks / compliments / laughter / tired / bye
+    if (/^(thanks|thank you|thx|ty|tysm|cool|nice|awesome|smart|genius|good job|op|pro)[!.\s]*$/i.test(cleanAlpha)) {
+      return (
+        `Anytime! 😄✨ You're doing awesome — *psst...* keep that momentum going with one quick quiz level to stack more Study Coins! 🪙🚀`
+      );
+    }
+
+    if (/^(haha|hehe|lol|lmao|rofl|bruh|bro|wtf|omg)[!.\s]*$/i.test(cleanAlpha)) {
+      return (
+        `Haha 😄 alright, ready whenever you are! Drop a **${subject}** doubt or ask for a *psst...* memory hack!`
+      );
+    }
+
+    if (cleanAlpha.includes('tired') || cleanAlpha.includes('sleepy') || cleanAlpha.includes('hungry') || cleanAlpha === 'bye') {
+      return (
+        `Take a quick breather & hydrate! 💧✨ Whenever you're ready, we can do just one tiny 5-question **${subject}** warm-up to keep your streak alive! 🔥`
       );
     }
 
@@ -220,6 +277,13 @@ export class NovaAiService {
         conceptAnswer = `**${board} Class ${grade} ${subject} Key Strategy**\n\nBreak the topic into: (1) core definition, (2) governing formula or rule, and (3) one worked example.`;
       }
     } else {
+      const hasMathOrStudyCue = /\d|[=+\-*/^]|what|why|how|explain|define|solve|find|calculate|formula|chapter|theorem|law|grammar|noun|verb|cell|atom|history|geography/i.test(q);
+      if (!hasMathOrStudyCue && cleanAlpha.split(' ').length <= 6) {
+        return (
+          `Gotcha! 😄 I'm tuned best for **${board} Class ${grade} ${subject}** questions, formulas, and *psst...* study tricks.\n\n` +
+          `Drop a chapter topic or paste a question you want to solve, and let's crack it together! 🚀`
+        );
+      }
       conceptAnswer = `**${board} Class ${grade} ${subject}**\n\nTo master "${query}", list what is given, identify the core formula or principle, and solve step-by-step while checking units.`;
     }
 
@@ -237,12 +301,13 @@ export class NovaAiService {
     subject: string,
     history?: { role: 'user' | 'model'; text: string }[],
     learnerId?: string,
-    learnerPlan?: string
+    learnerPlan?: string,
+    imageDataUrl?: string
   ): Promise<string> {
     const trimmed = query.trim();
 
     const generateDeterministicFallback = (): string => {
-      return this.generateBuiltInAiResponse(trimmed, board, grade, subject, learnerPlan, learnerId);
+      return this.generateBuiltInAiResponse(trimmed, board, grade, subject, learnerPlan, learnerId, Boolean(imageDataUrl));
     };
 
     if (!HybridQuizService.getPreferLiveAi()) {
@@ -253,7 +318,7 @@ export class NovaAiService {
       const serverCall = fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: trimmed, board, grade, subject, history, learnerId, learnerPlan })
+        body: JSON.stringify({ query: trimmed, board, grade, subject, history, learnerId, learnerPlan, imageDataUrl })
       }).then(async (r) => {
         if (r.status === 429) {
           return {

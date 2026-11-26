@@ -5227,7 +5227,52 @@ export function generateStudyGirlChatResponse({
     );
   }
 
-  // 2. Casual Study Buddy Chat, Secrets ("psst") & Greetings
+  // 2. Casual Study Buddy Chat, Insults, Fun Topics, Secrets ("psst") & Greetings
+  if (
+    cleanAlpha.includes('dumb') || cleanAlpha.includes('stupid') || cleanAlpha.includes('idiot') ||
+    cleanAlpha.includes('useless') || cleanAlpha.includes('boring') || cleanAlpha.includes('trash') ||
+    cleanAlpha.includes('bad bot') || cleanAlpha.includes('shut up')
+  ) {
+    return (
+      `Ouch, my circuits felt that, ${studentFirstName}! 😅⚡ Give me a chance to redeem myself — drop one tough **${subject}** question or weird formula and watch me break it down in seconds! 🚀`
+    );
+  }
+
+  if (
+    cleanAlpha.includes('pokemon') || cleanAlpha.includes('pikachu') || cleanAlpha.includes('charizard') ||
+    cleanAlpha.includes('minecraft') || cleanAlpha.includes('roblox') || cleanAlpha.includes('bgmi') ||
+    cleanAlpha.includes('free fire') || cleanAlpha.includes('anime') || cleanAlpha.includes('naruto') ||
+    cleanAlpha.includes('cricket') || cleanAlpha.includes('football')
+  ) {
+    return (
+      `Ooh, nice taste ${studentFirstName}! 🎮⚡ Even Pikachu and top trainers had to level up through tough battles — *psst...* let's treat your next **${subject}** chapter like a gym battle and grab some Study Coins! 🪙✨\n\nWhich topic should we conquer first?`
+    );
+  }
+
+  if (/^(help|help me|pls help|please help|idk|i dont know|confused|stuck|explain)[!.\s]*$/i.test(cleanAlpha)) {
+    return (
+      `I'm right here to help, ${studentFirstName}! 🙌✨ Tell me which **${subject}** chapter, formula, or homework question you're stuck on (paste the exact question here) and I'll walk you through it step-by-step!`
+    );
+  }
+
+  if (/^(thanks|thank you|thx|ty|tysm|cool|nice|awesome|smart|genius|good job|op|pro)[!.\s]*$/i.test(cleanAlpha)) {
+    return (
+      `Anytime, ${studentFirstName}! 😄✨ You're doing awesome — *psst...* keep that momentum going with one quick quiz level to stack more Study Coins! 🪙🚀`
+    );
+  }
+
+  if (/^(haha|hehe|lol|lmao|rofl|bruh|bro|wtf|omg)[!.\s]*$/i.test(cleanAlpha)) {
+    return (
+      `Haha 😄 alright ${studentFirstName}, ready whenever you are! Drop a **${subject}** doubt or ask for a *psst...* memory hack!`
+    );
+  }
+
+  if (cleanAlpha.includes('tired') || cleanAlpha.includes('sleepy') || cleanAlpha.includes('hungry') || cleanAlpha === 'bye') {
+    return (
+      `Take a quick breather & hydrate, ${studentFirstName}! 💧✨ Whenever you're ready, we can do just one tiny 5-question **${subject}** warm-up to keep your streak alive! 🔥`
+    );
+  }
+
   if (cleanAlpha.includes('secret') || cleanAlpha.includes('psst') || cleanAlpha.includes('tell me something')) {
     return (
       `*Psst...* okay ${studentFirstName}, secret study hack time! 🤫✨\n\n` +
@@ -5345,6 +5390,13 @@ export function generateStudyGirlChatResponse({
   } else if (matchedTopic) {
     conceptAnswer = `**${matchedTopic.topicTag} (${board} Class ${grade})**\n\n• **Core Concept:** ${matchedTopic.explanation}\n• **Hint:** ${matchedTopic.hint}\n• **Related Question:** "${matchedTopic.text}"`;
   } else {
+    const hasMathOrStudyCue = /\d|[=+\-*/^]|what|why|how|explain|define|solve|find|calculate|formula|chapter|theorem|law|grammar|noun|verb|cell|atom|history|geography/i.test(q);
+    if (!hasMathOrStudyCue && cleanAlpha.split(' ').length <= 6) {
+      return (
+        `Gotcha, ${studentFirstName}! 😄 I'm tuned best for **${board} Class ${grade} ${subject}** questions, formulas, and *psst...* study tricks.\n\n` +
+        `Drop a chapter topic or paste a question you want to solve, and let's crack it together! 🚀`
+      );
+    }
     conceptAnswer = `**${board} Class ${grade} ${subject}**\n\nTo solve "${cleanQuery}", list the given values, identify the relevant formula or rule, and verify units and signs at each step.`;
   }
 
@@ -5357,11 +5409,11 @@ export function generateStudyGirlChatResponse({
 
 apiRouter.post('/ai/chat', aiChatLimiter, async (req, res) => {
   try {
-    const { query, board = 'CBSE', grade = 10, subject = 'Mathematics', history, learnerId, learnerPlan } = req.body;
+    const { query, board = 'CBSE', grade = 10, subject = 'Mathematics', history, learnerId, learnerPlan, imageDataUrl } = req.body;
     const resolvedLearnerId = learnerId || req.headers['x-learner-id'] || null;
 
-    if (!query) {
-      return res.status(400).json({ success: false, error: 'Query is required.' });
+    if (!query && !imageDataUrl) {
+      return res.status(400).json({ success: false, error: 'Query or image is required.' });
     }
 
     // 1. Enforce Per-Student Daily Quota & Coin Message Check (bypassed during 20-min chat break)
@@ -5402,14 +5454,16 @@ apiRouter.post('/ai/chat', aiChatLimiter, async (req, res) => {
     const isPremium = planTier === 'LITE' || planTier === 'PLUS' || planTier === 'PREMIUM';
 
     if (keys.length === 0) {
-      const responseText = generateStudyGirlChatResponse({
-        cleanQuery,
-        board,
-        grade,
-        subject,
-        resolvedLearnerId,
-        learnerPlan: planTier
-      });
+      const responseText = imageDataUrl
+        ? `Got your photo! 📸✨\n\nSince live AI vision is currently offline, I can't read the contents of the image directly — *psst...* type out the question or tell me what's in the photo (like a math problem, diagram, or even Pokémon cards!) and I'll help right away! 🚀`
+        : generateStudyGirlChatResponse({
+            cleanQuery,
+            board,
+            grade,
+            subject,
+            resolvedLearnerId,
+            learnerPlan: planTier
+          });
 
       if (resolvedLearnerId) {
         consumeStudentAiMessage(resolvedLearnerId);
@@ -5462,11 +5516,24 @@ Core Directives:
 
     const userPrompt = isSuspect
       ? `[Reminder: Educational K-12 Study Tutor only] Student asks: "${cleanQuery}"`
-      : cleanQuery;
+      : (cleanQuery || 'Please look at the attached photo and help the student.');
+
+    const userParts = [{ text: userPrompt }];
+    if (typeof imageDataUrl === 'string' && imageDataUrl.startsWith('data:image/')) {
+      const match = imageDataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+      if (match) {
+        userParts.push({
+          inlineData: {
+            mimeType: match[1],
+            data: match[2]
+          }
+        });
+      }
+    }
 
     contents.push({
       role: 'user',
-      parts: [{ text: userPrompt }]
+      parts: userParts
     });
 
     const bodyPayload = {
@@ -5482,8 +5549,10 @@ Core Directives:
     let replyText = '';
     if (result.ok && result.data?.candidates?.[0]?.content?.parts?.[0]?.text) {
       replyText = result.data.candidates[0].content.parts[0].text.trim();
+    } else if (imageDataUrl) {
+      replyText = `Got your photo! 📸✨\n\nSince live AI vision is currently unavailable, I can't read the contents of the image directly — *psst...* type out the question or tell me what's in the photo (like a math problem, diagram, or even Pokémon cards!) and I'll help right away! 🚀`;
     } else {
-      // Fallback seamlessly to the rich StudyGirl engine so student NEVER sees an error
+      // Fallback seamlessly to the Study Buddy engine so student NEVER sees an error
       replyText = generateStudyGirlChatResponse({
         cleanQuery,
         board,

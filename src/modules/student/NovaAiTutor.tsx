@@ -502,18 +502,15 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
         return;
       }
 
-      const finalQuery = attachedPhoto
-        ? `Student attached a textbook reference photo along with their question: "${queryText}". Provide a clear, step-by-step explanation for ${board} Class ${grade}.`
-        : queryText;
-
       const response = await NovaAiService.answerStudentQuery(
-        finalQuery,
+        queryText || (attachedPhoto ? 'Please help me with this photo.' : ''),
         board,
         grade,
         activeSubject,
         historyPayload,
         learner?.id,
-        quota?.planTier || learner?.activePlan || 'FREE'
+        quota?.planTier || learner?.activePlan || 'FREE',
+        attachedPhoto || undefined
       );
       const aiMsg: NovaMessage = {
         id: 'msg_nova_' + Date.now(),
