@@ -121,7 +121,8 @@ export const DownloadsPage: React.FC<DownloadsPageProps> = ({ onBack, onOpenWebA
 
           <a
             href={WINDOWS_INSTALLER_URL}
-            download="AcademicLevel_K12_Online_Setup.exe"
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-full py-3.5 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs sm:text-sm inline-flex items-center justify-center space-x-2 shadow-md transition-all"
           >
             <Download className="w-4 h-4" />
