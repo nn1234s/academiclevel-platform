@@ -14,17 +14,12 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  Share2,
   Users,
   ShieldAlert,
   ArrowRight,
   Zap,
   Sparkles,
-  Award,
-  Copy,
-  Check,
-  Link,
-  MessageCircle
+  Award
 } from 'lucide-react';
 
 interface QuizDuelArenaProps {
@@ -82,15 +77,6 @@ export const QuizDuelArena: React.FC<QuizDuelArenaProps> = ({
   const [timeLeft, setTimeLeft] = useState<number>(15);
   const [opponentStatus, setOpponentStatus] = useState<'THINKING' | 'ANSWERED'>('THINKING');
   const [duelHistory, setDuelHistory] = useState<QuizDuel[]>([]);
-  const [copiedShare, setCopiedShare] = useState<boolean>(false);
-
-  // Friend Challenge Room State
-  const [activeFriendDuel, setActiveFriendDuel] = useState<QuizDuel | null>(null);
-  const [createdRoomCode, setCreatedRoomCode] = useState<string | null>(null);
-  const [joinRoomInput, setJoinRoomInput] = useState<string>('');
-  const [joinError, setJoinError] = useState<string | null>(null);
-  const [friendChallengeTab, setFriendChallengeTab] = useState<'CREATE' | 'JOIN'>('CREATE');
-  const [roomCopied, setRoomCopied] = useState<boolean>(false);
 
   const subjects = CurriculumService.getSubjects(learner.board, learner.grade);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -98,113 +84,6 @@ export const QuizDuelArena: React.FC<QuizDuelArenaProps> = ({
   useEffect(() => {
     setDuelHistory(StorageRLSLayer.getDuelsForLearner(learner.id));
   }, [learner.id]);
-
-  // Deep-link check for ?room=... param on load
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const roomParam = params.get('room');
-      if (roomParam) {
-        setJoinRoomInput(roomParam);
-        handleJoinRoom(roomParam);
-      }
-    }
-  }, []);
-
-  const handleCreateRoom = () => {
-    if (selectedTier.entryCost > 0 && learner.coinBalance < selectedTier.entryCost) {
-      alert(isHinglish ? `Aapke paas ${selectedTier.entryCost} coins nahi hain.` : `You need ${selectedTier.entryCost} coins to wager this tier.`);
-      return;
-    }
-    const duel = StorageRLSLayer.createFriendChallenge(learner.id, selectedSubjectId, selectedTier.entryCost);
-    setActiveFriendDuel(duel);
-    setCreatedRoomCode(duel.roomCode || null);
-  };
-
-  const handleShareCreatedRoomWhatsApp = () => {
-    if (!createdRoomCode) return;
-    const link = `https://academiclevel.in/arena?room=${createdRoomCode}`;
-    const text = `⚔️ *1v1 SYLLABUS QUIZ DUEL CHALLENGE!* ⚔️
-👤 *Challenger:* ${learner.fullName || 'Scholar'}
-📚 *Subject:* ${selectedSubjectId.toUpperCase()} (Class ${learner.grade})
-🪙 *Win Pot:* +${selectedTier.winnerReward} Study Coins!
-
-Maine 1v1 battle room banaya hai! Kya tu mujhe hara sakta hai?
-👉 Tap to accept & battle: ${link}
-
-Room Code: *${createdRoomCode}*`;
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-  };
-
-  const handleCopyRoomCode = () => {
-    if (!createdRoomCode) return;
-    navigator.clipboard.writeText(createdRoomCode);
-    setRoomCopied(true);
-    setTimeout(() => setRoomCopied(false), 2000);
-  };
-
-  const handleJoinRoom = (codeToJoin?: string) => {
-    const code = (codeToJoin || joinRoomInput).trim().toUpperCase();
-    if (!code) {
-      setJoinError('Please enter a valid 6-digit Room Code');
-      return;
-    }
-    const duel = StorageRLSLayer.getDuelByRoomCode(code);
-    if (!duel) {
-      setJoinError(isHinglish ? 'Room code nahi mila ya expire ho gaya.' : 'Room code not found or expired.');
-      return;
-    }
-    setJoinError(null);
-    setActiveFriendDuel(duel);
-    setSelectedSubjectId(duel.subjectId || selectedSubjectId);
-
-    setOpponent({
-      name: duel.challengerName || 'Friend Challenger',
-      location: 'India',
-      accuracy: 0.8,
-      avatar: '👑'
-    });
-
-    const qs = OfflineBankService.getQuestions(
-      learner.board,
-      learner.grade,
-      duel.subjectId || selectedSubjectId,
-      'FOUNDATION',
-      5
-    );
-    setDuelQuestions(qs.slice(0, 5));
-    setCurrentQIndex(0);
-    setUserScore(0);
-    setOpponentScore(0);
-    setSelectedOption(null);
-    setIsAnswerSubmitted(false);
-    setTimeLeft(15);
-    setGameState('DUELING');
-  };
-
-  const handleStartCreatedRoomBattle = () => {
-    setOpponent({
-      name: 'Classmate (Live Room)',
-      location: 'WhatsApp Friend',
-      accuracy: 0.8,
-      avatar: '⚡'
-    });
-    const qs = OfflineBankService.getQuestions(
-      learner.board,
-      learner.grade,
-      selectedSubjectId,
-      'FOUNDATION',
-      5
-    );
-    setDuelQuestions(qs.slice(0, 5));
-    setCurrentQIndex(0);
-    setUserScore(0);
-    setOpponentScore(0);
-    setSelectedOption(null);
-    setIsAnswerSubmitted(false);
-    setTimeLeft(15);
-    setGameState('DUELING');
-  };
 
   // Matchmaking effect
   useEffect(() => {
@@ -372,14 +251,6 @@ Room Code: *${createdRoomCode}*`;
     };
     StorageRLSLayer.recordDuelResult(record);
     setDuelHistory(StorageRLSLayer.getDuelsForLearner(learner.id));
-  };
-
-  const handleShareDuelLink = () => {
-    const duelUrl = `https://academiclevel.in/duel?ref=${learner.id}&code=AL-DUEL-${Math.floor(1000 + Math.random() * 9000)}`;
-    const shareText = `⚔️ ${learner.fullName} has challenged you to a 1v1 Quiz Duel on AcademicLevel! Can you beat my score? Play here: ${duelUrl}`;
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
-    setCopiedShare(true);
-    setTimeout(() => setCopiedShare(false), 3000);
   };
 
   // 1. MATCHMAKING SCREEN
@@ -628,11 +499,10 @@ Room Code: *${createdRoomCode}*`;
               {isHinglish ? 'Naya Duel Khele' : 'Play Another Duel'}
             </button>
             <button
-              onClick={handleShareDuelLink}
-              className="flex-1 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm transition-all cursor-pointer shadow-md flex items-center justify-center space-x-1.5"
+              onClick={onBackToDashboard}
+              className="flex-1 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs sm:text-sm transition-all cursor-pointer shadow-xs"
             >
-              <Share2 className="w-4 h-4" />
-              <span>{isHinglish ? 'Classmate ko Challenge Karo' : 'Challenge via WhatsApp'}</span>
+              {isHinglish ? '← Dashboard Par Jaayein' : '← Back to Dashboard'}
             </button>
           </div>
         </div>
@@ -655,8 +525,8 @@ Room Code: *${createdRoomCode}*`;
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
             {isHinglish
-              ? 'Apne syllabus par online scholars se live 5-question blitz khelein ya friend ko challenge karein. Fast answers aur high score se jeetein coin pot!'
-              : 'Go head-to-head in a fast 5-question syllabus blitz against online peers or invite friends via WhatsApp. Speed + accuracy takes the coin pot!'}
+              ? 'Apne syllabus par smart kid-modeled practice bots se fast 5-question blitz khelein. Speed aur accuracy se jeetein coin pot!'
+              : 'Go head-to-head in a fast 5-question syllabus blitz against smart kid-modeled practice bots. Speed + accuracy takes the coin pot!'}
           </p>
 
           <div className="pt-2 flex flex-wrap gap-3">
@@ -668,13 +538,6 @@ Room Code: *${createdRoomCode}*`;
               <span>{isHinglish ? 'Quick Match Shuru Karo' : 'Start Quick Match'}</span>
             </button>
             <button
-              onClick={handleShareDuelLink}
-              className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-sm flex items-center space-x-2 transition-all cursor-pointer"
-            >
-              <Share2 className="w-4 h-4" />
-              <span>{isHinglish ? 'Friend ko Challenge Karo' : 'Challenge a Classmate'}</span>
-            </button>
-            <button
               onClick={onBackToDashboard}
               className="px-4 py-3 rounded-2xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-bold text-sm transition-all cursor-pointer"
             >
@@ -682,123 +545,6 @@ Room Code: *${createdRoomCode}*`;
             </button>
           </div>
         </div>
-      </div>
-
-      {/* WhatsApp 1v1 Friend Challenge Room */}
-      <div className="bg-gradient-to-r from-emerald-900/90 via-slate-900 to-indigo-950 text-white border-2 border-emerald-500/40 rounded-3xl p-6 shadow-lg space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
-              <MessageCircle className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
-                {isHinglish ? 'Viral Friend Mode' : 'Direct Friend Challenge'}
-              </span>
-              <h3 className="text-base sm:text-lg font-black text-white">
-                {isHinglish ? 'WhatsApp 1v1 Friend Room Banayein 💬' : 'Challenge a Classmate via WhatsApp 💬'}
-              </h3>
-            </div>
-          </div>
-
-          <div className="flex rounded-xl bg-black/40 p-1 border border-white/10 shrink-0">
-            <button
-              onClick={() => setFriendChallengeTab('CREATE')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                friendChallengeTab === 'CREATE' ? 'bg-emerald-500 text-white shadow-xs' : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              {isHinglish ? 'Room Create Karein' : 'Create Room'}
-            </button>
-            <button
-              onClick={() => setFriendChallengeTab('JOIN')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                friendChallengeTab === 'JOIN' ? 'bg-emerald-500 text-white shadow-xs' : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              {isHinglish ? 'Room Code Enter Karein' : 'Join Room'}
-            </button>
-          </div>
-        </div>
-
-        {friendChallengeTab === 'CREATE' ? (
-          <div className="space-y-4">
-            <p className="text-xs text-slate-300 leading-relaxed">
-              {isHinglish
-                ? `Apne dost ko Class ${learner.grade} ${selectedSubjectId.toUpperCase()} me 1v1 quiz challenge karein! Wager: ${selectedTier.entryCost} Coins (Win Pot: +${selectedTier.winnerReward} Coins).`
-                : `Challenge your friend to a 1v1 battle in Class ${learner.grade} ${selectedSubjectId.toUpperCase()}! Pot: +${selectedTier.winnerReward} Coins.`}
-            </p>
-
-            {createdRoomCode ? (
-              <div className="bg-black/40 border border-emerald-500/40 rounded-2xl p-4 space-y-3 animate-in fade-in">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-xs font-bold text-slate-300">Room Code:</span>
-                    <span className="font-mono text-xl sm:text-2xl font-black text-amber-300 tracking-widest bg-amber-400/10 px-3 py-1 rounded-xl border border-amber-400/30">
-                      {createdRoomCode}
-                    </span>
-                    <button
-                      onClick={handleCopyRoomCode}
-                      className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold text-slate-200 transition-colors cursor-pointer"
-                    >
-                      {roomCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                    </button>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                    <button
-                      onClick={handleShareCreatedRoomWhatsApp}
-                      className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black text-xs flex items-center justify-center space-x-1.5 transition-all shadow-md cursor-pointer"
-                    >
-                      <Share2 className="w-3.5 h-3.5" />
-                      <span>{isHinglish ? 'WhatsApp par Send Karein 📱' : 'Share on WhatsApp 📱'}</span>
-                    </button>
-                    <button
-                      onClick={handleStartCreatedRoomBattle}
-                      className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs flex items-center justify-center space-x-1.5 transition-all shadow-md cursor-pointer"
-                    >
-                      <Zap className="w-3.5 h-3.5 text-amber-300" />
-                      <span>{isHinglish ? 'Battle Shuru Karo' : 'Enter Battle'}</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <button
-                onClick={handleCreateRoom}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-emerald-950 font-black text-xs sm:text-sm flex items-center space-x-2 shadow-md cursor-pointer transition-all"
-              >
-                <Sparkles className="w-4 h-4 text-amber-300" />
-                <span>{isHinglish ? 'Room Generate Karein & WhatsApp Link Payein' : 'Generate Room Code & WhatsApp Link'}</span>
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <p className="text-xs text-slate-300">
-              {isHinglish
-                ? 'Apne dost ke dwara bheja gaya 6-digit Room Code (e.g. AL-4821) yahan daalein:'
-                : 'Enter the 6-digit challenge code sent by your classmate:'}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-2 max-w-md">
-              <input
-                type="text"
-                placeholder="e.g. AL-7842"
-                value={joinRoomInput}
-                onChange={e => setJoinRoomInput(e.target.value.toUpperCase())}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-black/40 border border-white/20 text-white text-sm font-mono tracking-wider focus:outline-none focus:border-emerald-400 uppercase"
-              />
-              <button
-                onClick={() => handleJoinRoom()}
-                className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition-all cursor-pointer shadow-md"
-              >
-                <Swords className="w-4 h-4" />
-                <span>{isHinglish ? 'Room Join Karein' : 'Join & Battle'}</span>
-              </button>
-            </div>
-            {joinError && <p className="text-xs text-rose-400 font-bold">{joinError}</p>}
-          </div>
-        )}
       </div>
 
       {/* Select Wager Tier */}

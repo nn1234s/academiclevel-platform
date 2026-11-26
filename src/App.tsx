@@ -7,6 +7,7 @@ import { ErrorBoundary } from './modules/shared/ErrorBoundary';
 import { PaywallGateModal } from './modules/shared/PaywallGateModal';
 import { AuthModal } from './modules/shared/AuthModal';
 import { StudyCoinIcon } from './modules/shared/StudyCoinIcon';
+import { ProfileAvatar } from './modules/shared/ProfileAvatar';
 import { useLanguage } from './core/i18n/LanguageContext';
 import { LanguagePreferenceModal } from './modules/shared/LanguagePreferenceModal';
 
@@ -1101,9 +1102,18 @@ export const App: React.FC = () => {
                     onClick={() => navigateTo('PROFILE')}
                     title={`Student Profile (${currentLearner?.fullName || 'Student'})`}
                     aria-label="Student Profile"
-                    className="flex items-center justify-center sm:space-x-1.5 w-8 h-8 sm:w-auto sm:px-2.5 sm:py-1.5 sm:h-9 rounded-[3px] bg-white hover:bg-[#F8FAFC] text-[#1E293B] text-xs font-semibold transition-colors shrink-0 flex-shrink-0 cursor-pointer border border-[#CBD5E1] shadow-2xs"
+                    className="flex items-center justify-center sm:space-x-1.5 w-8 h-8 sm:w-auto sm:px-2 sm:py-1 sm:h-9 rounded-[3px] bg-white hover:bg-[#F8FAFC] text-[#1E293B] text-xs font-semibold transition-colors shrink-0 flex-shrink-0 cursor-pointer border border-[#CBD5E1] shadow-2xs"
                   >
-                    <User className="w-3.5 h-3.5 text-[#3F51B5] shrink-0" />
+                    {currentLearner ? (
+                      <ProfileAvatar
+                        learner={currentLearner}
+                        sizeClass="w-6 h-6"
+                        textClass="text-xs"
+                        roundedClass="rounded-lg"
+                      />
+                    ) : (
+                      <User className="w-3.5 h-3.5 text-[#3F51B5] shrink-0" />
+                    )}
                     <span className="hidden xl:inline truncate max-w-[90px]">
                       {currentLearner?.fullName.split(' ')[0]}
                     </span>

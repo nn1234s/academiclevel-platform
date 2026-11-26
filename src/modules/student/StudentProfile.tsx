@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Learner, Grade } from '../../core/types';
 import { useAuth } from '../../core/auth/AuthContext';
 import { ApiClient } from '../../core/api/apiClient';
+import {
+  ProfileAvatar,
+  PRESET_EMOJI_PFPS,
+  getLocalCustomPfp,
+  setLocalCustomPfp,
+  parseEmojiPfp
+} from '../shared/ProfileAvatar';
 import {
   User,
   Shield,
@@ -17,7 +24,10 @@ import {
   EyeOff,
   LogOut,
   Trash2,
-  Crown
+  Crown,
+  Upload,
+  Smartphone,
+  Globe
 } from 'lucide-react';
 
 interface StudentProfileProps {
@@ -42,6 +52,104 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
   const [deleteConfirmInput, setDeleteConfirmInput] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+
+  // Profile Picture (Local Photo + Synced Emoji PFP)
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [localPhoto, setLocalPhoto] = useState<string | null>(() => getLocalCustomPfp(learner.id));
+  const [pendingPhotoPreview, setPendingPhotoPreview] = useState<string | null>(null);
+  const [pfpStatus, setPfpStatus] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isSavingEmoji, setIsSavingEmoji] = useState(false);
+  const activeEmoji = parseEmojiPfp(learner.avatarFrame);
+
+  const handleSelectEmojiPfp = async (emoji: string) => {
+    setIsSavingEmoji(true);
+    setPfpStatus(null);
+    try {
+      const res = await ApiClient.updateAvatarFrame(learner.id, `emoji:${emoji}`);
+      if (res.success) {
+        onRefreshLearner();
+        setPfpStatus({
+          type: 'success',
+          text: localPhoto
+            ? `Saved ${emoji} across all your devices! Remove your local photo below if you want ${emoji} shown on this device.`
+            : `Avatar ${emoji} saved! It will appear on every device you log in to.`
+        });
+      } else {
+        setPfpStatus({ type: 'error', text: 'Could not save emoji avatar. Please try again.' });
+      }
+    } catch {
+      setPfpStatus({ type: 'error', text: 'Connection error while saving emoji avatar.' });
+    } finally {
+      setIsSavingEmoji(false);
+    }
+  };
+
+  const handlePhotoFileChosen = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setPfpStatus({ type: 'error', text: 'Please choose an image file (PNG, JPG, WebP, etc.).' });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const maxSide = 160;
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          setPendingPhotoPreview(reader.result as string);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, w, h);
+        setPendingPhotoPreview(canvas.toDataURL('image/jpeg', 0.82));
+        setPfpStatus(null);
+      };
+      img.onerror = () => {
+        setPfpStatus({ type: 'error', text: 'Could not read that image. Try another photo.' });
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleConfirmSaveLocalPhoto = () => {
+    if (!pendingPhotoPreview) return;
+    try {
+      setLocalCustomPfp(learner.id, pendingPhotoPreview);
+      setLocalPhoto(pendingPhotoPreview);
+      setPendingPhotoPreview(null);
+      setPfpStatus({
+        type: 'success',
+        text: 'Custom photo saved locally in this browser! (Remember: it stays on this device only.)'
+      });
+    } catch {
+      setPfpStatus({
+        type: 'error',
+        text: 'Browser storage is full. Please clear old site data or use a smaller image.'
+      });
+    }
+  };
+
+  const handleRemoveLocalPhoto = () => {
+    setLocalCustomPfp(learner.id, null);
+    setLocalPhoto(null);
+    setPendingPhotoPreview(null);
+    setPfpStatus({
+      type: 'success',
+      text: activeEmoji
+        ? `Local photo removed — now showing your synced ${activeEmoji} avatar.`
+        : 'Local photo removed.'
+    });
+  };
 
   const handleConfirmDelete = async () => {
     const input = deleteConfirmInput.trim();
@@ -96,9 +204,7 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
       {/* Profile Overview Card */}
       <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-900/50 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl font-black shadow-lg shadow-indigo-950">
-            {learner.fullName.substring(0, 2).toUpperCase()}
-          </div>
+          <ProfileAvatar learner={learner} sizeClass="w-16 h-16" textClass="text-2xl" roundedClass="rounded-2xl" />
           <div>
             <div className="flex items-center space-x-2">
               <h2 className="text-xl font-bold text-white">{learner.fullName}</h2>
@@ -130,6 +236,153 @@ export const StudentProfile: React.FC<StudentProfileProps> = ({ learner, onRefre
             <span>Sign Out</span>
           </button>
         </div>
+      </div>
+
+      {/* Profile Picture & Emoji Avatar Card */}
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-5 text-slate-900">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 className="text-base font-extrabold text-slate-900 flex items-center space-x-2">
+              <Sparkles className="w-4 h-4 text-indigo-600" />
+              <span>Profile Picture &amp; Avatar</span>
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Pick a Preset Emoji to sync across every device, or upload a custom photo stored locally on this device.
+            </p>
+          </div>
+        </div>
+
+        {/* 1. Preset Emoji PFPs (Synced Across All Devices) */}
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
+              <Globe className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Preset Emoji PFP (Syncs on Every Device)</span>
+            </span>
+            {activeEmoji && (
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                Synced: {activeEmoji}
+              </span>
+            )}
+          </div>
+          <div className="grid grid-cols-8 sm:grid-cols-8 gap-2">
+            {PRESET_EMOJI_PFPS.map((item) => {
+              const isSelected = activeEmoji === item.emoji;
+              return (
+                <button
+                  key={item.emoji}
+                  type="button"
+                  disabled={isSavingEmoji}
+                  onClick={() => handleSelectEmojiPfp(item.emoji)}
+                  title={`${item.label} (Syncs on every device)`}
+                  className={`h-11 rounded-2xl text-xl flex items-center justify-center border transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-indigo-50 border-2 border-indigo-600 shadow-xs scale-105'
+                      : 'bg-slate-50 border-slate-200 hover:bg-indigo-50/50 hover:border-indigo-300'
+                  }`}
+                >
+                  {item.emoji}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 2. Custom Photo Upload (LocalStorage Only) */}
+        <div className="pt-4 border-t border-slate-100 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span className="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
+                <Smartphone className="w-3.5 h-3.5 text-amber-600" />
+                <span>Custom Photo Upload (This Device Only)</span>
+              </span>
+              <p className="text-[11px] text-amber-700 font-medium mt-0.5">
+                Note: Custom uploaded photos are saved in LocalStorage on this device only and will NOT sync across devices.
+              </p>
+            </div>
+            <div className="flex items-center space-x-2 shrink-0">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoFileChosen}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center space-x-1.5 cursor-pointer shadow-xs transition-all"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>{localPhoto ? 'Change Local Photo' : 'Upload Photo'}</span>
+              </button>
+              {localPhoto && (
+                <button
+                  type="button"
+                  onClick={handleRemoveLocalPhoto}
+                  className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer transition-all"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Explicit LocalStorage Reminder Confirmation Before Setting */}
+          {pendingPhotoPreview && (
+            <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 space-y-3">
+              <div className="flex items-start space-x-3">
+                <img
+                  src={pendingPhotoPreview}
+                  alt="Preview"
+                  className="w-14 h-14 rounded-2xl object-cover border border-amber-400 shrink-0"
+                />
+                <div className="space-y-1">
+                  <p className="text-xs font-extrabold text-amber-950 flex items-center space-x-1.5">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Reminder Before Setting: This Photo Is Local Only!</span>
+                  </p>
+                  <p className="text-[11px] text-amber-900 leading-relaxed">
+                    Your uploaded profile picture is saved in this browser&apos;s <strong>LocalStorage</strong> and will <strong>NOT appear on other phones, tablets, or devices</strong>. Use a Preset Emoji PFP above if you want your avatar on every device.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setPendingPhotoPreview(null)}
+                  className="px-3.5 py-1.5 rounded-xl bg-white border border-amber-300 text-amber-900 text-xs font-bold hover:bg-amber-100 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmSaveLocalPhoto}
+                  className="px-4 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold cursor-pointer shadow-xs"
+                >
+                  I Understand — Set Local Photo
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {pfpStatus && (
+          <div
+            className={`p-3 rounded-2xl text-xs font-semibold flex items-center space-x-2 ${
+              pfpStatus.type === 'success'
+                ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                : 'bg-rose-50 border border-rose-200 text-rose-800'
+            }`}
+          >
+            {pfpStatus.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            )}
+            <span>{pfpStatus.text}</span>
+          </div>
+        )}
       </div>
 
       {/* Active Subscription & Entitlement Branding Card */}

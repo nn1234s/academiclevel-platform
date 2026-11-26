@@ -157,6 +157,16 @@ export class ApiClient {
     });
   }
 
+  public static async updateAvatarFrame(
+    id: string,
+    avatarFrame: string
+  ): Promise<{ success: boolean; learner?: Learner }> {
+    return this.request(`/students/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ avatarFrame })
+    });
+  }
+
   public static async spinWheel(id: string): Promise<{
     success: boolean;
     coinsWon: number;
