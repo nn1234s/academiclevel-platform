@@ -1031,7 +1031,7 @@ class StorageRLSLayerClass {
         {
           subject: "psst... secret formula trick inside! ✨",
           preview: "here is a tiny brain hack so you never forget formulas in exams 🎀",
-          body: "psst... bestie, open up! 💌\n\ndid you know that taking a quick 3-question quiz within 20 minutes of learning doubles your long-term memory?\nit's pure brain science, no cap! 🧠💡\n\nlet's do a quick quiz together right now before the concept slips away! 🌸✨",
+          body: "psst... bestie, open up! 💌\n\ndid you know that taking a quick 5-question quiz within 20 minutes of learning doubles your long-term memory?\nit's pure brain science, no cap! 🧠💡\n\nlet's do a quick quiz together right now before the concept slips away! 🌸✨",
           quizActionSubject: 'science'
         },
         {
@@ -1042,8 +1042,8 @@ class StorageRLSLayerClass {
         },
         {
           subject: "psst... hydration + quiz check! 🥤✨",
-          preview: "take a sip of water and let's solve 3 quick questions 🌸",
-          body: "psst... quick study check-in! 🥤🎀\n\ntake a nice deep breath, drink a sip of water, and let's do a cute 3-question syllabus blitz.\ni promise it'll only take 90 seconds! you've got this! ✨🎧",
+          preview: "take a sip of water and let's solve 5 quick questions 🌸",
+          body: "psst... quick study check-in! 🥤🎀\n\ntake a nice deep breath, drink a sip of water, and let's do a cute 5-question syllabus blitz.\ni promise it'll only take 2 minutes! you've got this! ✨🎧",
           quizActionSubject: 'science'
         },
         {
@@ -1054,8 +1054,8 @@ class StorageRLSLayerClass {
         },
         {
           subject: "psst... pop quiz challenge from nova! 🎀",
-          preview: "i bet you can get 3/3 on this cute mini syllabus quiz! 🌸",
-          body: "psst... bet you can't beat this! 🎯🎀\n\ni hand-picked a super cute 3-question challenge for your grade. get all 3 right and earn bonus coins!\nare you in, bestie? tap below to start! 🌸✨",
+          preview: "i bet you can get 5/5 on this cute mini syllabus quiz! 🌸",
+          body: "psst... bet you can't beat this! 🎯🎀\n\ni hand-picked a super cute 5-question challenge for your grade. get all 5 right and earn bonus coins!\nare you in, bestie? tap below to start! 🌸✨",
           quizActionSubject: 'math'
         }
       ];
