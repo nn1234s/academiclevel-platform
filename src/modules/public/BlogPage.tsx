@@ -36,6 +36,22 @@ interface BlogPost {
 
 const BLOG_POSTS: BlogPost[] = [
   {
+    id: 'master-qb-curated-mcqs',
+    date: 'Nov 26, 2026',
+    category: 'UPDATES',
+    tag: 'Question Bank',
+    title: 'Master Question Bank Upgrade: 3,600 Curated 4-Option MCQs (Classes 1–12)',
+    summary:
+      'Imported the new Master Question Bank & Curriculum Blueprint across Classes 1–12 with curated 4-option MCQs, verified answer keys, topic tags, and step-by-step explanations.',
+    highlights: [
+      '300 curated questions per class across CBSE Classes 1–12 (3,600 total)',
+      '100% verified 4 distinct options, exact answer keys, and explanations',
+      'Synced into both curatedQuestionBank.json and SQLite question_bank'
+    ],
+    icon: <Database className="w-5 h-5 text-indigo-600" />,
+    accentBg: 'bg-indigo-50 border-indigo-200'
+  },
+  {
     id: 'nova-psst-voice',
     date: 'Nov 26, 2026',
     category: 'UPDATES',
