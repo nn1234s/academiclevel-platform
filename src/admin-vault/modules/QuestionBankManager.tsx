@@ -42,15 +42,19 @@ export const QuestionBankManager: React.FC = () => {
   const [hint, setHint] = useState('');
   const [notice, setNotice] = useState('');
 
-  // AI Hybrid State with 5-Key Cascading Failover Pool
+  // AI Hybrid State with up to 30-Key Cascading Failover Pool
+  const MAX_KEY_SLOTS = 30;
   const [aiConfig, setAiConfig] = useState<AiConfig>({
     hasApiKey: false,
     keyCount: 0,
     preferLiveAi: true,
     model: 'gemini-3.5-flash-lite'
   });
-  const [apiKeysList, setApiKeysList] = useState<string[]>(['', '', '', '', '']);
-  const [showKeys, setShowKeys] = useState<boolean[]>([false, false, false, false, false]);
+  const [apiKeysList, setApiKeysList] = useState<string[]>(() => Array(MAX_KEY_SLOTS).fill(''));
+  const [showKeys, setShowKeys] = useState<boolean[]>(() => Array(MAX_KEY_SLOTS).fill(false));
+  const [visibleSlotCount, setVisibleSlotCount] = useState<number>(5);
+  const [bulkKeysInput, setBulkKeysInput] = useState<string>('');
+  const [showBulkImport, setShowBulkImport] = useState<boolean>(false);
   const [isTestingAi, setIsTestingAi] = useState(false);
   const [poolTestResults, setPoolTestResults] = useState<{
     success: boolean;
@@ -66,13 +70,16 @@ export const QuestionBankManager: React.FC = () => {
     HybridQuizService.getConfig().then(cfg => {
       setAiConfig(cfg);
       const storedPool = HybridQuizService.getClientStoredKeysPool();
-      const initialKeys = ['', '', '', '', ''];
-      for (let i = 0; i < 5; i++) {
+      const initialKeys = Array(MAX_KEY_SLOTS).fill('');
+      let highestFilled = 5;
+      for (let i = 0; i < MAX_KEY_SLOTS; i++) {
         if (storedPool[i]) {
           initialKeys[i] = storedPool[i];
+          highestFilled = Math.max(highestFilled, i + 1);
         }
       }
       setApiKeysList(initialKeys);
+      setVisibleSlotCount(Math.min(MAX_KEY_SLOTS, Math.max(5, highestFilled)));
     });
   }, []);
 
@@ -247,30 +254,30 @@ export const QuestionBankManager: React.FC = () => {
                 : 'bg-amber-950/60 border-amber-700/60 text-amber-300'
             }`}>
               {(aiConfig.keyCount || 0) > 0 || apiKeysList.some(k => k.trim())
-                ? `● ${apiKeysList.filter(k => k.trim()).length || aiConfig.keyCount || 1}/5 Keys Armed in Pool`
+                ? `● ${apiKeysList.filter(k => k.trim()).length || aiConfig.keyCount || 1}/30 Keys Armed in Pool`
                 : '○ Offline Mode (No Keys in Pool)'}
             </span>
           </div>
         </div>
 
-        {/* 5-Key Cascading Failover Pipeline Banner */}
+        {/* 30-Key Cascading Failover Pipeline Banner */}
         <div className="bg-slate-950/70 border border-indigo-950 rounded-2xl p-3.5 space-y-2">
           <div className="flex items-center justify-between text-[11px]">
             <span className="font-bold text-indigo-300 flex items-center space-x-1.5">
               <Layers className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Multi-Key Real-Time Failover Pool (Cascading Architecture)</span>
+              <span>Multi-Key Real-Time Failover Pool (Up to 30 Keys)</span>
             </span>
             <span className="text-[10px] text-slate-400 font-mono">
-              Auto-cascade: Key 1 ➔ Key 2 ➔ Key 3 ➔ Key 4 ➔ Key 5
+              Auto-cascade: Key 1 ➔ Key 2 ➔ ... ➔ Key 30
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-mono">
-            {[1, 2, 3, 4, 5].map(slotNum => {
+            {Array.from({ length: visibleSlotCount }, (_, idx) => idx + 1).map(slotNum => {
               const hasKey = !!apiKeysList[slotNum - 1]?.trim();
               const testSlot = poolTestResults?.results?.find(r => r.slot === slotNum);
               return (
                 <React.Fragment key={slotNum}>
-                  <div className={`px-2.5 py-1 rounded-lg border flex items-center space-x-1 ${
+                  <div className={`px-2 py-1 rounded-lg border flex items-center space-x-1 ${
                     testSlot
                       ? testSlot.ok
                         ? 'bg-emerald-950/70 border-emerald-700 text-emerald-300'
@@ -279,13 +286,11 @@ export const QuestionBankManager: React.FC = () => {
                       ? 'bg-indigo-950/60 border-indigo-800 text-indigo-200'
                       : 'bg-slate-900 border-slate-800 text-slate-500'
                   }`}>
-                    <span className="font-bold">Slot {slotNum}</span>
-                    <span>{slotNum === 1 ? '(Primary)' : '(Failover)'}</span>
+                    <span className="font-bold">#{slotNum}</span>
                     <span className="text-[9px]">
                       {testSlot ? (testSlot.ok ? '✓' : '✗') : (hasKey ? '●' : '○')}
                     </span>
                   </div>
-                  {slotNum < 5 && <span className="text-slate-600">➔</span>}
                 </React.Fragment>
               );
             })}
@@ -296,24 +301,77 @@ export const QuestionBankManager: React.FC = () => {
             </div>
           </div>
           <p className="text-[10px] text-slate-400">
-            If Key 1 hits Google rate limits (429), quota exhaustion, or error, the engine cascades immediately to Key 2, then Key 3, Key 4, and Key 5 without failing student quizzes.
+            If Key 1 hits Google rate limits (429), quota exhaustion, or error, the engine cascades immediately through Key 2…Key {MAX_KEY_SLOTS} without failing student queries.
           </p>
         </div>
 
-        {/* 5-Key Slot Editor */}
+        {/* 30-Key Slot Editor */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <label className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
               <Key className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Configure 5 Gemini API Key Slots:</span>
+              <span>Configure up to {MAX_KEY_SLOTS} Gemini API Key Slots ({apiKeysList.filter(k => k.trim()).length}/{MAX_KEY_SLOTS} set):</span>
             </label>
-            <span className="text-[10px] text-slate-500 font-mono">
-              Slots 1–5 stored securely in SQLite database
-            </span>
+            <div className="flex items-center space-x-2">
+              <button
+                type="button"
+                onClick={() => setShowBulkImport(v => !v)}
+                className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[10px] font-bold text-indigo-300 border border-slate-700 cursor-pointer"
+              >
+                {showBulkImport ? 'Hide Bulk Paste' : 'Bulk Paste Keys'}
+              </button>
+              {visibleSlotCount < MAX_KEY_SLOTS && (
+                <button
+                  type="button"
+                  onClick={() => setVisibleSlotCount(c => Math.min(MAX_KEY_SLOTS, c + 5))}
+                  className="px-2.5 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-[10px] font-bold text-indigo-200 border border-indigo-500/40 cursor-pointer"
+                >
+                  + Add 5 Slots ({visibleSlotCount}/{MAX_KEY_SLOTS})
+                </button>
+              )}
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-2.5">
-            {[0, 1, 2, 3, 4].map(idx => {
+          {showBulkImport && (
+            <div className="bg-slate-950 border border-indigo-800/60 rounded-2xl p-3 space-y-2">
+              <p className="text-[10px] text-slate-400">
+                Paste up to 30 API keys separated by newlines, spaces, or commas:
+              </p>
+              <textarea
+                rows={4}
+                value={bulkKeysInput}
+                onChange={e => setBulkKeysInput(e.target.value)}
+                placeholder="Paste keys here (one per line or comma-separated)..."
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500"
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const parsed = bulkKeysInput
+                      .split(/[\r\n,\s]+/)
+                      .map(k => k.trim())
+                      .filter(Boolean)
+                      .slice(0, MAX_KEY_SLOTS);
+                    if (parsed.length > 0) {
+                      const next = Array(MAX_KEY_SLOTS).fill('');
+                      parsed.forEach((k, idx) => { next[idx] = k; });
+                      setApiKeysList(next);
+                      setVisibleSlotCount(Math.min(MAX_KEY_SLOTS, Math.max(5, parsed.length)));
+                      setShowBulkImport(false);
+                      setBulkKeysInput('');
+                    }
+                  }}
+                  className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold cursor-pointer"
+                >
+                  Apply to Slots
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-2.5 max-h-[420px] overflow-y-auto pr-1">
+            {Array.from({ length: visibleSlotCount }, (_, idx) => idx).map(idx => {
               const slotNumber = idx + 1;
               const isPrimary = idx === 0;
               const keyVal = apiKeysList[idx] || '';
@@ -396,7 +454,7 @@ export const QuestionBankManager: React.FC = () => {
             <div>
               <span className="text-xs font-bold text-white block">Hybrid Preference</span>
               <span className="text-[10px] text-slate-400">
-                {aiConfig.preferLiveAi ? 'Try 5-Key Gemini Pool First -> Cascading fallback' : 'Force Curated Syllabus Bank Only'}
+                {aiConfig.preferLiveAi ? 'Try 30-Key Gemini Pool First -> Cascading fallback' : 'Force Curated Syllabus Bank Only'}
               </span>
             </div>
             <button
@@ -431,7 +489,7 @@ export const QuestionBankManager: React.FC = () => {
               className="px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white font-bold text-xs rounded-xl border border-purple-600 transition-all flex items-center justify-center space-x-1.5"
             >
               <Zap className={`w-3.5 h-3.5 ${isTestingAi ? 'animate-spin' : ''}`} />
-              <span>{isTestingAi ? 'Testing Pool...' : 'Test All 5 Keys'}</span>
+              <span>{isTestingAi ? 'Testing Pool...' : 'Test All Keys'}</span>
             </button>
           </div>
         </div>

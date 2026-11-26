@@ -76,7 +76,7 @@ export class HybridQuizService {
 
   public static setClientStoredKeysPool(keys: string[]): void {
     if (typeof window === 'undefined') return;
-    const clean = keys.map(k => String(k || '').trim()).filter(Boolean).slice(0, 5);
+    const clean = keys.map(k => String(k || '').trim()).filter(Boolean).slice(0, 30);
     localStorage.setItem(this.LOCAL_KEYS_POOL_STORAGE, JSON.stringify(clean));
     if (clean[0]) {
       this.setClientStoredKey(clean[0]);
@@ -310,7 +310,7 @@ Return a valid JSON array of objects with keys: text, options (array of 4 string
   ): Promise<{ success: boolean; message: string }> {
     let keyList: string[] = [];
     if (Array.isArray(geminiApiKeyOrKeys)) {
-      keyList = geminiApiKeyOrKeys.map(k => String(k || '').trim()).filter(Boolean).slice(0, 5);
+      keyList = geminiApiKeyOrKeys.map(k => String(k || '').trim()).filter(Boolean).slice(0, 30);
       this.setClientStoredKeysPool(keyList);
     } else {
       const single = String(geminiApiKeyOrKeys || '').trim();

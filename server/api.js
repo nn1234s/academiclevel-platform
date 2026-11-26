@@ -4347,9 +4347,9 @@ function getGeminiApiKeys() {
     }
   } catch {}
 
-  // 2. Individual slots in system_settings: gemini_api_key_1 .. 5
+  // 2. Individual slots in system_settings: gemini_api_key_1 .. 30
   try {
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 30; i++) {
       const row = db.prepare(`SELECT value FROM system_settings WHERE key = 'gemini_api_key_${i}'`).get();
       const val = row?.value?.trim();
       if (val && !keys.includes(val)) {
@@ -4367,8 +4367,16 @@ function getGeminiApiKeys() {
     }
   } catch {}
 
-  // 4. Environment variables: GEMINI_API_KEY_1..5 and GEMINI_API_KEY
-  for (let i = 1; i <= 5; i++) {
+  // 4. Environment variables: GEMINI_API_KEYS (comma-separated), GEMINI_API_KEY_1..30 and GEMINI_API_KEY
+  if (process.env.GEMINI_API_KEYS) {
+    for (const raw of process.env.GEMINI_API_KEYS.split(',')) {
+      const trimmed = raw.trim();
+      if (trimmed && !keys.includes(trimmed)) {
+        keys.push(trimmed);
+      }
+    }
+  }
+  for (let i = 1; i <= 30; i++) {
     const envKey = process.env[`GEMINI_API_KEY_${i}`];
     if (envKey && envKey.trim() && !keys.includes(envKey.trim())) {
       keys.push(envKey.trim());
@@ -4378,7 +4386,7 @@ function getGeminiApiKeys() {
     keys.push(process.env.GEMINI_API_KEY.trim());
   }
 
-  return keys.slice(0, 5);
+  return keys.slice(0, 30);
 }
 
 function getGeminiApiKey() {
@@ -4865,15 +4873,15 @@ apiRouter.post('/admin/ai/config', adminAuth, (req, res) => {
     const { geminiApiKey, geminiApiKeys, preferLiveAi } = req.body;
     const now = new Date().toISOString();
 
-    // 1. Process 5-Key Pool if provided
+    // 1. Process up to 30-Key Pool if provided
     if (geminiApiKeys !== undefined) {
       let keyList = [];
       if (Array.isArray(geminiApiKeys)) {
         keyList = geminiApiKeys.map(k => String(k || '').trim()).filter(Boolean);
       } else if (typeof geminiApiKeys === 'string') {
-        keyList = geminiApiKeys.split(',').map(k => k.trim()).filter(Boolean);
+        keyList = geminiApiKeys.split(/[\r\n,]+/).map(k => k.trim()).filter(Boolean);
       }
-      keyList = keyList.slice(0, 5);
+      keyList = keyList.slice(0, 30);
 
       db.prepare(`
         INSERT INTO system_settings (key, value, updatedAt)
@@ -4881,7 +4889,7 @@ apiRouter.post('/admin/ai/config', adminAuth, (req, res) => {
         ON CONFLICT(key) DO UPDATE SET value = excluded.value, updatedAt = excluded.updatedAt
       `).run(JSON.stringify(keyList), now);
 
-      for (let i = 1; i <= 5; i++) {
+      for (let i = 1; i <= 30; i++) {
         const val = keyList[i - 1] || '';
         db.prepare(`
           INSERT INTO system_settings (key, value, updatedAt)
