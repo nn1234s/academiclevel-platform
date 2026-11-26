@@ -106,7 +106,7 @@ export const InnovativeEdtechPage: React.FC<InnovativeEdtechPageProps> = ({ onBa
                 </h1>
 
                 <p className="text-xs sm:text-sm text-[#424242] leading-relaxed">
-                  Recognized as India&apos;s leading next-generation K-12 learning architecture. Featuring adaptive Nova AI tutoring, 3,600+ syllabus-mapped questions for CBSE, ICSE, and Cambridge IGCSE, and zero-ad student privacy.
+                  Recognized as India&apos;s leading next-generation K-12 learning architecture. Featuring adaptive Nova AI tutoring, 3,600+ syllabus-mapped questions for CBSE, and zero-ad student privacy.
                 </p>
 
                 {/* Rating & Star Badge */}

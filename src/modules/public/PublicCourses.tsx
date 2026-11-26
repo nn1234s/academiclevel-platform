@@ -33,13 +33,13 @@ export const PublicCourses: React.FC<PublicCoursesProps> = ({
           Curriculum &amp; Syllabus Chapters
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 mt-2">
-          Strictly aligned with official syllabus frameworks for CBSE, ICSE/CISCE, and Cambridge IGCSE across Classes 1 to 12.
+          Strictly aligned with official syllabus frameworks for CBSE across Classes 1 to 12.
         </p>
 
         {/* Filter controls */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <div className="flex bg-slate-100 border border-slate-200 p-1 rounded-2xl">
-            {(['CBSE', 'ICSE', 'IGCSE'] as Board[]).map(b => (
+            {(['CBSE', 'CBSE', 'CBSE'] as Board[]).map(b => (
               <button
                 key={b}
                 onClick={() => setBoard(b)}

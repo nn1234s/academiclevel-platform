@@ -167,7 +167,7 @@ const CLASS_SYLLABUS_INFO: Record<Grade, {
     tagline: 'Multiplication Tables, Matter, Habitats & Paragraph Skills',
     subjects: ['Mathematics (Times Tables & Geometry)', 'General Science (Living & Non-Living)', 'English Grammar', 'Mental Aptitude'],
     keyHighlights: ['Multiplication speed-runs', 'Interactive science diagrams', 'Daily Question of the Day'],
-    targetExams: 'CBSE / ICSE School Evaluations & NCO / NSO Olympiads',
+    targetExams: 'CBSE School Evaluations & NCO / NSO Olympiads',
     sampleQuestion: {
       q: 'What is 7 multiplied by 6?',
       a: '42',
@@ -189,7 +189,7 @@ const CLASS_SYLLABUS_INFO: Record<Grade, {
     tagline: 'Decimals, Percentages, Circulatory System, Matter & Grammar',
     subjects: ['Mathematics (Decimals, Area & Volume)', 'General Science (Organs & Energy)', 'Social Studies & Earth', 'Logical Aptitude'],
     keyHighlights: ['50+ Concept Booster shortcuts', 'Step-by-step problem solver', 'Olympiad medal tracker'],
-    targetExams: 'CBSE / ICSE / State Board Mastery & Class 5 IMO/NSO/NSTSE',
+    targetExams: 'CBSE / State Board Mastery & Class 5 IMO/NSO/NSTSE',
     sampleQuestion: {
       q: 'What is 3/4 expressed as a decimal and percentage?',
       a: '0.75 or 75%',
@@ -243,8 +243,8 @@ const CLASS_SYLLABUS_INFO: Record<Grade, {
   10: {
     tagline: 'Quadratic Equations, Trigonometry, Light (Optics), Chemical Reactions & Heredity',
     subjects: ['Mathematics (Trigonometry & Surface Areas)', 'Physics (Electricity & Magnetic Effects)', 'Chemistry (Carbon & Acids)', 'Biology (Life Processes)'],
-    keyHighlights: ['1,000 Board exam specimen questions', 'CBSE / ICSE marking scheme alignment', 'High School Board Exam Rank Accelerator'],
-    targetExams: 'CBSE / ICSE Class 10 Board Exams & NTSE',
+    keyHighlights: ['1,000 Board exam specimen questions', 'CBSE marking scheme alignment', 'High School Board Exam Rank Accelerator'],
+    targetExams: 'CBSE Class 10 Board Exams & NTSE',
     sampleQuestion: {
       q: 'What is the value of sin²θ + cos²θ for any angle θ?',
       a: '1',
@@ -266,7 +266,7 @@ const CLASS_SYLLABUS_INFO: Record<Grade, {
     tagline: 'Integral Calculus, Electromagnetism, Electrochemistry, Organic Mechanisms & Board 95%+',
     subjects: ['Physics (Electrostatics, Optics, Modern Physics)', 'Chemistry (Solutions, Electrochemistry, Coordination, Aldehydes)', 'Mathematics (Integrals, Vectors, 3D Geometry)', 'Biology / Business / Economics'],
     keyHighlights: ['NTA-style timed test interface', '12th Board Examination distinction masterbank', 'All-India Scholar Rank leaderboards'],
-    targetExams: 'Class 12 Boards (CBSE / ICSE / State) & JEE Advanced, NEET, CUET',
+    targetExams: 'Class 12 Boards (CBSE / State) & JEE Advanced, NEET, CUET',
     sampleQuestion: {
       q: 'What is the integral of 1/x with respect to x?',
       a: 'ln|x| + C',
@@ -968,7 +968,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                     2. Select Education Board
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    {(['CBSE', 'ICSE', 'STATE'] as Board[]).map(b => (
+                    {(['CBSE', 'CBSE', 'STATE'] as Board[]).map(b => (
                       <button
                         key={b}
                         type="button"
@@ -1484,7 +1484,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-              Every Special Offer scholar gets 100% full access to our curated study material vault across Classes 1 to 12 (CBSE, ICSE &amp; Cambridge). 1-click printable vector PDFs for screen-free desk practice, dedicated student rough work scratchpads, and detachable step-by-step NCERT solutions.
+              Every Special Offer scholar gets 100% full access to our curated study material vault across Classes 1 to 12 (CBSE &amp; Cambridge). 1-click printable vector PDFs for screen-free desk practice, dedicated student rough work scratchpads, and detachable step-by-step NCERT solutions.
             </p>
           </div>
 
@@ -1618,7 +1618,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                         {syllabus.sampleQuestion.q}
                       </p>
                       <p className="text-[11px] text-slate-500 mt-1">
-                        [CBSE / ICSE Board Specimen &amp; Chapter Revision Standard • 2 Marks]
+                        [CBSE Board Specimen &amp; Chapter Revision Standard • 2 Marks]
                       </p>
                     </div>
                   </div>
@@ -1987,7 +1987,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               },
               {
                 q: 'Which classes are supported in this offer?',
-                a: 'All classes from Class 1 all the way to Class 12 are supported across CBSE, ICSE, and State Board curriculums.'
+                a: 'All classes from Class 1 all the way to Class 12 are supported across CBSE, and State Board curriculums.'
               },
               {
                 q: 'Do I get chapter study material and printable worksheets with this offer?',
@@ -2056,8 +2056,8 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
               <h4 className="text-slate-900 font-bold uppercase text-[11px] tracking-wider">Curriculum</h4>
               <ul className="space-y-1.5 text-slate-600">
                 <li><a href="/curriculum/cbse" className="hover:text-indigo-600 transition-colors">CBSE Classes 1–12</a></li>
-                <li><a href="/curriculum/icse" className="hover:text-indigo-600 transition-colors">ICSE Board</a></li>
-                <li><a href="/curriculum/cambridge" className="hover:text-indigo-600 transition-colors">Cambridge IGCSE</a></li>
+                <li><a href="/curriculum/icse" className="hover:text-indigo-600 transition-colors">CBSE Board</a></li>
+                <li><a href="/curriculum/cambridge" className="hover:text-indigo-600 transition-colors">CBSE</a></li>
                 <li><a href="/curriculum/olympiad" className="hover:text-indigo-600 transition-colors">Olympiad &amp; Foundations</a></li>
               </ul>
             </div>
@@ -2598,7 +2598,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                           className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-[#f95a00]"
                         >
                           <option value="CBSE">CBSE Board</option>
-                          <option value="ICSE">ICSE Board</option>
+                          <option value="CBSE">CBSE Board</option>
                           <option value="STATE">State Board</option>
                         </select>
                       </div>
@@ -2862,7 +2862,7 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
                       onChange={e => setSelectedBoard(e.target.value as Board)}
                       className="w-full bg-[#EEEEEE] border border-[#E0E0E0] rounded-xl px-3 py-2.5 text-white font-bold focus:outline-none"
                     >
-                      {['CBSE', 'ICSE', 'STATE_BOARD'].map(b => (
+                      {['CBSE', 'CBSE', 'STATE_BOARD'].map(b => (
                         <option key={b} value={b} className="bg-white text-[#212121]">{b.replace('_', ' ')}</option>
                       ))}
                     </select>

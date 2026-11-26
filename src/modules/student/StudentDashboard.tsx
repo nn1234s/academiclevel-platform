@@ -697,7 +697,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <span className="text-xs font-bold text-amber-800">{isHinglish ? 'Target: Board Finals me 100 / 100' : 'Target: 100 / 100 in Board Finals'}</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900">
-                CBSE &amp; ICSE Class 10 Specimen Paper Center
+                CBSE &amp; CBSE Class 10 Specimen Paper Center
               </h2>
               <p className="text-xs text-slate-600 max-w-xl leading-relaxed">
                 {isHinglish
@@ -1131,7 +1131,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </p>
 
             <div className="flex flex-wrap gap-2 text-[10px] font-mono text-slate-500 pt-0.5">
-              <span>• Classes 1 to 12 (CBSE, ICSE, Cambridge)</span>
+              <span>• Classes 1 to 12 (CBSE, Cambridge)</span>
               <span>• Printable Vector PDF</span>
               <span>• Detachable NCERT Solutions</span>
               <span>• Just 30 Coins (Earn +25 Coins / Quiz)</span>

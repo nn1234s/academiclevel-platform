@@ -13,7 +13,7 @@ const FAQS: FAQItem[] = [
   },
   {
     q: 'Which school boards are supported?',
-    a: 'We fully support CBSE (Central Board of Secondary Education), ICSE/CISCE (Council for the Indian School Certificate Examinations), and Cambridge IGCSE across Classes 1 through 12.'
+    a: 'We fully support CBSE (Central Board of Secondary Education), CBSE (Council for the Indian School Certificate Examinations), and CBSE across Classes 1 through 12.'
   },
   {
     q: 'How does the UPI QR payment work?',

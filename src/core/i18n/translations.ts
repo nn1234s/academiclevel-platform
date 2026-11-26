@@ -194,7 +194,7 @@ export const translations: Record<Language, Translations> = {
     quiz_coins_earned: 'Study Coins Earned',
 
     nova_greeting: 'Hi! I am Nova, your 24/7 AI Tutor. What concept would you like to master today? 🎀',
-    nova_placeholder: 'Ask any question from your CBSE, ICSE, or IGCSE syllabus...',
+    nova_placeholder: 'Ask any question from your CBSE, or CBSE syllabus...',
     nova_send: 'Send to Nova',
     nova_thinking: 'Nova AI is breaking down your concept step-by-step...',
 

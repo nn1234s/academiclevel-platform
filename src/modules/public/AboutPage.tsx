@@ -30,7 +30,7 @@ export const AboutPage: React.FC = () => {
             <Target className="w-5 h-5 text-indigo-600 mb-2" />
             <h3 className="font-bold text-slate-900 text-xs">Curriculum Precision</h3>
             <p className="text-[11px] text-slate-600 mt-1">
-              Zero off-syllabus noise. Everything maps strictly to CBSE, ICSE/CISCE, or Cambridge IGCSE.
+              Zero off-syllabus noise. Everything maps strictly to CBSE.
             </p>
           </div>
 

@@ -550,8 +550,8 @@ export const PracticeWorksheetViewer: React.FC<PracticeWorksheetViewerProps> = (
               className="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-slate-900 shadow-xs cursor-pointer"
             >
               <option value="CBSE">CBSE Board</option>
-              <option value="ICSE">ICSE Board</option>
-              <option value="IGCSE">Cambridge IGCSE</option>
+              <option value="CBSE">CBSE Board</option>
+              <option value="CBSE">CBSE</option>
             </select>
           </div>
 

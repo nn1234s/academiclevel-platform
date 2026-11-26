@@ -674,7 +674,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
         </div>
         <h3 className="text-lg font-bold text-slate-900 mb-1">Synthesizing Assessment Nodes...</h3>
         <p className="text-xs text-slate-500 max-w-sm mx-auto mb-6">
-          Engaging AcademicLevel Hybrid Engine — combining Live Gemini AI with verified CBSE/ICSE syllabus guardrails.
+          Engaging AcademicLevel Hybrid Engine — combining Live Gemini AI with verified CBSE syllabus guardrails.
         </p>
         <div className="w-48 h-1.5 bg-slate-200 rounded-full mx-auto overflow-hidden">
           <div className="w-full h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-pulse" />

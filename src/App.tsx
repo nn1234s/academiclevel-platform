@@ -2015,24 +2015,6 @@ export const App: React.FC = () => {
                   <li>
                     <button
                       type="button"
-                      onClick={() => navigateTo('CURRICULUM_ICSE')}
-                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
-                    >
-                      ICSE Board
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => navigateTo('CURRICULUM_CAMBRIDGE')}
-                      className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
-                    >
-                      Cambridge IGCSE
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
                       onClick={() => navigateTo('CURRICULUM_OLYMPIAD')}
                       className="hover:text-indigo-600 transition-colors cursor-pointer text-left"
                     >

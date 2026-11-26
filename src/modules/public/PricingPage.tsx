@@ -44,7 +44,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({ onSelectPlan, onOpenRe
               <span className="text-xs text-slate-500">/ 60 days (~₹24.50/mo)</span>
             </div>
             <p className="text-xs text-slate-600 mb-6 leading-relaxed">
-              60-day concept booster pass with uninterrupted CBSE, ICSE, and IGCSE syllabus coverage.
+              60-day concept booster pass with uninterrupted CBSE, and CBSE syllabus coverage.
             </p>
             <ul className="space-y-2 text-xs text-slate-700">
               {PLAN_PRICING.LITE.features.map((f, i) => (

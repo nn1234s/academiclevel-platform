@@ -1137,7 +1137,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <span>Live Quiz Tracker</span>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Monitor student test submissions in real time. Filter by Class (1–12), Board (CBSE/ICSE/IGCSE), and see instant accuracy percentages without manual grading.
+                Monitor student test submissions in real time. Filter by Class (1–12), Board (CBSE), and see instant accuracy percentages without manual grading.
               </p>
               <div className="p-2.5 rounded-xl bg-white border border-slate-200 text-[11px] font-mono text-indigo-700">
                 ✓ Live submission feed &amp; auto-grading
@@ -1391,7 +1391,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                           className="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-slate-900 text-xs focus:outline-none focus:border-indigo-500"
                         >
                           <option value="CBSE">CBSE</option>
-                          <option value="ICSE">ICSE</option>
+                          <option value="CBSE">CBSE</option>
                           <option value="CAMBRIDGE">Cambridge</option>
                         </select>
                       </div>

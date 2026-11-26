@@ -22,11 +22,11 @@ interface NotFoundPikaProps {
   isAuthenticated?: boolean;
 }
 
-// Sample courses and curriculum subjects across CBSE, ICSE, and IGCSE
+// Sample courses and curriculum subjects across CBSE, and CBSE
 interface CourseSuggestion {
   id: string;
   name: string;
-  board: 'CBSE' | 'ICSE' | 'IGCSE';
+  board: 'CBSE' | 'CBSE' | 'CBSE';
   grades: string;
   topics: string[];
 }
@@ -34,10 +34,10 @@ interface CourseSuggestion {
 const POPULAR_COURSES: CourseSuggestion[] = [
   { id: 'c1', name: 'Class 10 Science & Technology', board: 'CBSE', grades: 'Class 10', topics: ['Chemical Reactions', 'Electricity', 'Light', 'Life Processes'] },
   { id: 'c2', name: 'Class 10 Mathematics & Geometry', board: 'CBSE', grades: 'Class 10', topics: ['Trigonometry', 'Quadratic Equations', 'Real Numbers', 'Circles'] },
-  { id: 'c3', name: 'Class 9 Physics & Motion', board: 'ICSE', grades: 'Class 9', topics: ['Laws of Motion', 'Gravitation', 'Work & Energy', 'Sound'] },
-  { id: 'c4', name: 'Class 10 Chemistry & Periodic Trends', board: 'ICSE', grades: 'Class 10', topics: ['Periodic Table', 'Acids & Bases', 'Metallurgy', 'Organic Chemistry'] },
-  { id: 'c5', name: 'Cambridge IGCSE Biology (0610)', board: 'IGCSE', grades: 'Class 9–10', topics: ['Cell Structure', 'Enzymes', 'Plant Nutrition', 'Genetics'] },
-  { id: 'c6', name: 'Cambridge IGCSE Mathematics (0580)', board: 'IGCSE', grades: 'Class 9–10', topics: ['Algebraic Manipulation', 'Vectors', 'Probability', 'Calculus Basics'] },
+  { id: 'c3', name: 'Class 9 Physics & Motion', board: 'CBSE', grades: 'Class 9', topics: ['Laws of Motion', 'Gravitation', 'Work & Energy', 'Sound'] },
+  { id: 'c4', name: 'Class 10 Chemistry & Periodic Trends', board: 'CBSE', grades: 'Class 10', topics: ['Periodic Table', 'Acids & Bases', 'Metallurgy', 'Organic Chemistry'] },
+  { id: 'c5', name: 'CBSE Biology (0610)', board: 'CBSE', grades: 'Class 9–10', topics: ['Cell Structure', 'Enzymes', 'Plant Nutrition', 'Genetics'] },
+  { id: 'c6', name: 'CBSE Mathematics (0580)', board: 'CBSE', grades: 'Class 9–10', topics: ['Algebraic Manipulation', 'Vectors', 'Probability', 'Calculus Basics'] },
   { id: 'c7', name: 'Class 8 Social Science & History', board: 'CBSE', grades: 'Class 8', topics: ['Modern India', 'Constitution & Judiciary', 'Resources & Industries'] },
   { id: 'c8', name: 'Classes 1–5 Elementary Concept Foundations', board: 'CBSE', grades: 'Class 1–5', topics: ['Numbers & Operations', 'Living World', 'Measurement', 'Shapes'] }
 ];
@@ -408,7 +408,7 @@ export const NotFoundPika: React.FC<NotFoundPikaProps> = ({
                   type="text"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="e.g. CBSE Class 10 Science, ICSE Math, IGCSE Biology..."
+                  placeholder="e.g. CBSE Class 10 Science, CBSE Math, CBSE Biology..."
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm"
                 />
                 <Search className="w-4 h-4 text-[#616161] absolute left-3.5 top-3" />

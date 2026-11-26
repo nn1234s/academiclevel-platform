@@ -1046,7 +1046,7 @@ ${recipientName.trim()}`;
 
               <h3 className="font-bold text-slate-900 text-base">Class Practice Worksheets &amp; PDF Center</h3>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                Comprehensive, curriculum-calibrated practice worksheets covering all syllabus chapters for Classes 1 to 12 (CBSE, ICSE, Cambridge). Includes dedicated student rough work scratchpad and detachable step-by-step NCERT solutions.
+                Comprehensive, curriculum-calibrated practice worksheets covering all syllabus chapters for Classes 1 to 12 (CBSE, Cambridge). Includes dedicated student rough work scratchpad and detachable step-by-step NCERT solutions.
               </p>
 
               <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-mono">

@@ -51,16 +51,16 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate }) => {
           pill: 'CBSE'
         },
         {
-          label: 'ICSE / CISCE Curriculum',
+          label: 'CBSE Curriculum',
           description: 'Rigorous application-oriented syllabi covering Classes 1 through 10.',
           route: 'PUBLIC_COURSES',
-          pill: 'ICSE'
+          pill: 'CBSE'
         },
         {
-          label: 'Cambridge IGCSE Programme',
+          label: 'CBSE Programme',
           description: 'International benchmarked critical thinking and problem-solving modules.',
           route: 'PUBLIC_COURSES',
-          pill: 'IGCSE'
+          pill: 'CBSE'
         },
         {
           label: 'Olympiad & Foundation Tracks',
@@ -94,7 +94,7 @@ export const SitemapPage: React.FC<SitemapPageProps> = ({ onNavigate }) => {
         },
         {
           label: 'Chapter-Aligned Worksheets',
-          description: 'Printable and digital homework quizzes calibrated to CBSE and ICSE curricula.',
+          description: 'Printable and digital homework quizzes calibrated to CBSE curricula.',
           route: 'SCHOOL_PORTAL'
         },
         {
