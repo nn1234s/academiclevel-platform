@@ -173,15 +173,15 @@ export class NovaAiService {
 
     if (isPersonalOrRomantic) {
       return (
-        `Haha, appreciate the good vibes! 😄 I'm your AI study buddy though, so my superpower is helping you ace **${board} Class ${grade} ${subject}**!\n\n` +
-        `Drop any tricky question or chapter doubt and let's crack it together! 🚀`
+        `Haha, you're too sweet! 😄✨ I'm your AI study bestie though, so my superpower is hyping you up to crush **${board} Class ${grade} ${subject}**!\n\n` +
+        `*Psst...* drop any tricky question or chapter doubt right now and let's unlock those Study Coins together! 🪙🚀`
       );
     }
 
     if (/^(hi|hey|hello|yo|gm|gn|good morning|good afternoon|good evening|good night)[!.\s]*$/i.test(cleanAlpha)) {
       return (
-        `Hey there! 👋 Ready to knock out some **${subject}**?\n\n` +
-        `Ask me anything — whether it's a weird formula, a tough chapter, or a quick exam hack, I've got you! 😊`
+        `Heyy bestie! 👋✨ Ready to crush some **${subject}** together?\n\n` +
+        `*Psst...* tell me any chapter doubt, tricky formula, or ask for a secret memory hack — I've got your back 100%! 💖🚀`
       );
     }
 
@@ -208,7 +208,7 @@ export class NovaAiService {
       conceptAnswer = `**${board} Class ${grade} ${subject}**\n\nTo master "${query}", list what is given, identify the core formula or principle, and solve step-by-step while checking units.`;
     }
 
-    return `**Nova • AI Study Helper • ${subject}**\n\n${conceptAnswer}`;
+    return `✨ **Bestie Study Breakdown • ${subject}**\n\n${conceptAnswer}\n\n*Psst...* solve 2 quick quiz questions on this right now to lock it in your brain & grab Study Coins! 🪙💖`;
   }
 
   /**

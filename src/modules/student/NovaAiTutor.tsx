@@ -418,7 +418,7 @@ export const NovaAiTutor: React.FC<NovaAiTutorProps> = ({
       return;
     }
 
-    welcomeText = `Hello! I'm **Nova**, your AI Study Helper for **${board} Class ${grade}${activeSubject ? ` (${activeSubject})` : ''}**.\n\nAsk me any syllabus question, formula, or concept you'd like to revise step-by-step.`;
+    welcomeText = `Heyy bestie! ✨ I'm **Nova**, your study buddy for **${board} Class ${grade}${activeSubject ? ` (${activeSubject})` : ''}** 💖\n\n*Psst...* drop any tricky chapter question, weird formula, or homework doubt — I'll break it down with fun memory tricks so you can stack Study Coins & ace your next quiz! 🪙🚀`;
 
     setMessages([
       {
