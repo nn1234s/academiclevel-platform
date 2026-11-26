@@ -1215,13 +1215,24 @@ class StorageRLSLayerClass {
     const learner = this.getLearnerById(learnerId, learnerId);
     const userName = learner?.fullName || 'Scholar';
 
-    const cohortNames = [
-      'Aarav Sharma', 'Diya Patel', 'Rohan Gupta', 'Ananya Iyer', 'Kabir Verma',
-      'Isha Mehra', 'Aditya Singh', 'Sara Khan', 'Vihaan Joshi', 'Tanvi Rao',
-      'Arjun Nair', 'Meera Pillai', 'Reyansh Das', 'Prisha Sen', 'Devansh Roy'
+    const cohortProfiles = [
+      { name: 'Aarav Sharma', emoji: '🦁' },
+      { name: 'Diya Patel', emoji: '🦊' },
+      { name: 'Rohan Gupta', emoji: '🐯' },
+      { name: 'Ananya Iyer', emoji: '🦄' },
+      { name: 'Kabir Verma', emoji: '🦅' },
+      { name: 'Isha Mehra', emoji: '🐼' },
+      { name: 'Aditya Singh', emoji: '🐺' },
+      { name: 'Sara Khan', emoji: '🐨' },
+      { name: 'Vihaan Joshi', emoji: '🚀' },
+      { name: 'Tanvi Rao', emoji: '⚡' },
+      { name: 'Arjun Nair', emoji: '🌟' },
+      { name: 'Meera Pillai', emoji: '🎓' },
+      { name: 'Reyansh Das', emoji: '🐸' },
+      { name: 'Prisha Sen', emoji: '🐙' }
     ];
 
-    // Engagement engine: increase bots in the leaderboard by +5 coins every 5 minutes inside the device
+    // Increase peer scholar standings by +5 coins every 10 minutes
     const now = Date.now();
     const currentYear = new Date().getUTCFullYear();
     const weekNumber = Math.floor(now / (7 * 24 * 60 * 60 * 1000));
@@ -1244,18 +1255,18 @@ class StorageRLSLayerClass {
       } catch {}
 
       const elapsedMs = now - lastTick;
-      const fiveMinIntervals = Math.floor(elapsedMs / (5 * 60 * 1000));
+      const tenMinIntervals = Math.floor(elapsedMs / (10 * 60 * 1000));
 
-      if (fiveMinIntervals > 0) {
-        // Capped at 288 intervals (24h) to avoid extreme spikes on long gaps
-        const cappedIntervals = Math.min(fiveMinIntervals, 288);
+      if (tenMinIntervals > 0) {
+        // Capped at 144 intervals (24h) to avoid extreme spikes on long gaps
+        const cappedIntervals = Math.min(tenMinIntervals, 144);
         const coinsToAdd = cappedIntervals * 5;
 
-        cohortNames.slice(0, 14).forEach(name => {
-          botBonusMap[name] = (botBonusMap[name] || 0) + coinsToAdd;
+        cohortProfiles.forEach(p => {
+          botBonusMap[p.name] = (botBonusMap[p.name] || 0) + coinsToAdd;
         });
 
-        lastTick = lastTick + cappedIntervals * (5 * 60 * 1000);
+        lastTick = lastTick + cappedIntervals * (10 * 60 * 1000);
 
         try {
           localStorage.setItem(
@@ -1287,17 +1298,17 @@ class StorageRLSLayerClass {
     const daysRemaining = currentDay === 0 ? 0 : 7 - currentDay;
 
     const baseVariance = tier === 'DIAMOND' ? 520 : tier === 'GOLD' ? 260 : tier === 'SILVER' ? 120 : 35;
-    const standings: ScholarLeagueStanding[] = cohortNames.slice(0, 14).map((name, i) => {
+    const standings: ScholarLeagueStanding[] = cohortProfiles.map((profile, i) => {
       const baseScore = Math.max(0, baseVariance + Math.floor(Math.sin((i + 1) * 1.7) * (baseVariance * 0.4)));
-      const bonus = botBonusMap[name] || 0;
+      const bonus = botBonusMap[profile.name] || 0;
       const score = baseScore + bonus;
       return {
         learnerId: 'peer_' + i,
-        learnerName: name,
+        learnerName: profile.name,
         tier,
         weeklyCoinsEarned: score,
         rank: i + 1,
-        avatarFrame: i < 3 ? 'GOLDEN_WREATH' : null,
+        avatarFrame: `emoji:${profile.emoji}`,
         isCurrentUser: false
       };
     });

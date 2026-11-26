@@ -163,8 +163,9 @@ export class CurriculumService {
 
   /**
    * Retrieves organized, real syllabus chapters for a given Subject x Grade x Board.
-   * Ensures questions are categorized by chapter (Addition, Subtraction, Multiplication, Algebra, etc.).
-   * Calibrated strictly to 3 questions per chapter practice as requested by the user.
+   * Each chapter quiz has 5 questions:
+   * - Classes 1-10: 75 questions/subject => 15 chapters x 5 questions = 75
+   * - Classes 11-12: 50 questions/subject => 10 chapters x 5 questions = 50
    */
   public static getChaptersForSubject(board: Board, grade: Grade, subjectId: string): {
     id: string;
@@ -176,12 +177,163 @@ export class CurriculumService {
     badge: string;
   }[] {
     const rawChapters = this.getRawChaptersForSubject(board, grade, subjectId);
-    // User requirement: "make chapters just 3 questions and each should be unique"
-    return rawChapters.map(ch => ({
+    const targetChapterCount = grade <= 10 ? 15 : 10;
+    const expanded = this.expandChaptersToTarget(board, grade, subjectId, rawChapters, targetChapterCount);
+    return expanded.map(ch => ({
       ...ch,
-      questionCount: 3,
-      estimatedMinutes: 5
+      questionCount: 5,
+      estimatedMinutes: 8
     }));
+  }
+
+  private static expandChaptersToTarget(
+    board: Board,
+    grade: Grade,
+    subjectId: string,
+    rawChapters: {
+      id: string;
+      title: string;
+      description: string;
+      questionCount: number;
+      estimatedMinutes: number;
+      topics: string[];
+      badge: string;
+    }[],
+    targetCount: number
+  ) {
+    if (rawChapters.length >= targetCount) {
+      return rawChapters.slice(0, targetCount);
+    }
+
+    const sId = (subjectId || '').toLowerCase();
+    const extraUnitsBySubject: Record<string, { title: string; badge: string; topic: string }[]> = {
+      math: [
+        { title: 'Number Sense & Mental Arithmetic', badge: 'Numbers', topic: 'Number Sense' },
+        { title: 'Place Value & Estimation', badge: 'Place Value', topic: 'Place Value' },
+        { title: 'Word Problems & Everyday Math', badge: 'Word Problems', topic: 'Applied Arithmetic' },
+        { title: 'Fractions, Decimals & Ratios', badge: 'Fractions', topic: 'Fractions & Ratios' },
+        { title: 'Percentages & Simple Interest', badge: 'Percentages', topic: 'Percentages' },
+        { title: 'Patterns, Sequences & Logic', badge: 'Patterns', topic: 'Number Patterns' },
+        { title: 'Algebraic Expressions & Identities', badge: 'Algebra', topic: 'Algebraic Expressions' },
+        { title: 'Linear & Quadratic Equations', badge: 'Equations', topic: 'Equations' },
+        { title: 'Angles, Triangles & Polygons', badge: 'Geometry', topic: 'Geometry' },
+        { title: 'Perimeter, Area & Volume', badge: 'Mensuration', topic: 'Mensuration' },
+        { title: 'Coordinate Geometry & Graphs', badge: 'Graphs', topic: 'Coordinate Geometry' },
+        { title: 'Data Handling & Probability', badge: 'Statistics', topic: 'Data & Probability' },
+        { title: 'Speed, Time & Measurement', badge: 'Measurement', topic: 'Measurement' }
+      ],
+      science: [
+        { title: 'Living World & Habitats', badge: 'Living World', topic: 'Living Organisms' },
+        { title: 'Plants, Photosynthesis & Nutrition', badge: 'Plants', topic: 'Plant Biology' },
+        { title: 'Human Body, Health & Hygiene', badge: 'Human Body', topic: 'Human Physiology' },
+        { title: 'Matter, States & Physical Changes', badge: 'Matter', topic: 'States of Matter' },
+        { title: 'Acids, Bases & Everyday Chemistry', badge: 'Chemistry', topic: 'Chemical Properties' },
+        { title: 'Force, Motion & Simple Machines', badge: 'Motion', topic: 'Force & Motion' },
+        { title: 'Light, Shadows & Reflection', badge: 'Optics', topic: 'Light & Reflection' },
+        { title: 'Electricity, Circuits & Magnets', badge: 'Electricity', topic: 'Circuits & Magnetism' },
+        { title: 'Heat, Temperature & Weather', badge: 'Heat', topic: 'Thermal Science' },
+        { title: 'Sound, Waves & Vibration', badge: 'Sound', topic: 'Sound Waves' },
+        { title: 'Air, Water & Natural Resources', badge: 'Environment', topic: 'Natural Resources' },
+        { title: 'Solar System & Space Science', badge: 'Space', topic: 'Astronomy' }
+      ],
+      social: [
+        { title: 'Ancient Civilizations & Heritage', badge: 'History', topic: 'Ancient History' },
+        { title: 'Medieval India & Cultural Roots', badge: 'History', topic: 'Medieval History' },
+        { title: 'Modern India & Freedom Movement', badge: 'Freedom', topic: 'Modern History' },
+        { title: 'Our Earth, Continents & Oceans', badge: 'Geography', topic: 'Physical Geography' },
+        { title: 'Indian Rivers, Soil & Monsoon', badge: 'Geography', topic: 'Indian Geography' },
+        { title: 'Climate, Forests & Wildlife', badge: 'Ecology', topic: 'Environment' },
+        { title: 'Indian Constitution & Fundamental Rights', badge: 'Civics', topic: 'Constitution' },
+        { title: 'Local Self-Government & Democracy', badge: 'Civics', topic: 'Democracy' },
+        { title: 'Parliament, Judiciary & Governance', badge: 'Civics', topic: 'Governance' },
+        { title: 'Agriculture, Industries & Trade', badge: 'Economy', topic: 'Indian Economy' },
+        { title: 'Money, Banking & Consumer Rights', badge: 'Economics', topic: 'Money & Credit' },
+        { title: 'Global Organizations & General Knowledge', badge: 'GK', topic: 'World Affairs' }
+      ],
+      english: [
+        { title: 'Parts of Speech: Nouns & Pronouns', badge: 'Grammar', topic: 'Nouns & Pronouns' },
+        { title: 'Verbs, Tenses & Subject-Verb Agreement', badge: 'Tenses', topic: 'Verb Tenses' },
+        { title: 'Adjectives, Adverbs & Degrees', badge: 'Modifiers', topic: 'Adjectives & Adverbs' },
+        { title: 'Prepositions & Conjunctions', badge: 'Connectors', topic: 'Prepositions' },
+        { title: 'Articles, Determiners & Punctuation', badge: 'Mechanics', topic: 'Articles' },
+        { title: 'Active & Passive Voice', badge: 'Voice', topic: 'Voice Transformation' },
+        { title: 'Direct & Indirect Speech', badge: 'Narration', topic: 'Reported Speech' },
+        { title: 'Synonyms, Antonyms & Word Power', badge: 'Vocabulary', topic: 'Vocabulary' },
+        { title: 'Idioms, Phrases & Figures of Speech', badge: 'Expression', topic: 'Idioms' },
+        { title: 'Reading Comprehension & Inference', badge: 'Reading', topic: 'Comprehension' },
+        { title: 'Paragraph, Letter & Notice Writing', badge: 'Writing', topic: 'Composition' },
+        { title: 'Sentence Structure & Error Spotting', badge: 'Syntax', topic: 'Error Spotting' }
+      ],
+      physics: [
+        { title: 'Units, Dimensions & Error Analysis', badge: 'Units', topic: 'Measurement' },
+        { title: 'Kinematics & Projectile Motion', badge: 'Kinematics', topic: 'Motion in 2D' },
+        { title: 'Work, Energy & Power', badge: 'Energy', topic: 'Work & Energy' },
+        { title: 'Rotational Motion & Gravitation', badge: 'Mechanics', topic: 'Gravitation' },
+        { title: 'Thermodynamics & Kinetic Theory', badge: 'Thermal', topic: 'Thermodynamics' },
+        { title: 'Oscillations, Waves & Acoustics', badge: 'Waves', topic: 'Waves' },
+        { title: 'Electrostatics & Capacitance', badge: 'Electrostatics', topic: 'Electrostatics' },
+        { title: 'Current Electricity & Magnetism', badge: 'Circuits', topic: 'Current & Magnetism' }
+      ],
+      chemistry: [
+        { title: 'Atomic Structure & Periodicity', badge: 'Atoms', topic: 'Atomic Structure' },
+        { title: 'Chemical Bonding & Molecular Geometry', badge: 'Bonding', topic: 'Chemical Bonding' },
+        { title: 'States of Matter & Thermodynamics', badge: 'Physical', topic: 'Thermodynamics' },
+        { title: 'Chemical Equilibrium & Kinetics', badge: 'Kinetics', topic: 'Equilibrium' },
+        { title: 'Redox Reactions & Electrochemistry', badge: 'Redox', topic: 'Electrochemistry' },
+        { title: 'Coordination & d/f-Block Elements', badge: 'Inorganic', topic: 'Coordination' },
+        { title: 'Hydrocarbons & Haloalkanes', badge: 'Organic', topic: 'Hydrocarbons' },
+        { title: 'Alcohols, Carbonyls & Biomolecules', badge: 'Organic', topic: 'Functional Groups' }
+      ],
+      biology: [
+        { title: 'Diversity of Living Organisms', badge: 'Taxonomy', topic: 'Classification' },
+        { title: 'Cell Structure & Biomolecules', badge: 'Cell Bio', topic: 'Cell Biology' },
+        { title: 'Plant Physiology & Photosynthesis', badge: 'Botany', topic: 'Plant Physiology' },
+        { title: 'Human Digestion, Breathing & Circulation', badge: 'Physiology', topic: 'Human Physiology' },
+        { title: 'Neural Control & Endocrine System', badge: 'Neuro', topic: 'Control & Coordination' },
+        { title: 'Genetics, DNA & Molecular Inheritance', badge: 'Genetics', topic: 'Molecular Genetics' },
+        { title: 'Biotechnology & Its Applications', badge: 'Biotech', topic: 'Biotechnology' },
+        { title: 'Ecology, Biodiversity & Conservation', badge: 'Ecology', topic: 'Ecosystems' }
+      ],
+      humanities: [
+        { title: 'Early Societies & World Civilizations', badge: 'History', topic: 'World History' },
+        { title: 'Themes in Indian History', badge: 'History', topic: 'Indian History' },
+        { title: 'Geomorphology & Climatology', badge: 'Geography', topic: 'Physical Geography' },
+        { title: 'Human Geography & Urbanization', badge: 'Geography', topic: 'Human Geography' },
+        { title: 'Indian Constitution & Political Theory', badge: 'Polity', topic: 'Political Theory' },
+        { title: 'International Relations & Contemporary World', badge: 'Global', topic: 'World Politics' },
+        { title: 'Microeconomics: Demand & Market Equilibrium', badge: 'Micro', topic: 'Microeconomics' },
+        { title: 'Macroeconomics: National Income & Banking', badge: 'Macro', topic: 'Macroeconomics' }
+      ]
+    };
+
+    const key =
+      Object.keys(extraUnitsBySubject).find(k => sId.includes(k)) || 'math';
+    const pool = extraUnitsBySubject[key];
+    const existingTitles = new Set(rawChapters.map(c => c.title.toLowerCase()));
+    const result = [...rawChapters];
+
+    let poolIdx = 0;
+    while (result.length < targetCount) {
+      const unit = pool[poolIdx % pool.length];
+      const suffix = poolIdx >= pool.length ? ` (Part ${Math.floor(poolIdx / pool.length) + 1})` : '';
+      const candidateTitle = `${unit.title}${suffix}`;
+      if (!existingTitles.has(candidateTitle.toLowerCase())) {
+        existingTitles.add(candidateTitle.toLowerCase());
+        result.push({
+          id: `ch_${sId}_g${grade}_u${result.length + 1}`,
+          title: candidateTitle,
+          description: `Focused 5-question ${board} Class ${grade} practice set covering ${unit.topic}.`,
+          questionCount: 5,
+          estimatedMinutes: 8,
+          topics: [unit.topic, `${board} Class ${grade} Practice`, 'Concept Application'],
+          badge: unit.badge
+        });
+      }
+      poolIdx++;
+      if (poolIdx > 40) break;
+    }
+
+    return result;
   }
 
   private static getRawChaptersForSubject(board: Board, grade: Grade, subjectId: string): {

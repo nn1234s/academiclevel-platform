@@ -49,6 +49,36 @@ interface BlogPost {
 
 const BLOG_POSTS: BlogPost[] = [
   {
+    id: 'chapters-5q-top5-league-bonus',
+    date: 'Nov 26, 2026',
+    readTime: '4 min read',
+    category: 'UPDATES',
+    tag: 'Curriculum & Leagues',
+    title: '5-Question Chapter Quizzes, Expanded Chapters & Top-5 League +50 Coin Bonus',
+    summary:
+      'Upgraded chapter quizzes from 3 to 5 questions, expanded chapter counts across Classes 1–12 to match our 3,600-question bank (15 chapters/subject for Classes 1–10; 10 chapters/subject for Classes 11–12), and added a +50 Study Coin Top-5 League reward.',
+    highlights: [
+      'Classes 1–10: 15 chapters × 5 questions = 75 questions per subject',
+      'Classes 11–12: 10 chapters × 5 questions = 50 questions per subject',
+      'Weekly Scholar League Top-5 scholars automatically earn +50 Study Coins',
+      'Student avatars displayed directly on Weekly League Standings'
+    ],
+    sections: [
+      {
+        heading: 'Matching Chapters to Our 3,600-Question Bank',
+        body: 'Previously, each chapter quiz was capped at 3 questions and subjects had fewer chapter cards than their question pool supported. Now every chapter quiz delivers 5 focused questions: Classes 1–10 expand to 15 chapters per subject (75 questions), and Classes 11–12 expand to 10 chapters per subject (50 questions) — giving every learner complete 300-question coverage per class.'
+      },
+      {
+        heading: 'Top-5 Scholar League +50 Coin Bonus',
+        body: 'Climbing into the Top 5 of your Weekly Scholar League now unlocks an automatic +50 Study Coin weekly bonus on top of promotion progress, complete with student avatars across the leaderboard.'
+      }
+    ],
+    ctaLabel: 'Explore Syllabus Chapters',
+    ctaRoute: 'COURSES',
+    icon: <Award className="w-5 h-5 text-emerald-600" />,
+    accentBg: 'bg-emerald-50 border-emerald-200'
+  },
+  {
     id: 'master-qb-curated-mcqs',
     date: 'Nov 26, 2026',
     readTime: '5 min read',

@@ -98,20 +98,46 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
     daysRemainingInSeason: number;
   } | null>(null);
 
-  const [hasClaimedBonus, setHasClaimedBonus] = useState<boolean>(false);
+  const [hasClaimedTop5Bonus, setHasClaimedTop5Bonus] = useState<boolean>(false);
 
   useEffect(() => {
     const refreshStandings = () => {
       const data = StorageRLSLayer.getScholarLeagueStandings(learner.id);
       setLeagueData(data);
+
+      // Award +50 Study Coins once per week when the student reaches Top 5
+      const myEntry = data.standings.find(s => s.isCurrentUser);
+      const now = Date.now();
+      const weekKey = `${new Date().getUTCFullYear()}_W${Math.floor(now / (7 * 24 * 60 * 60 * 1000))}`;
+      const bonusKey = `al_league_top5_bonus_${learner.id}_${weekKey}`;
+
+      if (typeof window !== 'undefined') {
+        const alreadyAwarded = localStorage.getItem(bonusKey) === '1';
+        setHasClaimedTop5Bonus(alreadyAwarded);
+
+        if (myEntry && myEntry.rank <= 5 && !alreadyAwarded) {
+          localStorage.setItem(bonusKey, '1');
+          setHasClaimedTop5Bonus(true);
+          CoinLedgerService.appendTransactionAsync(learner.id, 50, 'LEAGUE_PROMOTION_REWARD', {
+            tier: data.tier,
+            rank: myEntry.rank,
+            top5Bonus: true
+          }).then(() => {
+            onCoinsUpdated();
+            try {
+              confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } catch {}
+          });
+        }
+      }
     };
 
     refreshStandings();
 
-    // Check & update every 20 seconds so +5 coins/5-min progression updates live seamlessly
-    const interval = setInterval(refreshStandings, 20000);
+    // Refresh standings silently every 30 seconds
+    const interval = setInterval(refreshStandings, 30000);
     return () => clearInterval(interval);
-  }, [learner.id]);
+  }, [learner.id, onCoinsUpdated]);
 
   if (!leagueData) return null;
 
@@ -132,22 +158,8 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
   }
 
   const progressPercent = Math.min(100, Math.floor((leagueData.weeklyCoins / nextTierMin) * 100));
-
-  const handleClaimLeagueBonus = () => {
-    if (hasClaimedBonus) return;
-    CoinLedgerService.appendTransaction(learner.id, currentCfg.promotionReward, 'LEAGUE_PROMOTION_REWARD', {
-      tier: leagueData.tier
-    });
-    setHasClaimedBonus(true);
-    onCoinsUpdated();
-    try {
-      confetti({
-        particleCount: 120,
-        spread: 80,
-        origin: { y: 0.6 }
-      });
-    } catch {}
-  };
+  const myStanding = leagueData.standings.find(s => s.isCurrentUser);
+  const isInTop5 = Boolean(myStanding && myStanding.rank <= 5);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
@@ -187,13 +199,15 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
               </div>
             </div>
 
-            {/* Promotion Reward Card */}
+            {/* Top 5 Reward Card */}
             <div className="p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm text-center shrink-0">
               <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block">
-                {isHinglish ? 'Promotion Bonus 🎁' : 'Promotion Bonus'}
+                {isInTop5 || hasClaimedTop5Bonus
+                  ? (isHinglish ? 'Top 5 Bonus Unlocked! 🎉' : 'Top 5 Bonus Unlocked!')
+                  : (isHinglish ? 'Top 5 Bonus 🎁' : 'Top 5 Bonus')}
               </span>
               <span className="text-xl font-black text-amber-300 mt-1 flex items-center justify-center space-x-1">
-                <span>+{currentCfg.promotionReward}</span>
+                <span>+50</span>
                 <StudyCoinIcon className="w-4 h-4 inline-block" glow />
               </span>
             </div>
@@ -255,14 +269,14 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="hidden sm:flex items-center space-x-1.5 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
+            <span className="hidden sm:flex items-center space-x-1.5 text-xs font-bold text-indigo-800 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>{isHinglish ? 'Live: Scholars padh rahe hain (+5 Coins / 5m)' : 'Live: Active Scholars (+5 Coins / 5m)'}</span>
+              <span>{isHinglish ? 'Live Cohort Standings' : 'Live Cohort Standings'}</span>
             </span>
 
             <div className="flex items-center space-x-2 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
               <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-              <span>{isHinglish ? 'Promotion Zone: Top 5 Scholars' : 'Promotion Zone: Top 5'}</span>
+              <span>{isHinglish ? 'Top 5: +50 Coins Bonus' : 'Top 5: +50 Coins'}</span>
             </div>
           </div>
         </div>
@@ -285,7 +299,7 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
                 }`}
               >
                 <div className="flex items-center space-x-3 sm:space-x-4">
-                  {/* Rank badge */}
+                  {/* Rank badge & Student Avatar */}
                   <div
                     className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-black text-xs sm:text-sm font-mono ${
                       item.rank === 1
@@ -301,6 +315,12 @@ export const ScholarLeagues: React.FC<ScholarLeaguesProps> = ({
                   >
                     {item.rank}
                   </div>
+
+                  {item.avatarFrame?.startsWith('emoji:') && (
+                    <div className="w-8 h-8 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-base shrink-0">
+                      {item.avatarFrame.slice(6)}
+                    </div>
+                  )}
 
                   {/* Name and Promotion Tag */}
                   <div>

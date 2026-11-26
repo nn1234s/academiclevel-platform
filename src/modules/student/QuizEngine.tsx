@@ -186,8 +186,8 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({
     }
 
     setIsLoadingQuiz(true);
-    // User requirement: chapter quizzes are strictly 3 questions, and each question must be unique
-    const targetQCount = chapter ? 3 : (targetCount || (levelNode === 'FOUNDATION' ? 10 : levelNode === 'CONCEPT' ? 12 : levelNode === 'EXAM_READY' ? 15 : 20));
+    // Chapter quizzes are 5 questions each (75/5 = 15 chapters for Classes 1-10; 50/5 = 10 chapters for Classes 11-12)
+    const targetQCount = chapter ? 5 : (targetCount || (levelNode === 'FOUNDATION' ? 10 : levelNode === 'CONCEPT' ? 12 : levelNode === 'EXAM_READY' ? 15 : 20));
     const seenKey = `al_seen_q_${learner.id}_${board}_${grade}_${subjectId}_${chapter || 'all'}`;
 
     const pickUniqueQuestions = (candidatePool: Question[]): Question[] => {
