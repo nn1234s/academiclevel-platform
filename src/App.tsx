@@ -59,6 +59,7 @@ import { StudentMailboxModal } from './modules/student/StudentMailboxModal';
 import { MistakeVault } from './modules/student/MistakeVault';
 import { QuizDuelArena } from './modules/student/QuizDuelArena';
 import { ScholarLeagues } from './modules/student/ScholarLeagues';
+import { StudyToolsWidget } from './modules/shared/StudyToolsWidget';
 
 // Icons
 import {
@@ -2690,6 +2691,9 @@ export const App: React.FC = () => {
 
         {/* User Language Selection Modal */}
         <LanguagePreferenceModal />
+
+        {/* Floating Student Study Booster Tools (Pomodoro Timer, Notes Scratchpad, Focus Mode Full Screen) */}
+        <StudyToolsWidget />
       </div>
     </ErrorBoundary>
   );

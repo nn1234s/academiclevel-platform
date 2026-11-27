@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, Monitor, Sparkles } from 'lucide-react';
+import { Download, Monitor, Sparkles, Timer, StickyNote, Maximize2 } from 'lucide-react';
 
 export const WINDOWS_INSTALLER_URL = 'https://drive.google.com/uc?export=download&id=1fhq9zeD4PHx9_icF2TPwpdSZgcSpErng';
 
@@ -57,19 +57,33 @@ export const WindowsAppBanner: React.FC<WindowsAppBannerProps> = ({ onOpenDownlo
       }`}
     >
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-400 text-amber-950 text-[11px] font-black uppercase tracking-wider shadow-xs">
               <Sparkles className="w-3.5 h-3.5" />
               <span>WINDOWS APP RECOMMENDED — BETTER THAN WEB</span>
             </span>
             <span className="text-[11px] font-semibold text-indigo-200">
-              Official Desktop Wrapper of academiclevel.in
+              Official Desktop Wrapper of academiclevel.in (~1 MB)
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-100 leading-relaxed">
-            We detected you&apos;re on <strong>Windows</strong>! Install the lightweight AcademicLevel Windows App for faster launch, distraction-free full-screen study, and a smoother experience than a browser tab.
+          <p className="text-xs sm:text-sm text-slate-100 leading-relaxed max-w-2xl">
+            We detected you&apos;re on <strong>Windows</strong>! The official Windows App includes a built-in <strong>Pomodoro study timer</strong>, instant <strong>notes scratchpad button</strong>, and full-screen <strong>focus mode</strong> — built for distraction-free study and higher test scores.
           </p>
+          <div className="flex flex-wrap items-center gap-2 pt-0.5 text-[11px] font-bold text-slate-200">
+            <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-indigo-900/80 border border-indigo-400/30 text-rose-300">
+              <Timer className="w-3.5 h-3.5" />
+              <span>Pomodoro Study Timer</span>
+            </span>
+            <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-indigo-900/80 border border-indigo-400/30 text-amber-300">
+              <StickyNote className="w-3.5 h-3.5" />
+              <span>Notes Scratchpad</span>
+            </span>
+            <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-indigo-900/80 border border-indigo-400/30 text-emerald-300">
+              <Maximize2 className="w-3.5 h-3.5" />
+              <span>Focus Mode (Full Screen)</span>
+            </span>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 shrink-0 w-full md:w-auto">

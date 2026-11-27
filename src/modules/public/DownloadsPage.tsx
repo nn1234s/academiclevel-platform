@@ -6,7 +6,10 @@ import {
   Globe,
   Monitor,
   Sparkles,
-  Zap
+  Zap,
+  Timer,
+  StickyNote,
+  Maximize2
 } from 'lucide-react';
 import { isDesktopAppOrWebView, isWindowsClient, WINDOWS_INSTALLER_URL } from '../shared/WindowsAppBanner';
 
@@ -104,10 +107,43 @@ export const DownloadsPage: React.FC<DownloadsPageProps> = ({ onBack, onOpenWebA
               Built as a clean, dedicated desktop wrapper around <strong>academiclevel.in</strong> so students can launch straight into CBSE quizzes, Nova AI, and Study Quests without browser tabs or distractions.
             </p>
 
+            {/* Exclusive Productivity Study Tools */}
+            <div className="bg-indigo-50/80 border border-indigo-200/90 rounded-2xl p-3.5 space-y-2">
+              <span className="text-[11px] font-black uppercase tracking-wider text-indigo-950 flex items-center space-x-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Built-In Desktop Study Powerhouse</span>
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                <div className="bg-white p-2.5 rounded-xl border border-indigo-100 shadow-2xs space-y-0.5">
+                  <div className="font-extrabold text-slate-900 flex items-center space-x-1.5">
+                    <Timer className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Pomodoro Timer</span>
+                  </div>
+                  <p className="text-[10px] text-slate-600 leading-tight">25m focus &amp; 5m break cycles for peak exam retention.</p>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border border-indigo-100 shadow-2xs space-y-0.5">
+                  <div className="font-extrabold text-slate-900 flex items-center space-x-1.5">
+                    <StickyNote className="w-3.5 h-3.5 text-amber-500" />
+                    <span>Notes Button</span>
+                  </div>
+                  <p className="text-[10px] text-slate-600 leading-tight">Instant scratchpad for formulas, notes &amp; tricky steps.</p>
+                </div>
+                <div className="bg-white p-2.5 rounded-xl border border-indigo-100 shadow-2xs space-y-0.5">
+                  <div className="font-extrabold text-slate-900 flex items-center space-x-1.5">
+                    <Maximize2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Focus Mode</span>
+                  </div>
+                  <p className="text-[10px] text-slate-600 leading-tight">One-click full screen blocking all desktop distractions.</p>
+                </div>
+              </div>
+            </div>
+
             <ul className="space-y-2 pt-1">
               {[
+                'Built-in Pomodoro Study Timer (25m focus + 5m recharge intervals)',
+                'Quick Notes Button & Scratchpad for instant formula capture',
+                'Focus Mode (full screen distraction-free study environment)',
                 'Faster 1-click launch from your Desktop or Start Menu',
-                'Distraction-free full-screen study window (no extra browser tabs)',
                 'Always synced live with academiclevel.in & your Study Coins',
                 'Lightweight 1 MB setup (AcademicLevel_K12_Online_Setup.exe)'
               ].map((item, idx) => (
