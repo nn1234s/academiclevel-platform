@@ -7,6 +7,7 @@ import { useAuth } from '../../core/auth/AuthContext';
 import { StorageRLSLayer } from '../../core/storage/StorageRLSLayer';
 import { WhatsDifferentFromChatGPT } from '../shared/WhatsDifferentFromChatGPT';
 import { WindowsAppBanner } from '../shared/WindowsAppBanner';
+import { AnimatedReviewsMarquee } from './AnimatedReviewsMarquee';
 import {
   Sparkles,
   Zap,
@@ -252,28 +253,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       icon: '🚀',
     },
   ];
-
-  const parentStudentReviews = [
-    { text: 'AcademicLevel makes learning so fun! 🎉', time: '19 days ago', author: 'Ananya S., Student', role: 'STUDENTS' },
-    { text: 'Best platform ever! Nova AI is awesome and solves doubts instantly!', time: '7 days ago', author: 'Rahul K., Student', role: 'STUDENTS' },
-    { text: 'I aced my test thanks to Nova AI and the concept booster! 💯', time: '20 days ago', author: 'Tanvi M., Student', role: 'STUDENTS' },
-    { text: 'Lessons are super cool and easy! Science is now my favourite.', time: '29 days ago', author: 'Ishaan P., Student', role: 'STUDENTS' },
-    { text: 'I love learning here, it’s like playtime with study coins! 💎', time: '9 days ago', author: 'Aarav G., Student', role: 'STUDENTS' },
-    { text: 'AcademicLevel is my secret to success in school exams 🚀', time: '10 days ago', author: 'Diya R., Student', role: 'STUDENTS' },
-    { text: 'Course content syncs with CBSE school syllabus, zero pressure to learn.', time: '11 days ago', author: 'Mrs. Sunita Verma', role: 'PARENTS' },
-    { text: 'Reasonable course price, low burden on parents. Truly accessible. 😍', time: '5 days ago', author: 'Rajesh Sharma', role: 'PARENTS' },
-    { text: 'Improved learning initiative, child no longer needs parental supervision.', time: '14 days ago', author: 'Dr. Meenakshi Iyer', role: 'PARENTS' },
-    { text: 'Nova AI makes everything so clear~ love the instant step-by-step guidance!', time: '20 days ago', author: 'Devendra N., Student', role: 'STUDENTS' },
-    { text: 'Autonomous AI tutor is always available for problem solving 24/7.', time: '4 days ago', author: 'Pooja Agarwal', role: 'PARENTS' },
-    { text: 'Children love to learn every single day, thank you AcademicLevel!', time: '8 days ago', author: 'Kavita Sengupta', role: 'PARENTS' },
-    { text: 'Nova AI is the best—patient, kind, and super smart ❤️', time: '24 days ago', author: 'Rohan B., Student', role: 'STUDENTS' },
-    { text: 'Best learning platform, none of them come close! 😍', time: '28 days ago', author: 'Amit Patel', role: 'PARENTS' },
-    { text: 'I feel smarter every day with Nova AI answering all my doubts.', time: '16 days ago', author: 'Sneha D., Student', role: 'STUDENTS' },
-  ];
-
-  const filteredReviews = activeTab === 'ALL'
-    ? parentStudentReviews
-    : parentStudentReviews.filter(r => r.role === activeTab);
 
   return (
     <div className="space-y-8 sm:space-y-16 text-[#212121] pb-8 sm:pb-12">
@@ -787,36 +766,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
         </div>
 
-        {/* Reviews Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredReviews.map((rev, idx) => (
-            <div
-              key={idx}
-              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3 flex flex-col justify-between hover:border-slate-300 hover:shadow-md transition-all"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-amber-500">
-                  <div className="flex items-center gap-0.5">
-                    {[1, 2, 3, 4, 5].map(s => (
-                      <Star key={s} className="w-3.5 h-3.5 fill-amber-400" />
-                    ))}
-                  </div>
-                  <span className="text-[10px] text-slate-400 font-mono">{rev.time}</span>
-                </div>
-                <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                  &ldquo;{rev.text}&rdquo;
-                </p>
-              </div>
-
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-                <span className="font-semibold text-slate-800">{rev.author}</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 font-medium">
-                  {rev.role === 'PARENTS' ? 'Parent' : 'Scholar'}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Animated Infinite Reviews Marquee (Matching Dual-Track Carousel) */}
+        <AnimatedReviewsMarquee activeRole={activeTab} />
       </section>
 
       {/* 8. TRANSPARENT PRICING PREVIEW */}

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StudyCoinIcon } from '../shared/StudyCoinIcon';
 import { SiteConfigService } from '../../services/siteConfigService';
 import { WindowsAppBanner } from '../shared/WindowsAppBanner';
+import { AnimatedReviewsMarquee } from './AnimatedReviewsMarquee';
 import {
   Star,
   Check,
@@ -1732,33 +1733,9 @@ export const Special49AdsLandingPage: React.FC<Special49AdsLandingPageProps> = (
             Hear from our community with AcademicLevel.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-10 text-left">
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
-              <p className="text-xs sm:text-sm text-slate-700 italic leading-relaxed">
-                &quot;AcademicLevel makes learning so fun! 🎉 I aced my test thanks to the quizzes!&quot;
-              </p>
-              <div className="mt-4 pt-3 border-t border-slate-100 text-xs font-bold text-slate-500">
-                — Student
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
-              <p className="text-xs sm:text-sm text-slate-700 italic leading-relaxed">
-                &quot;Best platform ever! Nova AI is awesome and course content syncs perfectly with school.&quot;
-              </p>
-              <div className="mt-4 pt-3 border-t border-slate-100 text-xs font-bold text-slate-500">
-                — Parent
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
-              <p className="text-xs sm:text-sm text-slate-700 italic leading-relaxed">
-                &quot;Improved learning initiative, no longer need parental supervision. My secret to success 🚀&quot;
-              </p>
-              <div className="mt-4 pt-3 border-t border-slate-100 text-xs font-bold text-slate-500">
-                — Grade 8 Student
-              </div>
-            </div>
+          {/* Dual-Row Animated Reviews Marquee */}
+          <div className="mt-8 text-left">
+            <AnimatedReviewsMarquee activeRole="ALL" />
           </div>
 
           <div className="mt-8">
